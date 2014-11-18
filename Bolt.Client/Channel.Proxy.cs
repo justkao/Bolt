@@ -15,27 +15,29 @@ namespace Bolt.Client
 
         #region Synchronous Methods
 
-        public virtual void Send<TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor)
+        public virtual void Send<TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation)
         {
-            RetrieveResponse<Empty, TRequestParameters>(parameters, descriptor);
+            RetrieveResponse<Empty, TRequestParameters>(parameters, descriptor, cancellation);
         }
 
-        public virtual TResult Send<TResult, TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor)
+        public virtual TResult Send<TResult, TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation)
         {
-            return RetrieveResponse<TResult, TRequestParameters>(parameters, descriptor);
+            return RetrieveResponse<TResult, TRequestParameters>(parameters, descriptor, cancellation);
         }
 
-        protected virtual T RetrieveResponse<T, TParameters>(TParameters parameters, MethodDescriptor descriptor)
+        protected virtual T RetrieveResponse<T, TParameters>(TParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation)
         {
             int tries = 0;
             while (true)
             {
+                cancellation.ThrowIfCancellationRequested();
+
                 HttpWebRequest channel = null;
                 Exception error = null;
 
                 try
                 {
-                    channel = GetChannel(descriptor);
+                    channel = GetChannel(descriptor, cancellation);
                 }
                 catch (SerializationException)
                 {
@@ -46,19 +48,21 @@ namespace Bolt.Client
                     error = e;
                 }
 
-                ClientExecutionContext context = new ClientExecutionContext(descriptor, channel, null);
-
-                if (channel != null)
+                using (ClientExecutionContext context = new ClientExecutionContext(descriptor, channel, cancellation, null))
                 {
-                    ResponseDescriptor<T> response = RetrieveResponse<T, TParameters>(context, parameters, tries);
-                    if (response.IsSuccess)
+                    if (channel != null)
                     {
-                        return response.GetResultOrThrow();
-                    }
+                        ResponseDescriptor<T> response = RetrieveResponse<T, TParameters>(context, parameters, tries);
+                        if (response.IsSuccess)
+                        {
+                            return response.GetResultOrThrow();
+                        }
 
-                    error = response.Error;
+                        error = response.Error;
+                    }
                 }
 
+                cancellation.ThrowIfCancellationRequested();
 
                 tries++;
                 if (tries > Retries)
@@ -77,27 +81,29 @@ namespace Bolt.Client
 
         #region Asynchornous Methods
 
-        public virtual async Task SendAsync<TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor)
+        public virtual async Task SendAsync<TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation)
         {
-            await RetrieveResponseAsync<Empty, TRequestParameters>(parameters, descriptor);
+            await RetrieveResponseAsync<Empty, TRequestParameters>(parameters, descriptor, cancellation);
         }
 
-        public virtual async Task<TResult> SendAsync<TResult, TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor)
+        public virtual async Task<TResult> SendAsync<TResult, TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation)
         {
-            return await RetrieveResponseAsync<TResult, TRequestParameters>(parameters, descriptor);
+            return await RetrieveResponseAsync<TResult, TRequestParameters>(parameters, descriptor, cancellation);
         }
 
-        protected virtual async Task<T> RetrieveResponseAsync<T, TParameters>(TParameters parameters, MethodDescriptor descriptor)
+        protected virtual async Task<T> RetrieveResponseAsync<T, TParameters>(TParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation)
         {
             int tries = 0;
             while (true)
             {
+                cancellation.ThrowIfCancellationRequested();
+
                 HttpWebRequest channel = null;
                 Exception error = null;
 
                 try
                 {
-                    channel = await GetChannelAsync(descriptor);
+                    channel = await GetChannelAsync(descriptor, cancellation);
                 }
                 catch (SerializationException)
                 {
@@ -108,19 +114,21 @@ namespace Bolt.Client
                     error = e;
                 }
 
-                ClientExecutionContext context = new ClientExecutionContext(descriptor, channel, null);
-
-                if (channel != null)
+                using (ClientExecutionContext context = new ClientExecutionContext(descriptor, channel, cancellation, null))
                 {
-                    ResponseDescriptor<T> response = await RetrieveResponseAsync<T, TParameters>(context, parameters, tries);
-                    if (response.IsSuccess)
+                    if (channel != null)
                     {
-                        return response.GetResultOrThrow();
-                    }
+                        ResponseDescriptor<T> response = await RetrieveResponseAsync<T, TParameters>(context, parameters, tries);
+                        if (response.IsSuccess)
+                        {
+                            return response.GetResultOrThrow();
+                        }
 
-                    error = response.Error;
+                        error = response.Error;
+                    }
                 }
 
+                cancellation.ThrowIfCancellationRequested();
 
                 tries++;
                 if (tries > Retries)
@@ -130,7 +138,7 @@ namespace Bolt.Client
                 }
                 if (RetryDelay != null)
                 {
-                    Thread.Sleep(RetryDelay.Value);
+                    await Task.Delay(RetryDelay.Value, cancellation);
                 }
             }
         }

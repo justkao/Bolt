@@ -1,13 +1,14 @@
 ﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Bolt
 {
     public static class SerializerExtensions
     {
-        public static async Task<T> DeserializeAsync<T>(this ISerializer serializer, Stream stream, bool bufferStream)
+        public static async Task<T> DeserializeAsync<T>(this ISerializer serializer, Stream stream, bool bufferStream, CancellationToken cancellation)
         {
             if (stream == null)
             {
@@ -17,13 +18,17 @@ namespace Bolt
             if (bufferStream)
             {
                 MemoryStream buffer = new MemoryStream();
-                await stream.CopyToAsync(buffer);
+                await stream.CopyToAsync(buffer, 4096, cancellation);
                 stream = buffer;
             }
 
             try
             {
                 return serializer.Read<T>(stream);
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
             }
             catch (SerializationException)
             {

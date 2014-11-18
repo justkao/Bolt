@@ -109,38 +109,41 @@ namespace Bolt.Generators
             {
                 if (IsAsync(method))
                 {
-                    WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType), result.TypeName, result.VariableName, FormatEndpoint(descriptor));
+                    WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
                 }
                 else if (forceAsync)
                 {
-                    WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, FormatEndpoint(descriptor));
+                    WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
                 }
                 else
                 {
-                    WriteLine("return Send<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, FormatEndpoint(descriptor));
+                    WriteLine("return Send<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
                 }
             }
             else
             {
                 if (IsAsync(method))
                 {
-                    WriteLine("return SendAsync({0}, {1});", result.VariableName, FormatEndpoint(descriptor));
+                    WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
                 }
                 else if (forceAsync)
                 {
-                    WriteLine("return SendAsync({0}, {1});", result.VariableName, FormatEndpoint(descriptor));
+                    WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
                 }
                 else
                 {
-                    WriteLine("Send({0}, {1});", result.VariableName, FormatEndpoint(descriptor));
+                    WriteLine("Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
                 }
             }
             EndBlock();
         }
 
-        private string FormatEndpoint(MethodDescriptor descriptor)
+        private string DeclareEndpoint(MethodDescriptor descriptor)
         {
-            return string.Format("GetEndpoint(new {3}(\"{0}\",\"{1}\",\"{2}\"))", descriptor.Contract, descriptor.Method, descriptor.Url, FormatType<MethodDescriptor>());
+            WriteLine("var descriptor = GetEndpoint(new {3}(\"{0}\",\"{1}\",\"{2}\"));", descriptor.Contract, descriptor.Method, descriptor.Url, FormatType<MethodDescriptor>());
+            WriteLine("var token = GetCancellationToken(descriptor);");
+            WriteLine();
+            return "descriptor, token";
         }
     }
 }

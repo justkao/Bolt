@@ -61,7 +61,6 @@
     <Compile Include="ErrorResponse.cs" />
     <Compile Include="ExecutionContextBase.cs" />
     <Compile Include="Extensions.cs" />
-    <Compile Include="IChannel.cs" />
     <Compile Include="IEndpointProvider.cs" />
     <Compile Include="IMetadataProvider.cs" />
     <Compile Include="ISerializer.cs" />

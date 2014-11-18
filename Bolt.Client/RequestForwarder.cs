@@ -22,6 +22,8 @@ namespace Bolt.Client
 
         public virtual ResponseDescriptor<T> GetResponse<T, TParameters>(ClientExecutionContext context, TParameters parameters)
         {
+            context.Cancellation.ThrowIfCancellationRequested();
+
             Exception clientException = null;
             context.Request.Accept = _dataHandler.ContentType;
 

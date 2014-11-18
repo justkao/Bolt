@@ -1,5 +1,6 @@
 using System;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Bolt.Client
@@ -17,34 +18,38 @@ namespace Bolt.Client
             OpenedChannel = null;
         }
 
-        protected virtual ChannelOpenedResult Open()
+        protected virtual ChannelOpenedResult Open(CancellationToken cancellation)
         {
             Uri serverUrl = ServerUrl;
 
             return new ChannelOpenedResult(serverUrl, null);
         }
 
-        protected virtual ChannelOpenedResult Open<TResult, TParameters>(MethodDescriptor descriptor, TParameters parameters)
+        protected virtual ChannelOpenedResult Open<TResult, TParameters>(MethodDescriptor descriptor, TParameters parameters, CancellationToken cancellation)
         {
             Uri server = ServerUrl;
             HttpWebRequest request = CreateWebRequest(CrateRemoteAddress(server, descriptor));
-            ResponseDescriptor<TResult> response = RetrieveResponse<TResult, TParameters>(new ClientExecutionContext(descriptor, request), parameters);
-
-            return new ChannelOpenedResult(server, response.GetResultOrThrow());
+            using (ClientExecutionContext ctxt = new ClientExecutionContext(descriptor, request, cancellation))
+            {
+                ResponseDescriptor<TResult> response = RetrieveResponse<TResult, TParameters>(ctxt, parameters);
+                return new ChannelOpenedResult(server, response.GetResultOrThrow());
+            }
         }
 
-        protected virtual Task<ChannelOpenedResult> OpenAsync()
+        protected virtual Task<ChannelOpenedResult> OpenAsync(CancellationToken cancellation)
         {
             return null;
         }
 
-        protected virtual async Task<ChannelOpenedResult> OpenAsync<TResult, TParameters>(MethodDescriptor descriptor, TParameters parameters)
+        protected virtual async Task<ChannelOpenedResult> OpenAsync<TResult, TParameters>(MethodDescriptor descriptor, TParameters parameters, CancellationToken cancellation)
         {
             Uri server = ServerUrl;
             HttpWebRequest request = CreateWebRequest(CrateRemoteAddress(server, descriptor));
-            ResponseDescriptor<TResult> response = await RetrieveResponseAsync<TResult, TParameters>(new ClientExecutionContext(descriptor, request), parameters);
-
-            return new ChannelOpenedResult(server, response.GetResultOrThrow());
+            using (ClientExecutionContext ctxt = new ClientExecutionContext(descriptor, request, cancellation))
+            {
+                ResponseDescriptor<TResult> response = await RetrieveResponseAsync<TResult, TParameters>(ctxt, parameters);
+                return new ChannelOpenedResult(server, response.GetResultOrThrow());
+            }
         }
 
         protected override void BeforeSending(ClientExecutionContext context, object parameters)
@@ -53,16 +58,16 @@ namespace Bolt.Client
             base.BeforeSending(context, parameters);
         }
 
-        protected override HttpWebRequest GetChannel(MethodDescriptor method)
+        protected override HttpWebRequest GetChannel(MethodDescriptor method, CancellationToken cancellation)
         {
-            ChannelOpenedResult channel = OpenedChannel ?? Open();
+            ChannelOpenedResult channel = OpenedChannel ?? Open(cancellation);
             OpenedChannel = channel;
             return CreateWebRequest(CrateRemoteAddress(channel.Server, method));
         }
 
-        protected override async Task<HttpWebRequest> GetChannelAsync(MethodDescriptor method)
+        protected override async Task<HttpWebRequest> GetChannelAsync(MethodDescriptor method, CancellationToken cancellation)
         {
-            ChannelOpenedResult channel = OpenedChannel ?? await OpenAsync();
+            ChannelOpenedResult channel = OpenedChannel ?? await OpenAsync(cancellation);
             OpenedChannel = channel;
             return CreateWebRequest(CrateRemoteAddress(channel.Server, method));
         }

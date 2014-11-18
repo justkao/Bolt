@@ -44,12 +44,14 @@ namespace Bolt.Client
                 return;
             }
 
+            context.Cancellation.ThrowIfCancellationRequested();
+
             byte[] raw = _serializer.Serialize(parameters);
             context.Request.ContentLength = raw.Length;
 
             using (Stream stream = await context.Request.GetRequestStreamAsync())
             {
-                await stream.WriteAsync(raw, 0, raw.Length);
+                await stream.WriteAsync(raw, 0, raw.Length, context.Cancellation);
             }
         }
 
@@ -60,10 +62,7 @@ namespace Bolt.Client
                 return Task.FromResult(default(T));
             }
 
-            using (Stream stream = context.Response.GetResponseStream())
-            {
-                return _serializer.DeserializeAsync<T>(stream, true);
-            }
+            return _serializer.DeserializeAsync<T>(context.Response.GetResponseStream(), true, context.Cancellation);
         }
 
         public T ReadResponse<T>(ClientExecutionContext context)
@@ -73,10 +72,7 @@ namespace Bolt.Client
                 return default(T);
             }
 
-            using (Stream stream = context.Response.GetResponseStream())
-            {
-                return _serializer.Deserialize<T>(stream, true);
-            }
+            return _serializer.Deserialize<T>(context.Response.GetResponseStream(), true);
         }
 
         public Exception ReadException(ClientExecutionContext context)
@@ -91,7 +87,7 @@ namespace Bolt.Client
         {
             using (Stream stream = context.Response.GetResponseStream())
             {
-                return ReadException(await _serializer.DeserializeAsync<ErrorResponse>(stream, true));
+                return ReadException(await _serializer.DeserializeAsync<ErrorResponse>(stream, true, context.Cancellation));
             }
         }
 

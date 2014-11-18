@@ -53,6 +53,7 @@
     <Compile Include="ClientConfiguration.cs" />
     <Compile Include="ClientDataHandler.cs" />
     <Compile Include="ClientExecutionContext.cs" />
+    <Compile Include="ICancellationTokenProvider.cs" />
     <Compile Include="IChannel.cs" />
     <Compile Include="IClientDataHandler.cs" />
     <Compile Include="IRequestForwarder.cs" />

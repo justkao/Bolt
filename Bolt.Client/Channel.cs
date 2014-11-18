@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Net;
+using System.Threading;
 using System.Threading.Tasks;
 
 
 namespace Bolt.Client
 {
-    public partial class Channel : Bolt.IChannel
+    public partial class Channel : IChannel
     {
         public virtual Uri ServerUrl { get; set; }
 
@@ -19,6 +20,8 @@ namespace Bolt.Client
 
         protected virtual ResponseDescriptor<T> RetrieveResponse<T, TParameters>(ClientExecutionContext context, TParameters parameters, int retry = 0)
         {
+            context.Cancellation.ThrowIfCancellationRequested();
+
             BeforeSending(context, parameters);
             ResponseDescriptor<T> response = RequestForwarder.GetResponse<T, TParameters>(context, parameters);
 
@@ -46,7 +49,7 @@ namespace Bolt.Client
             return response;
         }
 
-        protected virtual HttpWebRequest GetChannel(MethodDescriptor descriptor)
+        protected virtual HttpWebRequest GetChannel(MethodDescriptor descriptor, CancellationToken cancellation)
         {
             return CreateWebRequest(CrateRemoteAddress(ServerUrl, descriptor));
         }
@@ -84,7 +87,7 @@ namespace Bolt.Client
             return response;
         }
 
-        protected virtual Task<HttpWebRequest> GetChannelAsync(MethodDescriptor descriptor)
+        protected virtual Task<HttpWebRequest> GetChannelAsync(MethodDescriptor descriptor, CancellationToken cancellation)
         {
             return Task.FromResult(CreateWebRequest(CrateRemoteAddress(ServerUrl, descriptor)));
         }
@@ -142,7 +145,11 @@ namespace Bolt.Client
             return descriptor;
         }
 
-        #endregion
+        public virtual CancellationToken GetCancellationToken(MethodDescriptor descriptor)
+        {
+            return CancellationToken.None;
+        }
 
+        #endregion
     }
 }

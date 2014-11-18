@@ -1,15 +1,16 @@
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Bolt.Client
 {
-    public interface IChannel
+    public interface IChannel : IEndpointProvider, ICancellationTokenProvider
     {
-        Task ExecuteAsync<TRequestParameters>(TRequestParameters parameters, string method);
+        Task SendAsync<TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation);
 
-        Task<TResult> ExecuteAsync<TResult, TRequestParameters>(TRequestParameters parameters, string method);
+        Task<TResult> SendAsync<TResult, TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation);
 
-        void Execute<TRequestParameters>(TRequestParameters parameters, string method);
+        void Send<TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation);
 
-        TResult Execute<TResult, TRequestParameters>(TRequestParameters parameters, string method);
+        TResult Send<TResult, TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation);
     }
 }

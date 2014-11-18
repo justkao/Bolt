@@ -21,17 +21,23 @@ namespace Bolt.Server
 
         public Task<T> ReadParametersAsync<T>(ServerExecutionContext context)
         {
-            return _serializer.DeserializeAsync<T>(context.Context.Request.Body, true);
+            context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
+
+            return _serializer.DeserializeAsync<T>(context.Context.Request.Body, true, context.Context.Request.CallCancelled);
         }
 
         public Task WriteResponseAsync<T>(ServerExecutionContext context, T data)
         {
+            context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
+
             byte[] raw = _serializer.Serialize(data);
             return context.Context.Response.Body.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
         }
 
         public Task WriteExceptionAsync(ServerExecutionContext context, Exception exception)
         {
+            context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
+
             byte[] raw = _serializer.Serialize(Create(exception));
             return context.Context.Response.Body.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
         }
