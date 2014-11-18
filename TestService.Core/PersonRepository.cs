@@ -1,0 +1,63 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace TestService.Core
+{
+    public class PersonRepository : IPersonRepository
+    {
+        public Person UpdatePerson(Person person)
+        {
+            return null;
+        }
+
+        public Task DoNothingAsAsync()
+        {
+            return Task.FromResult(0);
+        }
+
+        public void DoNothing()
+        {
+        }
+
+        public Task DoNothingWithComplexParameterAsAsync(List<Person> person)
+        {
+            return Task.FromResult(0);
+        }
+
+        public void DoNothingWithComplexParameter(List<Person> person)
+        {
+        }
+
+        public int GetSimpleType(int arg)
+        {
+            return new Random().Next();
+        }
+
+        public Task GetSimpleTypeAsAsync(int arg)
+        {
+            return Task.FromResult(new Random().Next());
+        }
+
+        public Person GetSinglePerson(Person person)
+        {
+            return Person.Create(0);
+        }
+
+        public Task<Person> GetSinglePersonAsAsync(Person person)
+        {
+            return Task.FromResult(Person.Create(0));
+        }
+
+        public List<Person> GetManyPersons(Person person)
+        {
+            return Enumerable.Range(0, 100).Select(Person.Create).ToList();
+        }
+
+        public Task<List<Person>> GetManyPersonsAsAsync(Person person)
+        {
+            return Task.FromResult(Enumerable.Range(0, 100).Select(Person.Create).ToList());
+        }
+    }
+}

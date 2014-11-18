@@ -1,0 +1,23 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ assembly name="$(SolutionDir)Bolt\bin\$(Configuration)\Bolt.Core.dll" #>
+<#@ assembly name="$(SolutionDir)Bolt.Generators\bin\$(Configuration)\Bolt.Generators.dll" #>
+<#@ assembly name="$(SolutionDir)Bolt.Server\bin\$(Configuration)\Bolt.Server.dll" #>
+<#@ assembly name="$(SolutionDir)TestService.Core\bin\$(Configuration)\TestService.Core.dll" #>
+
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="Bolt" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ import namespace="Bolt.Generators" #>
+<#@ import namespace="TestService.Core" #>
+
+<#@ output extension="Designer.cs" #>
+<#  
+	var result = Generator.Create()
+		.Server(Contracts.PersonRepository)
+		.GetResult();
+
+	Write(result);
+#>
