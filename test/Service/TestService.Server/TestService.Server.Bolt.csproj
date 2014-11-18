@@ -87,11 +87,11 @@
       <Project>{970FD57B-0879-4ADD-BAFE-1278A90F97B0}</Project>
       <Name>Bolt.Sandbox</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bolt.Server\Bolt.Server.csproj">
+    <ProjectReference Include="..\..\..\src\Bolt.Server\Bolt.Server.csproj">
       <Project>{c8d9762e-4b32-4711-bf3c-eb4ea485743f}</Project>
       <Name>Bolt.Server</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Bolt\Bolt.Core.csproj">
+    <ProjectReference Include="..\..\..\src\Bolt.Core\Bolt.Core.csproj">
       <Project>{6d1f7d95-3346-4308-8b6f-2b5aab0d022f}</Project>
       <Name>Bolt.Core</Name>
     </ProjectReference>

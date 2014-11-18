@@ -64,7 +64,7 @@
     <Compile Include="StatefullChannel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Bolt\Bolt.Core.csproj">
+    <ProjectReference Include="..\Bolt.Core\Bolt.Core.csproj">
       <Project>{6d1f7d95-3346-4308-8b6f-2b5aab0d022f}</Project>
       <Name>Bolt.Core</Name>
     </ProjectReference>
