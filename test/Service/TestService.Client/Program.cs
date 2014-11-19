@@ -17,10 +17,6 @@ namespace TestService.Client
 
             int cnt = 10000;
 
-            Execute(c => c.GetManyPersonsAsAsync(Person.Create(10)).Wait(), cnt, "GetManyPersonsAsync");
-
-            Execute(c => c.GetSimpleTypeAsAsync(10), cnt, "DoNothing");
-
             Execute(c => c.DoNothing(), cnt, "DoNothing");
 
             Execute(c => c.GetSimpleType(new Random().Next()), cnt, "GetSimpleType");

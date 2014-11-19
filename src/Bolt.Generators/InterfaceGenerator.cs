@@ -22,7 +22,7 @@ namespace Bolt.Generators
         {
             bool hasAsyncInterfaces = Contract.GetEffectiveContracts().Any(ShouldHaveAsyncMethods);
 
-            foreach (var iface in Contract.GetEffectiveContracts().Except(new[] { Contract.RootContract }))
+            foreach (var iface in Contract.GetEffectiveContracts().Except(new[] { Contract.Root }))
             {
                 if (hasAsyncInterfaces)
                 {
@@ -30,7 +30,7 @@ namespace Bolt.Generators
                 }
             }
 
-            GenerateAsyncInterface(Contract.RootContract);
+            GenerateAsyncInterface(Contract.Root);
         }
 
         private void GenerateAsyncInterface(Type iface)

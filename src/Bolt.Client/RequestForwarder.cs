@@ -1,6 +1,5 @@
 using System;
 using System.Net;
-using System.Net.Sockets;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
@@ -42,15 +41,14 @@ namespace Bolt.Client
 
             try
             {
-
                 try
                 {
-                    HttpWebResponse response = (HttpWebResponse)context.Request.GetResponse();
+                    HttpWebResponse response = (HttpWebResponse)TaskExtensions.Execute(() => context.Request.GetResponseAsync());
                     context.Response = response;
                 }
                 catch (WebException e)
                 {
-                    if (e.InnerException is SocketException)
+                    if (IsCommunicationException(e))
                     {
                         throw;
                     }
@@ -95,7 +93,7 @@ namespace Bolt.Client
                 }
                 catch (WebException e)
                 {
-                    if (e.InnerException is SocketException)
+                    if (IsCommunicationException(e))
                     {
                         throw;
                     }
@@ -182,6 +180,16 @@ namespace Bolt.Client
             {
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
             }
+        }
+
+        protected virtual bool IsCommunicationException(WebException e)
+        {
+            if (e.Status == WebExceptionStatus.Success)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

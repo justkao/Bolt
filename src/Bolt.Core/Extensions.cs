@@ -6,6 +6,11 @@ namespace Bolt
 {
     public static class Extensions
     {
+        public static void Sleep(TimeSpan time)
+        {
+            Task.Delay(time).Wait();
+        }
+
         public static string CapitalizeFirstLetter(this string name)
         {
             return name.Substring(0, 1).ToUpper() + name.Substring(1);
@@ -13,7 +18,7 @@ namespace Bolt
 
         public static bool IsAsync(this MethodInfo method)
         {
-            return typeof(Task).IsAssignableFrom(method.ReturnType);
+            return typeof(Task).GetTypeInfo().IsAssignableFrom(method.ReturnType.GetTypeInfo());
         }
 
         public static string GetAsyncName(this MethodInfo method)

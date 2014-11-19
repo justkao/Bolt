@@ -13,6 +13,8 @@ namespace TestService.Client
             PersonRepository repository = new PersonRepository();
             repository.ServerUrl = Servers.IISBoltServer;
             repository.Prefix = Servers.Prefix;
+            repository.Contract = Contracts.PersonRepository;
+
             new ClientConfiguration().Update(repository);
             return repository;
         }
@@ -22,6 +24,8 @@ namespace TestService.Client
             PersonRepository repository = new PersonRepository();
             repository.ServerUrl = Servers.BoltServer;
             repository.Prefix = Servers.Prefix;
+            repository.Contract = Contracts.PersonRepository;
+
             new ClientConfiguration().Update(repository);
             return repository;
         }

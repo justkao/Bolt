@@ -59,5 +59,14 @@ namespace TestService.Core
         {
             return Task.FromResult(Enumerable.Range(0, 100).Select(Person.Create).ToList());
         }
+
+        public void InnerOperation()
+        {
+        }
+
+        public Task InnerOperationExAsync()
+        {
+            return Task.FromResult(0);
+        }
     }
 }

@@ -5,18 +5,16 @@ namespace Bolt.Generators
 {
     public interface IMetadataProvider
     {
-        ParametersDescriptor GetParametersClass(Type owner, MethodInfo method);
+        ParametersDescriptor GetParameterDescriptor(Type owner, MethodInfo method);
 
-        MethodDescriptor GetMethodDescriptor(ContractDefinition definition, MethodInfo method);
+        MethodDescriptor GetMethodDescriptor(ContractDefinition contract, MethodInfo method);
 
-        string GetRemoteUrl(ContractDefinition definition);
-
-        TypeDescriptor GetTypeDescriptor(Type type);
+        TypeDescriptor GetDescriptor(Type type);
     }
 
     public class MetadataProvider : IMetadataProvider
     {
-        public ParametersDescriptor GetParametersClass(Type owner, MethodInfo method)
+        public ParametersDescriptor GetParameterDescriptor(Type owner, MethodInfo method)
         {
             string ns = owner.Namespace + ".Parameters";
             string name = method != null ? method.Name + "Parameters" : null;
@@ -29,20 +27,12 @@ namespace Bolt.Generators
             };
         }
 
-        public MethodDescriptor GetMethodDescriptor(ContractDefinition definition, MethodInfo method)
+        public MethodDescriptor GetMethodDescriptor(ContractDefinition contract, MethodInfo method)
         {
-            return new MethodDescriptor(
-                definition.RootContract.StripInterfaceName(),
-                method.Name,
-                definition.RootContract.StripInterfaceName() + "/" + method.Name, null);
+            return new MethodDescriptor() { Contract = contract, Name = method.Name, Method = method };
         }
 
-        public string GetRemoteUrl(ContractDefinition definition)
-        {
-            return definition.RootContract.StripInterfaceName();
-        }
-
-        public TypeDescriptor GetTypeDescriptor(Type type)
+        public TypeDescriptor GetDescriptor(Type type)
         {
             return new TypeDescriptor()
             {

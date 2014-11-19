@@ -17,17 +17,19 @@ namespace TestService.Core
     {
         public override void Init()
         {
-            AddAction(TestService.Core.PersonRepositoryDescriptor.UpdatePerson, PersonRepository_UpdatePerson);
-            AddAction(TestService.Core.PersonRepositoryDescriptor.DoNothingAsAsync, PersonRepository_DoNothingAsAsync);
-            AddAction(TestService.Core.PersonRepositoryDescriptor.DoNothing, PersonRepository_DoNothing);
-            AddAction(TestService.Core.PersonRepositoryDescriptor.DoNothingWithComplexParameterAsAsync, PersonRepository_DoNothingWithComplexParameterAsAsync);
-            AddAction(TestService.Core.PersonRepositoryDescriptor.DoNothingWithComplexParameter, PersonRepository_DoNothingWithComplexParameter);
-            AddAction(TestService.Core.PersonRepositoryDescriptor.GetSimpleType, PersonRepository_GetSimpleType);
-            AddAction(TestService.Core.PersonRepositoryDescriptor.GetSimpleTypeAsAsync, PersonRepository_GetSimpleTypeAsAsync);
-            AddAction(TestService.Core.PersonRepositoryDescriptor.GetSinglePerson, PersonRepository_GetSinglePerson);
-            AddAction(TestService.Core.PersonRepositoryDescriptor.GetSinglePersonAsAsync, PersonRepository_GetSinglePersonAsAsync);
-            AddAction(TestService.Core.PersonRepositoryDescriptor.GetManyPersons, PersonRepository_GetManyPersons);
-            AddAction(TestService.Core.PersonRepositoryDescriptor.GetManyPersonsAsAsync, PersonRepository_GetManyPersonsAsAsync);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.Instance.UpdatePerson, PersonRepository_UpdatePerson);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.Instance.DoNothingAsAsync, PersonRepository_DoNothingAsAsync);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.Instance.DoNothing, PersonRepository_DoNothing);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.Instance.DoNothingWithComplexParameterAsAsync, PersonRepository_DoNothingWithComplexParameterAsAsync);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.Instance.DoNothingWithComplexParameter, PersonRepository_DoNothingWithComplexParameter);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.Instance.GetSimpleType, PersonRepository_GetSimpleType);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.Instance.GetSimpleTypeAsAsync, PersonRepository_GetSimpleTypeAsAsync);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.Instance.GetSinglePerson, PersonRepository_GetSinglePerson);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.Instance.GetSinglePersonAsAsync, PersonRepository_GetSinglePersonAsAsync);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.Instance.GetManyPersons, PersonRepository_GetManyPersons);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.Instance.GetManyPersonsAsAsync, PersonRepository_GetManyPersonsAsAsync);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.Instance.InnerOperation, PersonRepositoryInner_InnerOperation);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.Instance.InnerOperationExAsync, PersonRepositoryInner_InnerOperationExAsync);
 
             base.Init();
         }
@@ -116,6 +118,20 @@ namespace TestService.Core
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
             var result = await instance.GetManyPersonsAsAsync(parameters.Person);
             await ResponseHandler.Handle(context, result);
+        }
+
+        private async Task PersonRepositoryInner_InnerOperation(ServerExecutionContext context)
+        {
+            var instance = await InstanceProvider.GetInstanceAsync<IPersonRepositoryInner>(context);
+            instance.InnerOperation();
+            await ResponseHandler.Handle(context);
+        }
+
+        private async Task PersonRepositoryInner_InnerOperationExAsync(ServerExecutionContext context)
+        {
+            var instance = await InstanceProvider.GetInstanceAsync<IPersonRepositoryInner>(context);
+            await instance.InnerOperationExAsync();
+            await ResponseHandler.Handle(context);
         }
     }
 }

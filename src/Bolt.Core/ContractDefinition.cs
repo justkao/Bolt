@@ -7,90 +7,84 @@ namespace Bolt
 {
     public class ContractDefinition
     {
-        private IReadOnlyCollection<Type> _excludeContracts;
-        private bool _recursive;
+        private readonly IReadOnlyCollection<Type> _excludedContracts;
 
-        public ContractDefinition(Type rootContract)
+        public ContractDefinition(Type root, params Type[] excludedContracts)
         {
-            if (rootContract == null)
+            if (root == null)
             {
-                throw new ArgumentNullException("rootContract");
+                throw new ArgumentNullException("root");
             }
 
-            RootContract = rootContract;
+            Root = root;
+            Name = root.StripInterfaceName();
+            Namespace = root.Namespace;
+
+            _excludedContracts = excludedContracts != null ? excludedContracts.ToList() : new List<Type>();
         }
 
-        public Type RootContract { get; private set; }
+        public Type Root { get; private set; }
 
-        public bool Recursive
-        {
-            get { return _recursive; }
-            set
-            {
-                _recursive = value;
-                Validate();
-            }
-        }
+        public string Name { get; private set; }
 
-        public IReadOnlyCollection<Type> ExcludeContracts
+        public string Namespace { get; private set; }
+
+        public IReadOnlyCollection<Type> ExcludedContracts
         {
-            get { return _excludeContracts; }
-            set
-            {
-                _excludeContracts = value;
-                Validate();
-            }
+            get { return _excludedContracts; }
         }
 
         public virtual void Validate()
         {
-            if (!RootContract.IsInterface)
+            if (!Root.GetTypeInfo().IsInterface)
             {
                 throw new InvalidOperationException("Root contract definition must be interface type.");
             }
 
-            if (GetEffectiveMethods().Select(m => m.Name).Distinct().Count() != GetEffectiveMethods().Count())
+            foreach (Type contract in GetEffectiveContracts())
             {
-                throw new InvalidOperationException(
-                    string.Format("Interface {0} contains multiple methods with the same name.", RootContract.Name));
+                List<MethodInfo> methods = GetEffectiveMethods(contract).ToList();
+
+                if (methods.Select(m => m.Name).Distinct().Count() != methods.Count())
+                {
+                    throw new InvalidOperationException(
+                        string.Format("Interface {0} contains multiple methods with the same name.", contract.Name));
+                }
             }
         }
 
         public virtual IEnumerable<Type> GetEffectiveContracts(Type iface)
         {
-            return iface.GetInterfaces().Except(ExcludeContracts ?? Enumerable.Empty<Type>());
+            return iface.GetTypeInfo().ImplementedInterfaces.Except(ExcludedContracts ?? Enumerable.Empty<Type>());
         }
 
         public virtual IReadOnlyCollection<Type> GetEffectiveContracts()
         {
             List<Type> contracts = new List<Type>()
             {
-                RootContract
+                Root
             };
 
-            if (Recursive)
-            {
-                contracts.AddRange(
-                    GetInterfaces(RootContract)
-                        .Except(ExcludeContracts ?? Enumerable.Empty<Type>()));
-            }
+            contracts.AddRange(
+                GetInterfaces(Root)
+                    .Except(ExcludedContracts ?? Enumerable.Empty<Type>()));
 
             return contracts;
         }
 
         public virtual IEnumerable<MethodInfo> GetEffectiveMethods(Type iface)
         {
-            return iface.GetMethods();
+            return iface.GetTypeInfo().DeclaredMethods;
         }
 
         public virtual IEnumerable<MethodInfo> GetEffectiveMethods()
         {
-            return GetEffectiveContracts().SelectMany(effectiveContract => effectiveContract.GetMethods());
+            return GetEffectiveContracts().SelectMany(effectiveContract => effectiveContract.GetTypeInfo().DeclaredMethods);
         }
 
         protected virtual IEnumerable<Type> GetInterfaces(Type contract)
         {
-            return GetInterfacesInternal(contract.GetInterfaces()).Distinct();
+            return GetInterfacesInternal(contract.GetTypeInfo().ImplementedInterfaces).Distinct();
         }
 
         private IEnumerable<Type> GetInterfacesInternal(IEnumerable<Type> interfaces)
@@ -99,7 +93,7 @@ namespace Bolt
             {
                 yield return @interface;
 
-                foreach (Type inner in GetInterfacesInternal(@interface.GetInterfaces()))
+                foreach (Type inner in GetInterfacesInternal(@interface.GetTypeInfo().ImplementedInterfaces))
                 {
                     yield return inner;
                 }

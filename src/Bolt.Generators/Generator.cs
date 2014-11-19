@@ -114,7 +114,7 @@ namespace Bolt.Generators
         private Generator Add(ContractGeneratorBase generator)
         {
             generator.MetadataProvider = MetadataProvider;
-            Formatter.AddNamespace(generator.Contract.RootContract.Namespace);
+            Formatter.AddNamespace(generator.Contract.Namespace);
             _contractGenerator.Add(generator);
             return this;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Microsoft.Owin;
 
@@ -21,13 +22,15 @@ namespace Bolt.Server
 
         public override async Task Invoke(IOwinContext context)
         {
-            await Options.Executor.Execute(context, GetMethodName(context));
-        }
-
-        protected virtual string GetMethodName(IOwinContext context)
-        {
-            string[] segments = context.Request.Uri.AbsolutePath.Split('/');
-            return segments[segments.Length - 2] + "/" + segments[segments.Length - 1];
+            ActionDescriptor action = Options.ActionProvider.GetAction(context);
+            if (action != null)
+            {
+                await Options.Executor.Execute(context, action);
+            }
+            else
+            {
+                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+            }
         }
     }
 }

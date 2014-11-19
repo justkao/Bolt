@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 
 namespace Bolt.Client
@@ -23,14 +22,15 @@ namespace Bolt.Client
         {
             if (typeof(T) == typeof(Empty))
             {
-                context.Request.ContentLength = 0;
-                return;
+                using (TaskExtensions.Execute(context.Request.GetRequestStreamAsync))
+                {
+                    // auto set content length to 0
+                    return;
+                }
             }
 
             byte[] raw = _serializer.Serialize(parameters);
-            context.Request.ContentLength = raw.Length;
-
-            using (Stream stream = context.Request.GetRequestStream())
+            using (Stream stream = TaskExtensions.Execute(context.Request.GetRequestStreamAsync))
             {
                 stream.Write(raw, 0, raw.Length);
             }
@@ -40,15 +40,16 @@ namespace Bolt.Client
         {
             if (typeof(T) == typeof(Empty))
             {
-                context.Request.ContentLength = 0;
-                return;
+                using (TaskExtensions.Execute(context.Request.GetRequestStreamAsync))
+                {
+                    // auto set content length to 0
+                    return;
+                }
             }
 
             context.Cancellation.ThrowIfCancellationRequested();
 
             byte[] raw = _serializer.Serialize(parameters);
-            context.Request.ContentLength = raw.Length;
-
             using (Stream stream = await context.Request.GetRequestStreamAsync())
             {
                 await stream.WriteAsync(raw, 0, raw.Length, context.Cancellation);
@@ -98,8 +99,10 @@ namespace Bolt.Client
                 return null;
             }
 
-            BinaryFormatter formatter = new BinaryFormatter();
-            return (Exception)formatter.Deserialize(new MemoryStream(response.RawException));
+            return null;
+
+            // BinaryFormatter formatter = new BinaryFormatter();
+            // return (Exception)formatter.Deserialize(new MemoryStream(response.RawException));
         }
     }
 }

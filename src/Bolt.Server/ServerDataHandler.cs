@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading.Tasks;
 
 namespace Bolt.Server
@@ -46,6 +45,8 @@ namespace Bolt.Server
         {
             using (MemoryStream stream = new MemoryStream())
             {
+                return new ErrorResponse();
+                /* TODO:
                 BinaryFormatter formatter = new BinaryFormatter();
                 formatter.Serialize(stream, e);
 
@@ -53,6 +54,7 @@ namespace Bolt.Server
                 {
                     RawException = stream.ToArray()
                 };
+                 * */
             }
         }
     }

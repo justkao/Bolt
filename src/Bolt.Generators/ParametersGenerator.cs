@@ -69,7 +69,7 @@ namespace Bolt.Generators
                 };
             }
 
-            ParametersDescriptor descriptor = provider.GetParametersClass(method.DeclaringType, method);
+            ParametersDescriptor descriptor = provider.GetParameterDescriptor(method.DeclaringType, method);
             AddUsings(descriptor.Namespace);
             string typeName = descriptor.Name;
 
@@ -100,11 +100,11 @@ namespace Bolt.Generators
             WriteLine("[{0}]", FormatType<DataContractAttribute>());
             if (string.IsNullOrEmpty(BaseClass))
             {
-                WriteLine("public partial class {0}", provider.GetParametersClass(method.DeclaringType, method).Name);
+                WriteLine("public partial class {0}", provider.GetParameterDescriptor(method.DeclaringType, method).Name);
             }
             else
             {
-                WriteLine("public partial class {0} : {1}", provider.GetParametersClass(method.DeclaringType, method).Name, BaseClass);
+                WriteLine("public partial class {0} : {1}", provider.GetParameterDescriptor(method.DeclaringType, method).Name, BaseClass);
             }
 
             BeginBlock();

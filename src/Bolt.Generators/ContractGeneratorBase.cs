@@ -1,6 +1,5 @@
 using System;
 using System.IO;
-using System.Reflection;
 
 namespace Bolt.Generators
 {
@@ -51,17 +50,17 @@ namespace Bolt.Generators
                     value.Validate();
 
                     AddUsings(typeof(ContractDefinition).Namespace);
-                    AddUsings(Contract.RootContract.Namespace);
+                    AddUsings(Contract.Namespace);
                 }
             }
         }
 
         public abstract void Generate();
 
-        protected virtual string GetMethodDescriptorReference(MethodDescriptor descriptor, MethodInfo info)
+        protected virtual string GetMethodDescriptorReference(ContractDefinition contract, MethodDescriptor descriptor)
         {
-            TypeDescriptor typeDescriptor = MetadataProvider.GetTypeDescriptor(info.DeclaringType);
-            return typeDescriptor.FullName + "." + descriptor.Method;
+            TypeDescriptor typeDescriptor = MetadataProvider.GetDescriptor(contract.Root);
+            return typeDescriptor.FullName + ".Instance." + descriptor.Name;
         }
     }
 }

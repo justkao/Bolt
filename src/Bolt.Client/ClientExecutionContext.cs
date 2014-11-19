@@ -6,8 +6,8 @@ namespace Bolt.Client
 {
     public class ClientExecutionContext : ExecutionContextBase, IDisposable
     {
-        public ClientExecutionContext(MethodDescriptor methodDescriptor, HttpWebRequest request, CancellationToken cancellation, HttpWebResponse response = null)
-            : base(methodDescriptor)
+        public ClientExecutionContext(ActionDescriptor actionDescriptor, HttpWebRequest request, CancellationToken cancellation, HttpWebResponse response = null)
+            : base(actionDescriptor)
         {
             Request = request;
             Cancellation = cancellation;

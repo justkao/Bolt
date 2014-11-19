@@ -1,48 +1,50 @@
+using System;
+
 using Owin;
 
 namespace Bolt.Server
 {
     public static class ExecutorMiddlewareExtensions
     {
-        public static IAppBuilder RegisterEndpoint<TContract, TContractImplementation, TExecutor>(
-            this IAppBuilder builder, ContractDefinition definition, string prefix, ServerConfiguration configuration, IInstanceProvider instanceProvider = null)
-            where TExecutor : IExecutor, new()
-            where TContractImplementation : TContract
+        public static IAppBuilder UseStatelessExecutor<TExecutor, TContractImplementation>(
+            this IAppBuilder builder,
+            ServerConfiguration configuration,
+            ContractDescriptor descriptor) where TExecutor : IExecutor, new()
         {
-            return builder.Map(
-                prefix,
-                (b) =>
-                    b.RegisterContract<TContract, TContractImplementation, TExecutor>(definition, configuration,
-                        instanceProvider));
+            return builder.UseExecutor<TExecutor>(configuration, descriptor, new InstanceProvider<TContractImplementation>());
         }
 
-        public static void RegisterContract<TContract, TContractImplementation, TExecutor>(this IAppBuilder builder, ContractDefinition definition, ServerConfiguration configuration, IInstanceProvider instanceProvider = null)
-            where TExecutor : IExecutor, new()
-            where TContractImplementation : TContract
+        public static IAppBuilder UseExecutor<TExecutor>(
+            this IAppBuilder builder,
+            ServerConfiguration configuration,
+            ContractDescriptor descriptor,
+            IInstanceProvider instanceProvider) where TExecutor : IExecutor, new()
         {
-            ExecutorFactory<TExecutor> factory = new ExecutorFactory<TExecutor>(definition);
-
-            builder.Use<ExecutorMiddleware>(
-                new ExecutorMiddlewareOptions(
-                    factory.Create(configuration, instanceProvider ?? new InstanceProvider(definition, typeof(TContractImplementation)))));
+            ExecutorFactory<TExecutor> factory = new ExecutorFactory<TExecutor>();
+            IExecutor executor = factory.Create(configuration, instanceProvider);
+            builder.Use<ExecutorMiddleware>(new ExecutorMiddlewareOptions(executor, new ActionProvider(descriptor, configuration.EndpointProvider)));
+            return builder;
         }
 
-        public static void RegisterStatefullContract<TContract, TContractImplementation, TExecutor>(
-            this IAppBuilder builder, ContractDefinition definition, ServerConfiguration configuration, IInstanceProvider instanceProvider = null)
-            where TExecutor : IExecutor, new()
-            where TContractImplementation : TContract
+        public static IAppBuilder RegisterEndpoint(
+            this IAppBuilder builder,
+            ServerConfiguration configuration,
+            ContractDefinition definition,
+            string prefix,
+            Action<IAppBuilder> configure)
         {
-            ExecutorFactory<TExecutor> factory = new ExecutorFactory<TExecutor>(definition);
-
-            if (instanceProvider == null)
+            if (definition == null)
             {
-                instanceProvider = new StateFullInstanceProvider(definition, typeof(TContractImplementation))
-                {
-                    SessionHeader = configuration.SessionHeaderName
-                };
+                throw new ArgumentNullException("definition");
             }
 
-            builder.Use<ExecutorMiddleware>(new ExecutorMiddlewareOptions(factory.Create(configuration, instanceProvider)));
+            if (configuration == null)
+            {
+                throw new ArgumentNullException("configuration");
+            }
+
+            Uri url = configuration.EndpointProvider.GetEndpoint(null, prefix, definition, null);
+            return builder.Map(url.ToString(), configure);
         }
     }
 }

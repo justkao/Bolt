@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestService.Server.Bolt", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestService.Server.Wcf", "test\Service\TestService.Server.Wcf\TestService.Server.Wcf.csproj", "{D1C82C58-B3A4-4C18-BDCB-6E1B82D99226}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox\Sandbox.csproj", "{66F0E194-5E50-475A-A899-FF0B5CC99A85}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +75,10 @@ Global
 		{D1C82C58-B3A4-4C18-BDCB-6E1B82D99226}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1C82C58-B3A4-4C18-BDCB-6E1B82D99226}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1C82C58-B3A4-4C18-BDCB-6E1B82D99226}.Release|Any CPU.Build.0 = Release|Any CPU
+		{66F0E194-5E50-475A-A899-FF0B5CC99A85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{66F0E194-5E50-475A-A899-FF0B5CC99A85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{66F0E194-5E50-475A-A899-FF0B5CC99A85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{66F0E194-5E50-475A-A899-FF0B5CC99A85}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -85,5 +91,6 @@ Global
 		{CBEB1495-6B25-457D-ACFA-89A1C035CA87} = {73BA0D58-DF35-4193-BD7C-ECB25AB76125}
 		{018058F0-31E9-4C23-A9D9-A338E6EB177B} = {73BA0D58-DF35-4193-BD7C-ECB25AB76125}
 		{D1C82C58-B3A4-4C18-BDCB-6E1B82D99226} = {73BA0D58-DF35-4193-BD7C-ECB25AB76125}
+		{66F0E194-5E50-475A-A899-FF0B5CC99A85} = {B07FC614-1007-49C6-A695-3636E759C4E0}
 	EndGlobalSection
 EndGlobal

@@ -6,6 +6,6 @@ namespace Bolt.Server
 {
     public interface IExecutor
     {
-        Task Execute(IOwinContext context, string method);
+        Task Execute(IOwinContext context, ActionDescriptor action);
     }
 }

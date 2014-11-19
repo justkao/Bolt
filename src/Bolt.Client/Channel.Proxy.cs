@@ -15,17 +15,17 @@ namespace Bolt.Client
 
         #region Synchronous Methods
 
-        public virtual void Send<TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation)
+        public virtual void Send<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
             RetrieveResponse<Empty, TRequestParameters>(parameters, descriptor, cancellation);
         }
 
-        public virtual TResult Send<TResult, TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation)
+        public virtual TResult Send<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
             return RetrieveResponse<TResult, TRequestParameters>(parameters, descriptor, cancellation);
         }
 
-        protected virtual T RetrieveResponse<T, TParameters>(TParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation)
+        protected virtual T RetrieveResponse<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
             int tries = 0;
             while (true)
@@ -72,7 +72,7 @@ namespace Bolt.Client
                 }
                 if (RetryDelay != null)
                 {
-                    Thread.Sleep(RetryDelay.Value);
+                    Extensions.Sleep(RetryDelay.Value);
                 }
             }
         }
@@ -81,17 +81,17 @@ namespace Bolt.Client
 
         #region Asynchornous Methods
 
-        public virtual async Task SendAsync<TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation)
+        public virtual async Task SendAsync<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
             await RetrieveResponseAsync<Empty, TRequestParameters>(parameters, descriptor, cancellation);
         }
 
-        public virtual async Task<TResult> SendAsync<TResult, TRequestParameters>(TRequestParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation)
+        public virtual async Task<TResult> SendAsync<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
             return await RetrieveResponseAsync<TResult, TRequestParameters>(parameters, descriptor, cancellation);
         }
 
-        protected virtual async Task<T> RetrieveResponseAsync<T, TParameters>(TParameters parameters, MethodDescriptor descriptor, CancellationToken cancellation)
+        protected virtual async Task<T> RetrieveResponseAsync<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
             int tries = 0;
             while (true)

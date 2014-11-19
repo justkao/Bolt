@@ -12,6 +12,7 @@ namespace Bolt.Client
         {
             channel.DataHandler = ClientDataHandler;
             channel.RequestForwarder = RequestForwarder;
+            channel.EndpointProvider = EndpointProvider;
 
             if (channel is StatefullChannel)
             {

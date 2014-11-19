@@ -1,7 +1,11 @@
-﻿namespace Bolt
+﻿using System;
+
+namespace Bolt
 {
     public interface IEndpointProvider
     {
-        MethodDescriptor GetEndpoint(MethodDescriptor descriptor);
+        Uri GetEndpoint(Uri server, string prefix, ContractDefinition contract, ActionDescriptor descriptor);
+
+        string GetActionEndpoint(ActionDescriptor descriptor);
     }
 }

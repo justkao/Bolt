@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Bolt
+﻿namespace Bolt
 {
     public abstract class ExecutionContextBase
     {
-        protected ExecutionContextBase(MethodDescriptor methodDescriptor)
+        protected ExecutionContextBase(ActionDescriptor actionDescriptor)
         {
-            MethodDescriptor = methodDescriptor;
+            ActionDescriptor = actionDescriptor;
         }
 
-        public MethodDescriptor MethodDescriptor { get; private set; }
+        public ActionDescriptor ActionDescriptor { get; private set; }
     }
 }

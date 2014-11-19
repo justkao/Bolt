@@ -7,7 +7,7 @@ using Bolt;
 namespace TestService.Core
 {
     [ServiceContract]
-    public interface IPersonRepository
+    public interface IPersonRepository : IPersonRepositoryInner
     {
         [OperationContract]
         [AsyncOperation]

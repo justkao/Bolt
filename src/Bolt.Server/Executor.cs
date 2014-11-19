@@ -1,16 +1,19 @@
-using Microsoft.Owin;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Owin;
 
 namespace Bolt.Server
 {
     public class Executor : IExecutor
     {
-        private readonly IDictionary<string, ActionMetadata> _actions = new Dictionary<string, ActionMetadata>();
+        private readonly IDictionary<ActionDescriptor, ActionMetadata> _actions = new Dictionary<ActionDescriptor, ActionMetadata>();
+
         private IInstanceProvider _instanceProvider;
+
         private IResponseHandler _responseHandler;
+
         private IServerDataHandler _dataHandler;
 
         public IInstanceProvider InstanceProvider
@@ -62,19 +65,19 @@ namespace Bolt.Server
         {
         }
 
-        protected virtual void AddAction(MethodDescriptor descriptor, Func<ServerExecutionContext, Task> action)
+        protected virtual void AddAction(ActionDescriptor descriptor, Func<ServerExecutionContext, Task> action)
         {
-            _actions[descriptor.Url] = new ActionMetadata()
+            _actions[descriptor] = new ActionMetadata()
                                            {
                                                Descriptor = descriptor,
                                                Action = action
                                            };
         }
 
-        public virtual async Task Execute(IOwinContext context, string methodName)
+        public virtual async Task Execute(IOwinContext context, ActionDescriptor action)
         {
             ActionMetadata metadata;
-            if (_actions.TryGetValue(methodName, out metadata))
+            if (_actions.TryGetValue(action, out metadata))
             {
                 ServerExecutionContext ctxt = new ServerExecutionContext(context, metadata.Descriptor);
 
@@ -103,7 +106,7 @@ namespace Bolt.Server
         {
             public Func<ServerExecutionContext, Task> Action { get; set; }
 
-            public MethodDescriptor Descriptor { get; set; }
+            public ActionDescriptor Descriptor { get; set; }
         }
     }
 }

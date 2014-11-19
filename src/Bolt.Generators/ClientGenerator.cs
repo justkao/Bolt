@@ -1,9 +1,9 @@
-﻿using Bolt.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Bolt.Client;
 
 namespace Bolt.Generators
 {
@@ -50,11 +50,11 @@ namespace Bolt.Generators
 
         public override void Generate()
         {
-            BeginNamespace(ClientNamespace ?? Contract.RootContract.Namespace);
+            BeginNamespace(ClientNamespace ?? Contract.Namespace);
 
             List<Type> contracts = Contract.GetEffectiveContracts().ToList();
 
-            WriteLine("public partial class {0} : {1}{2}, {3}", ClassName ?? Contract.RootContract.StripInterfaceName(), BaseClass != null ? BaseClass + ", " : null, typeof(IChannel).FullName, Contract.RootContract.FullName);
+            WriteLine("public partial class {0} : {1}{2}, {3}", ClassName ?? Contract.Name, BaseClass != null ? BaseClass + ", " : null, typeof(IChannel).FullName, Contract.Root.FullName);
             BeginBlock();
 
             foreach (Type type in contracts)
@@ -109,38 +109,38 @@ namespace Bolt.Generators
             {
                 if (IsAsync(method))
                 {
-                    WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor, method));
+                    WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
                 }
                 else if (forceAsync)
                 {
-                    WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor, method));
+                    WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
                 }
                 else
                 {
-                    WriteLine("return Send<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor, method));
+                    WriteLine("return Send<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
                 }
             }
             else
             {
                 if (IsAsync(method))
                 {
-                    WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, method));
+                    WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
                 }
                 else if (forceAsync)
                 {
-                    WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, method));
+                    WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
                 }
                 else
                 {
-                    WriteLine("Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, method));
+                    WriteLine("Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
                 }
             }
             EndBlock();
         }
 
-        private string DeclareEndpoint(MethodDescriptor descriptor, MethodInfo info)
+        private string DeclareEndpoint(MethodDescriptor descriptor)
         {
-            WriteLine("var descriptor = GetEndpoint({0});", GetMethodDescriptorReference(descriptor, info));
+            WriteLine("var descriptor = {0};", GetMethodDescriptorReference(Contract, descriptor));
             WriteLine("var token = GetCancellationToken(descriptor);");
             WriteLine();
             return "descriptor, token";

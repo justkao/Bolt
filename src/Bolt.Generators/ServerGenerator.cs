@@ -1,9 +1,9 @@
-using Bolt.Server;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Bolt.Server;
 
 namespace Bolt.Generators
 {
@@ -35,9 +35,9 @@ namespace Bolt.Generators
 
         public override void Generate()
         {
-            BeginNamespace(ServerNamespace ?? Contract.RootContract.Namespace);
+            BeginNamespace(ServerNamespace ?? Contract.Namespace);
 
-            string name = ExecutorClassType ?? string.Format("{0}{1}", Contract.RootContract.StripInterfaceName(), FormatType<Executor>());
+            string name = ExecutorClassType ?? string.Format("{0}{1}", Contract.Name, FormatType<Executor>());
 
             WriteLine("public partial class {0} : {1}, {2}", name, typeof(Executor).FullName, FormatType<IExecutor>());
             BeginBlock();
@@ -48,7 +48,7 @@ namespace Bolt.Generators
 
             foreach (MethodInfo method in Contract.GetEffectiveMethods())
             {
-                WriteLine("AddAction({0}, {1});", FormatDescriptor(MetadataProvider.GetMethodDescriptor(Contract, method), method), FormatMethodName(method, MetadataProvider));
+                WriteLine("AddAction({0}, {1});", FormatDescriptor(MetadataProvider.GetMethodDescriptor(Contract, method)), FormatMethodName(method));
             }
             WriteLine();
             WriteLine("base.Init();");
@@ -61,12 +61,12 @@ namespace Bolt.Generators
 
             foreach (MethodInfo method in methods)
             {
-                WriteLine("private async {2} {0}({1} context)", FormatMethodName(method, MetadataProvider), FormatType(typeof(ServerExecutionContext)), FormatType<Task>());
+                WriteLine("private async {2} {0}({1} context)", FormatMethodName(method), FormatType(typeof(ServerExecutionContext)), FormatType<Task>());
                 BeginBlock();
 
                 if (HasParameters(method))
                 {
-                    ParametersDescriptor descriptor = MetadataProvider.GetParametersClass(method.DeclaringType, method);
+                    ParametersDescriptor descriptor = MetadataProvider.GetParameterDescriptor(method.DeclaringType, method);
                     AddUsings(descriptor.Namespace);
                     WriteLine("var parameters = await DataHandler.ReadParametersAsync<{0}>(context);", descriptor.Name);
                 }
@@ -98,12 +98,12 @@ namespace Bolt.Generators
             ExecutorClassType = name;
         }
 
-        private string FormatDescriptor(MethodDescriptor descriptor, MethodInfo info)
+        private string FormatDescriptor(MethodDescriptor descriptor)
         {
-            return GetMethodDescriptorReference(descriptor, info);
+            return GetMethodDescriptorReference(Contract, descriptor);
         }
 
-        private string FormatMethodName(MethodInfo info, IMetadataProvider provider)
+        private string FormatMethodName(MethodInfo info)
         {
             if (HasParameters(info))
             {

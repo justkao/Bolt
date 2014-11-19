@@ -6,9 +6,12 @@ namespace Bolt
         {
             SessionHeaderName = "Session-ID";
             Serializer = new ProtocolBufferSerializer();
+            EndpointProvider = new EndpointProvider();
         }
 
         public ISerializer Serializer { get; set; }
+
+        public IEndpointProvider EndpointProvider { get; set; }
 
         public string SessionHeaderName { get; set; }
     }

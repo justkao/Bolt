@@ -8,11 +8,85 @@ namespace Bolt.Client
 {
     public partial class Channel : IChannel
     {
+        private IClientDataHandler _dataHandler;
+
+        private IRequestForwarder _requestForwarder;
+
+        private IEndpointProvider _endpointProvider;
+
+        private ContractDefinition _contract;
+
         public virtual Uri ServerUrl { get; set; }
 
-        public IClientDataHandler DataHandler { get; set; }
+        public IClientDataHandler DataHandler
+        {
+            get
+            {
+                if (_dataHandler == null)
+                {
+                    throw new InvalidOperationException("Data handler not initialized.");
+                }
 
-        public IRequestForwarder RequestForwarder { get; set; }
+                return _dataHandler;
+            }
+            set
+            {
+                _dataHandler = value;
+            }
+        }
+
+        public IRequestForwarder RequestForwarder
+        {
+            get
+            {
+                if (_requestForwarder == null)
+                {
+                    throw new InvalidOperationException("Request Forwarder not initialized.");
+                }
+
+                return _requestForwarder;
+            }
+            set
+            {
+                _requestForwarder = value;
+            }
+        }
+
+        public IEndpointProvider EndpointProvider
+        {
+            get
+            {
+                if (_endpointProvider == null)
+                {
+                    throw new InvalidOperationException("Endpoint provider not initialized.");
+                }
+
+                return _endpointProvider;
+            }
+
+            set
+            {
+                _endpointProvider = value;
+            }
+        }
+
+        public ContractDefinition Contract
+        {
+            get
+            {
+                if (_contract == null)
+                {
+                    throw new InvalidOperationException("Contract definition not initialized.");
+                }
+
+                return _contract;
+            }
+
+            set
+            {
+                _contract = value;
+            }
+        }
 
         public string Prefix { get; set; }
 
@@ -49,9 +123,9 @@ namespace Bolt.Client
             return response;
         }
 
-        protected virtual HttpWebRequest GetChannel(MethodDescriptor descriptor, CancellationToken cancellation)
+        protected virtual HttpWebRequest GetChannel(ActionDescriptor action, CancellationToken cancellation)
         {
-            return CreateWebRequest(CrateRemoteAddress(ServerUrl, descriptor));
+            return CreateWebRequest(CrateRemoteAddress(ServerUrl, action));
         }
 
         #endregion
@@ -87,9 +161,9 @@ namespace Bolt.Client
             return response;
         }
 
-        protected virtual Task<HttpWebRequest> GetChannelAsync(MethodDescriptor descriptor, CancellationToken cancellation)
+        protected virtual Task<HttpWebRequest> GetChannelAsync(ActionDescriptor action, CancellationToken cancellation)
         {
-            return Task.FromResult(CreateWebRequest(CrateRemoteAddress(ServerUrl, descriptor)));
+            return Task.FromResult(CreateWebRequest(CrateRemoteAddress(ServerUrl, action)));
         }
 
         #endregion
@@ -113,23 +187,13 @@ namespace Bolt.Client
         {
         }
 
-        protected virtual void OnProxyFailed(Exception error, MethodDescriptor descriptor)
+        protected virtual void OnProxyFailed(Exception error, ActionDescriptor action)
         {
         }
 
-        protected virtual Uri CrateRemoteAddress(Uri server, MethodDescriptor descriptor)
+        protected virtual Uri CrateRemoteAddress(Uri server, ActionDescriptor descriptor)
         {
-            string url;
-            if (String.IsNullOrEmpty(Prefix))
-            {
-                url = server + "/" + descriptor.Url;
-            }
-            else
-            {
-                url = server + Prefix + "/" + descriptor.Url;
-            }
-
-            return new Uri(url);
+            return EndpointProvider.GetEndpoint(server, Prefix, Contract, descriptor);
         }
 
         protected virtual HttpWebRequest CreateWebRequest(Uri url)
@@ -140,12 +204,12 @@ namespace Bolt.Client
             return request;
         }
 
-        public virtual MethodDescriptor GetEndpoint(MethodDescriptor descriptor)
+        public virtual ActionDescriptor GetEndpoint(ActionDescriptor descriptor)
         {
             return descriptor;
         }
 
-        public virtual CancellationToken GetCancellationToken(MethodDescriptor descriptor)
+        public virtual CancellationToken GetCancellationToken(ActionDescriptor descriptor)
         {
             return CancellationToken.None;
         }

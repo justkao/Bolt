@@ -1,38 +1,57 @@
-﻿using Bolt;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
+﻿using System.Collections.Generic;
+using System.Reflection;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-using TestService.Core;
+using Bolt;
 
 namespace TestService.Core
 {
-    public static class PersonRepositoryDescriptor
+    public class PersonRepositoryDescriptor : ContractDescriptor
     {
-        public static readonly MethodDescriptor UpdatePerson = new MethodDescriptor("PersonRepository","UpdatePerson","PersonRepository/UpdatePerson", typeof(TestService.Core.Parameters.UpdatePersonParameters));
+        public PersonRepositoryDescriptor()
+            : base(typeof(TestService.Core.IPersonRepository))
+        {
+            UpdatePerson = Add("UpdatePerson", typeof(TestService.Core.Parameters.UpdatePersonParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("UpdatePerson"));
+            DoNothingAsAsync = Add("DoNothingAsAsync", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingAsAsync"));
+            DoNothing = Add("DoNothing", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothing"));
+            DoNothingWithComplexParameterAsAsync = Add("DoNothingWithComplexParameterAsAsync", typeof(TestService.Core.Parameters.DoNothingWithComplexParameterAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingWithComplexParameterAsAsync"));
+            DoNothingWithComplexParameter = Add("DoNothingWithComplexParameter", typeof(TestService.Core.Parameters.DoNothingWithComplexParameterParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingWithComplexParameter"));
+            GetSimpleType = Add("GetSimpleType", typeof(TestService.Core.Parameters.GetSimpleTypeParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetSimpleType"));
+            GetSimpleTypeAsAsync = Add("GetSimpleTypeAsAsync", typeof(TestService.Core.Parameters.GetSimpleTypeAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetSimpleTypeAsAsync"));
+            GetSinglePerson = Add("GetSinglePerson", typeof(TestService.Core.Parameters.GetSinglePersonParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetSinglePerson"));
+            GetSinglePersonAsAsync = Add("GetSinglePersonAsAsync", typeof(TestService.Core.Parameters.GetSinglePersonAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetSinglePersonAsAsync"));
+            GetManyPersons = Add("GetManyPersons", typeof(TestService.Core.Parameters.GetManyPersonsParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetManyPersons"));
+            GetManyPersonsAsAsync = Add("GetManyPersonsAsAsync", typeof(TestService.Core.Parameters.GetManyPersonsAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetManyPersonsAsAsync"));
+            InnerOperation = Add("InnerOperation", typeof(Bolt.Empty), typeof(IPersonRepositoryInner).GetTypeInfo().GetMethod("InnerOperation"));
+            InnerOperationExAsync = Add("InnerOperationExAsync", typeof(Bolt.Empty), typeof(IPersonRepositoryInner).GetTypeInfo().GetMethod("InnerOperationExAsync"));
+        }
 
-        public static readonly MethodDescriptor DoNothingAsAsync = new MethodDescriptor("PersonRepository","DoNothingAsAsync","PersonRepository/DoNothingAsAsync", typeof(Bolt.Empty));
+        public static readonly PersonRepositoryDescriptor Instance = new PersonRepositoryDescriptor();
 
-        public static readonly MethodDescriptor DoNothing = new MethodDescriptor("PersonRepository","DoNothing","PersonRepository/DoNothing", typeof(Bolt.Empty));
+        public ActionDescriptor UpdatePerson { get; private set; }
 
-        public static readonly MethodDescriptor DoNothingWithComplexParameterAsAsync = new MethodDescriptor("PersonRepository","DoNothingWithComplexParameterAsAsync","PersonRepository/DoNothingWithComplexParameterAsAsync", typeof(TestService.Core.Parameters.DoNothingWithComplexParameterAsAsyncParameters));
+        public ActionDescriptor DoNothingAsAsync { get; private set; }
 
-        public static readonly MethodDescriptor DoNothingWithComplexParameter = new MethodDescriptor("PersonRepository","DoNothingWithComplexParameter","PersonRepository/DoNothingWithComplexParameter", typeof(TestService.Core.Parameters.DoNothingWithComplexParameterParameters));
+        public ActionDescriptor DoNothing { get; private set; }
 
-        public static readonly MethodDescriptor GetSimpleType = new MethodDescriptor("PersonRepository","GetSimpleType","PersonRepository/GetSimpleType", typeof(TestService.Core.Parameters.GetSimpleTypeParameters));
+        public ActionDescriptor DoNothingWithComplexParameterAsAsync { get; private set; }
 
-        public static readonly MethodDescriptor GetSimpleTypeAsAsync = new MethodDescriptor("PersonRepository","GetSimpleTypeAsAsync","PersonRepository/GetSimpleTypeAsAsync", typeof(TestService.Core.Parameters.GetSimpleTypeAsAsyncParameters));
+        public ActionDescriptor DoNothingWithComplexParameter { get; private set; }
 
-        public static readonly MethodDescriptor GetSinglePerson = new MethodDescriptor("PersonRepository","GetSinglePerson","PersonRepository/GetSinglePerson", typeof(TestService.Core.Parameters.GetSinglePersonParameters));
+        public ActionDescriptor GetSimpleType { get; private set; }
 
-        public static readonly MethodDescriptor GetSinglePersonAsAsync = new MethodDescriptor("PersonRepository","GetSinglePersonAsAsync","PersonRepository/GetSinglePersonAsAsync", typeof(TestService.Core.Parameters.GetSinglePersonAsAsyncParameters));
+        public ActionDescriptor GetSimpleTypeAsAsync { get; private set; }
 
-        public static readonly MethodDescriptor GetManyPersons = new MethodDescriptor("PersonRepository","GetManyPersons","PersonRepository/GetManyPersons", typeof(TestService.Core.Parameters.GetManyPersonsParameters));
+        public ActionDescriptor GetSinglePerson { get; private set; }
 
-        public static readonly MethodDescriptor GetManyPersonsAsAsync = new MethodDescriptor("PersonRepository","GetManyPersonsAsAsync","PersonRepository/GetManyPersonsAsAsync", typeof(TestService.Core.Parameters.GetManyPersonsAsAsyncParameters));
+        public ActionDescriptor GetSinglePersonAsAsync { get; private set; }
+
+        public ActionDescriptor GetManyPersons { get; private set; }
+
+        public ActionDescriptor GetManyPersonsAsAsync { get; private set; }
+
+        public ActionDescriptor InnerOperation { get; private set; }
+
+        public ActionDescriptor InnerOperationExAsync { get; private set; }
 
     }
 }
