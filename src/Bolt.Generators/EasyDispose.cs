@@ -14,6 +14,7 @@ namespace Bolt.Generators
         public void Dispose()
         {
             _disposeAction();
+            GC.SuppressFinalize(this);
         }
     }
 }
