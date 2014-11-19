@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace Bolt.Generators
 {
@@ -61,6 +64,23 @@ namespace Bolt.Generators
         {
             TypeDescriptor typeDescriptor = MetadataProvider.GetDescriptor(contract.Root);
             return typeDescriptor.FullName + ".Instance." + descriptor.Name;
+        }
+
+        public virtual bool ShouldBeAsync(MethodInfo method, bool force)
+        {
+            if (method.IsAsync())
+            {
+                return false;
+            }
+
+            List<MethodInfo> methods = Contract.GetEffectiveMethods(method.DeclaringType).ToList();
+
+            if (force)
+            {
+                return methods.All(m => m.Name != method.Name + "Async");
+            }
+
+            return method.GetCustomAttribute<AsyncOperationAttribute>() != null && methods.All(m => m.Name != method.Name + "Async");
         }
     }
 }

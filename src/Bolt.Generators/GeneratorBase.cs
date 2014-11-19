@@ -33,7 +33,7 @@ namespace Bolt.Generators
                 WriteLine("using {0};", ns);
             }
 
-            Console.WriteLine();
+            WriteLine();
         }
 
         public virtual string FormatMethodParameters(MethodInfo method, bool includeTypes)
@@ -44,21 +44,6 @@ namespace Bolt.Generators
         public virtual bool HasParameters(MethodInfo method)
         {
             return method.GetParameters().Any();
-        }
-
-        public virtual bool ShouldBeAsync(MethodInfo method, bool force)
-        {
-            if (method.IsAsync())
-            {
-                return false;
-            }
-
-            if (force)
-            {
-                return !method.DeclaringType.GetMethods().Any(m => m.Name == method.Name + "Async");
-            }
-
-            return method.GetCustomAttribute<AsyncOperationAttribute>() != null && !method.DeclaringType.GetMethods().Any(m => m.Name == method.Name + "Async");
         }
 
         public virtual bool HasReturnValue(MethodInfo method)
@@ -78,12 +63,7 @@ namespace Bolt.Generators
 
         public virtual bool IsAsync(MethodInfo method)
         {
-            if (typeof(Task).IsAssignableFrom(method.ReturnType))
-            {
-                return true;
-            }
-
-            return false;
+            return method.IsAsync();
         }
 
         public virtual string FormatPublicProperty(Type type, string name)
@@ -154,7 +134,7 @@ namespace Bolt.Generators
                 return string.Format("void {0}({1})", info.Name, FormatMethodParameters(info, true));
             }
 
-            if (forceAsync && !typeof(Task).IsAssignableFrom(info.ReturnType))
+            if (forceAsync && !info.IsAsync())
             {
                 return string.Format("{3}<{0}> {1}({2})", FormatType(info.ReturnType), info.GetAsyncName(), FormatMethodParameters(info, true), FormatType<Task>());
             }

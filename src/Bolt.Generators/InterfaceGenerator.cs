@@ -69,7 +69,7 @@ namespace Bolt.Generators
             WriteLine("public interface {0} : {1}{2}", name, FormatType(iface), sb.ToString());
             BeginBlock();
 
-            List<MethodInfo> methods = (from m in iface.GetMethods()
+            List<MethodInfo> methods = (from m in Contract.GetEffectiveMethods(iface)
                                         where ShouldBeAsync(m, ForceAsync)
                                         select m).ToList();
 

@@ -27,7 +27,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestService.Server.Bolt", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestService.Server.Wcf", "test\Service\TestService.Server.Wcf\TestService.Server.Wcf.csproj", "{D1C82C58-B3A4-4C18-BDCB-6E1B82D99226}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox\Sandbox.csproj", "{66F0E194-5E50-475A-A899-FF0B5CC99A85}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "test\Sandbox\Sandbox.csproj", "{66F0E194-5E50-475A-A899-FF0B5CC99A85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

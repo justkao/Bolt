@@ -1,14 +1,19 @@
-﻿using System.Collections.Generic;
+﻿using Bolt;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
-using Bolt;
+using System.Text;
+using System.Threading.Tasks;
+using TestService.Core;
 
 namespace TestService.Core
 {
     public class PersonRepositoryDescriptor : ContractDescriptor
     {
-        public PersonRepositoryDescriptor()
-            : base(typeof(TestService.Core.IPersonRepository))
+        public PersonRepositoryDescriptor() : base(typeof(TestService.Core.IPersonRepository))
         {
             UpdatePerson = Add("UpdatePerson", typeof(TestService.Core.Parameters.UpdatePersonParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("UpdatePerson"));
             DoNothingAsAsync = Add("DoNothingAsAsync", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingAsAsync"));
@@ -120,5 +125,9 @@ namespace TestService.Core.Parameters
         [DataMember(Order = 1)]
         public Person Person { get; set; }
     }
+}
+
+namespace TestService.Core.Parameters
+{
 }
 

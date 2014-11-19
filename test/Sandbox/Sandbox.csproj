@@ -48,19 +48,19 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\Bolt.Client\Bolt.Client.csproj">
+    <ProjectReference Include="..\..\src\Bolt.Client\Bolt.Client.csproj">
       <Project>{65a1f42f-de09-415a-8a68-65e017fe63a8}</Project>
       <Name>Bolt.Client</Name>
     </ProjectReference>
-    <ProjectReference Include="..\src\Bolt.Core\Bolt.Core.csproj">
+    <ProjectReference Include="..\..\src\Bolt.Core\Bolt.Core.csproj">
       <Project>{6d1f7d95-3346-4308-8b6f-2b5aab0d022f}</Project>
       <Name>Bolt.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\src\Bolt.Generators\Bolt.Generators.csproj">
+    <ProjectReference Include="..\..\src\Bolt.Generators\Bolt.Generators.csproj">
       <Project>{984c96c8-c777-4361-a270-c716103d9c93}</Project>
       <Name>Bolt.Generators</Name>
     </ProjectReference>
-    <ProjectReference Include="..\src\Bolt.Server\Bolt.Server.csproj">
+    <ProjectReference Include="..\..\src\Bolt.Server\Bolt.Server.csproj">
       <Project>{c8d9762e-4b32-4711-bf3c-eb4ea485743f}</Project>
       <Name>Bolt.Server</Name>
     </ProjectReference>

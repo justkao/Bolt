@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace Bolt.Generators
@@ -48,7 +49,7 @@ namespace Bolt.Generators
 
         private string DoFormat(Type type)
         {
-            if (type.IsGenericType)
+            if (type.GetTypeInfo().IsGenericType)
             {
                 string name = type.Name.Substring(0, type.Name.IndexOf('`'));
 
@@ -77,7 +78,7 @@ namespace Bolt.Generators
 
             if (_namespaces.Contains(type.Namespace))
             {
-                if (typeof(Attribute).IsAssignableFrom(type))
+                if (typeof(Attribute).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
                 {
                     return type.Name.Substring(0, type.Name.IndexOf("Attribute", StringComparison.Ordinal));
                 }
@@ -85,7 +86,7 @@ namespace Bolt.Generators
                 return type.Name;
             }
 
-            if (typeof(Attribute).IsAssignableFrom(type))
+            if (typeof(Attribute).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
             {
                 return type.FullName.Substring(0, type.FullName.IndexOf("Attribute", StringComparison.Ordinal));
             }

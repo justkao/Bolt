@@ -42,15 +42,16 @@ namespace Bolt.Generators
 
             foreach (Type type in contracts)
             {
-                if (type.GetMethods().Any(HasParameters))
+                if (Contract.GetEffectiveMethods().Any(HasParameters))
                 {
                     BeginNamespace(MetadataProvider.GetParameterDescriptor(type, null).Namespace);
+                    IEnumerable<MethodInfo> methods = Contract.GetEffectiveMethods(type).ToList();
 
-                    foreach (MethodInfo method in type.GetMethods())
+                    foreach (MethodInfo method in methods)
                     {
                         if (generator.Generate(method, MetadataProvider))
                         {
-                            if (method != type.GetMethods().Last())
+                            if (!Equals(method, methods.Last()))
                             {
                                 WriteLine();
                             }
