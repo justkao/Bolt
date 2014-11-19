@@ -10,8 +10,10 @@ namespace Bolt.Server
             where TContractImplementation : TContract
         {
             return builder.Map(
-                prefix + new MetadataProvider().GetRemoteUrl(definition),
-                (b) => b.RegisterContract<TContract, TContractImplementation, TExecutor>(definition, configuration, instanceProvider));
+                prefix,
+                (b) =>
+                    b.RegisterContract<TContract, TContractImplementation, TExecutor>(definition, configuration,
+                        instanceProvider));
         }
 
         public static void RegisterContract<TContract, TContractImplementation, TExecutor>(this IAppBuilder builder, ContractDefinition definition, ServerConfiguration configuration, IInstanceProvider instanceProvider = null)

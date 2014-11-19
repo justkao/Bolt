@@ -69,7 +69,7 @@ namespace Bolt.Generators
                 };
             }
 
-            ClassDescriptor descriptor = provider.GetParametersClass(method.DeclaringType, method);
+            ParametersDescriptor descriptor = provider.GetParametersClass(method.DeclaringType, method);
             AddUsings(descriptor.Namespace);
             string typeName = descriptor.Name;
 

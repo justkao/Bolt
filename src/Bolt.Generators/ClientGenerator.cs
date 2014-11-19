@@ -74,7 +74,7 @@ namespace Bolt.Generators
 
             foreach (MethodInfo method in methods)
             {
-                GenerateMethod(method, generator, provider.GetRemoteUrl(Contract, method), provider, false);
+                GenerateMethod(method, generator, provider.GetMethodDescriptor(Contract, method), provider, false);
 
                 bool generateAsync = ShouldBeAsync(method, ForceAsync);
 
@@ -92,7 +92,7 @@ namespace Bolt.Generators
 
                 if (generateAsync)
                 {
-                    GenerateMethod(method, generator, provider.GetRemoteUrl(Contract, method), provider, true);
+                    GenerateMethod(method, generator, provider.GetMethodDescriptor(Contract, method), provider, true);
                     WriteLine();
                 }
             }
@@ -109,38 +109,38 @@ namespace Bolt.Generators
             {
                 if (IsAsync(method))
                 {
-                    WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
+                    WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor, method));
                 }
                 else if (forceAsync)
                 {
-                    WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
+                    WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor, method));
                 }
                 else
                 {
-                    WriteLine("return Send<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
+                    WriteLine("return Send<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor, method));
                 }
             }
             else
             {
                 if (IsAsync(method))
                 {
-                    WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
+                    WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, method));
                 }
                 else if (forceAsync)
                 {
-                    WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
+                    WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, method));
                 }
                 else
                 {
-                    WriteLine("Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
+                    WriteLine("Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, method));
                 }
             }
             EndBlock();
         }
 
-        private string DeclareEndpoint(MethodDescriptor descriptor)
+        private string DeclareEndpoint(MethodDescriptor descriptor, MethodInfo info)
         {
-            WriteLine("var descriptor = GetEndpoint(new {3}(\"{0}\",\"{1}\",\"{2}\"));", descriptor.Contract, descriptor.Method, descriptor.Url, FormatType<MethodDescriptor>());
+            WriteLine("var descriptor = GetEndpoint({0});", GetMethodDescriptorReference(descriptor, info));
             WriteLine("var token = GetCancellationToken(descriptor);");
             WriteLine();
             return "descriptor, token";

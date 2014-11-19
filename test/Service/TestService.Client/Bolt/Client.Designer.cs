@@ -19,7 +19,7 @@ namespace TestService.Core
         {
             var request = new UpdatePersonParameters();
             request.Person = person;
-            var descriptor = GetEndpoint(new MethodDescriptor("PersonRepository","UpdatePerson","PersonRepository/UpdatePerson"));
+            var descriptor = GetEndpoint(TestService.Core.PersonRepositoryDescriptor.UpdatePerson);
             var token = GetCancellationToken(descriptor);
 
             return Send<Person, UpdatePersonParameters>(request, descriptor, token);
@@ -29,7 +29,7 @@ namespace TestService.Core
         {
             var request = new UpdatePersonParameters();
             request.Person = person;
-            var descriptor = GetEndpoint(new MethodDescriptor("PersonRepository","UpdatePerson","PersonRepository/UpdatePerson"));
+            var descriptor = GetEndpoint(TestService.Core.PersonRepositoryDescriptor.UpdatePerson);
             var token = GetCancellationToken(descriptor);
 
             return SendAsync<Person, UpdatePersonParameters>(request, descriptor, token);
@@ -37,7 +37,7 @@ namespace TestService.Core
 
         public Task DoNothingAsAsync()
         {
-            var descriptor = GetEndpoint(new MethodDescriptor("PersonRepository","DoNothingAsAsync","PersonRepository/DoNothingAsAsync"));
+            var descriptor = GetEndpoint(TestService.Core.PersonRepositoryDescriptor.DoNothingAsAsync);
             var token = GetCancellationToken(descriptor);
 
             return SendAsync(Empty.Instance, descriptor, token);
@@ -45,7 +45,7 @@ namespace TestService.Core
 
         public void DoNothing()
         {
-            var descriptor = GetEndpoint(new MethodDescriptor("PersonRepository","DoNothing","PersonRepository/DoNothing"));
+            var descriptor = GetEndpoint(TestService.Core.PersonRepositoryDescriptor.DoNothing);
             var token = GetCancellationToken(descriptor);
 
             Send(Empty.Instance, descriptor, token);
@@ -55,7 +55,7 @@ namespace TestService.Core
         {
             var request = new DoNothingWithComplexParameterAsAsyncParameters();
             request.Person = person;
-            var descriptor = GetEndpoint(new MethodDescriptor("PersonRepository","DoNothingWithComplexParameterAsAsync","PersonRepository/DoNothingWithComplexParameterAsAsync"));
+            var descriptor = GetEndpoint(TestService.Core.PersonRepositoryDescriptor.DoNothingWithComplexParameterAsAsync);
             var token = GetCancellationToken(descriptor);
 
             return SendAsync(request, descriptor, token);
@@ -65,7 +65,7 @@ namespace TestService.Core
         {
             var request = new DoNothingWithComplexParameterParameters();
             request.Person = person;
-            var descriptor = GetEndpoint(new MethodDescriptor("PersonRepository","DoNothingWithComplexParameter","PersonRepository/DoNothingWithComplexParameter"));
+            var descriptor = GetEndpoint(TestService.Core.PersonRepositoryDescriptor.DoNothingWithComplexParameter);
             var token = GetCancellationToken(descriptor);
 
             Send(request, descriptor, token);
@@ -75,7 +75,7 @@ namespace TestService.Core
         {
             var request = new GetSimpleTypeParameters();
             request.Arg = arg;
-            var descriptor = GetEndpoint(new MethodDescriptor("PersonRepository","GetSimpleType","PersonRepository/GetSimpleType"));
+            var descriptor = GetEndpoint(TestService.Core.PersonRepositoryDescriptor.GetSimpleType);
             var token = GetCancellationToken(descriptor);
 
             return Send<int, GetSimpleTypeParameters>(request, descriptor, token);
@@ -85,7 +85,7 @@ namespace TestService.Core
         {
             var request = new GetSimpleTypeAsAsyncParameters();
             request.Arg = arg;
-            var descriptor = GetEndpoint(new MethodDescriptor("PersonRepository","GetSimpleTypeAsAsync","PersonRepository/GetSimpleTypeAsAsync"));
+            var descriptor = GetEndpoint(TestService.Core.PersonRepositoryDescriptor.GetSimpleTypeAsAsync);
             var token = GetCancellationToken(descriptor);
 
             return SendAsync(request, descriptor, token);
@@ -95,7 +95,7 @@ namespace TestService.Core
         {
             var request = new GetSinglePersonParameters();
             request.Person = person;
-            var descriptor = GetEndpoint(new MethodDescriptor("PersonRepository","GetSinglePerson","PersonRepository/GetSinglePerson"));
+            var descriptor = GetEndpoint(TestService.Core.PersonRepositoryDescriptor.GetSinglePerson);
             var token = GetCancellationToken(descriptor);
 
             return Send<Person, GetSinglePersonParameters>(request, descriptor, token);
@@ -105,7 +105,7 @@ namespace TestService.Core
         {
             var request = new GetSinglePersonAsAsyncParameters();
             request.Person = person;
-            var descriptor = GetEndpoint(new MethodDescriptor("PersonRepository","GetSinglePersonAsAsync","PersonRepository/GetSinglePersonAsAsync"));
+            var descriptor = GetEndpoint(TestService.Core.PersonRepositoryDescriptor.GetSinglePersonAsAsync);
             var token = GetCancellationToken(descriptor);
 
             return SendAsync<Person, GetSinglePersonAsAsyncParameters>(request, descriptor, token);
@@ -115,7 +115,7 @@ namespace TestService.Core
         {
             var request = new GetManyPersonsParameters();
             request.Person = person;
-            var descriptor = GetEndpoint(new MethodDescriptor("PersonRepository","GetManyPersons","PersonRepository/GetManyPersons"));
+            var descriptor = GetEndpoint(TestService.Core.PersonRepositoryDescriptor.GetManyPersons);
             var token = GetCancellationToken(descriptor);
 
             return Send<List<Person>, GetManyPersonsParameters>(request, descriptor, token);
@@ -125,7 +125,7 @@ namespace TestService.Core
         {
             var request = new GetManyPersonsAsAsyncParameters();
             request.Person = person;
-            var descriptor = GetEndpoint(new MethodDescriptor("PersonRepository","GetManyPersonsAsAsync","PersonRepository/GetManyPersonsAsAsync"));
+            var descriptor = GetEndpoint(TestService.Core.PersonRepositoryDescriptor.GetManyPersonsAsAsync);
             var token = GetCancellationToken(descriptor);
 
             return SendAsync<List<Person>, GetManyPersonsAsAsyncParameters>(request, descriptor, token);

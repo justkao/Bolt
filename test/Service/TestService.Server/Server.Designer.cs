@@ -17,17 +17,17 @@ namespace TestService.Core
     {
         public override void Init()
         {
-            AddAction(new MethodDescriptor("PersonRepository", "UpdatePerson", "PersonRepository/UpdatePerson"), PersonRepository_UpdatePerson);
-            AddAction(new MethodDescriptor("PersonRepository", "DoNothingAsAsync", "PersonRepository/DoNothingAsAsync"), PersonRepository_DoNothingAsAsync);
-            AddAction(new MethodDescriptor("PersonRepository", "DoNothing", "PersonRepository/DoNothing"), PersonRepository_DoNothing);
-            AddAction(new MethodDescriptor("PersonRepository", "DoNothingWithComplexParameterAsAsync", "PersonRepository/DoNothingWithComplexParameterAsAsync"), PersonRepository_DoNothingWithComplexParameterAsAsync);
-            AddAction(new MethodDescriptor("PersonRepository", "DoNothingWithComplexParameter", "PersonRepository/DoNothingWithComplexParameter"), PersonRepository_DoNothingWithComplexParameter);
-            AddAction(new MethodDescriptor("PersonRepository", "GetSimpleType", "PersonRepository/GetSimpleType"), PersonRepository_GetSimpleType);
-            AddAction(new MethodDescriptor("PersonRepository", "GetSimpleTypeAsAsync", "PersonRepository/GetSimpleTypeAsAsync"), PersonRepository_GetSimpleTypeAsAsync);
-            AddAction(new MethodDescriptor("PersonRepository", "GetSinglePerson", "PersonRepository/GetSinglePerson"), PersonRepository_GetSinglePerson);
-            AddAction(new MethodDescriptor("PersonRepository", "GetSinglePersonAsAsync", "PersonRepository/GetSinglePersonAsAsync"), PersonRepository_GetSinglePersonAsAsync);
-            AddAction(new MethodDescriptor("PersonRepository", "GetManyPersons", "PersonRepository/GetManyPersons"), PersonRepository_GetManyPersons);
-            AddAction(new MethodDescriptor("PersonRepository", "GetManyPersonsAsAsync", "PersonRepository/GetManyPersonsAsAsync"), PersonRepository_GetManyPersonsAsAsync);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.UpdatePerson, PersonRepository_UpdatePerson);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.DoNothingAsAsync, PersonRepository_DoNothingAsAsync);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.DoNothing, PersonRepository_DoNothing);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.DoNothingWithComplexParameterAsAsync, PersonRepository_DoNothingWithComplexParameterAsAsync);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.DoNothingWithComplexParameter, PersonRepository_DoNothingWithComplexParameter);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.GetSimpleType, PersonRepository_GetSimpleType);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.GetSimpleTypeAsAsync, PersonRepository_GetSimpleTypeAsAsync);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.GetSinglePerson, PersonRepository_GetSinglePerson);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.GetSinglePersonAsAsync, PersonRepository_GetSinglePersonAsAsync);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.GetManyPersons, PersonRepository_GetManyPersons);
+            AddAction(TestService.Core.PersonRepositoryDescriptor.GetManyPersonsAsAsync, PersonRepository_GetManyPersonsAsAsync);
 
             base.Init();
         }

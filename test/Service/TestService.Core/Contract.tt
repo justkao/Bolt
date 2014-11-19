@@ -1,7 +1,7 @@
 ﻿<#@ template debug="false" hostspecific="false" language="C#" #>
 <#@ assembly name="System.Core" #>
-<#@ assembly name="$(SolutionDir)Bolt\bin\$(Configuration)\Bolt.Core.dll" #>
-<#@ assembly name="$(SolutionDir)Bolt.Generators\bin\$(Configuration)\Bolt.Generators.dll" #>
+<#@ assembly name="$(SolutionDir)src\Bolt.Core\bin\$(Configuration)\Bolt.Core.dll" #>
+<#@ assembly name="$(SolutionDir)src\Bolt.Generators\bin\$(Configuration)\Bolt.Generators.dll" #>
 <#@ assembly name="$(TargetDir)TestService.Core.dll" #>
 <#@ import namespace="System.Linq" #>
 <#@ import namespace="System.Text" #>

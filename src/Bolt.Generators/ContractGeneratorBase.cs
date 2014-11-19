@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 
 namespace Bolt.Generators
 {
@@ -56,5 +57,11 @@ namespace Bolt.Generators
         }
 
         public abstract void Generate();
+
+        protected virtual string GetMethodDescriptorReference(MethodDescriptor descriptor, MethodInfo info)
+        {
+            TypeDescriptor typeDescriptor = MetadataProvider.GetTypeDescriptor(info.DeclaringType);
+            return typeDescriptor.FullName + "." + descriptor.Method;
+        }
     }
 }

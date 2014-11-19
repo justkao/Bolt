@@ -31,6 +31,11 @@ namespace Bolt.Generators
 
         public override void Generate()
         {
+            TypeDescriptorGenerator typeDescriptorGenerator = new TypeDescriptorGenerator(Output, Formatter, IntendProvider);
+            typeDescriptorGenerator.MetadataProvider = MetadataProvider;
+            typeDescriptorGenerator.Contract = Contract;
+            typeDescriptorGenerator.Generate();
+
             IReadOnlyCollection<Type> contracts = Contract.GetEffectiveContracts();
             ParametersGenerator generator = new ParametersGenerator(Output, Formatter, IntendProvider);
             generator.BaseClass = BaseClass;

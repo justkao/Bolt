@@ -33,14 +33,12 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>SigningKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\packages\Newtonsoft.Json.6.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
-    </Reference>
     <Reference Include="protobuf-net">
-      <HintPath>..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+      <HintPath>..\..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -53,7 +51,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncOperationAttribute.cs" />
-    <Compile Include="ClassDescriptor.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="ContractDefinition.cs" />
     <Compile Include="Empty.cs" />
@@ -62,9 +59,8 @@
     <Compile Include="ExecutionContextBase.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="IEndpointProvider.cs" />
-    <Compile Include="IMetadataProvider.cs" />
     <Compile Include="ISerializer.cs" />
-    <Compile Include="JsonSerializer.cs" />
+    <None Include="JsonSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ProtocolBufferSerializer.cs" />
     <Compile Include="Response.cs" />
@@ -74,7 +70,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="SigningKey.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

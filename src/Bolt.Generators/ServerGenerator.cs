@@ -1,5 +1,4 @@
 using Bolt.Server;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -38,8 +37,6 @@ namespace Bolt.Generators
         {
             BeginNamespace(ServerNamespace ?? Contract.RootContract.Namespace);
 
-            IReadOnlyCollection<Type> contracts = Contract.GetEffectiveContracts();
-
             string name = ExecutorClassType ?? string.Format("{0}{1}", Contract.RootContract.StripInterfaceName(), FormatType<Executor>());
 
             WriteLine("public partial class {0} : {1}, {2}", name, typeof(Executor).FullName, FormatType<IExecutor>());
@@ -48,9 +45,10 @@ namespace Bolt.Generators
             WriteLine("public override void Init()");
             BeginBlock();
 
-            foreach (MethodInfo method in contracts.SelectMany(t => t.GetMethods()).Distinct())
+
+            foreach (MethodInfo method in Contract.GetEffectiveMethods())
             {
-                WriteLine("AddAction({0}, {1});", FormatDescriptor(MetadataProvider.GetRemoteUrl(Contract, method)), FormatMethodName(method, MetadataProvider));
+                WriteLine("AddAction({0}, {1});", FormatDescriptor(MetadataProvider.GetMethodDescriptor(Contract, method), method), FormatMethodName(method, MetadataProvider));
             }
             WriteLine();
             WriteLine("base.Init();");
@@ -59,7 +57,7 @@ namespace Bolt.Generators
             WriteLine();
 
             ParametersGenerator generator = new ParametersGenerator(Output, Formatter, IntendProvider);
-            IEnumerable<MethodInfo> methods = contracts.SelectMany(t => t.GetMethods()).Distinct().ToList();
+            IEnumerable<MethodInfo> methods = Contract.GetEffectiveMethods().ToList();
 
             foreach (MethodInfo method in methods)
             {
@@ -68,7 +66,7 @@ namespace Bolt.Generators
 
                 if (HasParameters(method))
                 {
-                    ClassDescriptor descriptor = MetadataProvider.GetParametersClass(method.DeclaringType, method);
+                    ParametersDescriptor descriptor = MetadataProvider.GetParametersClass(method.DeclaringType, method);
                     AddUsings(descriptor.Namespace);
                     WriteLine("var parameters = await DataHandler.ReadParametersAsync<{0}>(context);", descriptor.Name);
                 }
@@ -100,9 +98,9 @@ namespace Bolt.Generators
             ExecutorClassType = name;
         }
 
-        private string FormatDescriptor(MethodDescriptor descriptor)
+        private string FormatDescriptor(MethodDescriptor descriptor, MethodInfo info)
         {
-            return string.Format("new MethodDescriptor(\"{0}\", \"{1}\", \"{2}\")", descriptor.Contract, descriptor.Method, descriptor.Url);
+            return GetMethodDescriptorReference(descriptor, info);
         }
 
         private string FormatMethodName(MethodInfo info, IMetadataProvider provider)
