@@ -57,7 +57,6 @@ namespace TestService.Core
         public ActionDescriptor InnerOperation { get; private set; }
 
         public ActionDescriptor InnerOperationExAsync { get; private set; }
-
     }
 }
 
@@ -125,9 +124,5 @@ namespace TestService.Core.Parameters
         [DataMember(Order = 1)]
         public Person Person { get; set; }
     }
-}
-
-namespace TestService.Core.Parameters
-{
 }
 
