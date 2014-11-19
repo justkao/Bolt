@@ -10,6 +10,7 @@ namespace Bolt
             Method = method;
             Url = url;
             Parameters = parameters;
+            HasParameters = parameters != typeof(Empty);
         }
 
         public string Contract { get; private set; }
@@ -19,5 +20,7 @@ namespace Bolt
         public string Url { get; private set; }
 
         public Type Parameters { get; set; }
+
+        public bool HasParameters { get; private set; }
     }
 }
