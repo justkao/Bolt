@@ -17,7 +17,8 @@
 <#@ output extension="Designer.cs" #>
 <#  
 	var result = Generator.Create(Contracts.PersonRepository)
-		.StatefullClient()
+		.StatefullClient(null, true)
+		.Async(true)
 		.GetResult();
 
 	Write(result);

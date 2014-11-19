@@ -29,6 +29,8 @@ namespace TestService.Core
             GetManyPersonsAsAsync = Add("GetManyPersonsAsAsync", typeof(TestService.Core.Parameters.GetManyPersonsAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetManyPersonsAsAsync"));
             InnerOperation = Add("InnerOperation", typeof(Bolt.Empty), typeof(IPersonRepositoryInner).GetTypeInfo().GetMethod("InnerOperation"));
             InnerOperationExAsync = Add("InnerOperationExAsync", typeof(Bolt.Empty), typeof(IPersonRepositoryInner).GetTypeInfo().GetMethod("InnerOperationExAsync"));
+            InnerOperation2 = Add("InnerOperation2", typeof(Bolt.Empty), typeof(IPersonRepositoryInner2).GetTypeInfo().GetMethod("InnerOperation2"));
+            InnerOperationExAsync2 = Add("InnerOperationExAsync2", typeof(Bolt.Empty), typeof(IPersonRepositoryInner2).GetTypeInfo().GetMethod("InnerOperationExAsync2"));
         }
 
         public static readonly PersonRepositoryDescriptor Default = new PersonRepositoryDescriptor();
@@ -60,6 +62,10 @@ namespace TestService.Core
         public virtual ActionDescriptor InnerOperation { get; private set; }
 
         public virtual ActionDescriptor InnerOperationExAsync { get; private set; }
+
+        public virtual ActionDescriptor InnerOperation2 { get; private set; }
+
+        public virtual ActionDescriptor InnerOperationExAsync2 { get; private set; }
     }
 }
 

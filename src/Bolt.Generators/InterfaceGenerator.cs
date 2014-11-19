@@ -51,7 +51,7 @@ namespace Bolt.Generators
 
             BeginNamespace(iface.Namespace);
 
-            IEnumerable<string> asyncBase = (from i in ContractDefinition.GetEffectiveContracts(iface)
+            IEnumerable<string> asyncBase = (from i in ContractDefinition.GetEffectiveContracts(iface).Where(ShouldHaveAsyncMethods)
                                              select FormatType(i) + "Async").ToList();
 
             StringBuilder sb = new StringBuilder();
@@ -63,7 +63,7 @@ namespace Bolt.Generators
             if (sb.Length > 0)
             {
                 sb.Remove(sb.Length - 2, 2);
-                sb.Insert(0, ",");
+                sb.Insert(0, ", ");
             }
 
             WriteLine("public interface {0} : {1}{2}", name, FormatType(iface), sb.ToString());

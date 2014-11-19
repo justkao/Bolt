@@ -75,5 +75,15 @@ namespace TestService.Core
         {
             return Task.FromResult(0);
         }
+
+        public void InnerOperation2()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task InnerOperationExAsync2()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

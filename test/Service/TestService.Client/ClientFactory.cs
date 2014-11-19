@@ -14,6 +14,8 @@ namespace TestService.Client
             repository.Prefix = Servers.Prefix;
             repository.Contract = Contracts.PersonRepository;
             repository.ContractDescriptor = new PersonRepositoryDescriptor();
+            repository.Retries = 10;
+            repository.RetryDelay = TimeSpan.FromSeconds(2);
 
             new ClientConfiguration().Update(repository);
             return repository;

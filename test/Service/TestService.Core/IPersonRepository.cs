@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace TestService.Core
 {
     [ServiceContract]
-    public interface IPersonRepository : IPersonRepositoryInner
+    public interface IPersonRepository : IPersonRepositoryInner, IPersonRepositoryInner2
     {
         [OperationContract]
         [AsyncOperation]

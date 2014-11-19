@@ -13,7 +13,7 @@ using TestService.Core.Parameters;
 
 namespace TestService.Core
 {
-    public partial class PersonRepository : StatefullChannel, Bolt.Client.IChannel, TestService.Core.IPersonRepository
+    public partial class PersonRepository : StatefullChannel, Bolt.Client.IChannel, TestService.Core.IPersonRepository, IPersonRepositoryAsync
     {
         public TestService.Core.PersonRepositoryDescriptor ContractDescriptor { get; set; }
 
@@ -47,6 +47,16 @@ namespace TestService.Core
             return Send<Person, UpdatePersonThatThrowsInvalidOperationExceptionParameters>(request, descriptor, token);
         }
 
+        public Task<Person> UpdatePersonThatThrowsInvalidOperationExceptionAsync(Person person)
+        {
+            var request = new UpdatePersonThatThrowsInvalidOperationExceptionParameters();
+            request.Person = person;
+            var descriptor = ContractDescriptor.UpdatePersonThatThrowsInvalidOperationException;
+            var token = GetCancellationToken(descriptor);
+
+            return SendAsync<Person, UpdatePersonThatThrowsInvalidOperationExceptionParameters>(request, descriptor, token);
+        }
+
         public Task DoNothingAsAsync()
         {
             var descriptor = ContractDescriptor.DoNothingAsAsync;
@@ -61,6 +71,14 @@ namespace TestService.Core
             var token = GetCancellationToken(descriptor);
 
             Send(Empty.Instance, descriptor, token);
+        }
+
+        public Task DoNothingAsync()
+        {
+            var descriptor = ContractDescriptor.DoNothing;
+            var token = GetCancellationToken(descriptor);
+
+            return SendAsync(Empty.Instance, descriptor, token);
         }
 
         public Task DoNothingWithComplexParameterAsAsync(List<Person> person)
@@ -83,6 +101,16 @@ namespace TestService.Core
             Send(request, descriptor, token);
         }
 
+        public Task DoNothingWithComplexParameterAsync(List<Person> person)
+        {
+            var request = new DoNothingWithComplexParameterParameters();
+            request.Person = person;
+            var descriptor = ContractDescriptor.DoNothingWithComplexParameter;
+            var token = GetCancellationToken(descriptor);
+
+            return SendAsync(request, descriptor, token);
+        }
+
         public int GetSimpleType(int arg)
         {
             var request = new GetSimpleTypeParameters();
@@ -91,6 +119,16 @@ namespace TestService.Core
             var token = GetCancellationToken(descriptor);
 
             return Send<int, GetSimpleTypeParameters>(request, descriptor, token);
+        }
+
+        public Task<int> GetSimpleTypeAsync(int arg)
+        {
+            var request = new GetSimpleTypeParameters();
+            request.Arg = arg;
+            var descriptor = ContractDescriptor.GetSimpleType;
+            var token = GetCancellationToken(descriptor);
+
+            return SendAsync<int, GetSimpleTypeParameters>(request, descriptor, token);
         }
 
         public Task GetSimpleTypeAsAsync(int arg)
@@ -113,6 +151,16 @@ namespace TestService.Core
             return Send<Person, GetSinglePersonParameters>(request, descriptor, token);
         }
 
+        public Task<Person> GetSinglePersonAsync(Person person)
+        {
+            var request = new GetSinglePersonParameters();
+            request.Person = person;
+            var descriptor = ContractDescriptor.GetSinglePerson;
+            var token = GetCancellationToken(descriptor);
+
+            return SendAsync<Person, GetSinglePersonParameters>(request, descriptor, token);
+        }
+
         public Task<Person> GetSinglePersonAsAsync(Person person)
         {
             var request = new GetSinglePersonAsAsyncParameters();
@@ -133,6 +181,16 @@ namespace TestService.Core
             return Send<List<Person>, GetManyPersonsParameters>(request, descriptor, token);
         }
 
+        public Task<List<Person>> GetManyPersonsAsync(Person person)
+        {
+            var request = new GetManyPersonsParameters();
+            request.Person = person;
+            var descriptor = ContractDescriptor.GetManyPersons;
+            var token = GetCancellationToken(descriptor);
+
+            return SendAsync<List<Person>, GetManyPersonsParameters>(request, descriptor, token);
+        }
+
         public Task<List<Person>> GetManyPersonsAsAsync(Person person)
         {
             var request = new GetManyPersonsAsAsyncParameters();
@@ -150,6 +208,14 @@ namespace TestService.Core
             Send(Empty.Instance, descriptor, token);
         }
 
+        public Task InnerOperationAsync()
+        {
+            var descriptor = ContractDescriptor.InnerOperation;
+            var token = GetCancellationToken(descriptor);
+
+            return SendAsync(Empty.Instance, descriptor, token);
+        }
+
         public Task InnerOperationExAsync()
         {
             var descriptor = ContractDescriptor.InnerOperationExAsync;
@@ -157,6 +223,65 @@ namespace TestService.Core
 
             return SendAsync(Empty.Instance, descriptor, token);
         }
+        public void InnerOperation2()
+        {
+            var descriptor = ContractDescriptor.InnerOperation2;
+            var token = GetCancellationToken(descriptor);
+
+            Send(Empty.Instance, descriptor, token);
+        }
+
+        public Task InnerOperation2Async()
+        {
+            var descriptor = ContractDescriptor.InnerOperation2;
+            var token = GetCancellationToken(descriptor);
+
+            return SendAsync(Empty.Instance, descriptor, token);
+        }
+
+        public Task InnerOperationExAsync2()
+        {
+            var descriptor = ContractDescriptor.InnerOperationExAsync2;
+            var token = GetCancellationToken(descriptor);
+
+            return SendAsync(Empty.Instance, descriptor, token);
+        }
+    }
+}
+
+namespace TestService.Core
+{
+    public interface IPersonRepositoryInnerAsync : IPersonRepositoryInner
+    {
+        Task InnerOperationAsync();
+    }
+}
+
+namespace TestService.Core
+{
+    public interface IPersonRepositoryInner2Async : IPersonRepositoryInner2
+    {
+        Task InnerOperation2Async();
+    }
+}
+
+namespace TestService.Core
+{
+    public interface IPersonRepositoryAsync : IPersonRepository, IPersonRepositoryInnerAsync, IPersonRepositoryInner2Async
+    {
+        Task<Person> UpdatePersonAsync(Person person);
+
+        Task<Person> UpdatePersonThatThrowsInvalidOperationExceptionAsync(Person person);
+
+        Task DoNothingAsync();
+
+        Task DoNothingWithComplexParameterAsync(List<Person> person);
+
+        Task<int> GetSimpleTypeAsync(int arg);
+
+        Task<Person> GetSinglePersonAsync(Person person);
+
+        Task<List<Person>> GetManyPersonsAsync(Person person);
     }
 }
 

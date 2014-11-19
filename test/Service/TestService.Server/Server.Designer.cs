@@ -36,6 +36,8 @@ namespace TestService.Core
             AddAction(ContractDescriptor.GetManyPersonsAsAsync, PersonRepository_GetManyPersonsAsAsync);
             AddAction(ContractDescriptor.InnerOperation, PersonRepositoryInner_InnerOperation);
             AddAction(ContractDescriptor.InnerOperationExAsync, PersonRepositoryInner_InnerOperationExAsync);
+            AddAction(ContractDescriptor.InnerOperation2, PersonRepositoryInner2_InnerOperation2);
+            AddAction(ContractDescriptor.InnerOperationExAsync2, PersonRepositoryInner2_InnerOperationExAsync2);
 
             base.Init();
         }
@@ -147,6 +149,20 @@ namespace TestService.Core
         {
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepositoryInner>(context);
             await instance.InnerOperationExAsync();
+            await ResponseHandler.Handle(context);
+        }
+
+        protected virtual async Task PersonRepositoryInner2_InnerOperation2(Bolt.Server.ServerExecutionContext context)
+        {
+            var instance = await InstanceProvider.GetInstanceAsync<IPersonRepositoryInner2>(context);
+            instance.InnerOperation2();
+            await ResponseHandler.Handle(context);
+        }
+
+        protected virtual async Task PersonRepositoryInner2_InnerOperationExAsync2(Bolt.Server.ServerExecutionContext context)
+        {
+            var instance = await InstanceProvider.GetInstanceAsync<IPersonRepositoryInner2>(context);
+            await instance.InnerOperationExAsync2();
             await ResponseHandler.Handle(context);
         }
     }
