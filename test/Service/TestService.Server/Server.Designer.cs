@@ -1,5 +1,4 @@
 ﻿
-
 using Bolt;
 using Bolt.Server;
 using System;

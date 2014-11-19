@@ -1,24 +1,6 @@
-﻿<#@ template debug="false" hostspecific="false" language="C#" #>
-<#@ assembly name="System.Core" #>
-<#@ assembly name="System.Runtime" #>
-<#@ assembly name="$(SolutionDir)src\Bolt.Core\bin\$(Configuration)\Bolt.Core.dll" #>
-<#@ assembly name="$(SolutionDir)src\Bolt.Generators\bin\$(Configuration)\Bolt.Generators.dll" #>
-<#@ assembly name="$(SolutionDir)src\Bolt.Server\bin\$(Configuration)\Bolt.Server.dll" #>
+﻿<#@ import namespace="TestService.Core" #>
+<#@ include file="$(SolutionDir)src\Bolt.Generators\Generator.tt" #>
 <#@ assembly name="$(SolutionDir)test\Service\TestService.Core\bin\$(Configuration)\TestService.Core.dll" #>
-
-<#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="System.IO" #>
-<#@ import namespace="Bolt" #>
-<#@ import namespace="System.Collections.Generic" #>
-<#@ import namespace="Bolt.Generators" #>
-<#@ import namespace="TestService.Core" #>
-
-<#@ output extension="Designer.cs" #>
 <#  
-	var result = Generator.Create()
-		.Server(Contracts.PersonRepository)
-		.GetResult();
-
-	Write(result);
+	Write(Create(Contracts.PersonRepository).Server().GetResult()); 
 #>

@@ -1,25 +1,10 @@
-﻿<#@ template debug="false" hostspecific="false" language="C#" #>
-<#@ assembly name="System.Core" #>
-<#@ assembly name="System.Runtime" #>
-<#@ assembly name="$(SolutionDir)src\Bolt.Core\bin\$(Configuration)\Bolt.Core.dll" #>
-<#@ assembly name="$(SolutionDir)src\Bolt.Generators\bin\$(Configuration)\Bolt.Generators.dll" #>
-<#@ assembly name="$(SolutionDir)src\Bolt.Client\bin\$(Configuration)\Bolt.Client.dll" #>
+﻿<#@ import namespace="TestService.Core" #>
+<#@ include file="$(SolutionDir)src\Bolt.Generators\Generator.tt" #>
 <#@ assembly name="$(SolutionDir)test\Service\TestService.Core\bin\$(Configuration)\TestService.Core.dll" #>
-
-<#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="System.IO" #>
-<#@ import namespace="Bolt" #>
-<#@ import namespace="System.Collections.Generic" #>
-<#@ import namespace="Bolt.Generators" #>
-<#@ import namespace="TestService.Core" #>
-
-<#@ output extension="Designer.cs" #>
 <#  
-	var result = Generator.Create(Contracts.PersonRepository)
-		.StatefullClient(null, true)
-		.Async(true)
-		.GetResult();
-
+	var result = Create(Contracts.PersonRepository)
+					.StatefullClient(null, true)
+					.Async(true)
+					.GetResult();
 	Write(result);
 #>

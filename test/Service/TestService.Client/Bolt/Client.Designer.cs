@@ -1,5 +1,4 @@
 ﻿
-
 using Bolt;
 using Bolt.Client;
 using System;
@@ -13,7 +12,7 @@ using TestService.Core.Parameters;
 
 namespace TestService.Core
 {
-    public partial class PersonRepository : StatefullChannel, Bolt.Client.IChannel, TestService.Core.IPersonRepository, IPersonRepositoryAsync
+    public partial class PersonRepository : StatefullChannel, Bolt.Client.IChannel, TestService.Core.IPersonRepository
     {
         public TestService.Core.PersonRepositoryDescriptor ContractDescriptor { get; set; }
 
