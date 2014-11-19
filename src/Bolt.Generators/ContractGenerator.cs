@@ -21,7 +21,7 @@ namespace Bolt.Generators
         public static string Generate(ContractDefinition definition)
         {
             ContractGenerator generator = new ContractGenerator();
-            generator.Contract = definition;
+            generator.ContractDefinition = definition;
             generator.Generate();
 
             return generator.Output.GetStringBuilder().ToString();
@@ -33,19 +33,19 @@ namespace Bolt.Generators
         {
             ContractDescriptorGenerator contractDescriptorGenerator = new ContractDescriptorGenerator(Output, Formatter, IntendProvider);
             contractDescriptorGenerator.MetadataProvider = MetadataProvider;
-            contractDescriptorGenerator.Contract = Contract;
+            contractDescriptorGenerator.ContractDefinition = ContractDefinition;
             contractDescriptorGenerator.Generate();
 
-            IReadOnlyCollection<Type> contracts = Contract.GetEffectiveContracts();
+            IReadOnlyCollection<Type> contracts = ContractDefinition.GetEffectiveContracts();
             ParametersGenerator generator = new ParametersGenerator(Output, Formatter, IntendProvider);
             generator.BaseClass = BaseClass;
 
             foreach (Type type in contracts)
             {
-                if (Contract.GetEffectiveMethods(type).Any(HasParameters))
+                if (ContractDefinition.GetEffectiveMethods(type).Any(HasParameters))
                 {
                     BeginNamespace(MetadataProvider.GetParameterDescriptor(type, null).Namespace);
-                    IEnumerable<MethodInfo> methods = Contract.GetEffectiveMethods(type).ToList();
+                    IEnumerable<MethodInfo> methods = ContractDefinition.GetEffectiveMethods(type).ToList();
 
                     foreach (MethodInfo method in methods)
                     {

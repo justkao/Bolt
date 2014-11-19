@@ -12,8 +12,8 @@
 <#@ import namespace="TestService.Core" #>
 <#@ output extension="Designer.cs" #>
 <#
-	string result =	Generator.Create()
-					.Contract(Contracts.PersonRepository)
+	string result =	Generator.Create(Contracts.PersonRepository)
+					.Contract()
 					.GetResult();
 
     Write(result);

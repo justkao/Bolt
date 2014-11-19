@@ -6,6 +6,11 @@ namespace Bolt
 {
     public static class TaskExtensions
     {
+        public static void Sleep(TimeSpan time)
+        {
+            Task.Delay(time).Wait();
+        }
+
         public static T Execute<T>(Func<Task<T>> asyncFunction)
         {
             try

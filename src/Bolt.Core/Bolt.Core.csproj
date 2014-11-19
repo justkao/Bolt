@@ -59,7 +59,6 @@
     <Compile Include="EndpointProvider.cs" />
     <Compile Include="ErrorResponse.cs" />
     <Compile Include="ExecutionContextBase.cs" />
-    <Compile Include="Extensions.cs" />
     <Compile Include="IEndpointProvider.cs" />
     <Compile Include="ISerializer.cs" />
     <Compile Include="JsonSerializer.cs" />

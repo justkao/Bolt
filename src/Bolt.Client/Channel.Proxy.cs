@@ -72,7 +72,7 @@ namespace Bolt.Client
                 }
                 if (RetryDelay != null)
                 {
-                    Extensions.Sleep(RetryDelay.Value);
+                    TaskExtensions.Sleep(RetryDelay.Value);
                 }
             }
         }

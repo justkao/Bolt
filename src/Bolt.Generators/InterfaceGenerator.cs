@@ -20,9 +20,9 @@ namespace Bolt.Generators
 
         public override void Generate()
         {
-            bool hasAsyncInterfaces = Contract.GetEffectiveContracts().Any(ShouldHaveAsyncMethods);
+            bool hasAsyncInterfaces = ContractDefinition.GetEffectiveContracts().Any(ShouldHaveAsyncMethods);
 
-            foreach (var iface in Contract.GetEffectiveContracts().Except(new[] { Contract.Root }))
+            foreach (var iface in ContractDefinition.GetEffectiveContracts().Except(new[] { ContractDefinition.Root }))
             {
                 if (hasAsyncInterfaces)
                 {
@@ -30,7 +30,7 @@ namespace Bolt.Generators
                 }
             }
 
-            GenerateAsyncInterface(Contract.Root);
+            GenerateAsyncInterface(ContractDefinition.Root);
         }
 
         private void GenerateAsyncInterface(Type iface)
@@ -40,7 +40,7 @@ namespace Bolt.Generators
                 return;
             }
 
-            if (!Contract.GetEffectiveContracts(iface).Concat(new[] { iface }).Any(ShouldHaveAsyncMethods))
+            if (!ContractDefinition.GetEffectiveContracts(iface).Concat(new[] { iface }).Any(ShouldHaveAsyncMethods))
             {
                 return;
             }
@@ -51,7 +51,7 @@ namespace Bolt.Generators
 
             BeginNamespace(iface.Namespace);
 
-            IEnumerable<string> asyncBase = (from i in Contract.GetEffectiveContracts(iface)
+            IEnumerable<string> asyncBase = (from i in ContractDefinition.GetEffectiveContracts(iface)
                                              select FormatType(i) + "Async").ToList();
 
             StringBuilder sb = new StringBuilder();
@@ -69,7 +69,7 @@ namespace Bolt.Generators
             WriteLine("public interface {0} : {1}{2}", name, FormatType(iface), sb.ToString());
             BeginBlock();
 
-            List<MethodInfo> methods = (from m in Contract.GetEffectiveMethods(iface)
+            List<MethodInfo> methods = (from m in ContractDefinition.GetEffectiveMethods(iface)
                                         where ShouldBeAsync(m, ForceAsync)
                                         select m).ToList();
 
@@ -91,7 +91,7 @@ namespace Bolt.Generators
 
         private bool ShouldHaveAsyncMethods(Type iface)
         {
-            return Contract.GetEffectiveMethods(iface).Any(m => ShouldBeAsync(m, ForceAsync));
+            return ContractDefinition.GetEffectiveMethods(iface).Any(m => ShouldBeAsync(m, ForceAsync));
         }
     }
 }

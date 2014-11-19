@@ -32,13 +32,13 @@ namespace Bolt.Generators
             set { _metadataProvider = value; }
         }
 
-        public ContractDefinition Contract
+        public ContractDefinition ContractDefinition
         {
             get
             {
                 if (_contract == null)
                 {
-                    throw new InvalidOperationException("Contract definition is not initialized.");
+                    throw new InvalidOperationException("ContractDefinition definition is not initialized.");
                 }
 
                 return _contract;
@@ -50,10 +50,8 @@ namespace Bolt.Generators
 
                 if (value != null)
                 {
-                    value.Validate();
-
                     AddUsings(typeof(ContractDefinition).Namespace);
-                    AddUsings(Contract.Namespace);
+                    AddUsings(ContractDefinition.Namespace);
                 }
             }
         }
@@ -67,7 +65,7 @@ namespace Bolt.Generators
                 return false;
             }
 
-            List<MethodInfo> methods = Contract.GetEffectiveMethods(method.DeclaringType).ToList();
+            List<MethodInfo> methods = ContractDefinition.GetEffectiveMethods(method.DeclaringType).ToList();
 
             if (force)
             {

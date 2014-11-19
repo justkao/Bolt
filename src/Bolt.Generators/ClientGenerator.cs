@@ -33,7 +33,7 @@ namespace Bolt.Generators
         {
             ClientGenerator generator = new ClientGenerator();
             generator.ClientNamespace = clientNamespace;
-            generator.Contract = definition;
+            generator.ContractDefinition = definition;
             generator.BaseClass = baseClass;
             generator.Generate();
 
@@ -50,14 +50,14 @@ namespace Bolt.Generators
 
         public override void Generate()
         {
-            BeginNamespace(ClientNamespace ?? Contract.Namespace);
+            BeginNamespace(ClientNamespace ?? ContractDefinition.Namespace);
 
-            List<Type> contracts = Contract.GetEffectiveContracts().ToList();
+            List<Type> contracts = ContractDefinition.GetEffectiveContracts().ToList();
 
-            WriteLine("public partial class {0} : {1}{2}, {3}", ClassName ?? Contract.Name, BaseClass != null ? BaseClass + ", " : null, typeof(IChannel).FullName, Contract.Root.FullName);
+            WriteLine("public partial class {0} : {1}{2}, {3}", ClassName ?? ContractDefinition.Name, BaseClass != null ? BaseClass + ", " : null, typeof(IChannel).FullName, ContractDefinition.Root.FullName);
             BeginBlock();
 
-            WriteLine("public {0} ContractDescriptor {{ get; set; }}", MetadataProvider.GetContractDescriptor(Contract).FullName);
+            WriteLine("public {0} ContractDescriptor {{ get; set; }}", MetadataProvider.GetContractDescriptor(ContractDefinition).FullName);
             WriteLine();
 
             foreach (Type type in contracts)
@@ -73,11 +73,11 @@ namespace Bolt.Generators
         private void Generate(Type contract, IMetadataProvider provider)
         {
             ParametersGenerator generator = new ParametersGenerator(Output, Formatter, IntendProvider);
-            MethodInfo[] methods = Contract.GetEffectiveMethods(contract).ToArray();
+            MethodInfo[] methods = ContractDefinition.GetEffectiveMethods(contract).ToArray();
 
             foreach (MethodInfo method in methods)
             {
-                GenerateMethod(method, generator, provider.GetMethodDescriptor(Contract, method), provider, false);
+                GenerateMethod(method, generator, provider.GetMethodDescriptor(ContractDefinition, method), provider, false);
 
                 bool generateAsync = ShouldBeAsync(method, ForceAsync);
 
@@ -95,7 +95,7 @@ namespace Bolt.Generators
 
                 if (generateAsync)
                 {
-                    GenerateMethod(method, generator, provider.GetMethodDescriptor(Contract, method), provider, true);
+                    GenerateMethod(method, generator, provider.GetMethodDescriptor(ContractDefinition, method), provider, true);
                     WriteLine();
                 }
             }

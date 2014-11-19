@@ -16,11 +16,17 @@ namespace Bolt
                 throw new ArgumentNullException("root");
             }
 
-            Root = root;
-            Name = root.StripInterfaceName();
-            Namespace = root.Namespace;
+            if (!root.GetTypeInfo().IsInterface)
+            {
+                throw new InvalidOperationException("Root contract definition must be interface type.");
+            }
 
+            Root = root;
+            Name = Root.Name[0] == 'I' ? Root.Name.Substring(1) : Root.Name;
+            Namespace = root.Namespace;
             _excludedContracts = excludedContracts != null ? excludedContracts.ToList() : new List<Type>();
+
+            Validate();
         }
 
         public Type Root { get; private set; }
@@ -32,25 +38,6 @@ namespace Bolt
         public IReadOnlyCollection<Type> ExcludedContracts
         {
             get { return _excludedContracts; }
-        }
-
-        public virtual void Validate()
-        {
-            if (!Root.GetTypeInfo().IsInterface)
-            {
-                throw new InvalidOperationException("Root contract definition must be interface type.");
-            }
-
-            foreach (Type contract in GetEffectiveContracts())
-            {
-                List<MethodInfo> methods = GetEffectiveMethods(contract).ToList();
-
-                if (methods.Select(m => m.Name).Distinct().Count() != methods.Count())
-                {
-                    throw new InvalidOperationException(
-                        string.Format("Interface {0} contains multiple methods with the same name.", contract.Name));
-                }
-            }
         }
 
         public virtual IEnumerable<Type> GetEffectiveContracts(Type iface)
@@ -97,6 +84,15 @@ namespace Bolt
                 {
                     yield return inner;
                 }
+            }
+        }
+
+        private void Validate()
+        {
+            List<MethodInfo> methods = GetEffectiveMethods().ToList();
+            if (methods.Select(m => m.Name).Distinct().Count() != methods.Count())
+            {
+                throw new InvalidOperationException(string.Format("Cotnract {0} contains multiple methods with the same name.", Root.FullName));
             }
         }
     }

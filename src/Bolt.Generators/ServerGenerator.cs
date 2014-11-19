@@ -27,7 +27,7 @@ namespace Bolt.Generators
         {
             ServerGenerator generator = new ServerGenerator();
             generator.ServerNamespace = serverNamespace;
-            generator.Contract = definition;
+            generator.ContractDefinition = definition;
             generator.Generate();
 
             return generator.Output.GetStringBuilder().ToString();
@@ -40,9 +40,9 @@ namespace Bolt.Generators
         public override void Generate()
         {
             AddUsings(BoltServerNamespace);
-            BeginNamespace(ServerNamespace ?? Contract.Namespace);
+            BeginNamespace(ServerNamespace ?? ContractDefinition.Namespace);
 
-            string name = ExecutorClassType ?? string.Format("{0}{1}", Contract.Name, ExecutorName);
+            string name = ExecutorClassType ?? string.Format("{0}{1}", ContractDefinition.Name, ExecutorName);
 
             WriteLine("public partial class {0} : {1}", name, ExecutorFullName);
             BeginBlock();
@@ -50,7 +50,7 @@ namespace Bolt.Generators
             WriteLine("public override void Init()");
             BeginBlock();
 
-            TypeDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(Contract);
+            TypeDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
 
             WriteLine("if (ContractDescriptor == null)");
             BeginBlock();
@@ -58,9 +58,9 @@ namespace Bolt.Generators
             EndBlock();
             WriteLine();
 
-            foreach (MethodInfo method in Contract.GetEffectiveMethods())
+            foreach (MethodInfo method in ContractDefinition.GetEffectiveMethods())
             {
-                WriteLine("AddAction(ContractDescriptor.{0}, {1});", MetadataProvider.GetMethodDescriptor(Contract, method).Name, FormatMethodName(method));
+                WriteLine("AddAction(ContractDescriptor.{0}, {1});", MetadataProvider.GetMethodDescriptor(ContractDefinition, method).Name, FormatMethodName(method));
             }
             WriteLine();
             WriteLine("base.Init();");
@@ -71,7 +71,7 @@ namespace Bolt.Generators
             WriteLine();
 
             ParametersGenerator generator = new ParametersGenerator(Output, Formatter, IntendProvider);
-            IEnumerable<MethodInfo> methods = Contract.GetEffectiveMethods().ToList();
+            IEnumerable<MethodInfo> methods = ContractDefinition.GetEffectiveMethods().ToList();
 
             foreach (MethodInfo method in methods)
             {

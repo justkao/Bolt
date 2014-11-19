@@ -1,8 +1,8 @@
+using Bolt.Client;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Bolt.Client;
 
 namespace Bolt.Generators
 {
@@ -20,9 +20,12 @@ namespace Bolt.Generators
         {
         }
 
-        public static Generator Create()
+        public static Generator Create(ContractDefinition contract = null)
         {
-            return new Generator();
+            return new Generator()
+            {
+                ContractDefinition = contract
+            };
         }
 
         public string GetResult()
@@ -42,7 +45,8 @@ namespace Bolt.Generators
                 catch (Exception e)
                 {
                     WriteLine("/*");
-                    WriteLine("Execution of '{0}' generator failed with error '{1}'", generatorBase.GetType().Name, e.ToString());
+                    WriteLine("Execution of '{0}' generator failed with error '{1}'", generatorBase.GetType().Name,
+                        e.ToString());
                     WriteLine("*/");
                 }
             }
@@ -57,25 +61,38 @@ namespace Bolt.Generators
             Output.GetStringBuilder().Insert(0, sb.ToString());
         }
 
-        public Generator All(ContractDefinition definition, bool statefull = false)
+        public Generator Async(bool force = false)
         {
-            Contract(definition);
-            Client(definition, null, statefull);
-            Server(definition);
-
-            return this;
+            return Add(new InterfaceGenerator(Output, Formatter, IntendProvider)
+            {
+                ContractDefinition = ContractDefinition,
+                ForceAsync = force
+            });
         }
 
         public Generator Async(ContractDefinition definition, bool force = false)
         {
-            return Add(new InterfaceGenerator(Output, Formatter, IntendProvider) { Contract = definition, ForceAsync = force });
+            return Add(new InterfaceGenerator(Output, Formatter, IntendProvider)
+            {
+                ContractDefinition = definition ?? ContractDefinition,
+                ForceAsync = force
+            });
+        }
+
+        public Generator Contract(string baseClass = null)
+        {
+            return Add(new ContractGenerator(Output, Formatter, IntendProvider)
+            {
+                ContractDefinition = ContractDefinition,
+                BaseClass = baseClass
+            });
         }
 
         public Generator Contract(ContractDefinition definition, string baseClass = null)
         {
             return Add(new ContractGenerator(Output, Formatter, IntendProvider)
             {
-                Contract = definition,
+                ContractDefinition = definition,
                 BaseClass = baseClass
             });
         }
@@ -84,25 +101,60 @@ namespace Bolt.Generators
         {
             return Add(new ServerGenerator(Output, Formatter, IntendProvider)
             {
-                Contract = definition,
+                ContractDefinition = definition,
                 ServerNamespace = ns,
             });
         }
 
-        public Generator Client(ContractDefinition definition, string ns = null, bool statefull = false, bool forceAsync = false, string className = null)
+        public Generator Server(string ns = null)
+        {
+            return Add(new ServerGenerator(Output, Formatter, IntendProvider)
+            {
+                ContractDefinition = ContractDefinition,
+                ServerNamespace = ns,
+            });
+        }
+
+        public Generator StatelessClient(string clientNamespace = null, bool forceAsync = false, string className = null)
         {
             AddUsings(typeof(Channel).Namespace);
 
-            return Client(definition, ns, statefull ? FormatType<StatefullChannel>() : FormatType<Channel>(), forceAsync, className);
+            return Client(ContractDefinition, clientNamespace, FormatType<Channel>(), forceAsync, className);
         }
 
-        public Generator Client(ContractDefinition definition, string ns = null, string baseClass = null, bool forceAsync = false, string className = null)
+        public Generator StatelessClient(ContractDefinition definition, string clientNamespace = null, bool forceAsync = false, string className = null)
+        {
+            AddUsings(typeof(Channel).Namespace);
+
+            return Client(definition, clientNamespace, FormatType<Channel>(), forceAsync, className);
+        }
+
+        public Generator StatefullClient(string clientNamespace = null, bool forceAsync = false, string className = null)
+        {
+            AddUsings(typeof(Channel).Namespace);
+
+            return Client(ContractDefinition, clientNamespace, FormatType<StatefullChannel>(), forceAsync, className);
+        }
+
+        public Generator StatefullClient(ContractDefinition definition, string clientNamespace = null, bool forceAsync = false, string className = null)
+        {
+            AddUsings(typeof(Channel).Namespace);
+
+            return Client(definition, clientNamespace, FormatType<StatefullChannel>(), forceAsync, className);
+        }
+
+        public Generator Client(string clientNamespace = null, string baseClass = null, bool forceAsync = false, string className = null)
+        {
+            return Client(ContractDefinition, clientNamespace, baseClass, forceAsync, className);
+        }
+
+        public Generator Client(ContractDefinition definition, string clientNamespace = null, string baseClass = null, bool forceAsync = false, string className = null)
         {
             return Add(new ClientGenerator(Output, Formatter, IntendProvider)
             {
-                ClientNamespace = ns,
+                ClientNamespace = clientNamespace,
                 BaseClass = baseClass,
-                Contract = definition,
+                ContractDefinition = definition,
                 ForceAsync = forceAsync,
                 ClassName = className
             });
@@ -111,7 +163,7 @@ namespace Bolt.Generators
         private Generator Add(ContractGeneratorBase generator)
         {
             generator.MetadataProvider = MetadataProvider;
-            Formatter.AddNamespace(generator.Contract.Namespace);
+            Formatter.AddNamespace(generator.ContractDefinition.Namespace);
             _contractGenerator.Add(generator);
             return this;
         }

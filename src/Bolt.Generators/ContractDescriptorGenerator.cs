@@ -23,20 +23,20 @@ namespace Bolt.Generators
         {
             AddUsings("System.Reflection");
 
-            IEnumerable<MethodInfo> methods = Contract.GetEffectiveMethods().ToList();
-            TypeDescriptor descriptor = MetadataProvider.GetContractDescriptor(Contract);
+            IEnumerable<MethodInfo> methods = ContractDefinition.GetEffectiveMethods().ToList();
+            TypeDescriptor descriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
 
             BeginNamespace(descriptor.Namespace);
 
             WriteLine("public partial class {0} : {1}", descriptor.Name, BaseClass ?? FormatType<ContractDescriptor>());
             BeginBlock();
 
-            WriteLine("public {0}() : base(typeof({1}))", descriptor.Name, Contract.Root.FullName);
+            WriteLine("public {0}() : base(typeof({1}))", descriptor.Name, ContractDefinition.Root.FullName);
             BeginBlock();
 
             foreach (MethodInfo method in methods)
             {
-                MethodDescriptor methodDescriptor = MetadataProvider.GetMethodDescriptor(Contract, method);
+                MethodDescriptor methodDescriptor = MetadataProvider.GetMethodDescriptor(ContractDefinition, method);
                 string parametersType = HasParameters(method)
                                             ? MetadataProvider.GetParameterDescriptor(method.DeclaringType, method).FullName
                                             : typeof(Empty).FullName;
@@ -58,7 +58,7 @@ namespace Bolt.Generators
 
             foreach (MethodInfo method in methods)
             {
-                MethodDescriptor methodDescriptor = MetadataProvider.GetMethodDescriptor(Contract, method);
+                MethodDescriptor methodDescriptor = MetadataProvider.GetMethodDescriptor(ContractDefinition, method);
                 WriteLine("public virtual {0} {1} {{ get; private set; }}", FormatType<ActionDescriptor>(), methodDescriptor.Name);
 
                 if (!Equals(method, methods.Last()))
