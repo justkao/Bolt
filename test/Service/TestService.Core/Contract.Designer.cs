@@ -16,6 +16,7 @@ namespace TestService.Core
         public PersonRepositoryDescriptor() : base(typeof(TestService.Core.IPersonRepository))
         {
             UpdatePerson = Add("UpdatePerson", typeof(TestService.Core.Parameters.UpdatePersonParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("UpdatePerson"));
+            UpdatePersonThatThrowsInvalidOperationException = Add("UpdatePersonThatThrowsInvalidOperationException", typeof(TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("UpdatePersonThatThrowsInvalidOperationException"));
             DoNothingAsAsync = Add("DoNothingAsAsync", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingAsAsync"));
             DoNothing = Add("DoNothing", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothing"));
             DoNothingWithComplexParameterAsAsync = Add("DoNothingWithComplexParameterAsAsync", typeof(TestService.Core.Parameters.DoNothingWithComplexParameterAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingWithComplexParameterAsAsync"));
@@ -33,6 +34,8 @@ namespace TestService.Core
         public static readonly PersonRepositoryDescriptor Default = new PersonRepositoryDescriptor();
 
         public virtual ActionDescriptor UpdatePerson { get; private set; }
+
+        public virtual ActionDescriptor UpdatePersonThatThrowsInvalidOperationException { get; private set; }
 
         public virtual ActionDescriptor DoNothingAsAsync { get; private set; }
 
@@ -64,6 +67,13 @@ namespace TestService.Core.Parameters
 {
     [DataContract]
     public partial class UpdatePersonParameters
+    {
+        [DataMember(Order = 1)]
+        public Person Person { get; set; }
+    }
+
+    [DataContract]
+    public partial class UpdatePersonThatThrowsInvalidOperationExceptionParameters
     {
         [DataMember(Order = 1)]
         public Person Person { get; set; }

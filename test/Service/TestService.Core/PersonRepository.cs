@@ -12,6 +12,11 @@ namespace TestService.Core
             return null;
         }
 
+        public Person UpdatePersonThatThrowsInvalidOperationException(Person person)
+        {
+            throw new InvalidOperationException("test message", new ArgumentOutOfRangeException("inner message"));
+        }
+
         public Task DoNothingAsAsync()
         {
             return Task.FromResult(0);

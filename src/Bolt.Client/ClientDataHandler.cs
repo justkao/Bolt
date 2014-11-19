@@ -11,7 +11,8 @@ namespace Bolt.Client
         private readonly JsonSerializerSettings _exceptionSerializerSettings = new JsonSerializerSettings()
         {
             TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
-            TypeNameHandling = TypeNameHandling.All
+            TypeNameHandling = TypeNameHandling.All,
+            Formatting = Formatting.None,
         };
 
         private readonly ISerializer _serializer;
@@ -100,14 +101,14 @@ namespace Bolt.Client
             }
         }
 
-        private Exception ReadException(ErrorResponse response)
+        protected virtual Exception ReadException(ErrorResponse response)
         {
             if (response == null || response.JsonException == null || response.JsonException.Length == 0)
             {
                 return null;
             }
 
-            return JsonConvert.DeserializeObject<Exception>(response.JsonException, _exceptionSerializerSettings);
+            return (Exception)JsonConvert.DeserializeObject(response.JsonException, _exceptionSerializerSettings);
         }
     }
 }

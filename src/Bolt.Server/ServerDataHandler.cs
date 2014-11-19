@@ -11,7 +11,7 @@ namespace Bolt.Server
         {
             TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
             TypeNameHandling = TypeNameHandling.All,
-            Formatting = Formatting.None,
+            Formatting = Formatting.None
         };
 
         private readonly ISerializer _serializer;
@@ -54,7 +54,7 @@ namespace Bolt.Server
             return context.Context.Response.Body.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
         }
 
-        private ErrorResponse Create(Exception e)
+        protected virtual ErrorResponse Create(Exception e)
         {
             return new ErrorResponse
             {

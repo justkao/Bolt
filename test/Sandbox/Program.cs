@@ -1,10 +1,7 @@
 ﻿
-using System.Runtime.Serialization.Formatters;
-using Bolt;
-using Bolt.Generators;
 using Newtonsoft.Json;
 using System;
-using JsonSerializer = Newtonsoft.Json.JsonSerializer;
+using System.Runtime.Serialization.Formatters;
 
 namespace Sandbox
 {
@@ -23,21 +20,29 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-            Exception e = new InvalidOperationException("Test", new Exception("inner"));
-            var resul = JsonConvert.SerializeObject(e, Formatting.None, new JsonSerializerSettings()
+            Exception e = new InvalidOperationException("Test");
+
+            try
+            {
+                throw e;
+            }
+            catch (Exception ex)
+            {
+                e = ex;
+            }
+
+            var resul = JsonConvert.SerializeObject(e, new JsonSerializerSettings()
             {
                 TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
-                TypeNameHandling = TypeNameHandling.All 
+                Formatting = Formatting.None,
+                TypeNameHandling = TypeNameHandling.All
             });
             e = (Exception)JsonConvert.DeserializeObject(resul, new JsonSerializerSettings()
             {
                 TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
+                Formatting = Formatting.None,
                 TypeNameHandling = TypeNameHandling.All
             });
-
-            JsonSerializer serializer = new JsonSerializer();
-            ContractDefinition definition = new ContractDefinition(typeof(ISamle1));
-            string result = Generator.Create().Contract(definition).GetResult();
 
         }
     }

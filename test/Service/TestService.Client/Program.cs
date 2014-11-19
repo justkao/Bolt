@@ -21,6 +21,19 @@ namespace TestService.Client
 
             // Execute(c => c.GetSimpleType(new Random().Next()), cnt, "GetSimpleType");
 
+            Execute(c =>
+            {
+                try
+                {
+                    c.UpdatePersonThatThrowsInvalidOperationException(Person.Create(10));
+                    Console.WriteLine("NOT OK ");
+                }
+                catch (InvalidOperationException)
+                {
+                }
+            }, cnt, "UpdatePersonThatThrowsInvalidOperationException");
+
+
             Execute(c => c.GetSinglePerson(Person.Create(10)), cnt, "GetSinglePerson");
 
             Execute(c => c.GetManyPersons(Person.Create(10)), cnt, "GetManyPersons");

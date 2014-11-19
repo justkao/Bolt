@@ -37,6 +37,16 @@ namespace TestService.Core
             return SendAsync<Person, UpdatePersonParameters>(request, descriptor, token);
         }
 
+        public Person UpdatePersonThatThrowsInvalidOperationException(Person person)
+        {
+            var request = new UpdatePersonThatThrowsInvalidOperationExceptionParameters();
+            request.Person = person;
+            var descriptor = ContractDescriptor.UpdatePersonThatThrowsInvalidOperationException;
+            var token = GetCancellationToken(descriptor);
+
+            return Send<Person, UpdatePersonThatThrowsInvalidOperationExceptionParameters>(request, descriptor, token);
+        }
+
         public Task DoNothingAsAsync()
         {
             var descriptor = ContractDescriptor.DoNothingAsAsync;

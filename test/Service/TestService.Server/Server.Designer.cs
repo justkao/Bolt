@@ -23,6 +23,7 @@ namespace TestService.Core
             }
 
             AddAction(ContractDescriptor.UpdatePerson, PersonRepository_UpdatePerson);
+            AddAction(ContractDescriptor.UpdatePersonThatThrowsInvalidOperationException, PersonRepository_UpdatePersonThatThrowsInvalidOperationException);
             AddAction(ContractDescriptor.DoNothingAsAsync, PersonRepository_DoNothingAsAsync);
             AddAction(ContractDescriptor.DoNothing, PersonRepository_DoNothing);
             AddAction(ContractDescriptor.DoNothingWithComplexParameterAsAsync, PersonRepository_DoNothingWithComplexParameterAsAsync);
@@ -46,6 +47,14 @@ namespace TestService.Core
             var parameters = await DataHandler.ReadParametersAsync<UpdatePersonParameters>(context);
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
             var result = instance.UpdatePerson(parameters.Person);
+            await ResponseHandler.Handle(context, result);
+        }
+
+        protected virtual async Task PersonRepository_UpdatePersonThatThrowsInvalidOperationException(Bolt.Server.ServerExecutionContext context)
+        {
+            var parameters = await DataHandler.ReadParametersAsync<UpdatePersonThatThrowsInvalidOperationExceptionParameters>(context);
+            var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
+            var result = instance.UpdatePersonThatThrowsInvalidOperationException(parameters.Person);
             await ResponseHandler.Handle(context, result);
         }
 

@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Bolt;
+using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
-
-using Bolt;
 
 namespace TestService.Core
 {
@@ -12,6 +11,9 @@ namespace TestService.Core
         [OperationContract]
         [AsyncOperation]
         Person UpdatePerson(Person person);
+
+        [OperationContract]
+        Person UpdatePersonThatThrowsInvalidOperationException(Person person);
 
         [OperationContract]
         Task DoNothingAsAsync();

@@ -157,6 +157,8 @@ namespace Bolt.Client
                     {
                         return new ResponseDescriptor<T>(context.Response, context, clientException, ResponseErrorType.Client);
                     }
+
+                    return new ResponseDescriptor<T>(context.Response, context, error, ResponseErrorType.Client);
                 }
                 catch (SerializationException e)
                 {

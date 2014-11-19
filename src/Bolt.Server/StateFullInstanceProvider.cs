@@ -95,7 +95,7 @@ namespace Bolt.Server
 
         public virtual void Dispose()
         {
-            // _timer.Dispose();
+            _timer.Dispose();
         }
     }
 }
