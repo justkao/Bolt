@@ -1,8 +1,8 @@
+using Microsoft.Owin;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.Owin;
 
 namespace Bolt.Server
 {
@@ -79,7 +79,7 @@ namespace Bolt.Server
             ActionMetadata metadata;
             if (_actions.TryGetValue(action, out metadata))
             {
-                ServerExecutionContext ctxt = new ServerExecutionContext(context, metadata.Descriptor);
+                ServerExecutionContext ctxt = new ServerExecutionContext(context, action);
 
                 Exception error = null;
                 try

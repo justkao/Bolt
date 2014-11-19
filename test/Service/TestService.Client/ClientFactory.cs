@@ -1,7 +1,6 @@
-﻿using System.ServiceModel;
-
-using Bolt.Client;
-
+﻿using Bolt.Client;
+using System;
+using System.ServiceModel;
 using TestService.Core;
 
 namespace TestService.Client
@@ -14,6 +13,7 @@ namespace TestService.Client
             repository.ServerUrl = Servers.IISBoltServer;
             repository.Prefix = Servers.Prefix;
             repository.Contract = Contracts.PersonRepository;
+            repository.ContractDescriptor = new PersonRepositoryDescriptor();
 
             new ClientConfiguration().Update(repository);
             return repository;
@@ -25,6 +25,9 @@ namespace TestService.Client
             repository.ServerUrl = Servers.BoltServer;
             repository.Prefix = Servers.Prefix;
             repository.Contract = Contracts.PersonRepository;
+            repository.ContractDescriptor = new PersonRepositoryDescriptor();
+            repository.Retries = 10;
+            repository.RetryDelay = TimeSpan.FromSeconds(2);
 
             new ClientConfiguration().Update(repository);
             return repository;

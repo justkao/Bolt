@@ -1,11 +1,19 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
+using System.Runtime.Serialization.Formatters;
 using System.Threading.Tasks;
 
 namespace Bolt.Client
 {
     public class ClientDataHandler : IClientDataHandler
     {
+        private readonly JsonSerializerSettings _exceptionSerializerSettings = new JsonSerializerSettings()
+        {
+            TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
+            TypeNameHandling = TypeNameHandling.All
+        };
+
         private readonly ISerializer _serializer;
 
         public ClientDataHandler(ISerializer serializer)
@@ -92,17 +100,14 @@ namespace Bolt.Client
             }
         }
 
-        private static Exception ReadException(ErrorResponse response)
+        private Exception ReadException(ErrorResponse response)
         {
-            if (response == null || response.RawException == null || response.RawException.Length == 0)
+            if (response == null || response.JsonException == null || response.JsonException.Length == 0)
             {
                 return null;
             }
 
-            return null;
-
-            // BinaryFormatter formatter = new BinaryFormatter();
-            // return (Exception)formatter.Deserialize(new MemoryStream(response.RawException));
+            return JsonConvert.DeserializeObject<Exception>(response.JsonException, _exceptionSerializerSettings);
         }
     }
 }

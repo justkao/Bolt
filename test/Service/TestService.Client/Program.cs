@@ -17,9 +17,9 @@ namespace TestService.Client
 
             int cnt = 10000;
 
-            Execute(c => c.DoNothing(), cnt, "DoNothing");
+            // Execute(c => c.DoNothing(), cnt, "DoNothing");
 
-            Execute(c => c.GetSimpleType(new Random().Next()), cnt, "GetSimpleType");
+            // Execute(c => c.GetSimpleType(new Random().Next()), cnt, "GetSimpleType");
 
             Execute(c => c.GetSinglePerson(Person.Create(10)), cnt, "GetSinglePerson");
 

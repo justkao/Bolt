@@ -60,12 +60,6 @@ namespace Bolt.Generators
 
         public abstract void Generate();
 
-        protected virtual string GetMethodDescriptorReference(ContractDefinition contract, MethodDescriptor descriptor)
-        {
-            TypeDescriptor typeDescriptor = MetadataProvider.GetDescriptor(contract.Root);
-            return typeDescriptor.FullName + ".Instance." + descriptor.Name;
-        }
-
         public virtual bool ShouldBeAsync(MethodInfo method, bool force)
         {
             if (method.IsAsync())

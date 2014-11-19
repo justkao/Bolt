@@ -7,8 +7,6 @@ namespace Bolt.Client
 {
     public abstract class StatefullChannel : Channel
     {
-        public string SessionId { get; set; }
-
         public string SessionHeader { get; set; }
 
         public virtual ChannelOpenedResult OpenedChannel { get; protected set; }
@@ -21,8 +19,7 @@ namespace Bolt.Client
         protected virtual ChannelOpenedResult Open(CancellationToken cancellation)
         {
             Uri serverUrl = ServerUrl;
-
-            return new ChannelOpenedResult(serverUrl, null);
+            return new ChannelOpenedResult(serverUrl, null, Guid.NewGuid().ToString());
         }
 
         protected virtual ChannelOpenedResult Open<TResult, TParameters>(ActionDescriptor descriptor, TParameters parameters, CancellationToken cancellation)
@@ -32,13 +29,14 @@ namespace Bolt.Client
             using (ClientExecutionContext ctxt = new ClientExecutionContext(descriptor, request, cancellation))
             {
                 ResponseDescriptor<TResult> response = RetrieveResponse<TResult, TParameters>(ctxt, parameters);
-                return new ChannelOpenedResult(server, response.GetResultOrThrow());
+                return new ChannelOpenedResult(server, response.GetResultOrThrow(), Guid.NewGuid().ToString());
             }
         }
 
         protected virtual Task<ChannelOpenedResult> OpenAsync(CancellationToken cancellation)
         {
-            return null;
+            Uri serverUrl = ServerUrl;
+            return Task.FromResult(new ChannelOpenedResult(serverUrl, null, Guid.NewGuid().ToString()));
         }
 
         protected virtual async Task<ChannelOpenedResult> OpenAsync<TResult, TParameters>(ActionDescriptor descriptor, TParameters parameters, CancellationToken cancellation)
@@ -48,13 +46,18 @@ namespace Bolt.Client
             using (ClientExecutionContext ctxt = new ClientExecutionContext(descriptor, request, cancellation))
             {
                 ResponseDescriptor<TResult> response = await RetrieveResponseAsync<TResult, TParameters>(ctxt, parameters);
-                return new ChannelOpenedResult(server, response.GetResultOrThrow());
+                return new ChannelOpenedResult(server, response.GetResultOrThrow(), Guid.NewGuid().ToString());
             }
         }
 
         protected override void BeforeSending(ClientExecutionContext context, object parameters)
         {
-            context.Request.Headers[SessionHeader] = SessionId;
+            ChannelOpenedResult channel = OpenedChannel;
+            if (channel != null)
+            {
+                context.Request.Headers[SessionHeader] = channel.SessionId;
+            }
+
             base.BeforeSending(context, parameters);
         }
 

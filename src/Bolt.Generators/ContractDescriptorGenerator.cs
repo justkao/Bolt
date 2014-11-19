@@ -24,11 +24,11 @@ namespace Bolt.Generators
             AddUsings("System.Reflection");
 
             IEnumerable<MethodInfo> methods = Contract.GetEffectiveMethods().ToList();
-            TypeDescriptor descriptor = MetadataProvider.GetDescriptor(Contract.Root);
+            TypeDescriptor descriptor = MetadataProvider.GetContractDescriptor(Contract);
 
             BeginNamespace(descriptor.Namespace);
 
-            WriteLine("public class {0} : {1}", descriptor.Name, BaseClass ?? FormatType<ContractDescriptor>());
+            WriteLine("public partial class {0} : {1}", descriptor.Name, BaseClass ?? FormatType<ContractDescriptor>());
             BeginBlock();
 
             WriteLine("public {0}() : base(typeof({1}))", descriptor.Name, Contract.Root.FullName);
@@ -53,13 +53,13 @@ namespace Bolt.Generators
 
             WriteLine();
 
-            WriteLine("public static readonly {0} Instance = new {0}();", descriptor.Name, descriptor);
+            WriteLine("public static readonly {0} Default = new {0}();", descriptor.Name, descriptor);
             WriteLine();
 
             foreach (MethodInfo method in methods)
             {
                 MethodDescriptor methodDescriptor = MetadataProvider.GetMethodDescriptor(Contract, method);
-                WriteLine("public {0} {1} {{ get; private set; }}", FormatType<ActionDescriptor>(), methodDescriptor.Name);
+                WriteLine("public virtual {0} {1} {{ get; private set; }}", FormatType<ActionDescriptor>(), methodDescriptor.Name);
 
                 if (!Equals(method, methods.Last()))
                 {

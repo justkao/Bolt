@@ -9,7 +9,7 @@ namespace Bolt.Generators
 
         MethodDescriptor GetMethodDescriptor(ContractDefinition contract, MethodInfo method);
 
-        TypeDescriptor GetDescriptor(Type type);
+        TypeDescriptor GetContractDescriptor(ContractDefinition contract);
     }
 
     public class MetadataProvider : IMetadataProvider
@@ -32,13 +32,13 @@ namespace Bolt.Generators
             return new MethodDescriptor() { Contract = contract, Name = method.Name, Method = method };
         }
 
-        public TypeDescriptor GetDescriptor(Type type)
+        public TypeDescriptor GetContractDescriptor(ContractDefinition contract)
         {
             return new TypeDescriptor()
             {
-                Name = type.StripInterfaceName() + "Descriptor",
-                Namespace = type.Namespace,
-                FullName = type.Namespace + "." + type.StripInterfaceName() + "Descriptor"
+                Name = contract.Name + "Descriptor",
+                Namespace = contract.Namespace,
+                FullName = contract.Namespace + "." + contract.Name + "Descriptor"
             };
         }
     }

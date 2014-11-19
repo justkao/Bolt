@@ -11,7 +11,7 @@ using TestService.Core;
 
 namespace TestService.Core
 {
-    public class PersonRepositoryDescriptor : ContractDescriptor
+    public partial class PersonRepositoryDescriptor : ContractDescriptor
     {
         public PersonRepositoryDescriptor() : base(typeof(TestService.Core.IPersonRepository))
         {
@@ -30,33 +30,33 @@ namespace TestService.Core
             InnerOperationExAsync = Add("InnerOperationExAsync", typeof(Bolt.Empty), typeof(IPersonRepositoryInner).GetTypeInfo().GetMethod("InnerOperationExAsync"));
         }
 
-        public static readonly PersonRepositoryDescriptor Instance = new PersonRepositoryDescriptor();
+        public static readonly PersonRepositoryDescriptor Default = new PersonRepositoryDescriptor();
 
-        public ActionDescriptor UpdatePerson { get; private set; }
+        public virtual ActionDescriptor UpdatePerson { get; private set; }
 
-        public ActionDescriptor DoNothingAsAsync { get; private set; }
+        public virtual ActionDescriptor DoNothingAsAsync { get; private set; }
 
-        public ActionDescriptor DoNothing { get; private set; }
+        public virtual ActionDescriptor DoNothing { get; private set; }
 
-        public ActionDescriptor DoNothingWithComplexParameterAsAsync { get; private set; }
+        public virtual ActionDescriptor DoNothingWithComplexParameterAsAsync { get; private set; }
 
-        public ActionDescriptor DoNothingWithComplexParameter { get; private set; }
+        public virtual ActionDescriptor DoNothingWithComplexParameter { get; private set; }
 
-        public ActionDescriptor GetSimpleType { get; private set; }
+        public virtual ActionDescriptor GetSimpleType { get; private set; }
 
-        public ActionDescriptor GetSimpleTypeAsAsync { get; private set; }
+        public virtual ActionDescriptor GetSimpleTypeAsAsync { get; private set; }
 
-        public ActionDescriptor GetSinglePerson { get; private set; }
+        public virtual ActionDescriptor GetSinglePerson { get; private set; }
 
-        public ActionDescriptor GetSinglePersonAsAsync { get; private set; }
+        public virtual ActionDescriptor GetSinglePersonAsAsync { get; private set; }
 
-        public ActionDescriptor GetManyPersons { get; private set; }
+        public virtual ActionDescriptor GetManyPersons { get; private set; }
 
-        public ActionDescriptor GetManyPersonsAsAsync { get; private set; }
+        public virtual ActionDescriptor GetManyPersonsAsAsync { get; private set; }
 
-        public ActionDescriptor InnerOperation { get; private set; }
+        public virtual ActionDescriptor InnerOperation { get; private set; }
 
-        public ActionDescriptor InnerOperationExAsync { get; private set; }
+        public virtual ActionDescriptor InnerOperationExAsync { get; private set; }
     }
 }
 

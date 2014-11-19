@@ -194,7 +194,7 @@ namespace Bolt.Client
                 return true;
             }
 
-            return true;
+            return false;
         }
     }
 }

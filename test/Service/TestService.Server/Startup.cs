@@ -17,7 +17,7 @@ namespace TestService.Server
 
         private void ConfigurePersonRepository(IAppBuilder obj, ServerConfiguration configuration)
         {
-            obj.UseStatelessExecutor<PersonRepositoryExecutor, PersonRepository>(configuration, PersonRepositoryDescriptor.Instance);
+            obj.UseStatefullExecutor<PersonRepositoryExecutor, PersonRepository>(configuration, PersonRepositoryDescriptor.Default);
         }
     }
 }

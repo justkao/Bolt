@@ -19,6 +19,7 @@ namespace Bolt
             {
                 MemoryStream buffer = new MemoryStream();
                 await stream.CopyToAsync(buffer, 4096, cancellation);
+                buffer.Seek(0, SeekOrigin.Begin);
                 stream = buffer;
             }
 
@@ -58,6 +59,7 @@ namespace Bolt
             {
                 MemoryStream buffer = new MemoryStream();
                 stream.CopyTo(buffer);
+                buffer.Seek(0, SeekOrigin.Begin);
                 stream = buffer;
             }
 

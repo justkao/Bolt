@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Bolt.Client;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Bolt.Client;
 
 namespace Bolt.Generators
 {
@@ -56,6 +56,9 @@ namespace Bolt.Generators
 
             WriteLine("public partial class {0} : {1}{2}, {3}", ClassName ?? Contract.Name, BaseClass != null ? BaseClass + ", " : null, typeof(IChannel).FullName, Contract.Root.FullName);
             BeginBlock();
+
+            WriteLine("public {0} ContractDescriptor {{ get; set; }}", MetadataProvider.GetContractDescriptor(Contract).FullName);
+            WriteLine();
 
             foreach (Type type in contracts)
             {
@@ -140,7 +143,7 @@ namespace Bolt.Generators
 
         private string DeclareEndpoint(MethodDescriptor descriptor)
         {
-            WriteLine("var descriptor = {0};", GetMethodDescriptorReference(Contract, descriptor));
+            WriteLine("var descriptor = ContractDescriptor.{0};", descriptor.Name);
             WriteLine("var token = GetCancellationToken(descriptor);");
             WriteLine();
             return "descriptor, token";

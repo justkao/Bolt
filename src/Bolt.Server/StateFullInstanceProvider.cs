@@ -1,22 +1,22 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Timers;
 
 namespace Bolt.Server
 {
     public class StateFullInstanceProvider<TImplementation> : InstanceProvider<TImplementation>, IDisposable
     {
         private readonly ConcurrentDictionary<string, InstanceMetadata> _instances = new ConcurrentDictionary<string, InstanceMetadata>();
-        // private readonly Timer _timer;
+        private readonly Timer _timer;
 
         public StateFullInstanceProvider()
         {
-            /*
             _timer = new Timer();
             _timer.Interval = TimeSpan.FromMinutes(1).TotalMilliseconds;
             _timer.Elapsed += OnTimerElapsed;
             _timer.Enabled = true;
-             * */
         }
 
         public string SessionHeader { get; set; }
@@ -38,7 +38,7 @@ namespace Bolt.Server
                 return await Task.FromResult((TInstance)instance.Instance);
             }
 
-            instance = new InstanceMetadata(base.GetInstanceAsync<TInstance>(context));
+            instance = new InstanceMetadata(await base.GetInstanceAsync<TInstance>(context));
             _instances[sessionId] = instance;
             return (TInstance)instance.Instance;
         }
@@ -69,7 +69,6 @@ namespace Bolt.Server
             return (DateTime.UtcNow - timestamp) > InstanceTimeout;
         }
 
-        /*
         private void OnTimerElapsed(object sender, ElapsedEventArgs e)
         {
             foreach (KeyValuePair<string, InstanceMetadata> pair in _instances)
@@ -80,7 +79,7 @@ namespace Bolt.Server
                 }
             }
         }
-        */
+
         private class InstanceMetadata
         {
             public InstanceMetadata(object instance)

@@ -13,13 +13,15 @@ using TestService.Core.Parameters;
 
 namespace TestService.Core
 {
-    public partial class PersonRepository : Channel, Bolt.Client.IChannel, TestService.Core.IPersonRepository
+    public partial class PersonRepository : StatefullChannel, Bolt.Client.IChannel, TestService.Core.IPersonRepository
     {
+        public TestService.Core.PersonRepositoryDescriptor ContractDescriptor { get; set; }
+
         public Person UpdatePerson(Person person)
         {
             var request = new UpdatePersonParameters();
             request.Person = person;
-            var descriptor = TestService.Core.PersonRepositoryDescriptor.Instance.UpdatePerson;
+            var descriptor = ContractDescriptor.UpdatePerson;
             var token = GetCancellationToken(descriptor);
 
             return Send<Person, UpdatePersonParameters>(request, descriptor, token);
@@ -29,7 +31,7 @@ namespace TestService.Core
         {
             var request = new UpdatePersonParameters();
             request.Person = person;
-            var descriptor = TestService.Core.PersonRepositoryDescriptor.Instance.UpdatePerson;
+            var descriptor = ContractDescriptor.UpdatePerson;
             var token = GetCancellationToken(descriptor);
 
             return SendAsync<Person, UpdatePersonParameters>(request, descriptor, token);
@@ -37,7 +39,7 @@ namespace TestService.Core
 
         public Task DoNothingAsAsync()
         {
-            var descriptor = TestService.Core.PersonRepositoryDescriptor.Instance.DoNothingAsAsync;
+            var descriptor = ContractDescriptor.DoNothingAsAsync;
             var token = GetCancellationToken(descriptor);
 
             return SendAsync(Empty.Instance, descriptor, token);
@@ -45,7 +47,7 @@ namespace TestService.Core
 
         public void DoNothing()
         {
-            var descriptor = TestService.Core.PersonRepositoryDescriptor.Instance.DoNothing;
+            var descriptor = ContractDescriptor.DoNothing;
             var token = GetCancellationToken(descriptor);
 
             Send(Empty.Instance, descriptor, token);
@@ -55,7 +57,7 @@ namespace TestService.Core
         {
             var request = new DoNothingWithComplexParameterAsAsyncParameters();
             request.Person = person;
-            var descriptor = TestService.Core.PersonRepositoryDescriptor.Instance.DoNothingWithComplexParameterAsAsync;
+            var descriptor = ContractDescriptor.DoNothingWithComplexParameterAsAsync;
             var token = GetCancellationToken(descriptor);
 
             return SendAsync(request, descriptor, token);
@@ -65,7 +67,7 @@ namespace TestService.Core
         {
             var request = new DoNothingWithComplexParameterParameters();
             request.Person = person;
-            var descriptor = TestService.Core.PersonRepositoryDescriptor.Instance.DoNothingWithComplexParameter;
+            var descriptor = ContractDescriptor.DoNothingWithComplexParameter;
             var token = GetCancellationToken(descriptor);
 
             Send(request, descriptor, token);
@@ -75,7 +77,7 @@ namespace TestService.Core
         {
             var request = new GetSimpleTypeParameters();
             request.Arg = arg;
-            var descriptor = TestService.Core.PersonRepositoryDescriptor.Instance.GetSimpleType;
+            var descriptor = ContractDescriptor.GetSimpleType;
             var token = GetCancellationToken(descriptor);
 
             return Send<int, GetSimpleTypeParameters>(request, descriptor, token);
@@ -85,7 +87,7 @@ namespace TestService.Core
         {
             var request = new GetSimpleTypeAsAsyncParameters();
             request.Arg = arg;
-            var descriptor = TestService.Core.PersonRepositoryDescriptor.Instance.GetSimpleTypeAsAsync;
+            var descriptor = ContractDescriptor.GetSimpleTypeAsAsync;
             var token = GetCancellationToken(descriptor);
 
             return SendAsync(request, descriptor, token);
@@ -95,7 +97,7 @@ namespace TestService.Core
         {
             var request = new GetSinglePersonParameters();
             request.Person = person;
-            var descriptor = TestService.Core.PersonRepositoryDescriptor.Instance.GetSinglePerson;
+            var descriptor = ContractDescriptor.GetSinglePerson;
             var token = GetCancellationToken(descriptor);
 
             return Send<Person, GetSinglePersonParameters>(request, descriptor, token);
@@ -105,7 +107,7 @@ namespace TestService.Core
         {
             var request = new GetSinglePersonAsAsyncParameters();
             request.Person = person;
-            var descriptor = TestService.Core.PersonRepositoryDescriptor.Instance.GetSinglePersonAsAsync;
+            var descriptor = ContractDescriptor.GetSinglePersonAsAsync;
             var token = GetCancellationToken(descriptor);
 
             return SendAsync<Person, GetSinglePersonAsAsyncParameters>(request, descriptor, token);
@@ -115,7 +117,7 @@ namespace TestService.Core
         {
             var request = new GetManyPersonsParameters();
             request.Person = person;
-            var descriptor = TestService.Core.PersonRepositoryDescriptor.Instance.GetManyPersons;
+            var descriptor = ContractDescriptor.GetManyPersons;
             var token = GetCancellationToken(descriptor);
 
             return Send<List<Person>, GetManyPersonsParameters>(request, descriptor, token);
@@ -125,14 +127,14 @@ namespace TestService.Core
         {
             var request = new GetManyPersonsAsAsyncParameters();
             request.Person = person;
-            var descriptor = TestService.Core.PersonRepositoryDescriptor.Instance.GetManyPersonsAsAsync;
+            var descriptor = ContractDescriptor.GetManyPersonsAsAsync;
             var token = GetCancellationToken(descriptor);
 
             return SendAsync<List<Person>, GetManyPersonsAsAsyncParameters>(request, descriptor, token);
         }
         public void InnerOperation()
         {
-            var descriptor = TestService.Core.PersonRepositoryDescriptor.Instance.InnerOperation;
+            var descriptor = ContractDescriptor.InnerOperation;
             var token = GetCancellationToken(descriptor);
 
             Send(Empty.Instance, descriptor, token);
@@ -140,7 +142,7 @@ namespace TestService.Core
 
         public Task InnerOperationExAsync()
         {
-            var descriptor = TestService.Core.PersonRepositoryDescriptor.Instance.InnerOperationExAsync;
+            var descriptor = ContractDescriptor.InnerOperationExAsync;
             var token = GetCancellationToken(descriptor);
 
             return SendAsync(Empty.Instance, descriptor, token);

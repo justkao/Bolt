@@ -1,6 +1,5 @@
-using System;
-
 using Owin;
+using System;
 
 namespace Bolt.Server
 {
@@ -12,6 +11,18 @@ namespace Bolt.Server
             ContractDescriptor descriptor) where TExecutor : IExecutor, new()
         {
             return builder.UseExecutor<TExecutor>(configuration, descriptor, new InstanceProvider<TContractImplementation>());
+        }
+
+        public static IAppBuilder UseStatefullExecutor<TExecutor, TContractImplementation>(
+            this IAppBuilder builder,
+            ServerConfiguration configuration,
+            ContractDescriptor descriptor) where TExecutor : IExecutor, new()
+        {
+            return builder.UseExecutor<TExecutor>(configuration, descriptor,
+                new StateFullInstanceProvider<TContractImplementation>()
+                {
+                    SessionHeader = configuration.SessionHeaderName
+                });
         }
 
         public static IAppBuilder UseExecutor<TExecutor>(

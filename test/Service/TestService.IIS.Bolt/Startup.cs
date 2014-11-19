@@ -16,7 +16,7 @@ namespace TestService.IIS.Bolt
 
         private void ConfigurePersonRepository(IAppBuilder obj, ServerConfiguration configuration)
         {
-            obj.UseStatelessExecutor<PersonRepositoryExecutor, PersonRepository>(configuration, PersonRepositoryDescriptor.Instance);
+            obj.UseStatelessExecutor<PersonRepositoryExecutor, PersonRepository>(configuration, PersonRepositoryDescriptor.Default);
         }
     }
 }
