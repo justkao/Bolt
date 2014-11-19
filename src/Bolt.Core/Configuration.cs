@@ -5,7 +5,7 @@ namespace Bolt
         public Configuration()
         {
             SessionHeaderName = "Session-ID";
-            Serializer = new ProtocolBufferSerializer();
+            Serializer = new JsonSerializer();
             EndpointProvider = new EndpointProvider();
         }
 

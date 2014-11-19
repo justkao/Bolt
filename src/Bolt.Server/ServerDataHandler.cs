@@ -8,9 +8,14 @@ namespace Bolt.Server
     {
         private readonly ISerializer _serializer;
 
-        public ServerDataHandler(ISerializer serializer = null)
+        public ServerDataHandler(ISerializer serializer)
         {
-            _serializer = serializer ?? new ProtocolBufferSerializer();
+            if (serializer == null)
+            {
+                throw new ArgumentNullException("serializer");
+            }
+
+            _serializer = serializer;
         }
 
         public string ContentType

@@ -3,12 +3,15 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Bolt.Server;
 
 namespace Bolt.Generators
 {
     public class ServerGenerator : ContractGeneratorBase
     {
+        private const string ExecutorType = "Bolt.Server.Executor";
+        private const string ServerExecutionContext = "Bolt.Server.ServerExecutionContext";
+        private const string BoltServerNamespace = "Bolt.Server";
+
         public ServerGenerator()
             : this(new StringWriter(), new TypeFormatter(), new IntendProvider())
         {
@@ -35,11 +38,12 @@ namespace Bolt.Generators
 
         public override void Generate()
         {
+            AddUsings(BoltServerNamespace);
             BeginNamespace(ServerNamespace ?? Contract.Namespace);
 
-            string name = ExecutorClassType ?? string.Format("{0}{1}", Contract.Name, FormatType<Executor>());
+            string name = ExecutorClassType ?? string.Format("{0}{1}", Contract.Name, ExecutorType);
 
-            WriteLine("public partial class {0} : {1}, {2}", name, typeof(Executor).FullName, FormatType<IExecutor>());
+            WriteLine("public partial class {0} : {1}, {2}", name, ExecutorType, ExecutorType);
             BeginBlock();
 
             WriteLine("public override void Init()");
@@ -61,7 +65,7 @@ namespace Bolt.Generators
 
             foreach (MethodInfo method in methods)
             {
-                WriteLine("private async {2} {0}({1} context)", FormatMethodName(method), FormatType(typeof(ServerExecutionContext)), FormatType<Task>());
+                WriteLine("private async {2} {0}({1} context)", FormatMethodName(method), ServerExecutionContext, FormatType<Task>());
                 BeginBlock();
 
                 if (HasParameters(method))

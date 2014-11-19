@@ -4,7 +4,7 @@
     {
         public ServerConfiguration()
         {
-            ServerDataHandler = new ServerDataHandler();
+            ServerDataHandler = new ServerDataHandler(Serializer);
             ResponseHandler = new ResponseHandler(ServerDataHandler);
         }
 

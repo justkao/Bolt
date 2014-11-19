@@ -40,14 +40,13 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="protobuf-net">
-      <HintPath>..\..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\packages\Newtonsoft.Json.6.0.6\lib\portable-net45+wp80+win8+wpa81+aspnetcore50\Newtonsoft.Json.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -63,9 +62,9 @@
     <Compile Include="Extensions.cs" />
     <Compile Include="IEndpointProvider.cs" />
     <Compile Include="ISerializer.cs" />
-    <None Include="JsonSerializer.cs" />
+    <Compile Include="JsonSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ProtocolBufferSerializer.cs" />
+    <None Include="ProtocolBufferSerializer.cs" />
     <Compile Include="Response.cs" />
     <Compile Include="SerializerExtensions.cs" />
     <Compile Include="TaskExtensions.cs" />

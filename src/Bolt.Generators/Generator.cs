@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Bolt.Client;
-using Bolt.Server;
 
 namespace Bolt.Generators
 {
@@ -83,8 +82,6 @@ namespace Bolt.Generators
 
         public Generator Server(ContractDefinition definition, string ns = null)
         {
-            AddUsings(typeof(Executor).Namespace);
-
             return Add(new ServerGenerator(Output, Formatter, IntendProvider)
             {
                 Contract = definition,

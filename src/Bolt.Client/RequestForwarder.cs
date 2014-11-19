@@ -189,6 +189,11 @@ namespace Bolt.Client
                 return false;
             }
 
+            if (e.Response == null)
+            {
+                return true;
+            }
+
             return true;
         }
     }
