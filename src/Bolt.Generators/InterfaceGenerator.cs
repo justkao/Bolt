@@ -46,46 +46,44 @@ namespace Bolt.Generators
             }
 
             _generatedInterfaces.Add(iface);
-
             string name = iface.Name + "Async";
 
-            BeginNamespace(iface.Namespace);
-
-            IEnumerable<string> asyncBase = (from i in ContractDefinition.GetEffectiveContracts(iface).Where(ShouldHaveAsyncMethods)
-                                             select FormatType(i) + "Async").ToList();
-
-            StringBuilder sb = new StringBuilder();
-            foreach (string s in asyncBase)
+            using (WithNamespace(iface.Namespace))
             {
-                sb.AppendFormat("{0}, ", s);
-            }
+                IEnumerable<string> asyncBase = (from i in ContractDefinition.GetEffectiveContracts(iface).Where(ShouldHaveAsyncMethods)
+                                                 select FormatType(i) + "Async").ToList();
 
-            if (sb.Length > 0)
-            {
-                sb.Remove(sb.Length - 2, 2);
-                sb.Insert(0, ", ");
-            }
-
-            WriteLine("public interface {0} : {1}{2}", name, FormatType(iface), sb.ToString());
-            BeginBlock();
-
-            List<MethodInfo> methods = (from m in ContractDefinition.GetEffectiveMethods(iface)
-                                        where ShouldBeAsync(m, ForceAsync)
-                                        select m).ToList();
-
-
-            foreach (MethodInfo method in methods)
-            {
-                WriteLine(FormatMethodDeclaration(method, true) + ";");
-                if (method != methods.Last())
+                StringBuilder sb = new StringBuilder();
+                foreach (string s in asyncBase)
                 {
-                    WriteLine();
+                    sb.AppendFormat("{0}, ", s);
+                }
+
+                if (sb.Length > 0)
+                {
+                    sb.Remove(sb.Length - 2, 2);
+                    sb.Insert(0, ", ");
+                }
+
+                WriteLine("public interface {0} : {1}{2}", name, FormatType(iface), sb.ToString());
+                using (WithBlock())
+                {
+                    List<MethodInfo> methods = (from m in ContractDefinition.GetEffectiveMethods(iface)
+                                                where ShouldBeAsync(m, ForceAsync)
+                                                select m).ToList();
+
+
+                    foreach (MethodInfo method in methods)
+                    {
+                        WriteLine(FormatMethodDeclaration(method, true) + ";");
+                        if (method != methods.Last())
+                        {
+                            WriteLine();
+                        }
+                    }
                 }
             }
 
-            EndBlock();
-
-            EndNamespace();
             WriteLine();
         }
 

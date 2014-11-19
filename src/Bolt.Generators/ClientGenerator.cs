@@ -50,23 +50,23 @@ namespace Bolt.Generators
 
         public override void Generate()
         {
-            BeginNamespace(ClientNamespace ?? ContractDefinition.Namespace);
-
-            List<Type> contracts = ContractDefinition.GetEffectiveContracts().ToList();
-
-            WriteLine("public partial class {0} : {1}{2}, {3}", ClassName ?? ContractDefinition.Name, BaseClass != null ? BaseClass + ", " : null, typeof(IChannel).FullName, ContractDefinition.Root.FullName);
-            BeginBlock();
-
-            WriteLine("public {0} ContractDescriptor {{ get; set; }}", MetadataProvider.GetContractDescriptor(ContractDefinition).FullName);
-            WriteLine();
-
-            foreach (Type type in contracts)
+            using (WithNamespace(ClientNamespace ?? ContractDefinition.Namespace))
             {
-                Generate(type, MetadataProvider);
+                List<Type> contracts = ContractDefinition.GetEffectiveContracts().ToList();
+
+                WriteLine("public partial class {0} : {1}{2}, {3}", ClassName ?? ContractDefinition.Name, BaseClass != null ? BaseClass + ", " : null, typeof(IChannel).FullName, ContractDefinition.Root.FullName);
+                using (WithBlock())
+                {
+                    WriteLine("public {0} ContractDescriptor {{ get; set; }}", MetadataProvider.GetContractDescriptor(ContractDefinition).FullName);
+                    WriteLine();
+
+                    foreach (Type type in contracts)
+                    {
+                        Generate(type, MetadataProvider);
+                    }
+                }
             }
 
-            EndBlock();
-            EndNamespace();
             WriteLine();
         }
 
@@ -104,41 +104,41 @@ namespace Bolt.Generators
         private void GenerateMethod(MethodInfo method, ParametersGenerator generator, MethodDescriptor descriptor, IMetadataProvider provider, bool forceAsync)
         {
             WriteLine("public " + FormatMethodDeclaration(method, forceAsync));
-            BeginBlock();
-
-            GenerateRequestCodeResult result = generator.GenerateRequestCode(method, method.GetParameters().ToDictionary(p => p, p => p.Name), provider);
-
-            if (HasReturnValue(method))
+            using (WithBlock())
             {
-                if (IsAsync(method))
+                GenerateRequestCodeResult result = generator.GenerateRequestCode(method, method.GetParameters().ToDictionary(p => p, p => p.Name), provider);
+
+                if (HasReturnValue(method))
                 {
-                    WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
-                }
-                else if (forceAsync)
-                {
-                    WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
+                    if (IsAsync(method))
+                    {
+                        WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
+                    }
+                    else if (forceAsync)
+                    {
+                        WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
+                    }
+                    else
+                    {
+                        WriteLine("return Send<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
+                    }
                 }
                 else
                 {
-                    WriteLine("return Send<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
+                    if (IsAsync(method))
+                    {
+                        WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
+                    }
+                    else if (forceAsync)
+                    {
+                        WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
+                    }
+                    else
+                    {
+                        WriteLine("Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
+                    }
                 }
             }
-            else
-            {
-                if (IsAsync(method))
-                {
-                    WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
-                }
-                else if (forceAsync)
-                {
-                    WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
-                }
-                else
-                {
-                    WriteLine("Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
-                }
-            }
-            EndBlock();
         }
 
         private string DeclareEndpoint(MethodDescriptor descriptor)

@@ -189,6 +189,20 @@ namespace Bolt.Generators
             EndBlock();
         }
 
+        public virtual IDisposable WithNamespace(string name)
+        {
+            BeginNamespace(name);
+
+            return new EasyDispose(EndNamespace);
+        }
+
+        public virtual IDisposable WithBlock()
+        {
+            BeginBlock();
+
+            return new EasyDispose(EndBlock);
+        }
+
         public virtual void BeginBlock()
         {
             WriteLine("{");

@@ -107,22 +107,21 @@ namespace Bolt.Generators
                 WriteLine("public partial class {0} : {1}", provider.GetParameterDescriptor(method.DeclaringType, method).Name, BaseClass);
             }
 
-            BeginBlock();
-
-            int order = 1;
-            foreach (ParameterInfo info in method.GetParameters())
+            using (WithBlock())
             {
-                WriteLine("[{0}(Order = {1})]", FormatType<DataMemberAttribute>(), order);
-                WriteLine(FormatPublicProperty(info.ParameterType, info.Name.CapitalizeFirstLetter()));
-                order++;
-
-                if (info != method.GetParameters().Last())
+                int order = 1;
+                foreach (ParameterInfo info in method.GetParameters())
                 {
-                    WriteLine();
+                    WriteLine("[{0}(Order = {1})]", FormatType<DataMemberAttribute>(), order);
+                    WriteLine(FormatPublicProperty(info.ParameterType, info.Name.CapitalizeFirstLetter()));
+                    order++;
+
+                    if (info != method.GetParameters().Last())
+                    {
+                        WriteLine();
+                    }
                 }
             }
-
-            EndBlock();
 
             return true;
         }

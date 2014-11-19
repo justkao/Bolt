@@ -40,44 +40,64 @@ namespace Bolt.Generators
         public override void Generate()
         {
             AddUsings(BoltServerNamespace);
-            BeginNamespace(ServerNamespace ?? ContractDefinition.Namespace);
-
             string name = ExecutorClassType ?? string.Format("{0}{1}", ContractDefinition.Name, ExecutorName);
 
-            WriteLine("public partial class {0} : {1}", name, ExecutorFullName);
-            BeginBlock();
-
-            WriteLine("public override void Init()");
-            BeginBlock();
-
-            TypeDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
-
-            WriteLine("if (ContractDescriptor == null)");
-            BeginBlock();
-            WriteLine("ContractDescriptor = {0}.Default;", contractDescriptor.FullName);
-            EndBlock();
-            WriteLine();
-
-            foreach (MethodInfo method in ContractDefinition.GetEffectiveMethods())
+            using (WithNamespace(ServerNamespace ?? ContractDefinition.Namespace))
             {
-                WriteLine("AddAction(ContractDescriptor.{0}, {1});", MetadataProvider.GetMethodDescriptor(ContractDefinition, method).Name, FormatMethodName(method));
+                WriteLine("public partial class {0} : {1}", name, ExecutorFullName);
+                using (WithBlock())
+                {
+                    TypeDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
+
+                    WriteLine("public override void Init()");
+                    using (WithBlock())
+                    {
+                        WriteLine("if (ContractDescriptor == null)");
+                        using (WithBlock())
+                        {
+                            WriteLine("ContractDescriptor = {0}.Default;", contractDescriptor.FullName);
+                        }
+                        WriteLine();
+
+                        foreach (MethodInfo method in ContractDefinition.GetEffectiveMethods())
+                        {
+                            WriteLine("AddAction(ContractDescriptor.{0}, {1});", MetadataProvider.GetMethodDescriptor(ContractDefinition, method).Name, FormatMethodName(method));
+                        }
+
+                        WriteLine();
+                        WriteLine("base.Init();");
+                    }
+
+
+                    WriteLine();
+                    WriteLine("public {0} ContractDescriptor {{ get; set; }}", contractDescriptor.FullName);
+                    WriteLine();
+
+                    ParametersGenerator generator = new ParametersGenerator(Output, Formatter, IntendProvider);
+                    IEnumerable<MethodInfo> methods = ContractDefinition.GetEffectiveMethods().ToList();
+
+                    foreach (MethodInfo method in methods)
+                    {
+                        WriteInvocationMethod(method, generator);
+
+                        if (!Equals(method, methods.Last()))
+                        {
+                            WriteLine();
+                        }
+                    }
+                }
             }
-            WriteLine();
-            WriteLine("base.Init();");
-            EndBlock();
 
             WriteLine();
-            WriteLine("public {0} ContractDescriptor {{ get; set; }}", contractDescriptor.FullName);
-            WriteLine();
+            ExecutorClassType = name;
+        }
 
-            ParametersGenerator generator = new ParametersGenerator(Output, Formatter, IntendProvider);
-            IEnumerable<MethodInfo> methods = ContractDefinition.GetEffectiveMethods().ToList();
+        private void WriteInvocationMethod(MethodInfo method, ParametersGenerator generator)
+        {
+            WriteLine("protected virtual async {2} {0}({1} context)", FormatMethodName(method), ServerExecutionContext, FormatType<Task>());
 
-            foreach (MethodInfo method in methods)
+            using (WithBlock())
             {
-                WriteLine("protected virtual async {2} {0}({1} context)", FormatMethodName(method), ServerExecutionContext, FormatType<Task>());
-                BeginBlock();
-
                 if (HasParameters(method))
                 {
                     ParametersDescriptor descriptor = MetadataProvider.GetParameterDescriptor(method.DeclaringType, method);
@@ -86,8 +106,8 @@ namespace Bolt.Generators
                 }
 
                 WriteLine("var instance = await InstanceProvider.GetInstanceAsync<{0}>(context);", FormatType(method.DeclaringType));
-                string result = generator.GenerateInvocationCode("instance", "parameters", method);
 
+                string result = generator.GenerateInvocationCode("instance", "parameters", method);
                 if (!string.IsNullOrEmpty(result))
                 {
                     WriteLine("await ResponseHandler.Handle(context, result);");
@@ -96,20 +116,7 @@ namespace Bolt.Generators
                 {
                     WriteLine("await ResponseHandler.Handle(context);");
                 }
-
-                EndBlock();
-
-                if (method != methods.Last())
-                {
-                    WriteLine();
-                }
             }
-
-            EndBlock();
-            EndNamespace();
-            WriteLine();
-
-            ExecutorClassType = name;
         }
 
         private string FormatMethodName(MethodInfo info)

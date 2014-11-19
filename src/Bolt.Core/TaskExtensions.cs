@@ -20,7 +20,6 @@ namespace Bolt
                 {
                     return asyncFunction().GetAwaiter().GetResult();
                 }
-
                 return Task.Run(() => asyncFunction().GetAwaiter().GetResult()).GetAwaiter().GetResult();
             }
             catch (AggregateException e)
