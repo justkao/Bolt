@@ -44,6 +44,20 @@ namespace Bolt.Generators
                         GenerateMethods(g, type);
                     }
                 });
+            WriteLine();
+
+            ClassDescriptor descriptor = new ClassDescriptor(generator.Descriptor.Name + "Factory",
+                generator.Descriptor.Namespace,
+                string.Format("Bolt.Client.ChannelFactory<{0}, {1}>", generator.Descriptor.Name, contractDescriptor.Name));
+
+            ClientFactoryGenerator clientFactoryGenerator = new ClientFactoryGenerator(Output, Formatter, IntendProvider)
+            {
+                ContractDefinition = ContractDefinition,
+                ContractDescriptor = descriptor
+            };
+
+            clientFactoryGenerator.Generate();
+            WriteLine();
         }
 
         private void GenerateMethods(ClassGenerator classGenerator, Type contract)

@@ -17,12 +17,15 @@ namespace Bolt
         {
             TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
             TypeNameHandling = TypeNameHandling.All,
-            Formatting = Formatting.None
+            Formatting = Formatting.None,
+            ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+
         };
 
         public string Serialize(Exception exception)
         {
-            return JsonConvert.SerializeObject(exception, _exceptionSerializerSettings);
+            string raw = JsonConvert.SerializeObject(exception, _exceptionSerializerSettings);
+            return raw;
         }
 
         public Exception Deserialize(string exception)

@@ -169,6 +169,22 @@ namespace Bolt.Service.Test.Core
     }
 }
 
+
+namespace Bolt.Service.Test.Core
+{
+    public partial class TestContractChannelFactory : Bolt.Client.ChannelFactory<TestContractChannel, TestContractDescriptor>
+    {
+        public TestContractChannelFactory(ContractDefinition contractDefinition) : this(contractDefinition, TestContractDescriptor.Default)
+        {
+        }
+
+        public TestContractChannelFactory(ContractDefinition contractDefinition,TestContractDescriptor descriptor) : base(contractDefinition, descriptor)
+        {
+        }
+    }
+}
+
+
 namespace Bolt.Server
 {
     public partial class TestContractExecutor : Bolt.Server.Executor

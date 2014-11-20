@@ -39,6 +39,7 @@
   <ItemGroup>
     <Compile Include="ClassDescriptor.cs" />
     <Compile Include="ClassGenerator.cs" />
+    <Compile Include="ClientFactoryGenerator.cs" />
     <Compile Include="EasyDispose.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="MethodDescriptor.cs" />

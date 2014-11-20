@@ -171,9 +171,10 @@ namespace Bolt.Service.Test
 
         public virtual ITestContractAsync GetChannel()
         {
-            TestContractFactory factory = new TestContractFactory();
+            TestContractChannelFactory factory = new TestContractChannelFactory(Contracts.TestContract);
             factory.ClientConfiguration = ClientConfiguration;
             factory.Prefix = Prefix;
+
             return factory.Create(ServerUrl);
         }
 
