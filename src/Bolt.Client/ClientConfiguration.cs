@@ -5,16 +5,16 @@ namespace Bolt.Client
         public ClientConfiguration(ISerializer serializer)
             : base(serializer)
         {
+            ExceptionSerializer = new ExceptionSerializer();
             ClientDataHandler = new ClientDataHandler(serializer, ExceptionSerializer);
             RequestForwarder = new RequestForwarder(ClientDataHandler);
-            ExceptionSerializer = new ExceptionSerializer();
         }
 
         public ClientConfiguration()
         {
+            ExceptionSerializer = new ExceptionSerializer();
             ClientDataHandler = new ClientDataHandler(Serializer, ExceptionSerializer);
             RequestForwarder = new RequestForwarder(ClientDataHandler);
-            ExceptionSerializer = new ExceptionSerializer();
         }
 
         public virtual void Update(Channel channel)

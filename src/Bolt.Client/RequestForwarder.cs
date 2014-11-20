@@ -201,10 +201,8 @@ namespace Bolt.Client
                 try
                 {
                     Exception error = _dataHandler.ReadException(context);
-                    if (error == null)
-                    {
-                        return new ResponseDescriptor<T>(context.Response, context, clientException, ResponseErrorType.Client);
-                    }
+                    return new ResponseDescriptor<T>(context.Response, context, error ?? clientException, ResponseErrorType.Client);
+
                 }
                 catch (SerializationException e)
                 {

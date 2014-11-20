@@ -144,8 +144,44 @@ namespace Bolt.Service.Test
             ITestContractAsync client = GetChannel();
             Mock<ITestContract> server = Server();
 
-            server.Setup(v => v.SimpleMethod()).Throws<InvalidOperationException>();
-            Assert.Throws<InvalidOperationException>(client.SimpleMethod);
+            server.Setup(v => v.SimpleMethod()).Throws<CustomException>();
+            Assert.Throws<CustomException>(client.SimpleMethod);
+        }
+
+        [Test]
+        public void Server_Throws_EnsureCorrectMessageOnClient()
+        {
+            ITestContractAsync client = GetChannel();
+            Mock<ITestContract> server = Server();
+
+            server.Setup(v => v.SimpleMethod()).Throws(new CustomException("test message"));
+
+            try
+            {
+                client.SimpleMethod();
+            }
+            catch (CustomException e)
+            {
+                Assert.AreEqual("test message", e.Message);
+            }
+        }
+
+        [Test]
+        public void Server_ThrowsWithInner_EnsureInnerReceivedOnClient()
+        {
+            ITestContractAsync client = GetChannel();
+            Mock<ITestContract> server = Server();
+
+            server.Setup(v => v.SimpleMethod()).Throws(new CustomException("test message", new CustomException()));
+
+            try
+            {
+                client.SimpleMethod();
+            }
+            catch (CustomException e)
+            {
+                Assert.IsNull(e.InnerException as CustomException);
+            }
         }
 
         private IDisposable _runningServer;

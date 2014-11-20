@@ -15,6 +15,11 @@ namespace Bolt.Server
                 throw new ArgumentNullException("serializer");
             }
 
+            if (exceptionSerializer == null)
+            {
+                throw new ArgumentNullException("exceptionSerializer");
+            }
+
             _serializer = serializer;
             _exceptionSerializer = exceptionSerializer;
         }

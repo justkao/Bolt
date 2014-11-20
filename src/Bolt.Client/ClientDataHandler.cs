@@ -11,6 +11,15 @@ namespace Bolt.Client
 
         public ClientDataHandler(ISerializer serializer, IExceptionSerializer exceptionSerializer)
         {
+            if (serializer == null)
+            {
+                throw new ArgumentNullException("serializer");
+            }
+            if (exceptionSerializer == null)
+            {
+                throw new ArgumentNullException("exceptionSerializer");
+            }
+
             _serializer = serializer;
             _exceptionSerializer = exceptionSerializer;
         }
