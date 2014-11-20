@@ -86,6 +86,7 @@ namespace Bolt.Generators
                 g =>
                 {
                     MethodInfo method = descriptor.Method;
+                    ParameterInfo cancellation = descriptor.GetCancellationTokenParameter();
 
                     GenerateRequestCodeResult result = GenerateRequestCode(
                         descriptor,
@@ -100,7 +101,7 @@ namespace Bolt.Generators
                                 FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType),
                                 result.TypeName,
                                 result.VariableName,
-                                DeclareEndpoint(descriptor));
+                                DeclareEndpoint(descriptor, cancellation));
                         }
                         else if (forceAsync)
                         {
@@ -109,7 +110,7 @@ namespace Bolt.Generators
                                 FormatType(method.ReturnType),
                                 result.TypeName,
                                 result.VariableName,
-                                DeclareEndpoint(descriptor));
+                                DeclareEndpoint(descriptor, cancellation));
                         }
                         else
                         {
@@ -118,22 +119,22 @@ namespace Bolt.Generators
                                 FormatType(method.ReturnType),
                                 result.TypeName,
                                 result.VariableName,
-                                DeclareEndpoint(descriptor));
+                                DeclareEndpoint(descriptor, cancellation));
                         }
                     }
                     else
                     {
                         if (IsAsync(method))
                         {
-                            WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
+                            WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
                         }
                         else if (forceAsync)
                         {
-                            WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
+                            WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
                         }
                         else
                         {
-                            WriteLine("Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
+                            WriteLine("Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
                         }
                     }
                 });
@@ -153,7 +154,7 @@ namespace Bolt.Generators
             AddUsings(methodDescriptor.Parameters.Namespace);
             WriteLine("var request = new {0}();", methodDescriptor.Parameters.Name);
 
-            foreach (ParameterInfo info in methodDescriptor.Method.GetParameters())
+            foreach (ParameterInfo info in methodDescriptor.GetParameters())
             {
                 WriteLine("request.{0} = {1};", info.Name.CapitalizeFirstLetter(), variables[info]);
             }
@@ -172,12 +173,17 @@ namespace Bolt.Generators
             public string TypeName { get; set; }
         }
 
-        private string DeclareEndpoint(MethodDescriptor descriptor)
+        private string DeclareEndpoint(MethodDescriptor descriptor, ParameterInfo cancellationTokenParameter)
         {
             WriteLine("var descriptor = ContractDescriptor.{0};", descriptor.Name);
-            WriteLine("var token = GetCancellationToken(descriptor);");
-            WriteLine();
-            return "descriptor, token";
+            if (cancellationTokenParameter == null)
+            {
+                WriteLine("var token = GetCancellationToken(descriptor);");
+                WriteLine();
+                return "descriptor, token";
+            }
+
+            return string.Format("descriptor, {0}", cancellationTokenParameter.Name);
         }
 
         protected override ClassDescriptor CreateDefaultDescriptor()

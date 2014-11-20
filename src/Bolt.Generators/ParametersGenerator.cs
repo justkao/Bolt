@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -26,7 +27,7 @@ namespace Bolt.Generators
                 g =>
                 {
                     int order = 1;
-                    ParameterInfo[] parameters = MethodDescriptor.Method.GetParameters();
+                    IEnumerable<ParameterInfo> parameters = MethodDescriptor.GetParameters().ToList();
 
                     foreach (ParameterInfo info in parameters)
                     {

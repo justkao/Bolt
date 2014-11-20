@@ -30,12 +30,21 @@ namespace Bolt.Client
             {
                 _dataHandler.WriteParameters(context, parameters);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (SerializationException e)
             {
                 return new ResponseDescriptor<T>(null, context, e, ResponseErrorType.Serialization);
             }
             catch (Exception e)
             {
+                if (e.InnerException is OperationCanceledException)
+                {
+                    throw e.InnerException;
+                }
+
                 return new ResponseDescriptor<T>(null, context, e, ResponseErrorType.Communication);
             }
 
@@ -43,11 +52,16 @@ namespace Bolt.Client
             {
                 try
                 {
-                    HttpWebResponse response = (HttpWebResponse)TaskExtensions.Execute(() => context.Request.GetResponseAsync());
+                    HttpWebResponse response = context.Request.GetResponse(context.Cancellation);
                     context.Response = response;
                 }
                 catch (WebException e)
                 {
+                    if (e.InnerException is OperationCanceledException)
+                    {
+                        throw e.InnerException;
+                    }
+
                     if (IsCommunicationException(e))
                     {
                         throw;
@@ -57,8 +71,17 @@ namespace Bolt.Client
                     clientException = e;
                 }
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception e)
             {
+                if (e.InnerException is OperationCanceledException)
+                {
+                    throw e.InnerException;
+                }
+
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
             }
 
@@ -77,12 +100,21 @@ namespace Bolt.Client
             {
                 await _dataHandler.WriteParametersAsync(context, parameters);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (SerializationException e)
             {
                 return new ResponseDescriptor<T>(null, context, e, ResponseErrorType.Serialization);
             }
             catch (Exception e)
             {
+                if (e.InnerException is OperationCanceledException)
+                {
+                    throw e.InnerException;
+                }
+
                 return new ResponseDescriptor<T>(null, context, e, ResponseErrorType.Communication);
             }
 
@@ -90,11 +122,16 @@ namespace Bolt.Client
             {
                 try
                 {
-                    HttpWebResponse response = (HttpWebResponse)await context.Request.GetResponseAsync();
+                    HttpWebResponse response = await context.Request.GetResponseAsync(context.Cancellation);
                     context.Response = response;
                 }
                 catch (WebException e)
                 {
+                    if (e.InnerException is OperationCanceledException)
+                    {
+                        throw e.InnerException;
+                    }
+
                     if (IsCommunicationException(e))
                     {
                         throw;
@@ -104,8 +141,17 @@ namespace Bolt.Client
                     clientException = e;
                 }
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception e)
             {
+                if (e.InnerException is OperationCanceledException)
+                {
+                    throw e.InnerException;
+                }
+
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
             }
 
@@ -130,8 +176,17 @@ namespace Bolt.Client
                 {
                     return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Deserialization);
                 }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
                 catch (Exception e)
                 {
+                    if (e.InnerException is OperationCanceledException)
+                    {
+                        throw e.InnerException;
+                    }
+
                     return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
                 }
             }
@@ -140,12 +195,21 @@ namespace Bolt.Client
             {
                 return new ResponseDescriptor<T>(context.Response, context, await _dataHandler.ReadResponseAsync<T>(context));
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (SerializationException e)
             {
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Deserialization);
             }
             catch (Exception e)
             {
+                if (e.InnerException is OperationCanceledException)
+                {
+                    throw e.InnerException;
+                }
+
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
             }
         }
@@ -166,8 +230,17 @@ namespace Bolt.Client
                 {
                     return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Deserialization);
                 }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
                 catch (Exception e)
                 {
+                    if (e.InnerException is OperationCanceledException)
+                    {
+                        throw e.InnerException;
+                    }
+
                     return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
                 }
             }
@@ -180,8 +253,17 @@ namespace Bolt.Client
             {
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Deserialization);
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception e)
             {
+                if (e.InnerException is OperationCanceledException)
+                {
+                    throw e.InnerException;
+                }
+
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
             }
         }

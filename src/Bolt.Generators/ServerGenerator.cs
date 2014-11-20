@@ -121,9 +121,17 @@ namespace Bolt.Generators
             {
                 StringBuilder sb = new StringBuilder();
 
-                foreach (ParameterInfo info in method.Method.GetParameters())
+                ParameterInfo cancellation = method.GetCancellationTokenParameter();
+                foreach (ParameterInfo info in method.GetAllParameters())
                 {
-                    sb.AppendFormat("{0}.{1}, ", parametersInstance, info.Name.CapitalizeFirstLetter());
+                    if (info == cancellation)
+                    {
+                        sb.Append("context.CallCancelled, ");
+                    }
+                    else
+                    {
+                        sb.AppendFormat("{0}.{1}, ", parametersInstance, info.Name.CapitalizeFirstLetter());
+                    }
                 }
                 sb.Remove(sb.Length - 2, 2);
                 parametersBody = sb.ToString();

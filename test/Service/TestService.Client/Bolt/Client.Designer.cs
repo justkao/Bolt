@@ -28,24 +28,20 @@ namespace TestService.Core
     {
         public TestService.Core.PersonRepositoryDescriptor ContractDescriptor { get; set; }
 
-        public virtual Person UpdatePerson(Person person)
+        public virtual Person UpdatePerson(Person person, System.Threading.CancellationToken cancellation)
         {
             var request = new UpdatePersonParameters();
             request.Person = person;
             var descriptor = ContractDescriptor.UpdatePerson;
-            var token = GetCancellationToken(descriptor);
-
-            return Send<Person, UpdatePersonParameters>(request, descriptor, token);
+            return Send<Person, UpdatePersonParameters>(request, descriptor, cancellation);
         }
 
-        public virtual Task<Person> UpdatePersonAsync(Person person)
+        public virtual Task<Person> UpdatePersonAsync(Person person, System.Threading.CancellationToken cancellation)
         {
             var request = new UpdatePersonParameters();
             request.Person = person;
             var descriptor = ContractDescriptor.UpdatePerson;
-            var token = GetCancellationToken(descriptor);
-
-            return SendAsync<Person, UpdatePersonParameters>(request, descriptor, token);
+            return SendAsync<Person, UpdatePersonParameters>(request, descriptor, cancellation);
         }
 
         public virtual Person UpdatePersonThatThrowsInvalidOperationException(Person person)
@@ -56,6 +52,21 @@ namespace TestService.Core
             var token = GetCancellationToken(descriptor);
 
             return Send<Person, UpdatePersonThatThrowsInvalidOperationExceptionParameters>(request, descriptor, token);
+        }
+
+        public virtual Task DoLongRunningOperationAsync(Person person, System.Threading.CancellationToken cancellation)
+        {
+            var request = new DoLongRunningOperationAsyncParameters();
+            request.Person = person;
+            var descriptor = ContractDescriptor.DoLongRunningOperationAsync;
+            return SendAsync(request, descriptor, cancellation);
+        }
+
+        public virtual Task DoLongRunningOperation2Async(System.Threading.CancellationToken cancellation)
+        {
+            var request = new DoLongRunningOperation2AsyncParameters();
+            var descriptor = ContractDescriptor.DoLongRunningOperation2Async;
+            return SendAsync(request, descriptor, cancellation);
         }
 
         public virtual Task DoNothingAsAsync()
@@ -222,7 +233,7 @@ namespace TestService.Core
 {
     public interface IPersonRepositoryAsync : IPersonRepository, IPersonRepositoryInnerAsync, IPersonRepositoryInner2Async
     {
-        Task<Person> UpdatePersonAsync(Person person);
+        Task<Person> UpdatePersonAsync(Person person, System.Threading.CancellationToken cancellation);
     }
 }
 

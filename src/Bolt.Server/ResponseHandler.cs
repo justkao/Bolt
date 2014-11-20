@@ -37,6 +37,8 @@ namespace Bolt.Server
 
         public Task HandleErrorResponse(ServerExecutionContext context, Exception error)
         {
+            context.CallCancelled.ThrowIfCancellationRequested();
+
             context.Context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             context.Context.Response.ContentType = _serverDataHandler.ContentType;
 

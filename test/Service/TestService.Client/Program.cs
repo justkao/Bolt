@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
+using System.Threading;
 
 using TestService.Core;
 
@@ -14,6 +15,9 @@ namespace TestService.Client
         {
             ServicePointManager.DefaultConnectionLimit = 1000;
             ServicePointManager.MaxServicePoints = 1000;
+
+            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
+            ClientFactory.CreateBolt().DoLongRunningOperation2Async(cts.Token).Wait();
 
             int cnt = 10000;
 

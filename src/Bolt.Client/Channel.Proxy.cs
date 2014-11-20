@@ -39,6 +39,10 @@ namespace Bolt.Client
                 {
                     channel = GetChannel(descriptor, cancellation);
                 }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
                 catch (SerializationException)
                 {
                     throw;
@@ -104,6 +108,10 @@ namespace Bolt.Client
                 try
                 {
                     channel = await GetChannelAsync(descriptor, cancellation);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
                 }
                 catch (SerializationException)
                 {
