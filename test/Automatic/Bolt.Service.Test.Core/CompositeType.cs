@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 
 namespace Bolt.Service.Test.Core
 {
+    [DataContract]
     public class CompositeType
     {
         public static CompositeType CreateRandom(bool createInner = true)
@@ -34,16 +36,22 @@ namespace Bolt.Service.Test.Core
             return type;
         }
 
+        [DataMember(Order = 1)]
         public int Int { get; set; }
 
+        [DataMember(Order = 2)]
         public double Double { get; set; }
 
+        [DataMember(Order = 3)]
         public List<string> List { get; set; }
 
+        [DataMember(Order = 4)]
         public DateTime DateTime { get; set; }
 
+        [DataMember(Order = 5)]
         public bool Bool { get; set; }
 
+        [DataMember(Order = 6)]
         public List<CompositeType> Inner { get; set; }
 
         protected bool Equals(CompositeType other)

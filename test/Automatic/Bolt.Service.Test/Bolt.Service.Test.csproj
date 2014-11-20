@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CustomException.cs" />
+    <Compile Include="SerializerType.cs" />
     <Compile Include="ServiceTest.cs" />
     <Compile Include="GeneratedCode.Designer.cs">
       <DependentUpon>GeneratedCode.tt</DependentUpon>

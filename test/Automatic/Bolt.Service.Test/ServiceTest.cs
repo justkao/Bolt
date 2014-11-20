@@ -11,9 +11,17 @@ using System.Threading.Tasks;
 
 namespace Bolt.Service.Test
 {
-    [TestFixture]
+    [TestFixture(SerializerType.Json)]
+    [TestFixture(SerializerType.Proto)]
     public class ServiceTest
     {
+        private readonly SerializerType _serializerType;
+
+        public ServiceTest(SerializerType serializerType)
+        {
+            _serializerType = serializerType;
+        }
+
         [Test]
         public void ClientCallsAsyncMethod_AsyncOnClientAndServer_EnsureExecutedOnServer()
         {
@@ -61,6 +69,22 @@ namespace Bolt.Service.Test
         }
 
         [Test]
+        public async Task Client_CallsAsyncFunction_EnsureCalledAsyncOnServer()
+        {
+            ITestContractAsync client = GetChannel();
+            Mock<ITestContract> server = Server();
+
+            server.Setup(v => v.SimpleAsyncFunction()).Returns(async () =>
+            {
+                await Task.Delay(1);
+                return 10;
+            });
+
+            int result = await client.SimpleAsyncFunction();
+            Assert.AreEqual(10, result);
+        }
+
+        [Test]
         public void Client_CancelsRequest_EnsureCancelledOnServer()
         {
             Mock<ITestContract> server = Server();
@@ -77,8 +101,7 @@ namespace Bolt.Service.Test
             {
                 serverToken = t;
                 called.Set();
-                Assert.Throws<OperationCanceledException>(() => Task.Delay(TimeSpan.FromSeconds(30), t).Wait(t));
-                serverToken = t;
+                Assert.Throws<OperationCanceledException>(() => Task.Delay(TimeSpan.FromSeconds(2), t).Wait(t));
                 waitHandle.Set();
             });
 
@@ -109,6 +132,20 @@ namespace Bolt.Service.Test
 
             server.Setup(v => v.SimpleMethodWithSimpleArguments(arg));
             client.SimpleMethodWithSimpleArguments(arg);
+        }
+
+        [Test]
+        public void Client_ManyComplexParameters_EnsureSameOnServer()
+        {
+            ITestContractAsync client = GetChannel();
+            Mock<ITestContract> server = Server();
+
+            CompositeType arg1 = CompositeType.CreateRandom();
+            CompositeType arg2 = CompositeType.CreateRandom();
+            DateTime arg3 = DateTime.UtcNow;
+
+            server.Setup(v => v.MethodWithManyArguments(arg1, arg2, arg3));
+            client.MethodWithManyArguments(arg1, arg2, arg3);
         }
 
         [Test]
@@ -238,7 +275,19 @@ namespace Bolt.Service.Test
         [TestFixtureSetUp]
         protected virtual void Init()
         {
-            JsonSerializer serializer = new JsonSerializer();
+            ISerializer serializer = null;
+
+            switch (_serializerType)
+            {
+                case SerializerType.Proto:
+                    serializer = new ProtocolBufferSerializer();
+                    break;
+                case SerializerType.Json:
+                    serializer = new JsonSerializer();
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
             JsonExceptionSerializer jsonExceptionSerializer = new JsonExceptionSerializer();
 
             ServerConfiguration = new ServerConfiguration(serializer, jsonExceptionSerializer);

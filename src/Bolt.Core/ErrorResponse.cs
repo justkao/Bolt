@@ -6,6 +6,6 @@ namespace Bolt
     public class ErrorResponse
     {
         [DataMember(Order = 1)]
-        public string RawException { get; set; }
+        public byte[] RawException { get; set; }
     }
 }

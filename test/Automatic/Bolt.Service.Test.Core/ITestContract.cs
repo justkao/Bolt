@@ -1,4 +1,5 @@
 ﻿
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -15,6 +16,10 @@ namespace Bolt.Service.Test.Core
         void SimpleMethodWithComplexParameter(CompositeType compositeType);
 
         int SimpleFunction();
+
+        Task<int> SimpleAsyncFunction();
+
+        void MethodWithManyArguments(CompositeType arg1, CompositeType arg2, DateTime time);
     }
 
     public interface ITestContract : ITestContractInner

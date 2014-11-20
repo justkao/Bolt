@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
+using System.IO;
 using System.Runtime.Serialization.Formatters;
-using Newtonsoft.Json;
 
 namespace Bolt.Core.Serialization
 {
@@ -14,15 +15,38 @@ namespace Bolt.Core.Serialization
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
         };
 
-        public string Serialize(Exception exception)
+        public byte[] Serialize(Exception exception)
         {
-            string raw = JsonConvert.SerializeObject(exception, _exceptionSerializerSettings);
-            return raw;
+            Newtonsoft.Json.JsonSerializer serializer = Newtonsoft.Json.JsonSerializer.CreateDefault(_exceptionSerializerSettings);
+
+            using (MemoryStream stream = new MemoryStream())
+            {
+                using (StreamWriter streamWriter = new StreamWriter(stream))
+                {
+                    using (JsonWriter writer = new JsonTextWriter(streamWriter))
+                    {
+                        serializer.Serialize(writer, exception);
+                    }
+                }
+
+                return stream.ToArray();
+            }
         }
 
-        public Exception Deserialize(string exception)
+        public Exception Deserialize(byte[] exception)
         {
-            return JsonConvert.DeserializeObject<Exception>(exception, _exceptionSerializerSettings);
+            Newtonsoft.Json.JsonSerializer serializer = Newtonsoft.Json.JsonSerializer.CreateDefault(_exceptionSerializerSettings);
+
+            using (MemoryStream stream = new MemoryStream(exception))
+            {
+                using (StreamReader streamReader = new StreamReader(stream))
+                {
+                    using (JsonTextReader reader = new JsonTextReader(streamReader))
+                    {
+                        return serializer.Deserialize<Exception>(reader);
+                    }
+                }
+            }
         }
     }
 }

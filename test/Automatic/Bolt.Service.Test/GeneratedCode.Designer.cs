@@ -34,6 +34,19 @@ namespace Bolt.Service.Test.Core.Parameters
         public CompositeType CompositeType { get; set; }
     }
 
+    [DataContract]
+    public partial class MethodWithManyArgumentsParameters
+    {
+        [DataMember(Order = 1)]
+        public CompositeType Arg1 { get; set; }
+
+        [DataMember(Order = 2)]
+        public CompositeType Arg2 { get; set; }
+
+        [DataMember(Order = 3)]
+        public DateTime Time { get; set; }
+    }
+
 }
 
 namespace Bolt.Service.Test.Core
@@ -49,6 +62,8 @@ namespace Bolt.Service.Test.Core
             ComplexFunction = Add("ComplexFunction", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("ComplexFunction"));
             SimpleMethodWithComplexParameter = Add("SimpleMethodWithComplexParameter", typeof(Bolt.Service.Test.Core.Parameters.SimpleMethodWithComplexParameterParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleMethodWithComplexParameter"));
             SimpleFunction = Add("SimpleFunction", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleFunction"));
+            SimpleAsyncFunction = Add("SimpleAsyncFunction", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleAsyncFunction"));
+            MethodWithManyArguments = Add("MethodWithManyArguments", typeof(Bolt.Service.Test.Core.Parameters.MethodWithManyArgumentsParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("MethodWithManyArguments"));
         }
 
         public static readonly TestContractDescriptor Default = new TestContractDescriptor();
@@ -66,6 +81,10 @@ namespace Bolt.Service.Test.Core
         public virtual ActionDescriptor SimpleMethodWithComplexParameter { get; set; }
 
         public virtual ActionDescriptor SimpleFunction { get; set; }
+
+        public virtual ActionDescriptor SimpleAsyncFunction { get; set; }
+
+        public virtual ActionDescriptor MethodWithManyArguments { get; set; }
     }
 }
 
@@ -166,6 +185,26 @@ namespace Bolt.Service.Test.Core
 
             return Send<int, Empty>(Empty.Instance, descriptor, token);
         }
+
+        public virtual Task<int> SimpleAsyncFunction()
+        {
+            var descriptor = ContractDescriptor.SimpleAsyncFunction;
+            var token = GetCancellationToken(descriptor);
+
+            return SendAsync<int, Empty>(Empty.Instance, descriptor, token);
+        }
+
+        public virtual void MethodWithManyArguments(CompositeType arg1, CompositeType arg2, DateTime time)
+        {
+            var request = new MethodWithManyArgumentsParameters();
+            request.Arg1 = arg1;
+            request.Arg2 = arg2;
+            request.Time = time;
+            var descriptor = ContractDescriptor.MethodWithManyArguments;
+            var token = GetCancellationToken(descriptor);
+
+            Send(request, descriptor, token);
+        }
     }
 }
 
@@ -203,6 +242,8 @@ namespace Bolt.Server
             AddAction(ContractDescriptor.ComplexFunction, TestContract_ComplexFunction);
             AddAction(ContractDescriptor.SimpleMethodWithComplexParameter, TestContractInner_SimpleMethodWithComplexParameter);
             AddAction(ContractDescriptor.SimpleFunction, TestContractInner_SimpleFunction);
+            AddAction(ContractDescriptor.SimpleAsyncFunction, TestContractInner_SimpleAsyncFunction);
+            AddAction(ContractDescriptor.MethodWithManyArguments, TestContractInner_MethodWithManyArguments);
 
             base.Init();
         }
@@ -259,6 +300,21 @@ namespace Bolt.Server
             var instance = await InstanceProvider.GetInstanceAsync<ITestContractInner>(context);
             var result = instance.SimpleFunction();
             await ResponseHandler.Handle(context, result);
+        }
+
+        protected virtual async Task TestContractInner_SimpleAsyncFunction(Bolt.Server.ServerExecutionContext context)
+        {
+            var instance = await InstanceProvider.GetInstanceAsync<ITestContractInner>(context);
+            var result = await instance.SimpleAsyncFunction();
+            await ResponseHandler.Handle(context, result);
+        }
+
+        protected virtual async Task TestContractInner_MethodWithManyArguments(Bolt.Server.ServerExecutionContext context)
+        {
+            var parameters = await DataHandler.ReadParametersAsync<MethodWithManyArgumentsParameters>(context);
+            var instance = await InstanceProvider.GetInstanceAsync<ITestContractInner>(context);
+            instance.MethodWithManyArguments(parameters.Arg1, parameters.Arg2, parameters.Time);
+            await ResponseHandler.Handle(context);
         }
     }
 }

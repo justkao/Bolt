@@ -54,7 +54,7 @@
     <Compile Include="JsonSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <None Include="packages.config" />
-    <None Include="ProtocolBufferSerializer.cs" />
+    <Compile Include="ProtocolBufferSerializer.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Bolt.Core\Bolt.Core.csproj">

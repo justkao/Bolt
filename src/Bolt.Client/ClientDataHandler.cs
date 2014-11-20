@@ -74,7 +74,10 @@ namespace Bolt.Client
                 return Task.FromResult(default(T));
             }
 
-            return _serializer.DeserializeAsync<T>(context.Response.GetResponseStream(), true, context.Cancellation);
+            using (Stream stream = context.Response.GetResponseStream())
+            {
+                return _serializer.DeserializeAsync<T>(stream, true, context.Cancellation);
+            }
         }
 
         public T ReadResponse<T>(ClientExecutionContext context)
@@ -84,7 +87,10 @@ namespace Bolt.Client
                 return default(T);
             }
 
-            return _serializer.Deserialize<T>(context.Response.GetResponseStream(), true);
+            using (Stream stream = context.Response.GetResponseStream())
+            {
+                return _serializer.Deserialize<T>(stream, true);
+            }
         }
 
         public Exception ReadException(ClientExecutionContext context)
