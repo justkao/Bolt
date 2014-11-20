@@ -1,8 +1,6 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 
 namespace Bolt.Generators
 {
@@ -18,49 +16,29 @@ namespace Bolt.Generators
         {
         }
 
-        public static string Generate(ContractDefinition definition)
-        {
-            ContractGenerator generator = new ContractGenerator();
-            generator.ContractDefinition = definition;
-            generator.Generate();
-
-            return generator.Output.GetStringBuilder().ToString();
-        }
-
-        public string BaseClass { get; set; }
-
         public override void Generate()
         {
-            ContractDescriptorGenerator contractDescriptorGenerator = new ContractDescriptorGenerator(Output, Formatter, IntendProvider);
-            contractDescriptorGenerator.MetadataProvider = MetadataProvider;
-            contractDescriptorGenerator.ContractDefinition = ContractDefinition;
-            contractDescriptorGenerator.Generate();
+            List<MethodDescriptor> methods =
+                ContractDefinition.GetEffectiveMethods()
+                    .Select(m => MetadataProvider.GetMethodDescriptor(ContractDefinition, m))
+                    .Where(m => m.HasParameters())
+                    .ToList();
 
-            IReadOnlyCollection<Type> contracts = ContractDefinition.GetEffectiveContracts();
-            ParametersGenerator generator = new ParametersGenerator(Output, Formatter, IntendProvider);
-            generator.BaseClass = BaseClass;
-
-            foreach (Type type in contracts)
+            foreach (IGrouping<string, MethodDescriptor> grouping in methods.GroupBy(m => m.Parameters.Namespace))
             {
-                if (ContractDefinition.GetEffectiveMethods(type).Any(HasParameters))
+                using (WithNamespace(grouping.Key))
                 {
-                    BeginNamespace(MetadataProvider.GetParameterDescriptor(type, null).Namespace);
-                    IEnumerable<MethodInfo> methods = ContractDefinition.GetEffectiveMethods(type).ToList();
-
-                    foreach (MethodInfo method in methods)
+                    foreach (MethodDescriptor method in methods)
                     {
-                        if (generator.Generate(method, MetadataProvider))
+                        ParametersGenerator parametersGenerator = new ParametersGenerator(method, Output, Formatter, IntendProvider)
                         {
-                            if (!Equals(method, methods.Last()))
-                            {
-                                WriteLine();
-                            }
-                        }
+                            IncludeNamepsace = false
+                        };
+                        parametersGenerator.Generate();
                     }
-
-                    EndNamespace();
-                    WriteLine();
                 }
+
+                WriteLine();
             }
         }
     }

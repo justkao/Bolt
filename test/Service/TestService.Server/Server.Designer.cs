@@ -1,4 +1,17 @@
 ﻿
+
+
+
+
+
+
+
+
+
+
+
+
+
 using Bolt;
 using Bolt.Server;
 using System;
@@ -10,7 +23,7 @@ using System.Threading.Tasks;
 using TestService.Core;
 using TestService.Core.Parameters;
 
-namespace TestService.Core
+namespace Bolt.Server
 {
     public partial class PersonRepositoryExecutor : Bolt.Server.Executor
     {
@@ -41,7 +54,7 @@ namespace TestService.Core
             base.Init();
         }
 
-        public TestService.Core.PersonRepositoryDescriptor ContractDescriptor { get; set; }
+        public virtual TestService.Core.PersonRepositoryDescriptor ContractDescriptor { get; set; }
 
         protected virtual async Task PersonRepository_UpdatePerson(Bolt.Server.ServerExecutionContext context)
         {

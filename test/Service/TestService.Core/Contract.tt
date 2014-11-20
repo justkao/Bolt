@@ -4,6 +4,7 @@
 <#  
 	string result =	Create(Contracts.PersonRepository)
 					.Contract()
+					.Descriptor()
 					.GetResult();
 
     Write(result);

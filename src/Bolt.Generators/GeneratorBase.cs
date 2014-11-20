@@ -26,6 +26,10 @@ namespace Bolt.Generators
 
         public IntendProvider IntendProvider { get; set; }
 
+        public virtual void Generate()
+        {
+        }
+
         public virtual void GenerateUsings()
         {
             foreach (string ns in Formatter.GetNamespaces())

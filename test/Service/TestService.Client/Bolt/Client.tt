@@ -3,8 +3,8 @@
 <#@ assembly name="$(SolutionDir)test\Service\TestService.Core\bin\$(Configuration)\TestService.Core.dll" #>
 <#  
 	var result = Create(Contracts.PersonRepository)
-					.StatefullClient(null, true)
-					.Async(true)
+					.Client()
+					.Async()
 					.GetResult();
 	Write(result);
 #>

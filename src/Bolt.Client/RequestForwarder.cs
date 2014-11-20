@@ -66,7 +66,9 @@ namespace Bolt.Client
             return CreateResponse<T>(context, clientException);
         }
 
-        public virtual async Task<ResponseDescriptor<T>> GetResponseAsync<T, TParameters>(ClientExecutionContext context, TParameters parameters)
+        public virtual async Task<ResponseDescriptor<T>> GetResponseAsync<T, TParameters>(
+            ClientExecutionContext context,
+            TParameters parameters)
         {
             Exception clientException = null;
             context.Request.Accept = _dataHandler.ContentType;
@@ -110,7 +112,9 @@ namespace Bolt.Client
             return await CreateResponseAsync<T>(context, clientException);
         }
 
-        protected virtual async Task<ResponseDescriptor<T>> CreateResponseAsync<T>(ClientExecutionContext context, Exception clientException)
+        protected virtual async Task<ResponseDescriptor<T>> CreateResponseAsync<T>(
+            ClientExecutionContext context,
+            Exception clientException)
         {
             if (clientException != null)
             {
@@ -157,8 +161,6 @@ namespace Bolt.Client
                     {
                         return new ResponseDescriptor<T>(context.Response, context, clientException, ResponseErrorType.Client);
                     }
-
-                    return new ResponseDescriptor<T>(context.Response, context, error, ResponseErrorType.Client);
                 }
                 catch (SerializationException e)
                 {

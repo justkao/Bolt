@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Bolt.Generators
 {
-    public class InterfaceGenerator : ContractGenerator
+    public class InterfaceGenerator : ContractGeneratorBase
     {
         private readonly List<Type> _generatedInterfaces = new List<Type>();
 

@@ -4,10 +4,25 @@ namespace Bolt.Generators
 {
     public class MethodDescriptor
     {
-        public ContractDefinition Contract { get; set; }
+        public MethodDescriptor(ContractDefinition contract, MethodInfo method, string name, ClassDescriptor parameters)
+        {
+            Contract = contract;
+            Method = method;
+            Name = name;
+            Parameters = parameters;
+        }
 
-        public MethodInfo Method { get; set; }
+        public ContractDefinition Contract { get; private set; }
 
-        public string Name { get; set; }
+        public MethodInfo Method { get; private set; }
+
+        public string Name { get; private set; }
+
+        public ClassDescriptor Parameters { get; private set; }
+
+        public bool HasParameters()
+        {
+            return Parameters != null && Parameters.FullName != typeof(Empty).FullName;
+        }
     }
 }

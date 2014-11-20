@@ -15,21 +15,23 @@ namespace Bolt.Generators
         public ContractDescriptorGenerator(StringWriter output, TypeFormatter formatter, IntendProvider provider)
             : base(output, formatter, provider)
         {
+            StaticAccessorProperty = "Default";
         }
 
-        public string BaseClass { get; set; }
+        public string StaticAccessorProperty { get; set; }
 
         public override void Generate()
         {
+            ClassDescriptor descriptor = ContractDescriptor;
+            AddUsings(descriptor.Namespace);
+            AddUsings("System.Runtime");
             AddUsings("System.Reflection");
 
-            IEnumerable<MethodInfo> methods = ContractDefinition.GetEffectiveMethods().ToList();
-            TypeDescriptor descriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
+            List<MethodInfo> methods = ContractDefinition.GetEffectiveMethods().ToList();
 
-            using (WithNamespace(descriptor.Namespace))
-            {
-                WriteLine("public partial class {0} : {1}", descriptor.Name, BaseClass ?? FormatType<ContractDescriptor>());
-                using (WithBlock())
+            ClassGenerator classGenerator = CreateClassGenerator(descriptor);
+            classGenerator.GenerateClass(
+                g =>
                 {
                     WriteLine("public {0}() : base(typeof({1}))", descriptor.Name, ContractDefinition.Root.FullName);
                     using (WithBlock())
@@ -37,8 +39,9 @@ namespace Bolt.Generators
                         foreach (MethodInfo method in methods)
                         {
                             MethodDescriptor methodDescriptor = MetadataProvider.GetMethodDescriptor(ContractDefinition, method);
+
                             string parametersType = HasParameters(method)
-                                                        ? MetadataProvider.GetParameterDescriptor(method.DeclaringType, method).FullName
+                                                        ? methodDescriptor.Parameters.FullName
                                                         : typeof(Empty).FullName;
 
                             WriteLine(
@@ -51,22 +54,26 @@ namespace Bolt.Generators
                     }
 
                     WriteLine();
-                    WriteLine("public static readonly {0} Default = new {0}();", descriptor.Name, descriptor);
+                    WriteLine("public static readonly {0} {1} = new {0}();", descriptor.Name, StaticAccessorProperty);
                     WriteLine();
 
                     foreach (MethodInfo method in methods)
                     {
                         MethodDescriptor methodDescriptor = MetadataProvider.GetMethodDescriptor(ContractDefinition, method);
-                        WriteLine("public virtual {0} {1} {{ get; private set; }}", FormatType<ActionDescriptor>(), methodDescriptor.Name);
-
+                        g.WritePublicProperty(FormatType<ActionDescriptor>(), methodDescriptor.Name);
                         if (!Equals(method, methods.Last()))
                         {
                             WriteLine();
                         }
                     }
-                }
-            }
-            WriteLine();
+                });
+        }
+
+        protected override ClassDescriptor CreateDefaultDescriptor()
+        {
+            ClassDescriptor descriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
+            descriptor.BaseClasses = new[] { FormatType<ContractDescriptor>() };
+            return descriptor;
         }
     }
 }
