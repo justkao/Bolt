@@ -9,7 +9,7 @@ namespace TestService.Client
     {
         public static IPersonRepository CreateIISBolt()
         {
-            PersonRepository repository = new PersonRepository();
+            PersonRepositoryChannel repository = new PersonRepositoryChannel();
             repository.ServerUrl = Servers.IISBoltServer;
             repository.Prefix = Servers.Prefix;
             repository.Contract = Contracts.PersonRepository;
@@ -23,7 +23,7 @@ namespace TestService.Client
 
         public static IPersonRepository CreateBolt()
         {
-            PersonRepository repository = new PersonRepository();
+            PersonRepositoryChannel repository = new PersonRepositoryChannel();
             repository.ServerUrl = Servers.BoltServer;
             repository.Prefix = Servers.Prefix;
             repository.Contract = Contracts.PersonRepository;

@@ -1,4 +1,6 @@
-﻿using Microsoft.Owin;
+﻿using System.Threading;
+
+using Microsoft.Owin;
 
 namespace Bolt.Server
 {
@@ -11,5 +13,13 @@ namespace Bolt.Server
         }
 
         public IOwinContext Context { get; private set; }
+
+        public CancellationToken CallCancelled
+        {
+            get
+            {
+                return Context.Request.CallCancelled;
+            }
+        }
     }
 }

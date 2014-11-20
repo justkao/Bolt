@@ -1,7 +1,9 @@
 ﻿
-using Newtonsoft.Json;
 using System;
 using System.Runtime.Serialization.Formatters;
+using Bolt;
+using Bolt.Generators;
+using Newtonsoft.Json;
 
 namespace Sandbox
 {
@@ -20,6 +22,8 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
+            string result = new Generator() { ContractDefinition = new ContractDefinition(typeof(ISamle1)) }.StateFullClient().GetResult();
+
             Exception e = new InvalidOperationException("Test");
 
             try

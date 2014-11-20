@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace TestService.Core
 {
     public class PersonRepository : IPersonRepository
     {
-        public Person UpdatePerson(Person person)
+        public Person UpdatePerson(Person person, CancellationToken cancellation)
         {
             return null;
         }
@@ -15,6 +16,16 @@ namespace TestService.Core
         public Person UpdatePersonThatThrowsInvalidOperationException(Person person)
         {
             throw new InvalidOperationException("test message", new ArgumentOutOfRangeException("inner message"));
+        }
+
+        public Task DoLongRunningOperationAsync(Person person, CancellationToken cancellation)
+        {
+            return Task.Delay(TimeSpan.FromMinutes(1), cancellation);
+        }
+
+        public Task DoLongRunningOperation2Async(CancellationToken cancellation)
+        {
+            return Task.Delay(TimeSpan.FromMinutes(1), cancellation);
         }
 
         public Task DoNothingAsAsync()

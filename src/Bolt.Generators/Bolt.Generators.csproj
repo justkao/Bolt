@@ -37,10 +37,11 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClassDescriptor.cs" />
+    <Compile Include="ClassGenerator.cs" />
     <Compile Include="EasyDispose.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="MethodDescriptor.cs" />
-    <Compile Include="ParametersDescriptor.cs" />
     <Compile Include="IMetadataProvider.cs" />
     <Compile Include="ContractDescriptorGenerator.cs" />
     <Compile Include="InterfaceGenerator.cs" />
@@ -53,7 +54,6 @@
     <Compile Include="ContractGenerator.cs" />
     <Compile Include="ParametersGenerator.cs" />
     <Compile Include="ServerGenerator.cs" />
-    <Compile Include="TypeDescriptor.cs" />
     <Compile Include="TypeFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

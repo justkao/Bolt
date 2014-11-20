@@ -1,9 +1,10 @@
-﻿using Bolt.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+
+using Bolt.Client;
 
 namespace Bolt.Generators
 {
@@ -17,77 +18,53 @@ namespace Bolt.Generators
         public ClientGenerator(StringWriter output, TypeFormatter formatter, IntendProvider intendProvider)
             : base(output, formatter, intendProvider)
         {
+            ContractDescriptorProperty = "ContractDescriptor";
         }
 
-        public static string GenerateStatefull(ContractDefinition definition, string clientNamespace)
-        {
-            return Generate(definition, clientNamespace, typeof(StatefullChannel).FullName);
-        }
-
-        public static string GenerateStateless(ContractDefinition definition, string clientNamespace)
-        {
-            return Generate(definition, clientNamespace, typeof(Channel).FullName);
-        }
-
-        public static string Generate(ContractDefinition definition, string clientNamespace, string baseClass = null)
-        {
-            ClientGenerator generator = new ClientGenerator();
-            generator.ClientNamespace = clientNamespace;
-            generator.ContractDefinition = definition;
-            generator.BaseClass = baseClass;
-            generator.Generate();
-
-            return generator.Output.GetStringBuilder().ToString();
-        }
-
-        public string ClientNamespace { get; set; }
-
-        public string BaseClass { get; set; }
-
-        public string ClassName { get; set; }
+        public string ContractDescriptorProperty { get; set; }
 
         public bool ForceAsync { get; set; }
 
+        public bool StateFull { get; set; }
+
         public override void Generate()
         {
-            using (WithNamespace(ClientNamespace ?? ContractDefinition.Namespace))
-            {
-                List<Type> contracts = ContractDefinition.GetEffectiveContracts().ToList();
+            ClassDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
+            ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
 
-                WriteLine("public partial class {0} : {1}{2}, {3}", ClassName ?? ContractDefinition.Name, BaseClass != null ? BaseClass + ", " : null, typeof(IChannel).FullName, ContractDefinition.Root.FullName);
-                using (WithBlock())
+            generator.GenerateClass(
+                g =>
                 {
-                    WriteLine("public {0} ContractDescriptor {{ get; set; }}", MetadataProvider.GetContractDescriptor(ContractDefinition).FullName);
+                    WriteLine("public {0} {1} {{ get; set; }}", contractDescriptor.FullName, ContractDescriptorProperty);
                     WriteLine();
+
+                    List<Type> contracts = ContractDefinition.GetEffectiveContracts().ToList();
 
                     foreach (Type type in contracts)
                     {
-                        Generate(type, MetadataProvider);
+                        GenerateMethods(g, type);
                     }
-                }
-            }
-
-            WriteLine();
+                });
         }
 
-        private void Generate(Type contract, IMetadataProvider provider)
+        private void GenerateMethods(ClassGenerator classGenerator, Type contract)
         {
-            ParametersGenerator generator = new ParametersGenerator(Output, Formatter, IntendProvider);
             MethodInfo[] methods = ContractDefinition.GetEffectiveMethods(contract).ToArray();
 
             foreach (MethodInfo method in methods)
             {
-                GenerateMethod(method, generator, provider.GetMethodDescriptor(ContractDefinition, method), provider, false);
+                MethodDescriptor descriptor = MetadataProvider.GetMethodDescriptor(ContractDefinition, method);
+
+                GenerateMethod(classGenerator, descriptor, false);
 
                 bool generateAsync = ShouldBeAsync(method, ForceAsync);
-
                 if (generateAsync)
                 {
                     WriteLine();
                 }
                 else
                 {
-                    if (method != methods.Last())
+                    if (!Equals(method, methods.Last()))
                     {
                         WriteLine();
                     }
@@ -95,58 +72,136 @@ namespace Bolt.Generators
 
                 if (generateAsync)
                 {
-                    GenerateMethod(method, generator, provider.GetMethodDescriptor(ContractDefinition, method), provider, true);
+                    GenerateMethod(classGenerator, descriptor, true);
                     WriteLine();
                 }
             }
         }
 
-        private void GenerateMethod(MethodInfo method, ParametersGenerator generator, MethodDescriptor descriptor, IMetadataProvider provider, bool forceAsync)
+        private void GenerateMethod(ClassGenerator classGenerator, MethodDescriptor descriptor, bool forceAsync)
         {
-            WriteLine("public " + FormatMethodDeclaration(method, forceAsync));
-            using (WithBlock())
-            {
-                GenerateRequestCodeResult result = generator.GenerateRequestCode(method, method.GetParameters().ToDictionary(p => p, p => p.Name), provider);
+            classGenerator.WriteMethod(
+                descriptor.Method,
+                forceAsync,
+                g =>
+                {
+                    MethodInfo method = descriptor.Method;
+                    ParameterInfo cancellation = descriptor.GetCancellationTokenParameter();
 
-                if (HasReturnValue(method))
-                {
-                    if (IsAsync(method))
+                    GenerateRequestCodeResult result = GenerateRequestCode(
+                        descriptor,
+                        descriptor.Method.GetParameters().ToDictionary(p => p, p => p.Name));
+
+                    if (HasReturnValue(method))
                     {
-                        WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
-                    }
-                    else if (forceAsync)
-                    {
-                        WriteLine("return SendAsync<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
+                        if (IsAsync(method))
+                        {
+                            WriteLine(
+                                "return SendAsync<{0}, {1}>({2}, {3});",
+                                FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType),
+                                result.TypeName,
+                                result.VariableName,
+                                DeclareEndpoint(descriptor, cancellation));
+                        }
+                        else if (forceAsync)
+                        {
+                            WriteLine(
+                                "return SendAsync<{0}, {1}>({2}, {3});",
+                                FormatType(method.ReturnType),
+                                result.TypeName,
+                                result.VariableName,
+                                DeclareEndpoint(descriptor, cancellation));
+                        }
+                        else
+                        {
+                            WriteLine(
+                                "return Send<{0}, {1}>({2}, {3});",
+                                FormatType(method.ReturnType),
+                                result.TypeName,
+                                result.VariableName,
+                                DeclareEndpoint(descriptor, cancellation));
+                        }
                     }
                     else
                     {
-                        WriteLine("return Send<{0}, {1}>({2}, {3});", FormatType(method.ReturnType), result.TypeName, result.VariableName, DeclareEndpoint(descriptor));
+                        if (IsAsync(method))
+                        {
+                            WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
+                        }
+                        else if (forceAsync)
+                        {
+                            WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
+                        }
+                        else
+                        {
+                            WriteLine("Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
+                        }
                     }
-                }
-                else
-                {
-                    if (IsAsync(method))
-                    {
-                        WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
-                    }
-                    else if (forceAsync)
-                    {
-                        WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
-                    }
-                    else
-                    {
-                        WriteLine("Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor));
-                    }
-                }
-            }
+                });
         }
 
-        private string DeclareEndpoint(MethodDescriptor descriptor)
+        protected virtual GenerateRequestCodeResult GenerateRequestCode(MethodDescriptor methodDescriptor, Dictionary<ParameterInfo, string> variables)
+        {
+            if (!methodDescriptor.HasParameters())
+            {
+                return new GenerateRequestCodeResult()
+                {
+                    VariableName = FormatType<Empty>() + ".Instance",
+                    TypeName = FormatType<Empty>()
+                };
+            }
+
+            AddUsings(methodDescriptor.Parameters.Namespace);
+            WriteLine("var request = new {0}();", methodDescriptor.Parameters.Name);
+
+            foreach (ParameterInfo info in methodDescriptor.GetParameters())
+            {
+                WriteLine("request.{0} = {1};", info.Name.CapitalizeFirstLetter(), variables[info]);
+            }
+
+            return new GenerateRequestCodeResult()
+            {
+                VariableName = "request",
+                TypeName = methodDescriptor.Parameters.Name
+            };
+        }
+
+        protected class GenerateRequestCodeResult
+        {
+            public string VariableName { get; set; }
+
+            public string TypeName { get; set; }
+        }
+
+        private string DeclareEndpoint(MethodDescriptor descriptor, ParameterInfo cancellationTokenParameter)
         {
             WriteLine("var descriptor = ContractDescriptor.{0};", descriptor.Name);
-            WriteLine("var token = GetCancellationToken(descriptor);");
-            WriteLine();
-            return "descriptor, token";
+            if (cancellationTokenParameter == null)
+            {
+                WriteLine("var token = GetCancellationToken(descriptor);");
+                WriteLine();
+                return "descriptor, token";
+            }
+
+            return string.Format("descriptor, {0}", cancellationTokenParameter.Name);
+        }
+
+        protected override ClassDescriptor CreateDefaultDescriptor()
+        {
+            if (StateFull)
+            {
+                return new ClassDescriptor(
+                    ContractDefinition.Name + "Channel",
+                    ContractDefinition.Namespace,
+                    FormatType<StatefullChannel>(),
+                    ContractDefinition.Root.FullName);
+            }
+
+            return new ClassDescriptor(
+                ContractDefinition.Name + "Channel",
+                ContractDefinition.Namespace,
+                FormatType<Channel>(),
+                ContractDefinition.Root.FullName);
         }
     }
 }

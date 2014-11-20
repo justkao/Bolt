@@ -1,6 +1,18 @@
 ﻿
+
+
+
+
+
+
+
+
+
+
+
+
+
 using Bolt;
-using Bolt.Client;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,31 +24,27 @@ using TestService.Core.Parameters;
 
 namespace TestService.Core
 {
-    public partial class PersonRepository : StatefullChannel, Bolt.Client.IChannel, TestService.Core.IPersonRepository
+    public partial class PersonRepositoryChannel : Bolt.Client.Channel, TestService.Core.IPersonRepository
     {
         public TestService.Core.PersonRepositoryDescriptor ContractDescriptor { get; set; }
 
-        public Person UpdatePerson(Person person)
+        public virtual Person UpdatePerson(Person person, System.Threading.CancellationToken cancellation)
         {
             var request = new UpdatePersonParameters();
             request.Person = person;
             var descriptor = ContractDescriptor.UpdatePerson;
-            var token = GetCancellationToken(descriptor);
-
-            return Send<Person, UpdatePersonParameters>(request, descriptor, token);
+            return Send<Person, UpdatePersonParameters>(request, descriptor, cancellation);
         }
 
-        public Task<Person> UpdatePersonAsync(Person person)
+        public virtual Task<Person> UpdatePersonAsync(Person person, System.Threading.CancellationToken cancellation)
         {
             var request = new UpdatePersonParameters();
             request.Person = person;
             var descriptor = ContractDescriptor.UpdatePerson;
-            var token = GetCancellationToken(descriptor);
-
-            return SendAsync<Person, UpdatePersonParameters>(request, descriptor, token);
+            return SendAsync<Person, UpdatePersonParameters>(request, descriptor, cancellation);
         }
 
-        public Person UpdatePersonThatThrowsInvalidOperationException(Person person)
+        public virtual Person UpdatePersonThatThrowsInvalidOperationException(Person person)
         {
             var request = new UpdatePersonThatThrowsInvalidOperationExceptionParameters();
             request.Person = person;
@@ -46,17 +54,22 @@ namespace TestService.Core
             return Send<Person, UpdatePersonThatThrowsInvalidOperationExceptionParameters>(request, descriptor, token);
         }
 
-        public Task<Person> UpdatePersonThatThrowsInvalidOperationExceptionAsync(Person person)
+        public virtual Task DoLongRunningOperationAsync(Person person, System.Threading.CancellationToken cancellation)
         {
-            var request = new UpdatePersonThatThrowsInvalidOperationExceptionParameters();
+            var request = new DoLongRunningOperationAsyncParameters();
             request.Person = person;
-            var descriptor = ContractDescriptor.UpdatePersonThatThrowsInvalidOperationException;
-            var token = GetCancellationToken(descriptor);
-
-            return SendAsync<Person, UpdatePersonThatThrowsInvalidOperationExceptionParameters>(request, descriptor, token);
+            var descriptor = ContractDescriptor.DoLongRunningOperationAsync;
+            return SendAsync(request, descriptor, cancellation);
         }
 
-        public Task DoNothingAsAsync()
+        public virtual Task DoLongRunningOperation2Async(System.Threading.CancellationToken cancellation)
+        {
+            var request = new DoLongRunningOperation2AsyncParameters();
+            var descriptor = ContractDescriptor.DoLongRunningOperation2Async;
+            return SendAsync(request, descriptor, cancellation);
+        }
+
+        public virtual Task DoNothingAsAsync()
         {
             var descriptor = ContractDescriptor.DoNothingAsAsync;
             var token = GetCancellationToken(descriptor);
@@ -64,7 +77,7 @@ namespace TestService.Core
             return SendAsync(Empty.Instance, descriptor, token);
         }
 
-        public void DoNothing()
+        public virtual void DoNothing()
         {
             var descriptor = ContractDescriptor.DoNothing;
             var token = GetCancellationToken(descriptor);
@@ -72,15 +85,7 @@ namespace TestService.Core
             Send(Empty.Instance, descriptor, token);
         }
 
-        public Task DoNothingAsync()
-        {
-            var descriptor = ContractDescriptor.DoNothing;
-            var token = GetCancellationToken(descriptor);
-
-            return SendAsync(Empty.Instance, descriptor, token);
-        }
-
-        public Task DoNothingWithComplexParameterAsAsync(List<Person> person)
+        public virtual Task DoNothingWithComplexParameterAsAsync(List<Person> person)
         {
             var request = new DoNothingWithComplexParameterAsAsyncParameters();
             request.Person = person;
@@ -90,7 +95,7 @@ namespace TestService.Core
             return SendAsync(request, descriptor, token);
         }
 
-        public void DoNothingWithComplexParameter(List<Person> person)
+        public virtual void DoNothingWithComplexParameter(List<Person> person)
         {
             var request = new DoNothingWithComplexParameterParameters();
             request.Person = person;
@@ -100,17 +105,7 @@ namespace TestService.Core
             Send(request, descriptor, token);
         }
 
-        public Task DoNothingWithComplexParameterAsync(List<Person> person)
-        {
-            var request = new DoNothingWithComplexParameterParameters();
-            request.Person = person;
-            var descriptor = ContractDescriptor.DoNothingWithComplexParameter;
-            var token = GetCancellationToken(descriptor);
-
-            return SendAsync(request, descriptor, token);
-        }
-
-        public int GetSimpleType(int arg)
+        public virtual int GetSimpleType(int arg)
         {
             var request = new GetSimpleTypeParameters();
             request.Arg = arg;
@@ -120,17 +115,7 @@ namespace TestService.Core
             return Send<int, GetSimpleTypeParameters>(request, descriptor, token);
         }
 
-        public Task<int> GetSimpleTypeAsync(int arg)
-        {
-            var request = new GetSimpleTypeParameters();
-            request.Arg = arg;
-            var descriptor = ContractDescriptor.GetSimpleType;
-            var token = GetCancellationToken(descriptor);
-
-            return SendAsync<int, GetSimpleTypeParameters>(request, descriptor, token);
-        }
-
-        public Task GetSimpleTypeAsAsync(int arg)
+        public virtual Task GetSimpleTypeAsAsync(int arg)
         {
             var request = new GetSimpleTypeAsAsyncParameters();
             request.Arg = arg;
@@ -140,7 +125,7 @@ namespace TestService.Core
             return SendAsync(request, descriptor, token);
         }
 
-        public Person GetSinglePerson(Person person)
+        public virtual Person GetSinglePerson(Person person)
         {
             var request = new GetSinglePersonParameters();
             request.Person = person;
@@ -150,17 +135,7 @@ namespace TestService.Core
             return Send<Person, GetSinglePersonParameters>(request, descriptor, token);
         }
 
-        public Task<Person> GetSinglePersonAsync(Person person)
-        {
-            var request = new GetSinglePersonParameters();
-            request.Person = person;
-            var descriptor = ContractDescriptor.GetSinglePerson;
-            var token = GetCancellationToken(descriptor);
-
-            return SendAsync<Person, GetSinglePersonParameters>(request, descriptor, token);
-        }
-
-        public Task<Person> GetSinglePersonAsAsync(Person person)
+        public virtual Task<Person> GetSinglePersonAsAsync(Person person)
         {
             var request = new GetSinglePersonAsAsyncParameters();
             request.Person = person;
@@ -170,7 +145,7 @@ namespace TestService.Core
             return SendAsync<Person, GetSinglePersonAsAsyncParameters>(request, descriptor, token);
         }
 
-        public List<Person> GetManyPersons(Person person)
+        public virtual List<Person> GetManyPersons(Person person)
         {
             var request = new GetManyPersonsParameters();
             request.Person = person;
@@ -180,17 +155,7 @@ namespace TestService.Core
             return Send<List<Person>, GetManyPersonsParameters>(request, descriptor, token);
         }
 
-        public Task<List<Person>> GetManyPersonsAsync(Person person)
-        {
-            var request = new GetManyPersonsParameters();
-            request.Person = person;
-            var descriptor = ContractDescriptor.GetManyPersons;
-            var token = GetCancellationToken(descriptor);
-
-            return SendAsync<List<Person>, GetManyPersonsParameters>(request, descriptor, token);
-        }
-
-        public Task<List<Person>> GetManyPersonsAsAsync(Person person)
+        public virtual Task<List<Person>> GetManyPersonsAsAsync(Person person)
         {
             var request = new GetManyPersonsAsAsyncParameters();
             request.Person = person;
@@ -199,7 +164,7 @@ namespace TestService.Core
 
             return SendAsync<List<Person>, GetManyPersonsAsAsyncParameters>(request, descriptor, token);
         }
-        public void InnerOperation()
+        public virtual void InnerOperation()
         {
             var descriptor = ContractDescriptor.InnerOperation;
             var token = GetCancellationToken(descriptor);
@@ -207,7 +172,7 @@ namespace TestService.Core
             Send(Empty.Instance, descriptor, token);
         }
 
-        public Task InnerOperationAsync()
+        public virtual Task InnerOperationAsync()
         {
             var descriptor = ContractDescriptor.InnerOperation;
             var token = GetCancellationToken(descriptor);
@@ -215,14 +180,14 @@ namespace TestService.Core
             return SendAsync(Empty.Instance, descriptor, token);
         }
 
-        public Task InnerOperationExAsync()
+        public virtual Task InnerOperationExAsync()
         {
             var descriptor = ContractDescriptor.InnerOperationExAsync;
             var token = GetCancellationToken(descriptor);
 
             return SendAsync(Empty.Instance, descriptor, token);
         }
-        public void InnerOperation2()
+        public virtual void InnerOperation2()
         {
             var descriptor = ContractDescriptor.InnerOperation2;
             var token = GetCancellationToken(descriptor);
@@ -230,7 +195,7 @@ namespace TestService.Core
             Send(Empty.Instance, descriptor, token);
         }
 
-        public Task InnerOperation2Async()
+        public virtual Task InnerOperation2Async()
         {
             var descriptor = ContractDescriptor.InnerOperation2;
             var token = GetCancellationToken(descriptor);
@@ -238,7 +203,7 @@ namespace TestService.Core
             return SendAsync(Empty.Instance, descriptor, token);
         }
 
-        public Task InnerOperationExAsync2()
+        public virtual Task InnerOperationExAsync2()
         {
             var descriptor = ContractDescriptor.InnerOperationExAsync2;
             var token = GetCancellationToken(descriptor);
@@ -268,19 +233,7 @@ namespace TestService.Core
 {
     public interface IPersonRepositoryAsync : IPersonRepository, IPersonRepositoryInnerAsync, IPersonRepositoryInner2Async
     {
-        Task<Person> UpdatePersonAsync(Person person);
-
-        Task<Person> UpdatePersonThatThrowsInvalidOperationExceptionAsync(Person person);
-
-        Task DoNothingAsync();
-
-        Task DoNothingWithComplexParameterAsync(List<Person> person);
-
-        Task<int> GetSimpleTypeAsync(int arg);
-
-        Task<Person> GetSinglePersonAsync(Person person);
-
-        Task<List<Person>> GetManyPersonsAsync(Person person);
+        Task<Person> UpdatePersonAsync(Person person, System.Threading.CancellationToken cancellation);
     }
 }
 

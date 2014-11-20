@@ -1,4 +1,3 @@
-using Bolt.Client;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -45,8 +44,7 @@ namespace Bolt.Generators
                 catch (Exception e)
                 {
                     WriteLine("/*");
-                    WriteLine("Execution of '{0}' generator failed with error '{1}'", generatorBase.GetType().Name,
-                        e.ToString());
+                    WriteLine("Execution of '{0}' generator failed with error '{1}'", generatorBase.GetType().Name, e.ToString());
                     WriteLine("*/");
                 }
             }
@@ -61,102 +59,67 @@ namespace Bolt.Generators
             Output.GetStringBuilder().Insert(0, sb.ToString());
         }
 
-        public Generator Async(bool force = false)
-        {
-            return Add(new InterfaceGenerator(Output, Formatter, IntendProvider)
-            {
-                ContractDefinition = ContractDefinition,
-                ForceAsync = force
-            });
-        }
-
-        public Generator Async(ContractDefinition definition, bool force = false)
+        public Generator Async(ContractDefinition definition = null, ClassDescriptor contractDescriptor = null, bool force = false)
         {
             return Add(new InterfaceGenerator(Output, Formatter, IntendProvider)
             {
                 ContractDefinition = definition ?? ContractDefinition,
+                ContractDescriptor = contractDescriptor,
                 ForceAsync = force
             });
         }
 
-        public Generator Contract(string baseClass = null)
+        public Generator Descriptor(ContractDefinition definition = null, ClassDescriptor descriptor = null)
         {
-            return Add(new ContractGenerator(Output, Formatter, IntendProvider)
-            {
-                ContractDefinition = ContractDefinition,
-                BaseClass = baseClass
-            });
+            return
+                Add(
+                    new ContractDescriptorGenerator(Output, Formatter, IntendProvider)
+                        {
+                            ContractDefinition = definition ?? ContractDefinition,
+                            ContractDescriptor = descriptor
+                        });
         }
 
-        public Generator Contract(ContractDefinition definition, string baseClass = null)
+        public Generator Contract(ContractDefinition definition = null, ClassDescriptor descriptor = null)
         {
-            return Add(new ContractGenerator(Output, Formatter, IntendProvider)
-            {
-                ContractDefinition = definition,
-                BaseClass = baseClass
-            });
+            return
+                Add(
+                    new ContractGenerator(Output, Formatter, IntendProvider)
+                        {
+                            ContractDefinition = definition ?? ContractDefinition,
+                            ContractDescriptor = descriptor
+                        });
         }
 
-        public Generator Server(ContractDefinition definition, string ns = null)
+        public Generator Server(ContractDefinition definition = null, ClassDescriptor descriptor = null)
         {
-            return Add(new ServerGenerator(Output, Formatter, IntendProvider)
-            {
-                ContractDefinition = definition,
-                ServerNamespace = ns,
-            });
+            return
+                Add(
+                    new ServerGenerator(Output, Formatter, IntendProvider)
+                        {
+                            ContractDefinition = definition ?? ContractDefinition,
+                            ContractDescriptor = descriptor
+                        });
         }
 
-        public Generator Server(string ns = null)
-        {
-            return Add(new ServerGenerator(Output, Formatter, IntendProvider)
-            {
-                ContractDefinition = ContractDefinition,
-                ServerNamespace = ns,
-            });
-        }
-
-        public Generator StatelessClient(string clientNamespace = null, bool forceAsync = false, string className = null)
-        {
-            AddUsings(typeof(Channel).Namespace);
-
-            return Client(ContractDefinition, clientNamespace, FormatType<Channel>(), forceAsync, className);
-        }
-
-        public Generator StatelessClient(ContractDefinition definition, string clientNamespace = null, bool forceAsync = false, string className = null)
-        {
-            AddUsings(typeof(Channel).Namespace);
-
-            return Client(definition, clientNamespace, FormatType<Channel>(), forceAsync, className);
-        }
-
-        public Generator StatefullClient(string clientNamespace = null, bool forceAsync = false, string className = null)
-        {
-            AddUsings(typeof(Channel).Namespace);
-
-            return Client(ContractDefinition, clientNamespace, FormatType<StatefullChannel>(), forceAsync, className);
-        }
-
-        public Generator StatefullClient(ContractDefinition definition, string clientNamespace = null, bool forceAsync = false, string className = null)
-        {
-            AddUsings(typeof(Channel).Namespace);
-
-            return Client(definition, clientNamespace, FormatType<StatefullChannel>(), forceAsync, className);
-        }
-
-        public Generator Client(string clientNamespace = null, string baseClass = null, bool forceAsync = false, string className = null)
-        {
-            return Client(ContractDefinition, clientNamespace, baseClass, forceAsync, className);
-        }
-
-        public Generator Client(ContractDefinition definition, string clientNamespace = null, string baseClass = null, bool forceAsync = false, string className = null)
+        public Generator StateFullClient(ContractDefinition definition = null, ClassDescriptor descriptor = null, bool forceAsync = false)
         {
             return Add(new ClientGenerator(Output, Formatter, IntendProvider)
             {
-                ClientNamespace = clientNamespace,
-                BaseClass = baseClass,
-                ContractDefinition = definition,
+                ContractDefinition = definition ?? ContractDefinition,
+                ContractDescriptor = descriptor,
                 ForceAsync = forceAsync,
-                ClassName = className
+                StateFull = true
+            });
+        }
+
+        public Generator Client(ContractDefinition definition = null, ClassDescriptor descriptor = null, bool forceAsync = false)
+        {
+            return Add(new ClientGenerator(Output, Formatter, IntendProvider)
+            {
+                ContractDefinition = definition ?? ContractDefinition,
+                ContractDescriptor = descriptor,
+                ForceAsync = forceAsync
             });
         }
 

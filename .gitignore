@@ -26,3 +26,4 @@
 /test/Service/TestService.Server/obj/Debug
 /test/Service/TestService.Server.Wcf/bin/Debug
 /test/Service/TestService.Server.Wcf/obj/Debug
+*.suo

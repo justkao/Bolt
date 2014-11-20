@@ -67,6 +67,7 @@
     <Compile Include="Response.cs" />
     <Compile Include="SerializerExtensions.cs" />
     <Compile Include="TaskExtensions.cs" />
+    <Compile Include="WebRequestExtensions.cs" />
     <Compile Include="XmlSerializer.cs" />
   </ItemGroup>
   <ItemGroup>

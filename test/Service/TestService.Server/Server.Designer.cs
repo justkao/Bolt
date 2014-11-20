@@ -1,4 +1,17 @@
 ﻿
+
+
+
+
+
+
+
+
+
+
+
+
+
 using Bolt;
 using Bolt.Server;
 using System;
@@ -10,7 +23,7 @@ using System.Threading.Tasks;
 using TestService.Core;
 using TestService.Core.Parameters;
 
-namespace TestService.Core
+namespace Bolt.Server
 {
     public partial class PersonRepositoryExecutor : Bolt.Server.Executor
     {
@@ -23,6 +36,8 @@ namespace TestService.Core
 
             AddAction(ContractDescriptor.UpdatePerson, PersonRepository_UpdatePerson);
             AddAction(ContractDescriptor.UpdatePersonThatThrowsInvalidOperationException, PersonRepository_UpdatePersonThatThrowsInvalidOperationException);
+            AddAction(ContractDescriptor.DoLongRunningOperationAsync, PersonRepository_DoLongRunningOperationAsync);
+            AddAction(ContractDescriptor.DoLongRunningOperation2Async, PersonRepository_DoLongRunningOperation2Async);
             AddAction(ContractDescriptor.DoNothingAsAsync, PersonRepository_DoNothingAsAsync);
             AddAction(ContractDescriptor.DoNothing, PersonRepository_DoNothing);
             AddAction(ContractDescriptor.DoNothingWithComplexParameterAsAsync, PersonRepository_DoNothingWithComplexParameterAsAsync);
@@ -41,13 +56,13 @@ namespace TestService.Core
             base.Init();
         }
 
-        public TestService.Core.PersonRepositoryDescriptor ContractDescriptor { get; set; }
+        public virtual TestService.Core.PersonRepositoryDescriptor ContractDescriptor { get; set; }
 
         protected virtual async Task PersonRepository_UpdatePerson(Bolt.Server.ServerExecutionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<UpdatePersonParameters>(context);
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
-            var result = instance.UpdatePerson(parameters.Person);
+            var result = instance.UpdatePerson(parameters.Person, context.CallCancelled);
             await ResponseHandler.Handle(context, result);
         }
 
@@ -57,6 +72,22 @@ namespace TestService.Core
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
             var result = instance.UpdatePersonThatThrowsInvalidOperationException(parameters.Person);
             await ResponseHandler.Handle(context, result);
+        }
+
+        protected virtual async Task PersonRepository_DoLongRunningOperationAsync(Bolt.Server.ServerExecutionContext context)
+        {
+            var parameters = await DataHandler.ReadParametersAsync<DoLongRunningOperationAsyncParameters>(context);
+            var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
+            await instance.DoLongRunningOperationAsync(parameters.Person, context.CallCancelled);
+            await ResponseHandler.Handle(context);
+        }
+
+        protected virtual async Task PersonRepository_DoLongRunningOperation2Async(Bolt.Server.ServerExecutionContext context)
+        {
+            var parameters = await DataHandler.ReadParametersAsync<DoLongRunningOperation2AsyncParameters>(context);
+            var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
+            await instance.DoLongRunningOperation2Async(context.CallCancelled);
+            await ResponseHandler.Handle(context);
         }
 
         protected virtual async Task PersonRepository_DoNothingAsAsync(Bolt.Server.ServerExecutionContext context)
