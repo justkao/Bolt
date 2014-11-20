@@ -40,11 +40,7 @@ namespace Bolt.Client
             }
             catch (Exception e)
             {
-                if (e.InnerException is OperationCanceledException)
-                {
-                    throw e.InnerException;
-                }
-
+                e.EnsureNotCancelled();
                 return new ResponseDescriptor<T>(null, context, e, ResponseErrorType.Communication);
             }
 
@@ -57,9 +53,11 @@ namespace Bolt.Client
                 }
                 catch (WebException e)
                 {
-                    if (e.InnerException is OperationCanceledException)
+                    e.EnsureNotCancelled();
+
+                    if (e.Status == WebExceptionStatus.RequestCanceled)
                     {
-                        throw e.InnerException;
+                        throw new OperationCanceledException(context.Cancellation);
                     }
 
                     if (IsCommunicationException(e))
@@ -77,11 +75,7 @@ namespace Bolt.Client
             }
             catch (Exception e)
             {
-                if (e.InnerException is OperationCanceledException)
-                {
-                    throw e.InnerException;
-                }
-
+                e.EnsureNotCancelled();
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
             }
 
@@ -110,11 +104,7 @@ namespace Bolt.Client
             }
             catch (Exception e)
             {
-                if (e.InnerException is OperationCanceledException)
-                {
-                    throw e.InnerException;
-                }
-
+                e.EnsureNotCancelled();
                 return new ResponseDescriptor<T>(null, context, e, ResponseErrorType.Communication);
             }
 
@@ -127,9 +117,11 @@ namespace Bolt.Client
                 }
                 catch (WebException e)
                 {
-                    if (e.InnerException is OperationCanceledException)
+                    e.EnsureNotCancelled();
+
+                    if (e.Status == WebExceptionStatus.RequestCanceled)
                     {
-                        throw e.InnerException;
+                        throw new OperationCanceledException(context.Cancellation);
                     }
 
                     if (IsCommunicationException(e))
@@ -147,11 +139,7 @@ namespace Bolt.Client
             }
             catch (Exception e)
             {
-                if (e.InnerException is OperationCanceledException)
-                {
-                    throw e.InnerException;
-                }
-
+                e.EnsureNotCancelled();
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
             }
 
@@ -182,11 +170,7 @@ namespace Bolt.Client
                 }
                 catch (Exception e)
                 {
-                    if (e.InnerException is OperationCanceledException)
-                    {
-                        throw e.InnerException;
-                    }
-
+                    e.EnsureNotCancelled();
                     return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
                 }
             }
@@ -205,11 +189,7 @@ namespace Bolt.Client
             }
             catch (Exception e)
             {
-                if (e.InnerException is OperationCanceledException)
-                {
-                    throw e.InnerException;
-                }
-
+                e.EnsureNotCancelled();
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
             }
         }
@@ -236,11 +216,7 @@ namespace Bolt.Client
                 }
                 catch (Exception e)
                 {
-                    if (e.InnerException is OperationCanceledException)
-                    {
-                        throw e.InnerException;
-                    }
-
+                    e.EnsureNotCancelled();
                     return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
                 }
             }
@@ -259,11 +235,7 @@ namespace Bolt.Client
             }
             catch (Exception e)
             {
-                if (e.InnerException is OperationCanceledException)
-                {
-                    throw e.InnerException;
-                }
-
+                e.EnsureNotCancelled();
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
             }
         }

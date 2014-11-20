@@ -27,3 +27,11 @@
 /test/Service/TestService.Server.Wcf/bin/Debug
 /test/Service/TestService.Server.Wcf/obj/Debug
 *.suo
+*.dll
+*.pdb
+/test/Automatic/Bolt.Service.Test.Core/bin/Debug
+/test/Automatic/Bolt.Service.Test.Core/obj/Debug
+*.cache
+/test/Automatic/Bolt.Service.Test/bin/Debug
+/test/Automatic/Bolt.Service.Test/obj/Debug
+/Bolt.sln.DotSettings.user
