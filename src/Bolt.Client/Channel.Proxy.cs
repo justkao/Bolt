@@ -49,6 +49,7 @@ namespace Bolt.Client
                 }
                 catch (Exception e)
                 {
+                    e.EnsureNotCancelled();
                     error = e;
                 }
 
@@ -119,6 +120,7 @@ namespace Bolt.Client
                 }
                 catch (Exception e)
                 {
+                    e.EnsureNotCancelled();
                     error = e;
                 }
 

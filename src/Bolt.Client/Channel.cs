@@ -29,6 +29,7 @@ namespace Bolt.Client
 
                 return _dataHandler;
             }
+
             set
             {
                 _dataHandler = value;
@@ -46,6 +47,7 @@ namespace Bolt.Client
 
                 return _requestForwarder;
             }
+
             set
             {
                 _requestForwarder = value;

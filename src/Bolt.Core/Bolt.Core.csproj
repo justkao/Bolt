@@ -58,6 +58,7 @@
     <Compile Include="ActionDescriptor.cs" />
     <Compile Include="EndpointProvider.cs" />
     <Compile Include="ErrorResponse.cs" />
+    <Compile Include="ExceptionExtension.cs" />
     <Compile Include="ExecutionContextBase.cs" />
     <Compile Include="IEndpointProvider.cs" />
     <Compile Include="ISerializer.cs" />
