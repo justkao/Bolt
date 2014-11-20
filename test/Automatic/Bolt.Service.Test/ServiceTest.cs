@@ -171,14 +171,10 @@ namespace Bolt.Service.Test
 
         public virtual ITestContractAsync GetChannel()
         {
-            TestContractChannel channel = new TestContractChannel();
-            ClientConfiguration.Update(channel);
-            channel.ServerUrl = ServerUrl;
-            channel.Prefix = Prefix;
-            channel.ContractDescriptor = TestContractDescriptor.Default;
-            channel.Contract = TestContract;
-
-            return channel;
+            TestContractFactory factory = new TestContractFactory();
+            factory.ClientConfiguration = ClientConfiguration;
+            factory.Prefix = Prefix;
+            return factory.Create(ServerUrl);
         }
 
         [TestFixtureSetUp]

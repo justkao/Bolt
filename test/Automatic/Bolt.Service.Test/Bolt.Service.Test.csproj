@@ -71,6 +71,7 @@
     <Compile Include="MockInstanceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestContractChannel.cs" />
+    <Compile Include="TestContractFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Bolt.Service.Test.Core\Bolt.Service.Test.Core.csproj">

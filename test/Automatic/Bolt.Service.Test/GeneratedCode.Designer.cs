@@ -87,7 +87,7 @@ namespace Bolt.Service.Test.Core
 
 namespace Bolt.Service.Test.Core
 {
-    public partial class TestContractChannel : Bolt.Client.Channel, Bolt.Service.Test.Core.ITestContract
+    public partial class TestContractChannel : Bolt.Client.Channel, Bolt.Service.Test.Core.ITestContract, Bolt.Client.IContractDescriptorProvider<TestContractDescriptor>
     {
         public Bolt.Service.Test.Core.TestContractDescriptor ContractDescriptor { get; set; }
 
