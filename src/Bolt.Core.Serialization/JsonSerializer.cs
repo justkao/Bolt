@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Bolt
+namespace Bolt.Core.Serialization
 {
     public class JsonSerializer : ISerializer
     {

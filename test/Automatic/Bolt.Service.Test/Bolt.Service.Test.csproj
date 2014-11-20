@@ -45,6 +45,9 @@
     <Reference Include="Moq">
       <HintPath>..\..\..\packages\Moq.4.2.1409.1722\lib\net40\Moq.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\..\..\packages\Newtonsoft.Json.6.0.6\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.3\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -74,6 +77,10 @@
     <Compile Include="TestContractChannel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Bolt.Core.Serialization\Bolt.Core.Serialization.csproj">
+      <Project>{b0b083fd-a0a9-4709-8e14-5892b6f41846}</Project>
+      <Name>Bolt.Core.Serialization</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Bolt.Service.Test.Core\Bolt.Service.Test.Core.csproj">
       <Project>{beb79086-b231-479b-8e88-c5a6cf4802bb}</Project>
       <Name>Bolt.Service.Test.Core</Name>

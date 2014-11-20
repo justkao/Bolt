@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bolt.Service.Test", "test\A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bolt.Service.Test.Core", "test\Automatic\Bolt.Service.Test.Core\Bolt.Service.Test.Core.csproj", "{BEB79086-B231-479B-8E88-C5A6CF4802BB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bolt.Core.Serialization", "src\Bolt.Core.Serialization\Bolt.Core.Serialization.csproj", "{B0B083FD-A0A9-4709-8E14-5892B6F41846}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -93,6 +95,10 @@ Global
 		{BEB79086-B231-479B-8E88-C5A6CF4802BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEB79086-B231-479B-8E88-C5A6CF4802BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BEB79086-B231-479B-8E88-C5A6CF4802BB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0B083FD-A0A9-4709-8E14-5892B6F41846}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0B083FD-A0A9-4709-8E14-5892B6F41846}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0B083FD-A0A9-4709-8E14-5892B6F41846}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0B083FD-A0A9-4709-8E14-5892B6F41846}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

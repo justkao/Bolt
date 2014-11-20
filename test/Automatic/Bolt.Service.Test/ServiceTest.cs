@@ -1,4 +1,5 @@
 ﻿using Bolt.Client;
+using Bolt.Core.Serialization;
 using Bolt.Server;
 using Bolt.Service.Test.Core;
 using Microsoft.Owin.Hosting;
@@ -180,7 +181,27 @@ namespace Bolt.Service.Test
             }
             catch (CustomException e)
             {
-                Assert.IsNull(e.InnerException as CustomException);
+                Assert.IsNotNull(e.InnerException as CustomException);
+            }
+        }
+
+
+        [Test]
+        public void Server_ThrowsWithInner_EnsureInnerwithCorrectMessageReceivedOnClient()
+        {
+            ITestContractAsync client = GetChannel();
+            Mock<ITestContract> server = Server();
+
+            server.Setup(v => v.SimpleMethod()).Throws(new CustomException("test message", new CustomException("inner message")));
+
+            try
+            {
+                client.SimpleMethod();
+            }
+            catch (CustomException e)
+            {
+                Assert.IsNotNull(e.InnerException as CustomException);
+                Assert.AreEqual("inner message", e.InnerException.Message);
             }
         }
 
@@ -217,10 +238,11 @@ namespace Bolt.Service.Test
         [TestFixtureSetUp]
         protected virtual void Init()
         {
-            var serializer = new JsonSerializer();
+            JsonSerializer serializer = new JsonSerializer();
+            JsonExceptionSerializer jsonExceptionSerializer = new JsonExceptionSerializer();
 
-            ServerConfiguration = new ServerConfiguration(serializer);
-            ClientConfiguration = new ClientConfiguration(serializer);
+            ServerConfiguration = new ServerConfiguration(serializer, jsonExceptionSerializer);
+            ClientConfiguration = new ClientConfiguration(serializer, jsonExceptionSerializer);
 
             TestContract = Contracts.TestContract;
             Prefix = "test";

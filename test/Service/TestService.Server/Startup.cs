@@ -1,4 +1,6 @@
 ﻿
+using Bolt;
+using Bolt.Core.Serialization;
 using Bolt.Server;
 
 using Owin;
@@ -11,7 +13,7 @@ namespace TestService.Server
     {
         public void Configuration(IAppBuilder app)
         {
-            ServerConfiguration configuration = new ServerConfiguration();
+            ServerConfiguration configuration = new ServerConfiguration(new JsonSerializer(), new JsonExceptionSerializer());
             app.RegisterEndpoint(configuration, Contracts.PersonRepository, "api", b => ConfigurePersonRepository(b, configuration));
         }
 

@@ -1,4 +1,5 @@
 ﻿using Bolt.Client;
+using Bolt.Core.Serialization;
 using System;
 using System.ServiceModel;
 using TestService.Core;
@@ -17,7 +18,7 @@ namespace TestService.Client
             repository.Retries = 10;
             repository.RetryDelay = TimeSpan.FromSeconds(2);
 
-            new ClientConfiguration().Update(repository);
+            new ClientConfiguration(new JsonSerializer(), new JsonExceptionSerializer()).Update(repository);
             return repository;
         }
 
@@ -31,7 +32,7 @@ namespace TestService.Client
             repository.Retries = 10;
             repository.RetryDelay = TimeSpan.FromSeconds(2);
 
-            new ClientConfiguration().Update(repository);
+            new ClientConfiguration(new JsonSerializer(), new JsonExceptionSerializer()).Update(repository);
             return repository;
         }
 

@@ -2,18 +2,13 @@
 {
     public class ServerConfiguration : Configuration
     {
-        public ServerConfiguration(ISerializer serializer)
-            : base(serializer)
+        public ServerConfiguration(ISerializer serializer, IExceptionSerializer exceptionSerializer)
+            : base(serializer, exceptionSerializer)
         {
             ServerDataHandler = new ServerDataHandler(serializer, ExceptionSerializer);
             ResponseHandler = new ResponseHandler(ServerDataHandler);
         }
 
-        public ServerConfiguration()
-        {
-            ServerDataHandler = new ServerDataHandler(Serializer, ExceptionSerializer);
-            ResponseHandler = new ResponseHandler(ServerDataHandler);
-        }
 
         public IResponseHandler ResponseHandler { get; set; }
 

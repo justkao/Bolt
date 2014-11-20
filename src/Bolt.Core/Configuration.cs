@@ -1,29 +1,33 @@
+using System;
+
 namespace Bolt
 {
     public class Configuration
     {
-        public Configuration(ISerializer serializer)
+        public Configuration(ISerializer serializer, IExceptionSerializer exceptionSerializer)
         {
+            if (serializer == null)
+            {
+                throw new ArgumentNullException("serializer");
+            }
+
+            if (exceptionSerializer == null)
+            {
+                throw new ArgumentNullException("exceptionSerializer");
+            }
+
             Serializer = serializer;
+            ExceptionSerializer = exceptionSerializer;
             EndpointProvider = new EndpointProvider();
             SessionHeaderName = "Session-ID";
-            ExceptionSerializer = new ExceptionSerializer();
         }
 
-        public Configuration()
-        {
-            SessionHeaderName = "Session-ID";
-            Serializer = new JsonSerializer();
-            EndpointProvider = new EndpointProvider();
-            ExceptionSerializer = new ExceptionSerializer();
-        }
+        public ISerializer Serializer { get; private set; }
 
-        public ISerializer Serializer { get; set; }
+        public IExceptionSerializer ExceptionSerializer { get; private set; }
 
         public IEndpointProvider EndpointProvider { get; set; }
 
         public string SessionHeaderName { get; set; }
-
-        public IExceptionSerializer ExceptionSerializer { get; set; }
     }
 }
