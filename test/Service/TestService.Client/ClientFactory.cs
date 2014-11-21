@@ -1,7 +1,7 @@
-﻿using Bolt.Client;
-using Bolt.Core.Serialization;
-using System;
+﻿using System;
 using System.ServiceModel;
+using Bolt.Client;
+using Bolt.Core.Serialization;
 using TestService.Core;
 
 namespace TestService.Client
@@ -11,7 +11,7 @@ namespace TestService.Client
         public static IPersonRepository CreateIISBolt()
         {
             PersonRepositoryChannel repository = new PersonRepositoryChannel();
-            repository.ServerUrl = Servers.IISBoltServer;
+            repository.ConnectionProvider = new ConnectionProvider(() => Servers.IISBoltServer);
             repository.Prefix = Servers.Prefix;
             repository.Contract = Contracts.PersonRepository;
             repository.ContractDescriptor = new PersonRepositoryDescriptor();
@@ -25,13 +25,12 @@ namespace TestService.Client
         public static IPersonRepository CreateBolt()
         {
             PersonRepositoryChannel repository = new PersonRepositoryChannel();
-            repository.ServerUrl = Servers.BoltServer;
             repository.Prefix = Servers.Prefix;
             repository.Contract = Contracts.PersonRepository;
             repository.ContractDescriptor = new PersonRepositoryDescriptor();
             repository.Retries = 10;
             repository.RetryDelay = TimeSpan.FromSeconds(2);
-
+            repository.ConnectionProvider = new ConnectionProvider(() => Servers.BoltServer);
             new ClientConfiguration(new JsonSerializer(), new JsonExceptionSerializer()).Update(repository);
             return repository;
         }

@@ -6,9 +6,9 @@ namespace Bolt
 {
     public static class TaskExtensions
     {
-        public static void Sleep(TimeSpan time)
+        public static void Sleep(TimeSpan time, CancellationToken cancellation)
         {
-            Task.Delay(time).Wait();
+            Task.Delay(time, cancellation).Wait(cancellation);
         }
 
         public static T Execute<T>(Func<Task<T>> asyncFunction)

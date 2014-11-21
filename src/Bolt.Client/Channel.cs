@@ -8,6 +8,11 @@ namespace Bolt.Client
 {
     public partial class Channel : IChannel
     {
+        public Channel()
+        {
+            SessionHeader = Configuration.DefaultSessionHeaderName;
+        }
+
         private IClientDataHandler _dataHandler;
 
         private IRequestForwarder _requestForwarder;
@@ -16,7 +21,27 @@ namespace Bolt.Client
 
         private ContractDefinition _contract;
 
-        public virtual Uri ServerUrl { get; set; }
+        private IConnectionProvider _connectionProvider;
+
+        public string SessionHeader { get; set; }
+
+        public IConnectionProvider ConnectionProvider
+        {
+            get
+            {
+                if (_connectionProvider == null)
+                {
+                    throw new InvalidOperationException("ConnectionProvider not initialized.");
+                }
+
+                return _connectionProvider;
+            }
+
+            set
+            {
+                _connectionProvider = value;
+            }
+        }
 
         public IClientDataHandler DataHandler
         {
@@ -112,7 +137,10 @@ namespace Bolt.Client
                 case ResponseErrorType.Deserialization:
                     throw response.Error;
                 case ResponseErrorType.Communication:
-                    OnCommunicationError(context, response.Error, retry);
+                    if (!HandleCommunicationError(context, response.Error, retry))
+                    {
+                        throw response.Error;
+                    }
                     break;
                 case ResponseErrorType.Client:
                     if (!HandleResponseError(context, response.Error))
@@ -125,9 +153,29 @@ namespace Bolt.Client
             return response;
         }
 
-        protected virtual HttpWebRequest GetChannel(ActionDescriptor action, CancellationToken cancellation)
+        protected virtual ConnectionOpenedResult OpenConnection(ActionDescriptor action, CancellationToken cancellation)
         {
-            return CreateWebRequest(CrateRemoteAddress(ServerUrl, action));
+            ConnectionDescriptor connection = ConnectionProvider.GetConnection(OnConnectionOpening, cancellation);
+            HttpWebRequest request = CreateWebRequest(CrateRemoteAddress(connection.Server, action), connection.SessionId);
+            return new ConnectionOpenedResult(request, connection.Server);
+        }
+
+        protected void OnConnectionOpening(ConnectionDescriptor descriptor)
+        {
+        }
+
+        protected virtual TResult Open<TResult, TParameters>(ConnectionDescriptor connectionDescriptor, ActionDescriptor descriptor, TParameters parameters, CancellationToken cancellation)
+        {
+            HttpWebRequest request = CreateWebRequest(
+                CrateRemoteAddress(connectionDescriptor.Server, descriptor),
+                connectionDescriptor.SessionId);
+
+
+            using (ClientExecutionContext ctxt = new ClientExecutionContext(descriptor, request, connectionDescriptor.Server, cancellation))
+            {
+                ResponseDescriptor<TResult> response = RequestForwarder.GetResponse<TResult, TParameters>(ctxt, parameters);
+                return response.GetResultOrThrow();
+            }
         }
 
         #endregion
@@ -150,7 +198,10 @@ namespace Bolt.Client
                 case ResponseErrorType.Deserialization:
                     throw response.Error;
                 case ResponseErrorType.Communication:
-                    OnCommunicationError(context, response.Error, retry);
+                    if (!HandleCommunicationError(context, response.Error, retry))
+                    {
+                        throw response.Error;
+                    }
                     break;
                 case ResponseErrorType.Client:
                     if (!HandleResponseError(context, response.Error))
@@ -163,9 +214,29 @@ namespace Bolt.Client
             return response;
         }
 
-        protected virtual Task<HttpWebRequest> GetChannelAsync(ActionDescriptor action, CancellationToken cancellation)
+        protected virtual async Task<ConnectionOpenedResult> OpenConnectionAsync(ActionDescriptor action, CancellationToken cancellation)
         {
-            return Task.FromResult(CreateWebRequest(CrateRemoteAddress(ServerUrl, action)));
+            ConnectionDescriptor connection = await ConnectionProvider.GetConnectionAsync(OnConnectionOpeningAsync, cancellation);
+            HttpWebRequest requets = CreateWebRequest(CrateRemoteAddress(connection.Server, action), connection.SessionId);
+            return new ConnectionOpenedResult(requets, connection.Server);
+        }
+
+        protected Task OnConnectionOpeningAsync(ConnectionDescriptor descriptor)
+        {
+            return Task.FromResult(true);
+        }
+
+        protected virtual async Task<TResult> OpenAsync<TResult, TParameters>(ConnectionDescriptor connectionDescriptor, ActionDescriptor descriptor, TParameters parameters, CancellationToken cancellation)
+        {
+            HttpWebRequest request = CreateWebRequest(
+                CrateRemoteAddress(connectionDescriptor.Server, descriptor),
+                connectionDescriptor.SessionId);
+
+            using (ClientExecutionContext ctxt = new ClientExecutionContext(descriptor, request, connectionDescriptor.Server, cancellation))
+            {
+                ResponseDescriptor<TResult> response = await RequestForwarder.GetResponseAsync<TResult, TParameters>(ctxt, parameters);
+                return response.GetResultOrThrow();
+            }
         }
 
         #endregion
@@ -174,6 +245,7 @@ namespace Bolt.Client
 
         protected virtual bool HandleResponseError(ClientExecutionContext context, Exception error)
         {
+            ConnectionProvider.CloseConnection(context.Server);
             return false;
         }
 
@@ -185,12 +257,14 @@ namespace Bolt.Client
         {
         }
 
-        protected virtual void OnCommunicationError(ClientExecutionContext context, Exception error, int retries)
+        protected virtual bool HandleCommunicationError(ClientExecutionContext context, Exception error, int retries)
         {
+            return false;
         }
 
-        protected virtual void OnProxyFailed(Exception error, ActionDescriptor action)
+        protected virtual void OnProxyFailed(Uri server, Exception error, ActionDescriptor action)
         {
+            ConnectionProvider.CloseConnection(server);
         }
 
         protected virtual Uri CrateRemoteAddress(Uri server, ActionDescriptor descriptor)
@@ -198,11 +272,17 @@ namespace Bolt.Client
             return EndpointProvider.GetEndpoint(server, Prefix, Contract, descriptor);
         }
 
-        protected virtual HttpWebRequest CreateWebRequest(Uri url)
+        protected virtual HttpWebRequest CreateWebRequest(Uri server, string sessionId)
         {
-            HttpWebRequest request = WebRequest.CreateHttp(url);
+            HttpWebRequest request = WebRequest.CreateHttp(server);
             request.Proxy = WebRequest.DefaultWebProxy;
             request.Method = "Post";
+
+            if (!string.IsNullOrEmpty(sessionId))
+            {
+                request.Headers[SessionHeader] = sessionId;
+            }
+
             return request;
         }
 
@@ -214,6 +294,27 @@ namespace Bolt.Client
         public virtual CancellationToken GetCancellationToken(ActionDescriptor descriptor)
         {
             return CancellationToken.None;
+        }
+
+        protected struct ConnectionOpenedResult
+        {
+            public ConnectionOpenedResult(HttpWebRequest request, Uri server)
+                : this()
+            {
+                Request = request;
+                Server = server;
+            }
+
+            public static readonly ConnectionOpenedResult Invalid = new ConnectionOpenedResult(null, null);
+
+            public HttpWebRequest Request { get; private set; }
+
+            public Uri Server { get; private set; }
+
+            public bool IsValid()
+            {
+                return Request != null;
+            }
         }
 
         #endregion

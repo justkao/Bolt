@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,12 +31,12 @@ namespace Bolt.Client
             {
                 cancellation.ThrowIfCancellationRequested();
 
-                HttpWebRequest channel = null;
+                ConnectionOpenedResult channel = ConnectionOpenedResult.Invalid;
                 Exception error = null;
 
                 try
                 {
-                    channel = GetChannel(descriptor, cancellation);
+                    channel = OpenConnection(descriptor, cancellation);
                 }
                 catch (OperationCanceledException)
                 {
@@ -53,9 +52,18 @@ namespace Bolt.Client
                     error = e;
                 }
 
-                using (ClientExecutionContext context = new ClientExecutionContext(descriptor, channel, cancellation, null))
+                using (ClientExecutionContext context = new ClientExecutionContext(descriptor, channel.Request, channel.Server, cancellation))
                 {
-                    if (channel != null)
+                    if (error != null)
+                    {
+                        if (!HandleCommunicationError(context, error, tries))
+                        {
+                            ConnectionProvider.CloseConnection(channel.Server);
+                            throw error;
+                        }
+                    }
+
+                    if (channel.IsValid())
                     {
                         ResponseDescriptor<T> response = RetrieveResponse<T, TParameters>(context, parameters, tries);
                         if (response.IsSuccess)
@@ -72,12 +80,12 @@ namespace Bolt.Client
                 tries++;
                 if (tries > Retries)
                 {
-                    OnProxyFailed(error, descriptor);
+                    OnProxyFailed(channel.Server, error, descriptor);
                     throw error;
                 }
                 if (RetryDelay != null)
                 {
-                    TaskExtensions.Sleep(RetryDelay.Value);
+                    TaskExtensions.Sleep(RetryDelay.Value, cancellation);
                 }
             }
         }
@@ -103,12 +111,12 @@ namespace Bolt.Client
             {
                 cancellation.ThrowIfCancellationRequested();
 
-                HttpWebRequest channel = null;
+                ConnectionOpenedResult channel = ConnectionOpenedResult.Invalid;
                 Exception error = null;
 
                 try
                 {
-                    channel = await GetChannelAsync(descriptor, cancellation);
+                    channel = await OpenConnectionAsync(descriptor, cancellation);
                 }
                 catch (OperationCanceledException)
                 {
@@ -124,9 +132,18 @@ namespace Bolt.Client
                     error = e;
                 }
 
-                using (ClientExecutionContext context = new ClientExecutionContext(descriptor, channel, cancellation, null))
+                using (ClientExecutionContext context = new ClientExecutionContext(descriptor, channel.Request, channel.Server, cancellation))
                 {
-                    if (channel != null)
+                    if (error != null)
+                    {
+                        if (!HandleCommunicationError(context, error, tries))
+                        {
+                            ConnectionProvider.CloseConnection(channel.Server);
+                            throw error;
+                        }
+                    }
+
+                    if (channel.IsValid())
                     {
                         ResponseDescriptor<T> response = await RetrieveResponseAsync<T, TParameters>(context, parameters, tries);
                         if (response.IsSuccess)
@@ -143,7 +160,7 @@ namespace Bolt.Client
                 tries++;
                 if (tries > Retries)
                 {
-                    OnProxyFailed(error, descriptor);
+                    OnProxyFailed(channel.Server, error, descriptor);
                     throw error;
                 }
                 if (RetryDelay != null)

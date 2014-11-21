@@ -1,13 +1,13 @@
 ﻿
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.Serialization.Formatters;
 using Bolt;
 using Bolt.Generators;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Runtime.Serialization.Formatters;
 
 namespace Sandbox
 {
@@ -22,11 +22,11 @@ namespace Sandbox
         void DoSomething(double argument);
     }
 
-    class Program
+    internal class Program
     {
         static void Main(string[] args)
         {
-            string result = new Generator() { ContractDefinition = new ContractDefinition(typeof(ISamle1)) }.StateFullClient().GetResult();
+            string result = new Generator() { ContractDefinition = new ContractDefinition(typeof(ISamle1)) }.Client().GetResult();
 
             Exception e = new InvalidOperationException("Test");
             try

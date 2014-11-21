@@ -1,13 +1,13 @@
-﻿using Bolt.Client;
+﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Bolt.Client;
 using Bolt.Core.Serialization;
 using Bolt.Server;
 using Bolt.Service.Test.Core;
 using Microsoft.Owin.Hosting;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Bolt.Service.Test
 {
@@ -265,10 +265,11 @@ namespace Bolt.Service.Test
 
         public virtual ITestContractAsync GetChannel()
         {
-            TestContractChannelFactory factory = new TestContractChannelFactory(Contracts.TestContract);
-            factory.ClientConfiguration = ClientConfiguration;
-            factory.Prefix = Prefix;
-
+            TestContractChannelFactory factory = new TestContractChannelFactory(Contracts.TestContract)
+                                                     {
+                                                         ClientConfiguration = ClientConfiguration,
+                                                         Prefix = Prefix
+                                                     };
             return factory.Create(ServerUrl);
         }
 

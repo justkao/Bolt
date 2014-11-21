@@ -4,6 +4,8 @@ namespace Bolt
 {
     public class Configuration
     {
+        public const string DefaultSessionHeaderName = "Bolt-Session-ID";
+
         public Configuration(ISerializer serializer, IExceptionSerializer exceptionSerializer)
         {
             if (serializer == null)
@@ -19,7 +21,7 @@ namespace Bolt
             Serializer = serializer;
             ExceptionSerializer = exceptionSerializer;
             EndpointProvider = new EndpointProvider();
-            SessionHeaderName = "Session-ID";
+            SessionHeaderName = DefaultSessionHeaderName;
         }
 
         public ISerializer Serializer { get; private set; }

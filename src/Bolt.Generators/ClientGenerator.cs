@@ -1,9 +1,9 @@
-﻿using Bolt.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Bolt.Client;
 
 namespace Bolt.Generators
 {
@@ -23,8 +23,6 @@ namespace Bolt.Generators
         public string ContractDescriptorProperty { get; set; }
 
         public bool ForceAsync { get; set; }
-
-        public bool StateFull { get; set; }
 
         public override void Generate()
         {
@@ -203,16 +201,6 @@ namespace Bolt.Generators
         {
             ClassDescriptor descriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
             string descriptorProvider = string.Format("Bolt.Client.IContractDescriptorProvider<{0}>", descriptor.Name);
-
-            if (StateFull)
-            {
-                return new ClassDescriptor(
-                    ContractDefinition.Name + "Channel",
-                    ContractDefinition.Namespace,
-                    FormatType<StatefullChannel>(),
-                    ContractDefinition.Root.FullName,
-                    descriptorProvider);
-            }
 
             return new ClassDescriptor(
                 ContractDefinition.Name + "Channel",

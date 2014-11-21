@@ -14,11 +14,8 @@ namespace Bolt.Client
             channel.DataHandler = ClientDataHandler;
             channel.RequestForwarder = RequestForwarder;
             channel.EndpointProvider = EndpointProvider;
-
-            if (channel is StatefullChannel)
-            {
-                (channel as StatefullChannel).SessionHeader = SessionHeaderName;
-            }
+            channel.SessionHeader = SessionHeaderName;
+            channel.SessionHeader = SessionHeaderName;
         }
 
         public IRequestForwarder RequestForwarder { get; set; }

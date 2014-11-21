@@ -1,17 +1,10 @@
 ﻿
-using Bolt;
-using Bolt.Server;
+using System;
+using System.Reflection;
+using System.Runtime.Serialization;
+using System.Threading.Tasks;
 using Bolt.Service.Test.Core;
 using Bolt.Service.Test.Core.Parameters;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime;
-using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Bolt.Service.Test.Core.Parameters
 {
@@ -53,7 +46,8 @@ namespace Bolt.Service.Test.Core
 {
     public partial class TestContractDescriptor : ContractDescriptor
     {
-        public TestContractDescriptor() : base(typeof(Bolt.Service.Test.Core.ITestContract))
+        public TestContractDescriptor()
+            : base(typeof(Bolt.Service.Test.Core.ITestContract))
         {
             SimpleMethodWithSimpleArguments = Add("SimpleMethodWithSimpleArguments", typeof(Bolt.Service.Test.Core.Parameters.SimpleMethodWithSimpleArgumentsParameters), typeof(ITestContract).GetTypeInfo().GetMethod("SimpleMethodWithSimpleArguments"));
             SimpleMethod = Add("SimpleMethod", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("SimpleMethod"));
@@ -213,11 +207,13 @@ namespace Bolt.Service.Test.Core
 {
     public partial class TestContractChannelFactory : Bolt.Client.ChannelFactory<TestContractChannel, TestContractDescriptor>
     {
-        public TestContractChannelFactory(ContractDefinition contractDefinition) : this(contractDefinition, TestContractDescriptor.Default)
+        public TestContractChannelFactory(ContractDefinition contractDefinition)
+            : this(contractDefinition, TestContractDescriptor.Default)
         {
         }
 
-        public TestContractChannelFactory(ContractDefinition contractDefinition,TestContractDescriptor descriptor) : base(contractDefinition, descriptor)
+        public TestContractChannelFactory(ContractDefinition contractDefinition, TestContractDescriptor descriptor)
+            : base(contractDefinition, descriptor)
         {
         }
     }

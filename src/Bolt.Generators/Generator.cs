@@ -102,17 +102,6 @@ namespace Bolt.Generators
                         });
         }
 
-        public Generator StateFullClient(ContractDefinition definition = null, ClassDescriptor descriptor = null, bool forceAsync = false)
-        {
-            return Add(new ClientGenerator(Output, Formatter, IntendProvider)
-            {
-                ContractDefinition = definition ?? ContractDefinition,
-                ContractDescriptor = descriptor,
-                ForceAsync = forceAsync,
-                StateFull = true
-            });
-        }
-
         public Generator Client(ContractDefinition definition = null, ClassDescriptor descriptor = null, bool forceAsync = false)
         {
             return Add(new ClientGenerator(Output, Formatter, IntendProvider)

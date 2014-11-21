@@ -18,31 +18,54 @@ namespace Bolt.Client
                 throw new ArgumentNullException("contractDescriptor");
             }
 
+            if (contractDefinition.Root != contractDescriptor.Type)
+            {
+                throw new ArgumentException(
+                    "Contract definition and contract descriptor type does not match. Contract descriptor must have the same type as contract definition.");
+            }
+
             ContractDefinition = contractDefinition;
             ContractDescriptor = contractDescriptor;
         }
-
-        public ClientConfiguration ClientConfiguration { get; set; }
-
-        public string Prefix { get; set; }
 
         public ContractDefinition ContractDefinition { get; private set; }
 
         public TContractDescriptor ContractDescriptor { get; private set; }
 
-        public virtual TChannel Create(Uri server = null)
+        public ClientConfiguration ClientConfiguration { get; set; }
+
+        public string Prefix { get; set; }
+
+        public virtual TChannel Create(Uri server)
         {
+            return Create(new ConnectionProvider(server));
+        }
+
+        public virtual TChannel CreateStateFull(Uri server)
+        {
+            return Create(new StateFullConnectionProvider(server));
+        }
+
+        public virtual TChannel Create(IConnectionProvider connectionProvider)
+        {
+            if (connectionProvider == null)
+            {
+                throw new ArgumentNullException("connectionProvider");
+            }
+
             if (ClientConfiguration == null)
             {
                 throw new InvalidOperationException("ClientConfiguration not initialized.");
             }
+
 
             TChannel channel = new TChannel();
             ClientConfiguration.Update(channel);
             channel.Contract = ContractDefinition;
             channel.Prefix = Prefix;
             channel.ContractDescriptor = ContractDescriptor;
-            channel.ServerUrl = server;
+            channel.ConnectionProvider = connectionProvider;
+
             return channel;
         }
     }
