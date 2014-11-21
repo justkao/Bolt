@@ -2,9 +2,10 @@ namespace Bolt.Client
 {
     public class ClientConfiguration : Configuration
     {
-        public ClientConfiguration()
+        public ClientConfiguration(ISerializer serializer, IExceptionSerializer exceptionSerializer)
+            : base(serializer, exceptionSerializer)
         {
-            ClientDataHandler = new ClientDataHandler(Serializer);
+            ClientDataHandler = new ClientDataHandler(serializer, ExceptionSerializer);
             RequestForwarder = new RequestForwarder(ClientDataHandler);
         }
 

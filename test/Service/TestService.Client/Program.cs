@@ -17,7 +17,7 @@ namespace TestService.Client
             ServicePointManager.MaxServicePoints = 1000;
 
             CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            ClientFactory.CreateBolt().DoLongRunningOperation2Async(cts.Token).GetAwaiter().GetResult();
+            ClientFactory.CreateBolt().LongRunningOperation2Async(cts.Token);
 
             int cnt = 10000;
 

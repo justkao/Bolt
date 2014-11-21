@@ -20,6 +20,7 @@ namespace Bolt
                 MemoryStream buffer = new MemoryStream();
                 await stream.CopyToAsync(buffer, 4096, cancellation);
                 buffer.Seek(0, SeekOrigin.Begin);
+                stream.Dispose();
                 stream = buffer;
             }
 
@@ -37,6 +38,7 @@ namespace Bolt
             }
             catch (Exception e)
             {
+                e.EnsureNotCancelled();
                 throw new SerializationException(string.Format("Failed to deserialize object '{0}'.", typeof(T).Name), e);
             }
             finally
@@ -60,6 +62,7 @@ namespace Bolt
                 MemoryStream buffer = new MemoryStream();
                 stream.CopyTo(buffer);
                 buffer.Seek(0, SeekOrigin.Begin);
+                stream.Dispose();
                 stream = buffer;
             }
 
@@ -71,8 +74,13 @@ namespace Bolt
             {
                 throw;
             }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception e)
             {
+                e.EnsureNotCancelled();
                 throw new SerializationException(string.Format("Failed to deserialize object '{0}'.", typeof(T).Name), e);
             }
             finally

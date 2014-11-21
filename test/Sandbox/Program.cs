@@ -1,9 +1,13 @@
 ﻿
-using System;
-using System.Runtime.Serialization.Formatters;
 using Bolt;
 using Bolt.Generators;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
+using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Runtime.Serialization.Formatters;
 
 namespace Sandbox
 {
@@ -25,7 +29,6 @@ namespace Sandbox
             string result = new Generator() { ContractDefinition = new ContractDefinition(typeof(ISamle1)) }.StateFullClient().GetResult();
 
             Exception e = new InvalidOperationException("Test");
-
             try
             {
                 throw e;
@@ -35,19 +38,51 @@ namespace Sandbox
                 e = ex;
             }
 
-            var resul = JsonConvert.SerializeObject(e, new JsonSerializerSettings()
+            JsonSerializerSettings settings = new JsonSerializerSettings()
             {
                 TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
                 Formatting = Formatting.None,
-                TypeNameHandling = TypeNameHandling.All
-            });
-            e = (Exception)JsonConvert.DeserializeObject(resul, new JsonSerializerSettings()
-            {
-                TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
-                Formatting = Formatting.None,
-                TypeNameHandling = TypeNameHandling.All
-            });
+                TypeNameHandling = TypeNameHandling.All,
+                ContractResolver = new MyContractResolver()
+            };
 
+
+            var resul = JsonConvert.SerializeObject(e, settings);
+            e = (Exception)JsonConvert.DeserializeObject(resul, settings);
         }
+
+        private class MyContractResolver : DefaultContractResolver
+        {
+            private readonly List<MemberInfo> _ignoredMembers = new List<MemberInfo>();
+
+            public MyContractResolver()
+            {
+                _ignoredMembers.Add(typeof(Exception).GetTypeInfo().GetDeclaredProperty("TargetSite"));
+            }
+
+            protected override IValueProvider CreateMemberValueProvider(MemberInfo member)
+            {
+                return base.CreateMemberValueProvider(member);
+            }
+
+            protected override JsonProperty CreateProperty(MemberInfo member, MemberSerialization memberSerialization)
+            {
+                JsonProperty property = base.CreateProperty(member, memberSerialization);
+                if (_ignoredMembers.Contains(member))
+                {
+                    property.Ignored = true;
+                }
+
+                if (property.PropertyName == "Message")
+                {
+                    property.Writable = true;
+                    property.ItemConverter = new KeyValuePairConverter();
+                    property.MemberConverter = new KeyValuePairConverter();
+                }
+
+                return property;
+            }
+        }
+
     }
 }

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Bolt</RootNamespace>
     <AssemblyName>Bolt.Core</AssemblyName>
-    <TargetFrameworkProfile>Profile111</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Profile7</TargetFrameworkProfile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
@@ -40,10 +40,6 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Newtonsoft.Json">
-      <HintPath>..\..\packages\Newtonsoft.Json.6.0.6\lib\portable-net45+wp80+win8+wpa81+aspnetcore50\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
@@ -51,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncOperationAttribute.cs" />
+    <Compile Include="CollectionExtensions.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="ContractDefinition.cs" />
     <Compile Include="ContractDescriptor.cs" />
@@ -58,21 +55,17 @@
     <Compile Include="ActionDescriptor.cs" />
     <Compile Include="EndpointProvider.cs" />
     <Compile Include="ErrorResponse.cs" />
-    <Compile Include="ExceptionExtension.cs" />
+    <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="ExecutionContextBase.cs" />
     <Compile Include="IEndpointProvider.cs" />
+    <Compile Include="IExceptionSerializer.cs" />
     <Compile Include="ISerializer.cs" />
-    <Compile Include="JsonSerializer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <None Include="ProtocolBufferSerializer.cs" />
     <Compile Include="Response.cs" />
     <Compile Include="SerializerExtensions.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="WebRequestExtensions.cs" />
     <Compile Include="XmlSerializer.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
 </Project>

@@ -19,22 +19,37 @@ namespace Bolt
                 return (HttpWebResponse)await request.GetResponseAsync();
             }
 
-            using (cancellation.Register(
-                () =>
-                {
-                    try
-                    {
-                        request.Abort();
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                    }
-                },
-                false))
+            try
             {
-                WebResponse response = await request.GetResponseAsync();
+                using (cancellation.Register(
+                    () =>
+                    {
+                        try
+                        {
+                            request.Abort();
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                        }
+                    },
+                    false))
+                {
+                    WebResponse response = await request.GetResponseAsync();
+                    cancellation.ThrowIfCancellationRequested();
+                    return (HttpWebResponse)response;
+                }
+            }
+            catch (WebException e)
+            {
                 cancellation.ThrowIfCancellationRequested();
-                return (HttpWebResponse)response;
+                e.EnsureNotCancelled();
+
+                if (e.Status == WebExceptionStatus.RequestCanceled)
+                {
+                    throw new OperationCanceledException(cancellation);
+                }
+
+                throw;
             }
         }
     }

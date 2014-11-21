@@ -1,25 +1,27 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
-using System.Runtime.Serialization.Formatters;
 using System.Threading.Tasks;
 
 namespace Bolt.Client
 {
     public class ClientDataHandler : IClientDataHandler
     {
-        private readonly JsonSerializerSettings _exceptionSerializerSettings = new JsonSerializerSettings()
-        {
-            TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
-            TypeNameHandling = TypeNameHandling.All,
-            Formatting = Formatting.None,
-        };
-
         private readonly ISerializer _serializer;
+        private readonly IExceptionSerializer _exceptionSerializer;
 
-        public ClientDataHandler(ISerializer serializer)
+        public ClientDataHandler(ISerializer serializer, IExceptionSerializer exceptionSerializer)
         {
+            if (serializer == null)
+            {
+                throw new ArgumentNullException("serializer");
+            }
+            if (exceptionSerializer == null)
+            {
+                throw new ArgumentNullException("exceptionSerializer");
+            }
+
             _serializer = serializer;
+            _exceptionSerializer = exceptionSerializer;
         }
 
         public string ContentType
@@ -72,7 +74,10 @@ namespace Bolt.Client
                 return Task.FromResult(default(T));
             }
 
-            return _serializer.DeserializeAsync<T>(context.Response.GetResponseStream(), true, context.Cancellation);
+            using (Stream stream = context.Response.GetResponseStream())
+            {
+                return _serializer.DeserializeAsync<T>(stream, true, context.Cancellation);
+            }
         }
 
         public T ReadResponse<T>(ClientExecutionContext context)
@@ -82,7 +87,10 @@ namespace Bolt.Client
                 return default(T);
             }
 
-            return _serializer.Deserialize<T>(context.Response.GetResponseStream(), true);
+            using (Stream stream = context.Response.GetResponseStream())
+            {
+                return _serializer.Deserialize<T>(stream, true);
+            }
         }
 
         public Exception ReadException(ClientExecutionContext context)
@@ -103,12 +111,12 @@ namespace Bolt.Client
 
         protected virtual Exception ReadException(ErrorResponse response)
         {
-            if (response == null || response.JsonException == null || response.JsonException.Length == 0)
+            if (response == null || response.RawException == null || response.RawException.Length == 0)
             {
                 return null;
             }
 
-            return (Exception)JsonConvert.DeserializeObject(response.JsonException, _exceptionSerializerSettings);
+            return _exceptionSerializer.Deserialize(response.RawException);
         }
     }
 }

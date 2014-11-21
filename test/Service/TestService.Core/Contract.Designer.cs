@@ -54,6 +54,11 @@ namespace TestService.Core.Parameters
     }
 
     [DataContract]
+    public partial class LongRunningOperation2AsyncParameters
+    {
+    }
+
+    [DataContract]
     public partial class DoNothingWithComplexParameterAsAsyncParameters
     {
         [DataMember(Order = 1)]
@@ -121,6 +126,7 @@ namespace TestService.Core
             UpdatePersonThatThrowsInvalidOperationException = Add("UpdatePersonThatThrowsInvalidOperationException", typeof(TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("UpdatePersonThatThrowsInvalidOperationException"));
             DoLongRunningOperationAsync = Add("DoLongRunningOperationAsync", typeof(TestService.Core.Parameters.DoLongRunningOperationAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoLongRunningOperationAsync"));
             DoLongRunningOperation2Async = Add("DoLongRunningOperation2Async", typeof(TestService.Core.Parameters.DoLongRunningOperation2AsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoLongRunningOperation2Async"));
+            LongRunningOperation2Async = Add("LongRunningOperation2Async", typeof(TestService.Core.Parameters.LongRunningOperation2AsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("LongRunningOperation2Async"));
             DoNothingAsAsync = Add("DoNothingAsAsync", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingAsAsync"));
             DoNothing = Add("DoNothing", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothing"));
             DoNothingWithComplexParameterAsAsync = Add("DoNothingWithComplexParameterAsAsync", typeof(TestService.Core.Parameters.DoNothingWithComplexParameterAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingWithComplexParameterAsAsync"));
@@ -146,6 +152,8 @@ namespace TestService.Core
         public virtual ActionDescriptor DoLongRunningOperationAsync { get; set; }
 
         public virtual ActionDescriptor DoLongRunningOperation2Async { get; set; }
+
+        public virtual ActionDescriptor LongRunningOperation2Async { get; set; }
 
         public virtual ActionDescriptor DoNothingAsAsync { get; set; }
 

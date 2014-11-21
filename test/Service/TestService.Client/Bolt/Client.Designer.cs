@@ -69,6 +69,13 @@ namespace TestService.Core
             return SendAsync(request, descriptor, cancellation);
         }
 
+        public virtual void LongRunningOperation2Async(System.Threading.CancellationToken cancellation)
+        {
+            var request = new LongRunningOperation2AsyncParameters();
+            var descriptor = ContractDescriptor.LongRunningOperation2Async;
+            Send(request, descriptor, cancellation);
+        }
+
         public virtual Task DoNothingAsAsync()
         {
             var descriptor = ContractDescriptor.DoNothingAsAsync;

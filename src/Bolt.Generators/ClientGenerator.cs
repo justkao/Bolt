@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Bolt.Client;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-
-using Bolt.Client;
 
 namespace Bolt.Generators
 {
@@ -45,6 +44,20 @@ namespace Bolt.Generators
                         GenerateMethods(g, type);
                     }
                 });
+            WriteLine();
+
+            ClassDescriptor descriptor = new ClassDescriptor(generator.Descriptor.Name + "Factory",
+                generator.Descriptor.Namespace,
+                string.Format("Bolt.Client.ChannelFactory<{0}, {1}>", generator.Descriptor.Name, contractDescriptor.Name));
+
+            ClientFactoryGenerator clientFactoryGenerator = new ClientFactoryGenerator(Output, Formatter, IntendProvider)
+            {
+                ContractDefinition = ContractDefinition,
+                ContractDescriptor = descriptor
+            };
+
+            clientFactoryGenerator.Generate();
+            WriteLine();
         }
 
         private void GenerateMethods(ClassGenerator classGenerator, Type contract)
@@ -188,20 +201,25 @@ namespace Bolt.Generators
 
         protected override ClassDescriptor CreateDefaultDescriptor()
         {
+            ClassDescriptor descriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
+            string descriptorProvider = string.Format("Bolt.Client.IContractDescriptorProvider<{0}>", descriptor.Name);
+
             if (StateFull)
             {
                 return new ClassDescriptor(
                     ContractDefinition.Name + "Channel",
                     ContractDefinition.Namespace,
                     FormatType<StatefullChannel>(),
-                    ContractDefinition.Root.FullName);
+                    ContractDefinition.Root.FullName,
+                    descriptorProvider);
             }
 
             return new ClassDescriptor(
                 ContractDefinition.Name + "Channel",
                 ContractDefinition.Namespace,
                 FormatType<Channel>(),
-                ContractDefinition.Root.FullName);
+                ContractDefinition.Root.FullName,
+                descriptorProvider);
         }
     }
 }

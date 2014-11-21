@@ -23,6 +23,9 @@ namespace TestService.Core
         Task DoLongRunningOperation2Async(CancellationToken cancellation);
 
         [OperationContract]
+        void LongRunningOperation2Async(CancellationToken cancellation);
+
+        [OperationContract]
         Task DoNothingAsAsync();
 
         [OperationContract]

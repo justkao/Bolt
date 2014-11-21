@@ -1,0 +1,14 @@
+﻿<#@ import namespace="Bolt.Service.Test.Core" #>
+<#@ include file="$(SolutionDir)src\Bolt.Generators\Generator.tt" #>
+<#@ assembly name="$(SolutionDir)test\Automatic\Bolt.Service.Test.Core\bin\$(Configuration)\Bolt.Service.Test.Core.dll" #>
+<#  
+	string result =	Create(Contracts.TestContract)
+					.Contract()
+					.Descriptor()
+					.Async()
+					.Client()
+					.Server()
+					.GetResult();
+
+    Write(result);
+#>

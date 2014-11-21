@@ -26,6 +26,8 @@ namespace Bolt.Client
             {
                 Response.Dispose();
             }
+
+            GC.SuppressFinalize(this);
         }
     }
 }

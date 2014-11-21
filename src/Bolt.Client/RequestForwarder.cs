@@ -54,6 +54,12 @@ namespace Bolt.Client
                 catch (WebException e)
                 {
                     e.EnsureNotCancelled();
+
+                    if (e.Status == WebExceptionStatus.RequestCanceled)
+                    {
+                        throw new OperationCanceledException(context.Cancellation);
+                    }
+
                     if (IsCommunicationException(e))
                     {
                         throw;
@@ -111,9 +117,11 @@ namespace Bolt.Client
                 }
                 catch (WebException e)
                 {
-                    if (e.InnerException is OperationCanceledException)
+                    e.EnsureNotCancelled();
+
+                    if (e.Status == WebExceptionStatus.RequestCanceled)
                     {
-                        throw e.InnerException;
+                        throw new OperationCanceledException(context.Cancellation);
                     }
 
                     if (IsCommunicationException(e))
@@ -193,10 +201,8 @@ namespace Bolt.Client
                 try
                 {
                     Exception error = _dataHandler.ReadException(context);
-                    if (error == null)
-                    {
-                        return new ResponseDescriptor<T>(context.Response, context, clientException, ResponseErrorType.Client);
-                    }
+                    return new ResponseDescriptor<T>(context.Response, context, error ?? clientException, ResponseErrorType.Client);
+
                 }
                 catch (SerializationException e)
                 {

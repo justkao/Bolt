@@ -28,6 +28,11 @@ namespace TestService.Core
             return Task.Delay(TimeSpan.FromMinutes(1), cancellation);
         }
 
+        public void LongRunningOperation2Async(CancellationToken cancellation)
+        {
+            Task.Delay(TimeSpan.FromMinutes(1), cancellation).GetAwaiter().GetResult();
+        }
+
         public Task DoNothingAsAsync()
         {
             return Task.FromResult(0);
