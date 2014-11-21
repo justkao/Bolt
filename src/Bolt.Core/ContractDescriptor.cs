@@ -7,12 +7,25 @@ namespace Bolt
 {
     public abstract class ContractDescriptor : IEnumerable<ActionDescriptor>
     {
-        protected ContractDescriptor(Type type)
+        protected ContractDescriptor(Type type, string name)
         {
+            if (type == null)
+            {
+                throw new ArgumentNullException("type");
+            }
+
+            if (name == null)
+            {
+                throw new ArgumentNullException("name");
+            }
+
             Type = type;
+            Name = name;
         }
 
         public Type Type { get; private set; }
+
+        public string Name { get; private set; }
 
         private readonly List<ActionDescriptor> _actions = new List<ActionDescriptor>();
 

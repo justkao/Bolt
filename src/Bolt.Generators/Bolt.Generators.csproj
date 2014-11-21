@@ -31,6 +31,12 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>SigningKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -40,6 +46,7 @@
     <Compile Include="ClassDescriptor.cs" />
     <Compile Include="ClassGenerator.cs" />
     <Compile Include="ClientFactoryGenerator.cs" />
+    <Compile Include="ContractDefinition.cs" />
     <Compile Include="EasyDispose.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="MethodDescriptor.cs" />
@@ -72,6 +79,7 @@
     <None Include="Generator.tt">
       <LastGenOutput>Generator.Designer.cs</LastGenOutput>
     </None>
+    <None Include="SigningKey.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
 </Project>

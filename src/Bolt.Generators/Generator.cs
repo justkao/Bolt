@@ -108,7 +108,7 @@ namespace Bolt.Generators
             {
                 ContractDefinition = definition ?? ContractDefinition,
                 ContractDescriptor = descriptor,
-                ForceAsync = forceAsync
+                ForceAsync = forceAsync,
             });
         }
 

@@ -19,8 +19,6 @@ namespace Bolt.Client
 
         private IEndpointProvider _endpointProvider;
 
-        private ContractDefinition _contract;
-
         private IConnectionProvider _connectionProvider;
 
         public string SessionHeader { get; set; }
@@ -97,24 +95,6 @@ namespace Bolt.Client
             }
         }
 
-        public ContractDefinition Contract
-        {
-            get
-            {
-                if (_contract == null)
-                {
-                    throw new InvalidOperationException("Contract definition not initialized.");
-                }
-
-                return _contract;
-            }
-
-            set
-            {
-                _contract = value;
-            }
-        }
-
         public string Prefix { get; set; }
 
         #region Synchronous Methods
@@ -137,6 +117,7 @@ namespace Bolt.Client
                 case ResponseErrorType.Deserialization:
                     throw response.Error;
                 case ResponseErrorType.Communication:
+                    ConnectionProvider.ConnectionFailed(context.Server, response.Error);
                     if (!HandleCommunicationError(context, response.Error, retry))
                     {
                         throw response.Error;
@@ -155,12 +136,12 @@ namespace Bolt.Client
 
         protected virtual ConnectionOpenedResult OpenConnection(ActionDescriptor action, CancellationToken cancellation)
         {
-            ConnectionDescriptor connection = ConnectionProvider.GetConnection(OnConnectionOpening, cancellation);
+            ConnectionDescriptor connection = ConnectionProvider.GetConnection(descriptor => OnConnectionOpening(descriptor, cancellation), cancellation);
             HttpWebRequest request = CreateWebRequest(CrateRemoteAddress(connection.Server, action), connection.SessionId);
             return new ConnectionOpenedResult(request, connection.Server);
         }
 
-        protected void OnConnectionOpening(ConnectionDescriptor descriptor)
+        protected virtual void OnConnectionOpening(ConnectionDescriptor descriptor, CancellationToken cancellation)
         {
         }
 
@@ -173,7 +154,12 @@ namespace Bolt.Client
 
             using (ClientExecutionContext ctxt = new ClientExecutionContext(descriptor, request, connectionDescriptor.Server, cancellation))
             {
+                BeforeSending(ctxt, parameters);
                 ResponseDescriptor<TResult> response = RequestForwarder.GetResponse<TResult, TParameters>(ctxt, parameters);
+                if (response.ErrorType == ResponseErrorType.Communication)
+                {
+                    ConnectionProvider.ConnectionFailed(ctxt.Server, response.Error);
+                }
                 return response.GetResultOrThrow();
             }
         }
@@ -216,12 +202,12 @@ namespace Bolt.Client
 
         protected virtual async Task<ConnectionOpenedResult> OpenConnectionAsync(ActionDescriptor action, CancellationToken cancellation)
         {
-            ConnectionDescriptor connection = await ConnectionProvider.GetConnectionAsync(OnConnectionOpeningAsync, cancellation);
+            ConnectionDescriptor connection = await ConnectionProvider.GetConnectionAsync(descriptor => OnConnectionOpeningAsync(descriptor, cancellation), cancellation);
             HttpWebRequest requets = CreateWebRequest(CrateRemoteAddress(connection.Server, action), connection.SessionId);
             return new ConnectionOpenedResult(requets, connection.Server);
         }
 
-        protected Task OnConnectionOpeningAsync(ConnectionDescriptor descriptor)
+        protected virtual Task OnConnectionOpeningAsync(ConnectionDescriptor descriptor, CancellationToken cancellation)
         {
             return Task.FromResult(true);
         }
@@ -234,7 +220,12 @@ namespace Bolt.Client
 
             using (ClientExecutionContext ctxt = new ClientExecutionContext(descriptor, request, connectionDescriptor.Server, cancellation))
             {
+                BeforeSending(ctxt, parameters);
                 ResponseDescriptor<TResult> response = await RequestForwarder.GetResponseAsync<TResult, TParameters>(ctxt, parameters);
+                if (response.ErrorType == ResponseErrorType.Communication)
+                {
+                    ConnectionProvider.ConnectionFailed(ctxt.Server, response.Error);
+                }
                 return response.GetResultOrThrow();
             }
         }
@@ -269,7 +260,7 @@ namespace Bolt.Client
 
         protected virtual Uri CrateRemoteAddress(Uri server, ActionDescriptor descriptor)
         {
-            return EndpointProvider.GetEndpoint(server, Prefix, Contract, descriptor);
+            return EndpointProvider.GetEndpoint(server, Prefix, descriptor);
         }
 
         protected virtual HttpWebRequest CreateWebRequest(Uri server, string sessionId)

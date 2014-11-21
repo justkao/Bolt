@@ -1,5 +1,5 @@
-using Owin;
 using System;
+using Owin;
 
 namespace Bolt.Server
 {
@@ -18,11 +18,10 @@ namespace Bolt.Server
             ServerConfiguration configuration,
             ContractDescriptor descriptor) where TExecutor : IExecutor, new()
         {
-            return builder.UseExecutor<TExecutor>(configuration, descriptor,
-                new StateFullInstanceProvider<TContractImplementation>()
-                {
-                    SessionHeader = configuration.SessionHeaderName
-                });
+            return builder.UseExecutor<TExecutor>(
+                configuration,
+                descriptor,
+                new StateFullInstanceProvider<TContractImplementation>() { SessionHeader = configuration.SessionHeaderName });
         }
 
         public static IAppBuilder UseExecutor<TExecutor>(
@@ -40,21 +39,15 @@ namespace Bolt.Server
         public static IAppBuilder RegisterEndpoint(
             this IAppBuilder builder,
             ServerConfiguration configuration,
-            ContractDefinition definition,
             string prefix,
             Action<IAppBuilder> configure)
         {
-            if (definition == null)
-            {
-                throw new ArgumentNullException("definition");
-            }
-
             if (configuration == null)
             {
                 throw new ArgumentNullException("configuration");
             }
 
-            Uri url = configuration.EndpointProvider.GetEndpoint(null, prefix, definition, null);
+            Uri url = configuration.EndpointProvider.GetEndpoint(null, prefix, null);
             return builder.Map(url.ToString(), configure);
         }
     }

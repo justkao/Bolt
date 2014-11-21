@@ -9,6 +9,8 @@ namespace Bolt.Generators
 {
     public class ClientGenerator : ContractGeneratorBase
     {
+        private string _contractDescriptorProperty;
+
         public ClientGenerator()
             : this(new StringWriter(), new TypeFormatter(), new IntendProvider())
         {
@@ -17,12 +19,27 @@ namespace Bolt.Generators
         public ClientGenerator(StringWriter output, TypeFormatter formatter, IntendProvider intendProvider)
             : base(output, formatter, intendProvider)
         {
-            ContractDescriptorProperty = "ContractDescriptor";
         }
 
-        public string ContractDescriptorProperty { get; set; }
+        public virtual string ContractDescriptorProperty
+        {
+            get
+            {
+                if (_contractDescriptorProperty == null)
+                {
+                    return string.Format("{0}Descriptor", ContractDefinition.Name);
+
+                }
+
+                return _contractDescriptorProperty;
+            }
+
+            set { _contractDescriptorProperty = value; }
+        }
 
         public bool ForceAsync { get; set; }
+
+        public bool GenerateFactory { get; set; }
 
         public override void Generate()
         {
@@ -44,18 +61,24 @@ namespace Bolt.Generators
                 });
             WriteLine();
 
-            ClassDescriptor descriptor = new ClassDescriptor(generator.Descriptor.Name + "Factory",
-                generator.Descriptor.Namespace,
-                string.Format("Bolt.Client.ChannelFactory<{0}, {1}>", generator.Descriptor.Name, contractDescriptor.Name));
-
-            ClientFactoryGenerator clientFactoryGenerator = new ClientFactoryGenerator(Output, Formatter, IntendProvider)
+            if (GenerateFactory)
             {
-                ContractDefinition = ContractDefinition,
-                ContractDescriptor = descriptor
-            };
+                ClassDescriptor descriptor = new ClassDescriptor(
+                    generator.Descriptor.Name + "Factory",
+                    generator.Descriptor.Namespace,
+                    string.Format("Bolt.Client.ChannelFactory<{0}, {1}>", generator.Descriptor.Name, contractDescriptor.Name));
 
-            clientFactoryGenerator.Generate();
-            WriteLine();
+                ClientFactoryGenerator clientFactoryGenerator = new ClientFactoryGenerator(Output, Formatter, IntendProvider)
+                                                                    {
+                                                                        ContractDefinition =
+                                                                            ContractDefinition,
+                                                                        ContractDescriptor =
+                                                                            descriptor
+                                                                    };
+
+                clientFactoryGenerator.Generate();
+                WriteLine();
+            }
         }
 
         private void GenerateMethods(ClassGenerator classGenerator, Type contract)
@@ -186,7 +209,7 @@ namespace Bolt.Generators
 
         private string DeclareEndpoint(MethodDescriptor descriptor, ParameterInfo cancellationTokenParameter)
         {
-            WriteLine("var descriptor = ContractDescriptor.{0};", descriptor.Name);
+            WriteLine("var descriptor = {0}.{1};", ContractDescriptorProperty, descriptor.Name);
             if (cancellationTokenParameter == null)
             {
                 WriteLine("var token = GetCancellationToken(descriptor);");

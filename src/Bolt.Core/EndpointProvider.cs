@@ -5,7 +5,7 @@ namespace Bolt
 {
     public class EndpointProvider : IEndpointProvider
     {
-        public Uri GetEndpoint(Uri server, string prefix, ContractDefinition contract, ActionDescriptor descriptor)
+        public Uri GetEndpoint(Uri server, string prefix, ActionDescriptor descriptor)
         {
             StringBuilder sb = new StringBuilder();
             if (server != null)
@@ -27,13 +27,10 @@ namespace Bolt
                 }
             }
 
-            if (contract != null)
-            {
-                sb.Append("/" + contract.Name);
-            }
-
             if (descriptor != null)
             {
+                sb.Append("/" + descriptor.Contract.Name);
+
                 sb.Append("/" + GetActionEndpoint(descriptor));
             }
 

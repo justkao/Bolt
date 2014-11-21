@@ -33,7 +33,7 @@ namespace Bolt.Generators
             classGenerator.GenerateClass(
                 g =>
                 {
-                    WriteLine("public {0}() : base(typeof({1}))", descriptor.Name, ContractDefinition.Root.FullName);
+                    WriteLine("public {0}() : base(typeof({1}), \"{2}\")", descriptor.Name, ContractDefinition.Root.FullName, ContractDefinition.Name);
                     using (WithBlock())
                     {
                         foreach (MethodInfo method in methods)

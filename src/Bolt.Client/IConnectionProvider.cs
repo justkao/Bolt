@@ -10,6 +10,8 @@ namespace Bolt.Client
 
         Task<ConnectionDescriptor> GetConnectionAsync(Func<ConnectionDescriptor, Task> connectionOpening, CancellationToken cancellationToken);
 
-        void CloseConnection(Uri uri);
+        void CloseConnection(Uri server);
+
+        void ConnectionFailed(Uri server, Exception error);
     }
 }

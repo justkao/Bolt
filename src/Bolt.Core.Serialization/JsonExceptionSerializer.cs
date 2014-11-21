@@ -1,7 +1,8 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
+using Newtonsoft.Json;
 
 namespace Bolt.Core.Serialization
 {
@@ -14,6 +15,14 @@ namespace Bolt.Core.Serialization
             Formatting = Formatting.None,
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
         };
+
+        public JsonExceptionSerializer(SerializationBinder binder = null)
+        {
+            if (binder != null)
+            {
+                _exceptionSerializerSettings.Binder = binder;
+            }
+        }
 
         public byte[] Serialize(Exception exception)
         {

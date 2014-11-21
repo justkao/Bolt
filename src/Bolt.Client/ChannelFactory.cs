@@ -6,29 +6,15 @@ namespace Bolt.Client
         where TChannel : Channel, IContractDescriptorProvider<TContractDescriptor>, new()
         where TContractDescriptor : ContractDescriptor
     {
-        public ChannelFactory(ContractDefinition contractDefinition, TContractDescriptor contractDescriptor)
+        public ChannelFactory(TContractDescriptor contractDescriptor)
         {
-            if (contractDefinition == null)
-            {
-                throw new ArgumentNullException("contractDefinition");
-            }
-
             if (contractDescriptor == null)
             {
                 throw new ArgumentNullException("contractDescriptor");
             }
 
-            if (contractDefinition.Root != contractDescriptor.Type)
-            {
-                throw new ArgumentException(
-                    "Contract definition and contract descriptor type does not match. Contract descriptor must have the same type as contract definition.");
-            }
-
-            ContractDefinition = contractDefinition;
             ContractDescriptor = contractDescriptor;
         }
-
-        public ContractDefinition ContractDefinition { get; private set; }
 
         public TContractDescriptor ContractDescriptor { get; private set; }
 
@@ -61,7 +47,6 @@ namespace Bolt.Client
 
             TChannel channel = new TChannel();
             ClientConfiguration.Update(channel);
-            channel.Contract = ContractDefinition;
             channel.Prefix = Prefix;
             channel.ContractDescriptor = ContractDescriptor;
             channel.ConnectionProvider = connectionProvider;

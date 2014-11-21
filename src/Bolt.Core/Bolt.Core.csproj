@@ -33,11 +33,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>
-    </AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>SigningKey.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -49,7 +48,6 @@
     <Compile Include="AsyncOperationAttribute.cs" />
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="Configuration.cs" />
-    <Compile Include="ContractDefinition.cs" />
     <Compile Include="ContractDescriptor.cs" />
     <Compile Include="Empty.cs" />
     <Compile Include="ActionDescriptor.cs" />
@@ -66,6 +64,9 @@
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="WebRequestExtensions.cs" />
     <Compile Include="XmlSerializer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SigningKey.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
 </Project>

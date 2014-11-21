@@ -8,6 +8,10 @@ namespace Bolt.Client
     {
         private readonly Func<Uri> _serverProvider;
 
+        public ConnectionProvider()
+        {
+        }
+
         public ConnectionProvider(Uri serverUri)
             : this(() => serverUri)
         {
@@ -28,7 +32,11 @@ namespace Bolt.Client
             return Task.FromResult(new ConnectionDescriptor(GetServer(), null));
         }
 
-        public virtual void CloseConnection(Uri uri)
+        public virtual void CloseConnection(Uri server)
+        {
+        }
+
+        public virtual void ConnectionFailed(Uri server, Exception error)
         {
         }
 

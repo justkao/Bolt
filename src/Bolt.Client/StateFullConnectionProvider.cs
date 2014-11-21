@@ -9,6 +9,10 @@ namespace Bolt.Client
         private readonly object _syncRoot = new object();
         private bool _asyncConnectionOpening;
 
+        public StateFullConnectionProvider()
+        {
+        }
+
         public StateFullConnectionProvider(Uri serverUri)
             : base(serverUri)
         {
@@ -50,14 +54,14 @@ namespace Bolt.Client
 
         }
 
-        public override void CloseConnection(Uri uri)
+        public override void CloseConnection(Uri server)
         {
             lock (_syncRoot)
             {
                 OpenedConnection = null;
             }
 
-            base.CloseConnection(uri);
+            base.CloseConnection(server);
         }
 
         protected virtual ConnectionDescriptor OpenConnectionSafe(
