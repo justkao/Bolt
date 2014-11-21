@@ -4,7 +4,7 @@ namespace Bolt.Core.Serialization
 {
     public class JsonSerializer : ISerializer
     {
-        public void Write<T>(Stream stream, T data)
+        public virtual void Write<T>(Stream stream, T data)
         {
             using (StreamWriter writer = new StreamWriter(stream))
             {
@@ -12,7 +12,7 @@ namespace Bolt.Core.Serialization
             }
         }
 
-        public T Read<T>(Stream data)
+        public virtual T Read<T>(Stream data)
         {
             using (StreamReader reader = new StreamReader(data))
             {
@@ -21,7 +21,7 @@ namespace Bolt.Core.Serialization
             }
         }
 
-        public string ContentType
+        public virtual string ContentType
         {
             get { return "application/json"; }
         }

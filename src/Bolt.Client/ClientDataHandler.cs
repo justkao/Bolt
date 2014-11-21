@@ -24,12 +24,12 @@ namespace Bolt.Client
             _exceptionSerializer = exceptionSerializer;
         }
 
-        public string ContentType
+        public virtual string ContentType
         {
             get { return _serializer.ContentType; }
         }
 
-        public void WriteParameters<T>(ClientExecutionContext context, T parameters)
+        public virtual void WriteParameters<T>(ClientExecutionContext context, T parameters)
         {
             if (typeof(T) == typeof(Empty))
             {
@@ -47,7 +47,7 @@ namespace Bolt.Client
             }
         }
 
-        public async Task WriteParametersAsync<T>(ClientExecutionContext context, T parameters)
+        public virtual async Task WriteParametersAsync<T>(ClientExecutionContext context, T parameters)
         {
             if (typeof(T) == typeof(Empty))
             {
@@ -67,7 +67,7 @@ namespace Bolt.Client
             }
         }
 
-        public Task<T> ReadResponseAsync<T>(ClientExecutionContext context)
+        public virtual Task<T> ReadResponseAsync<T>(ClientExecutionContext context)
         {
             if (typeof(T) == typeof(Empty))
             {
@@ -80,7 +80,7 @@ namespace Bolt.Client
             }
         }
 
-        public T ReadResponse<T>(ClientExecutionContext context)
+        public virtual T ReadResponse<T>(ClientExecutionContext context)
         {
             if (typeof(T) == typeof(Empty))
             {
@@ -93,7 +93,7 @@ namespace Bolt.Client
             }
         }
 
-        public Exception ReadException(ClientExecutionContext context)
+        public virtual Exception ReadException(ClientExecutionContext context)
         {
             using (Stream stream = context.Response.GetResponseStream())
             {
@@ -101,7 +101,7 @@ namespace Bolt.Client
             }
         }
 
-        public async Task<Exception> ReadExceptionAsync(ClientExecutionContext context)
+        public virtual async Task<Exception> ReadExceptionAsync(ClientExecutionContext context)
         {
             using (Stream stream = context.Response.GetResponseStream())
             {

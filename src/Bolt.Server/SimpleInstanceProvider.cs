@@ -12,7 +12,7 @@ namespace Bolt.Server
             _factory = factory;
         }
 
-        public Task<T> GetInstanceAsync<T>(ServerExecutionContext context)
+        public virtual Task<T> GetInstanceAsync<T>(ServerExecutionContext context)
         {
             return Task.FromResult((T)(object)_factory(context));
         }

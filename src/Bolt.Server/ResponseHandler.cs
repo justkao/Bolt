@@ -18,7 +18,7 @@ namespace Bolt.Server
             _serverDataHandler = serverDataHandler;
         }
 
-        public Task Handle(ServerExecutionContext context)
+        public virtual Task Handle(ServerExecutionContext context)
         {
             context.Context.Response.StatusCode = (int)HttpStatusCode.OK;
             context.Context.Response.ContentType = _serverDataHandler.ContentType;
@@ -27,7 +27,7 @@ namespace Bolt.Server
             return Task.FromResult(0);
         }
 
-        public Task Handle<TResult>(ServerExecutionContext context, TResult result)
+        public virtual Task Handle<TResult>(ServerExecutionContext context, TResult result)
         {
             context.Context.Response.StatusCode = (int)HttpStatusCode.OK;
             context.Context.Response.ContentType = _serverDataHandler.ContentType;
@@ -35,7 +35,7 @@ namespace Bolt.Server
             return _serverDataHandler.WriteResponseAsync(context, result);
         }
 
-        public Task HandleErrorResponse(ServerExecutionContext context, Exception error)
+        public virtual Task HandleErrorResponse(ServerExecutionContext context, Exception error)
         {
             context.CallCancelled.ThrowIfCancellationRequested();
 

@@ -24,19 +24,19 @@ namespace Bolt.Server
             _exceptionSerializer = exceptionSerializer;
         }
 
-        public string ContentType
+        public virtual string ContentType
         {
             get { return _serializer.ContentType; }
         }
 
-        public Task<T> ReadParametersAsync<T>(ServerExecutionContext context)
+        public virtual Task<T> ReadParametersAsync<T>(ServerExecutionContext context)
         {
             context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
 
             return _serializer.DeserializeAsync<T>(context.Context.Request.Body, true, context.Context.Request.CallCancelled);
         }
 
-        public Task WriteResponseAsync<T>(ServerExecutionContext context, T data)
+        public virtual Task WriteResponseAsync<T>(ServerExecutionContext context, T data)
         {
             context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
 
@@ -44,7 +44,7 @@ namespace Bolt.Server
             return context.Context.Response.Body.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
         }
 
-        public Task WriteExceptionAsync(ServerExecutionContext context, Exception exception)
+        public virtual Task WriteExceptionAsync(ServerExecutionContext context, Exception exception)
         {
             context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
 

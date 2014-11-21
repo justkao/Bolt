@@ -20,7 +20,7 @@ namespace Bolt.Server
 
         public ContractDescriptor Descriptor { get; private set; }
 
-        public ActionDescriptor GetAction(IOwinContext context)
+        public virtual ActionDescriptor GetAction(IOwinContext context)
         {
             ActionDescriptor result;
             _actions.TryGetValue(GetMethodName(context), out result);

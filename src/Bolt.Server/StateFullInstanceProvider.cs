@@ -80,6 +80,11 @@ namespace Bolt.Server
             }
         }
 
+        public virtual void Dispose()
+        {
+            _timer.Dispose();
+        }
+
         private class InstanceMetadata
         {
             public InstanceMetadata(object instance)
@@ -91,11 +96,6 @@ namespace Bolt.Server
             public DateTime Timestamp { get; set; }
 
             public object Instance { get; private set; }
-        }
-
-        public virtual void Dispose()
-        {
-            _timer.Dispose();
         }
     }
 }
