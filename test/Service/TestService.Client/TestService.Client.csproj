@@ -47,10 +47,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bolt\Client.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Client.tt</DependentUpon>
+    <Compile Include="..\TestService.Core\Generated\PersonRepository.Client.Designer.cs">
+      <Link>PersonRepository.Client.Designer.cs</Link>
+    </Compile>
+    <Compile Include="..\TestService.Core\Generated\PersonRepository.Contract.Designer.cs">
+      <Link>PersonRepository.Contract.Designer.cs</Link>
     </Compile>
     <Compile Include="ClientFactory.cs" />
     <Compile Include="Program.cs" />
@@ -58,10 +59,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Bolt\Client.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>Client.Designer.cs</LastGenOutput>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

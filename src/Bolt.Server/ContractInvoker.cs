@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Bolt.Server
 {
-    public class Executor : IExecutor
+    public class ContractInvoker : IContractInvoker
     {
         private readonly IDictionary<ActionDescriptor, ActionMetadata> _actions = new Dictionary<ActionDescriptor, ActionMetadata>();
 

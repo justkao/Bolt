@@ -48,7 +48,7 @@ namespace Bolt.Client
             TChannel channel = new TChannel();
             ClientConfiguration.Update(channel);
             channel.Prefix = Prefix;
-            channel.ContractDescriptor = ContractDescriptor;
+            channel.Descriptor = ContractDescriptor;
             channel.ConnectionProvider = connectionProvider;
 
             return channel;

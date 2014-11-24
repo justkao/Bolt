@@ -12,6 +12,10 @@ namespace Bolt.Generators
         private ContractDefinition _contract;
         private ClassDescriptor _descriptor;
 
+        protected ContractGeneratorBase()
+        {
+        }
+
         protected ContractGeneratorBase(StringWriter output, TypeFormatter formatter, IntendProvider intendProvider)
             : base(output, formatter, intendProvider)
         {

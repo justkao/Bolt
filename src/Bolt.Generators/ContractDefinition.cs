@@ -7,7 +7,7 @@ namespace Bolt.Generators
 {
     public class ContractDefinition
     {
-        private readonly IReadOnlyCollection<Type> _excludedContracts;
+        private IReadOnlyCollection<Type> _excludedContracts;
 
         public ContractDefinition(Type root, params Type[] excludedContracts)
         {
@@ -37,7 +37,16 @@ namespace Bolt.Generators
 
         public IReadOnlyCollection<Type> ExcludedContracts
         {
-            get { return _excludedContracts; }
+            get
+            {
+                return _excludedContracts;
+            }
+
+            set
+            {
+                _excludedContracts = value;
+                Validate();
+            }
         }
 
         public virtual IEnumerable<Type> GetEffectiveContracts(Type iface)

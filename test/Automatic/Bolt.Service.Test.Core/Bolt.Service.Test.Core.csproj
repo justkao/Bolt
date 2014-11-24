@@ -41,7 +41,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompositeType.cs" />
-    <Compile Include="Contracts.cs" />
     <Compile Include="ITestContract.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -49,6 +48,10 @@
     <ProjectReference Include="..\..\..\src\Bolt.Client\Bolt.Client.csproj">
       <Project>{65a1f42f-de09-415a-8a68-65e017fe63a8}</Project>
       <Name>Bolt.Client</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\src\Bolt.Console\Bolt.Console.csproj">
+      <Project>{7e15c5a0-a53e-4971-88a4-1884f095ad23}</Project>
+      <Name>Bolt.Console</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\src\Bolt.Core\Bolt.Core.csproj">
       <Project>{6d1f7d95-3346-4308-8b6f-2b5aab0d022f}</Project>
@@ -63,7 +66,15 @@
       <Name>Bolt.Server</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Generated\Configuration.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>$(TargetDir)Bolt.exe $(ProjectDir)\Generated\Configuration.json</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

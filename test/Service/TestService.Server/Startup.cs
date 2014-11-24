@@ -1,5 +1,6 @@
 ﻿
 using Bolt;
+using Bolt.Console.Test.Contracts;
 using Bolt.Core.Serialization;
 using Bolt.Server;
 
@@ -14,12 +15,12 @@ namespace TestService.Server
         public void Configuration(IAppBuilder app)
         {
             ServerConfiguration configuration = new ServerConfiguration(new JsonSerializer(), new JsonExceptionSerializer());
-            app.RegisterEndpoint(configuration, Contracts.PersonRepository, "api", b => ConfigurePersonRepository(b, configuration));
+            app.RegisterEndpoint(configuration, "api", b => ConfigurePersonRepository(b, configuration));
         }
 
         private void ConfigurePersonRepository(IAppBuilder obj, ServerConfiguration configuration)
         {
-            obj.UseStatefullExecutor<PersonRepositoryExecutor, PersonRepository>(configuration, PersonRepositoryDescriptor.Default);
+            obj.UseContract<PersonRepositoryInvoker, PersonRepository>(configuration, PersonRepositoryDescriptor.Default);
         }
     }
 }

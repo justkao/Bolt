@@ -4,7 +4,7 @@ using Microsoft.Owin;
 
 namespace Bolt.Server
 {
-    public interface IExecutor
+    public interface IContractInvoker
     {
         Task Execute(IOwinContext context, ActionDescriptor action);
     }

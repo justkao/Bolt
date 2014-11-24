@@ -25,7 +25,7 @@ namespace Bolt.Server
             ActionDescriptor action = Options.ActionProvider.GetAction(context);
             if (action != null)
             {
-                await Options.Executor.Execute(context, action);
+                await Options.ContractInvoker.Execute(context, action);
             }
             else
             {

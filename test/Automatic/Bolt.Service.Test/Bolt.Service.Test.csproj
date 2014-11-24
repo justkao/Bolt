@@ -65,14 +65,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Bolt.Service.Test.Core\Generated\TestContract.Client.Designer.cs">
+      <Link>TestContract.Client.Designer.cs</Link>
+    </Compile>
+    <Compile Include="..\Bolt.Service.Test.Core\Generated\TestContract.Contract.Designer.cs">
+      <Link>TestContract.Contract.Designer.cs</Link>
+    </Compile>
+    <Compile Include="..\Bolt.Service.Test.Core\Generated\TestContract.Server.Designer.cs">
+      <Link>TestContract.Server.Designer.cs</Link>
+    </Compile>
     <Compile Include="CustomException.cs" />
     <Compile Include="SerializerType.cs" />
     <Compile Include="ServiceTest.cs" />
-    <Compile Include="GeneratedCode.Designer.cs">
-      <DependentUpon>GeneratedCode.tt</DependentUpon>
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <Compile Include="MockInstanceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestContractChannel.cs" />
@@ -104,10 +108,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="GeneratedCode.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>GeneratedCode.Designer.cs</LastGenOutput>
-    </None>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

@@ -11,6 +11,10 @@ namespace Bolt.Generators
     {
         private readonly List<Type> _generatedInterfaces = new List<Type>();
 
+        public InterfaceGenerator()
+        {
+        }
+
         public InterfaceGenerator(StringWriter output, TypeFormatter formatter, IntendProvider provider)
             : base(output, formatter, provider)
         {

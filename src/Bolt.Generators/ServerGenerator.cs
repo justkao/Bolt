@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Bolt.Generators
 {
     public class ServerGenerator : ContractGeneratorBase
     {
-        private const string ExecutorName = "Executor";
+        private const string ExecutorName = "ContractInvoker";
         private const string ServerExecutionContext = "Bolt.Server.ServerExecutionContext";
         private const string BoltServerNamespace = "Bolt.Server";
 
@@ -24,9 +25,17 @@ namespace Bolt.Generators
             : base(output, formatter, intendProvider)
         {
             ContractDescriptorPropertyName = "ContractDescriptor";
+            BaseClass = BoltServerNamespace + "." + ExecutorName;
+            Suffix = "Invoker";
         }
 
         public string ContractDescriptorPropertyName { get; set; }
+
+        public string BaseClass { get; set; }
+
+        public string Suffix { get; set; }
+
+        public string Namespace { get; set; }
 
         public override void Generate()
         {
@@ -82,7 +91,12 @@ namespace Bolt.Generators
 
         protected override ClassDescriptor CreateDefaultDescriptor()
         {
-            return new ClassDescriptor(ContractDefinition.Name + ExecutorName, BoltServerNamespace, BoltServerNamespace + "." + ExecutorName);
+            if (String.IsNullOrEmpty(BaseClass))
+            {
+                return new ClassDescriptor(ContractDefinition.Name + Suffix, Namespace ?? BoltServerNamespace);
+            }
+
+            return new ClassDescriptor(ContractDefinition.Name + Suffix, Namespace ?? BoltServerNamespace, BaseClass);
         }
 
         private void WriteInvocationMethod(MethodDescriptor methodDescriptor, ClassGenerator classGenerator)

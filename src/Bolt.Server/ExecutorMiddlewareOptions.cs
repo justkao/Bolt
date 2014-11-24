@@ -4,11 +4,11 @@ namespace Bolt.Server
 {
     public class ExecutorMiddlewareOptions
     {
-        public ExecutorMiddlewareOptions(IExecutor executor, IActionProvider actionProvider)
+        public ExecutorMiddlewareOptions(IContractInvoker contractInvoker, IActionProvider actionProvider)
         {
-            if (executor == null)
+            if (contractInvoker == null)
             {
-                throw new ArgumentNullException("executor");
+                throw new ArgumentNullException("contractInvoker");
             }
 
             if (actionProvider == null)
@@ -16,12 +16,12 @@ namespace Bolt.Server
                 throw new ArgumentNullException("actionProvider");
             }
 
-            Executor = executor;
+            ContractInvoker = contractInvoker;
 
             ActionProvider = actionProvider;
         }
 
-        public IExecutor Executor { get; private set; }
+        public IContractInvoker ContractInvoker { get; private set; }
 
         public IActionProvider ActionProvider { get; private set; }
     }

@@ -26,7 +26,7 @@ namespace Sandbox
     {
         static void Main(string[] args)
         {
-            string result = new Generator() { ContractDefinition = new ContractDefinition(typeof(ISamle1)) }.Client().GetResult();
+            string result = new DocumentGenerator() { ContractDefinition = new ContractDefinition(typeof(ISamle1)) }.Client().GetResult();
 
             Exception e = new InvalidOperationException("Test");
             try

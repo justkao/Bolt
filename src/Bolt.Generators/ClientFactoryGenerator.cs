@@ -15,9 +15,8 @@ namespace Bolt.Generators
                 g =>
                 {
                     WriteLine(
-                        "public {0}({1} contractDefinition) : this(contractDefinition, {2}.Default)",
+                        "public {0}() : this({1}.Default)",
                         ContractDescriptor.Name,
-                        FormatType<ContractDefinition>(),
                         MetadataProvider.GetContractDescriptor(ContractDefinition).Name);
                     using (WithBlock())
                     {
@@ -26,9 +25,8 @@ namespace Bolt.Generators
                     WriteLine();
 
                     WriteLine(
-                        "public {0}({1} contractDefinition,{2} descriptor) : base(contractDefinition, descriptor)",
+                        "public {0}({1} descriptor) : base(descriptor)",
                         ContractDescriptor.Name,
-                        FormatType<ContractDefinition>(),
                         MetadataProvider.GetContractDescriptor(ContractDefinition).Name);
                     using (WithBlock())
                     {

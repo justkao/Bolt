@@ -1,18 +1,18 @@
 ﻿namespace Bolt.Server
 {
-    public class ExecutorFactory<TExecutor> where TExecutor : IExecutor, new()
+    public class ExecutorFactory<TExecutor> where TExecutor : IContractInvoker, new()
     {
-        public virtual IExecutor Create(ServerConfiguration configuration, IInstanceProvider instanceProvider)
+        public virtual IContractInvoker Create(ServerConfiguration configuration, IInstanceProvider instanceProvider)
         {
-            Executor executor = (Executor)((object)new TExecutor());
+            ContractInvoker contractInvoker = (ContractInvoker)((object)new TExecutor());
 
-            executor.Init();
+            contractInvoker.Init();
 
-            executor.DataHandler = configuration.ServerDataHandler;
-            executor.ResponseHandler = configuration.ResponseHandler;
-            executor.InstanceProvider = instanceProvider;
+            contractInvoker.DataHandler = configuration.ServerDataHandler;
+            contractInvoker.ResponseHandler = configuration.ResponseHandler;
+            contractInvoker.InstanceProvider = instanceProvider;
 
-            return executor;
+            return contractInvoker;
         }
     }
 }

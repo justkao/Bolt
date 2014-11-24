@@ -13,8 +13,7 @@ namespace TestService.Client
             PersonRepositoryChannel repository = new PersonRepositoryChannel();
             repository.ConnectionProvider = new ConnectionProvider(() => Servers.IISBoltServer);
             repository.Prefix = Servers.Prefix;
-            repository.Contract = Contracts.PersonRepository;
-            repository.ContractDescriptor = new PersonRepositoryDescriptor();
+            repository.PersonRepositoryDescriptor = new PersonRepositoryDescriptor();
             repository.Retries = 10;
             repository.RetryDelay = TimeSpan.FromSeconds(2);
 
@@ -26,8 +25,7 @@ namespace TestService.Client
         {
             PersonRepositoryChannel repository = new PersonRepositoryChannel();
             repository.Prefix = Servers.Prefix;
-            repository.Contract = Contracts.PersonRepository;
-            repository.ContractDescriptor = new PersonRepositoryDescriptor();
+            repository.PersonRepositoryDescriptor = new PersonRepositoryDescriptor();
             repository.Retries = 10;
             repository.RetryDelay = TimeSpan.FromSeconds(2);
             repository.ConnectionProvider = new ConnectionProvider(() => Servers.BoltServer);

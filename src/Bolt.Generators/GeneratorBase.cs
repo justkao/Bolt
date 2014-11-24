@@ -10,6 +10,11 @@ namespace Bolt.Generators
 {
     public abstract class GeneratorBase
     {
+        protected GeneratorBase()
+            : this(new StringWriter(), new TypeFormatter(), new IntendProvider())
+        {
+        }
+
         protected GeneratorBase(StringWriter output, TypeFormatter formatter, IntendProvider intendProvider)
         {
             Formatter = formatter;
@@ -18,13 +23,23 @@ namespace Bolt.Generators
             Intend = "    ";
         }
 
-        public StringWriter Output { get; private set; }
+        public StringWriter Output { get; set; }
 
         public string Intend { get; set; }
 
-        public TypeFormatter Formatter { get; private set; }
+        public TypeFormatter Formatter { get; set; }
 
         public IntendProvider IntendProvider { get; set; }
+
+        public T Create<T>() where T : GeneratorBase, new()
+        {
+            T res = new T();
+            res.Output = Output;
+            res.Formatter = Formatter;
+            res.IntendProvider = IntendProvider;
+
+            return res;
+        }
 
         public virtual void Generate()
         {

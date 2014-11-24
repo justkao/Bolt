@@ -250,8 +250,6 @@ namespace Bolt.Service.Test
 
         public ClientConfiguration ClientConfiguration { get; set; }
 
-        public ContractDefinition TestContract { get; set; }
-
         public string Prefix { get; set; }
 
         public MockInstanceProvider InstanceProvider = new MockInstanceProvider();
@@ -265,7 +263,7 @@ namespace Bolt.Service.Test
 
         public virtual ITestContractAsync GetChannel()
         {
-            TestContractChannelFactory factory = new TestContractChannelFactory(Contracts.TestContract)
+            TestContractChannelFactory factory = new TestContractChannelFactory()
                                                      {
                                                          ClientConfiguration = ClientConfiguration,
                                                          Prefix = Prefix
@@ -294,14 +292,19 @@ namespace Bolt.Service.Test
             ServerConfiguration = new ServerConfiguration(serializer, jsonExceptionSerializer);
             ClientConfiguration = new ClientConfiguration(serializer, jsonExceptionSerializer);
 
-            TestContract = Contracts.TestContract;
             Prefix = "test";
 
-            _runningServer = WebApp.Start(ServerUrl.ToString(),
+            _runningServer = WebApp.Start(
+                ServerUrl.ToString(),
                 (b) =>
-                    b.RegisterEndpoint(ServerConfiguration, TestContract, Prefix,
-                        (endpointBuilder) => endpointBuilder.UseExecutor<TestContractExecutor>(ServerConfiguration,
-                            TestContractDescriptor.Default, InstanceProvider)));
+                b.RegisterEndpoint(
+                    ServerConfiguration,
+                    Prefix,
+                    (endpointBuilder) =>
+                    endpointBuilder.UseContract<TestContractInvoker>(
+                        ServerConfiguration,
+                        TestContractDescriptor.Default,
+                        InstanceProvider)));
         }
 
         [TestFixtureTearDown]

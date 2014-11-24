@@ -55,13 +55,13 @@
     <Compile Include="ActionProvider.cs" />
     <Compile Include="IActionProvider.cs" />
     <Compile Include="ServerDataHandler.cs" />
-    <Compile Include="Executor.cs" />
+    <Compile Include="ContractInvoker.cs" />
     <Compile Include="ExecutorFactory.cs" />
     <Compile Include="ExecutorMiddlewareExtensions.cs" />
     <Compile Include="IAsyncContractInitializer.cs" />
     <Compile Include="IContractInitializer.cs" />
     <Compile Include="IServerDataHandler.cs" />
-    <Compile Include="IExecutor.cs" />
+    <Compile Include="IContractInvoker.cs" />
     <Compile Include="InstanceProvider.cs" />
     <Compile Include="IResponseHandler.cs" />
     <Compile Include="ExecutorMiddleware.cs" />
