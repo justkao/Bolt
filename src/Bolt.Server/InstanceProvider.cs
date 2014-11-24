@@ -3,7 +3,15 @@ using System.Threading.Tasks;
 
 namespace Bolt.Server
 {
-    public class InstanceProvider<TImplementation> : IInstanceProvider
+    public class InstanceProvider<T> : InstanceProvider where T : new()
+    {
+        protected override object CreateInstance(Type type)
+        {
+            return new T();
+        }
+    }
+
+    public class InstanceProvider : IInstanceProvider
     {
         public virtual async Task<T> GetInstanceAsync<T>(ServerExecutionContext context)
         {
@@ -32,7 +40,7 @@ namespace Bolt.Server
 
         protected virtual object CreateInstance(Type type)
         {
-            return Activator.CreateInstance<TImplementation>();
+            return Activator.CreateInstance(type);
         }
     }
 }

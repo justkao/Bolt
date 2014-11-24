@@ -5,6 +5,7 @@ using Bolt.Service.Test.Core;
 using Microsoft.Owin.Hosting;
 using Moq;
 using NUnit.Framework;
+using Owin;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -297,14 +298,19 @@ namespace Bolt.Service.Test
             _runningServer = WebApp.Start(
                 ServerUrl.ToString(),
                 (b) =>
-                b.RegisterEndpoint(
-                    ServerConfiguration,
-                    Prefix,
-                    (endpointBuilder) =>
-                    endpointBuilder.UseContract<TestContractInvoker>(
-                        ServerConfiguration,
+                {
+                    IAppBuilder contractEndpointBuilder = b.MapContract(
                         TestContractDescriptor.Default,
-                        InstanceProvider)));
+                        ServerConfiguration,
+                        Prefix, (endpointBuilder) =>
+                        {
+
+                            endpointBuilder.UseContractInvoker<TestContractInvoker>(
+                                ServerConfiguration,
+                                TestContractDescriptor.Default,
+                                InstanceProvider);
+                        });
+                });
         }
 
         [TestFixtureTearDown]

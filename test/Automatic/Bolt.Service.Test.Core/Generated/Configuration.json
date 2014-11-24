@@ -6,9 +6,10 @@
             "assemblies": [ "Bolt.Service.Test.Core.dll" ],
             "client": {
                 "forceAsync": "true",
-                "generateFactory":  "true"
+                "generateFactory": "true"
             },
-            "server": { }
+            "server": {
+            }
         }
     ]
 }

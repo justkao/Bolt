@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-
-using Bolt.Generators;
-
+﻿using Bolt.Generators;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Bolt.Console
 {
@@ -20,12 +17,7 @@ namespace Bolt.Console
 
         public void Execute(ContractExecution execution)
         {
-            string output = Output;
-            if (string.IsNullOrEmpty(output))
-            {
-                output = Path.Combine(execution.OutputDirectory, GetFileName(execution.Definition));
-            }
-
+            string output = PathHelpers.GetOutput(execution.OutputDirectory, Output, GetFileName(execution.Definition));
             DocumentGenerator document = Parent.Parent.GetDocument(output);
             DoExecute(document, CoerceDescriptor(execution.Definition));
         }

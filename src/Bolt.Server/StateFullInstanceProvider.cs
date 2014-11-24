@@ -6,7 +6,15 @@ using System.Timers;
 
 namespace Bolt.Server
 {
-    public class StateFullInstanceProvider<TImplementation> : InstanceProvider<TImplementation>, IDisposable
+    public class StateFullInstanceProvider<T> : StateFullInstanceProvider where T : new()
+    {
+        protected override object CreateInstance(Type type)
+        {
+            return new T();
+        }
+    }
+
+    public class StateFullInstanceProvider : InstanceProvider, IDisposable
     {
         private readonly ConcurrentDictionary<string, InstanceMetadata> _instances = new ConcurrentDictionary<string, InstanceMetadata>();
         private readonly Timer _timer;

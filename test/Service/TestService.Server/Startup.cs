@@ -12,12 +12,12 @@ namespace TestService.Server
         public void Configuration(IAppBuilder app)
         {
             ServerConfiguration configuration = new ServerConfiguration(new JsonSerializer(), new JsonExceptionSerializer());
-            app.RegisterEndpoint(configuration, "api", b => ConfigurePersonRepository(b, configuration));
+            app.MapContract(PersonRepositoryDescriptor.Default, configuration, "api", b => ConfigurePersonRepository(b, configuration));
         }
 
         private void ConfigurePersonRepository(IAppBuilder obj, ServerConfiguration configuration)
         {
-            obj.UseContract<PersonRepositoryInvoker, PersonRepository>(configuration, PersonRepositoryDescriptor.Default);
+            obj.UseStateFullContractInvoker<PersonRepositoryInvoker, PersonRepository>(configuration, PersonRepositoryDescriptor.Default);
         }
     }
 }

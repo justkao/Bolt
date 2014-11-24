@@ -1,12 +1,10 @@
-﻿using System;
+﻿using Bolt.Generators;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-
-using Bolt.Generators;
-
-using Newtonsoft.Json;
 
 namespace Bolt.Console
 {
@@ -59,20 +57,8 @@ namespace Bolt.Console
                 Server.Parent = this;
             }
 
-            string outputDirectory = Output ?? Parent.OutputDirectory;
-            string extensions = Path.GetExtension(Output);
-            string outputFile = Output;
-            if (string.IsNullOrEmpty(extensions))
-            {
-                outputFile = ContractDefinition.Name + ".Contract.Designer.cs";
-            }
-            else
-            {
-                outputDirectory = Path.GetDirectoryName(Output);
-                outputFile = Path.GetFileName(Output);
-            }
+            string output = PathHelpers.GetOutput(Parent.OutputDirectory, Output, ContractDefinition.Name + ".Contract.Designer.cs");
 
-            string output = Path.Combine(outputDirectory, outputFile);
             DocumentGenerator document = Parent.GetDocument(output);
 
             document.Add(new ContractGenerator()
@@ -86,7 +72,7 @@ namespace Bolt.Console
                              });
 
 
-            ContractExecution execution = new ContractExecution(ContractDefinition, outputDirectory);
+            ContractExecution execution = new ContractExecution(ContractDefinition, Path.GetDirectoryName(output));
             if (Client != null)
             {
                 Client.Execute(execution);

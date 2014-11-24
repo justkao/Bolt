@@ -273,7 +273,7 @@ namespace Bolt.Client
 
         protected virtual Uri CrateRemoteAddress(Uri server, ActionDescriptor descriptor)
         {
-            return EndpointProvider.GetEndpoint(server, Prefix, descriptor);
+            return EndpointProvider.GetEndpoint(server, Prefix, descriptor.Contract, descriptor);
         }
 
         protected virtual HttpWebRequest CreateWebRequest(Uri server, string sessionId)

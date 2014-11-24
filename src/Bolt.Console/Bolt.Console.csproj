@@ -45,6 +45,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientConfig.cs" />
+    <Compile Include="PathHelpers.cs" />
     <Compile Include="RootConfig.cs" />
     <Compile Include="ServerConfig.cs" />
     <Compile Include="TypeHelper.cs" />
