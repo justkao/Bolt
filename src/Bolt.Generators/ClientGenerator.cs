@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Bolt.Client;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Bolt.Client;
 
 namespace Bolt.Generators
 {
@@ -67,6 +67,8 @@ namespace Bolt.Generators
                 _baseClass = value;
             }
         }
+
+        public IEnumerable<string> BaseInterfaces { get; set; }
 
         public override void Generate()
         {
@@ -264,13 +266,20 @@ namespace Bolt.Generators
         protected override ClassDescriptor CreateDefaultDescriptor()
         {
             string descriptorProvider = FormatDescriptorProvider();
+            List<string> baseClasses = new List<string>();
+            baseClasses.Add(BaseClass);
+            baseClasses.Add(ContractDefinition.Root.FullName);
+            baseClasses.Add(descriptorProvider);
+
+            if (BaseInterfaces != null)
+            {
+                baseClasses.AddRange(BaseInterfaces);
+            }
 
             return new ClassDescriptor(
                 Name ?? ContractDefinition.Name + Suffix,
                 Namespace ?? ContractDefinition.Namespace,
-                BaseClass,
-                ContractDefinition.Root.FullName,
-                descriptorProvider);
+                baseClasses.Distinct().ToArray());
         }
 
         private string FormatDescriptorProvider(ClassDescriptor contractDescriptor = null)

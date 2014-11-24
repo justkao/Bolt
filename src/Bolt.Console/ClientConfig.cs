@@ -1,6 +1,7 @@
 ﻿
 using Bolt.Client;
 using Bolt.Generators;
+using System.Linq;
 
 namespace Bolt.Console
 {
@@ -21,13 +22,28 @@ namespace Bolt.Console
         protected override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
         {
             ClientGenerator clientGenerator = new ClientGenerator()
-                                {
-                                    ForceAsync = ForceAsync,
-                                    ContractDefinition = definition,
-                                    GenerateFactory = GenerateFactory,
-                                    Namespace = Namespace,
-                                    Name = Name
-                                };
+            {
+                ForceAsync = ForceAsync,
+                ContractDefinition = definition,
+                GenerateFactory = GenerateFactory,
+                Namespace = Namespace,
+                Name = Name
+            };
+
+            if (ForceAsync)
+            {
+                InterfaceGenerator interfaceGenerator = new InterfaceGenerator()
+                {
+                    ContractDefinition = definition,
+                    ForceAsync = ForceAsync
+                };
+
+                generator.Add(interfaceGenerator);
+                interfaceGenerator.Generated += (s, e) =>
+                {
+                    clientGenerator.BaseInterfaces = interfaceGenerator.GeneratedAsyncInterfaces.ToList();
+                };
+            }
 
             if (CustomBaseClass)
             {
@@ -38,16 +54,6 @@ namespace Bolt.Console
             {
                 clientGenerator.Suffix = Suffix;
             }
-
-            if (ForceAsync)
-            {
-                generator.Add(new InterfaceGenerator()
-                                  {
-                                      ContractDefinition = definition,
-                                      ForceAsync = ForceAsync
-                                  });
-            }
-
 
             generator.Add(clientGenerator);
         }

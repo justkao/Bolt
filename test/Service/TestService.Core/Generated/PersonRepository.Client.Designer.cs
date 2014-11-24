@@ -55,7 +55,7 @@ namespace TestService.Core
 
 namespace TestService.Core
 {
-    public partial class PersonRepositoryChannel : Bolt.Client.Channel, TestService.Core.IPersonRepository, Bolt.Client.IContractDescriptorProvider<PersonRepositoryDescriptor>
+    public partial class PersonRepositoryChannel : Bolt.Client.Channel, TestService.Core.IPersonRepository, Bolt.Client.IContractDescriptorProvider<PersonRepositoryDescriptor>, IPersonRepositoryInnerAsync, IPersonRepositoryInner2Async, IPersonRepositoryAsync
     {
         public TestService.Core.PersonRepositoryDescriptor PersonRepositoryDescriptor { get; set; }
 

@@ -11,6 +11,8 @@ namespace Bolt.Generators
     {
         private readonly List<Type> _generatedInterfaces = new List<Type>();
 
+        private readonly List<string> _generatedAsyncInterfaces = new List<string>();
+
         public InterfaceGenerator()
         {
         }
@@ -20,8 +22,15 @@ namespace Bolt.Generators
         {
         }
 
-        public bool ForceAsync { get; set; }
+        public event EventHandler Generated;
 
+        public IEnumerable<string> GeneratedAsyncInterfaces
+        {
+            get { return _generatedAsyncInterfaces; }
+        }
+
+        public bool ForceAsync { get; set; }
+        
         public override void Generate()
         {
             bool hasAsyncInterfaces = ContractDefinition.GetEffectiveContracts().Any(ShouldHaveAsyncMethods);
@@ -35,6 +44,11 @@ namespace Bolt.Generators
             }
 
             GenerateAsyncInterface(ContractDefinition.Root);
+
+            if (Generated != null)
+            {
+                Generated(this, EventArgs.Empty);
+            }
         }
 
         private void GenerateAsyncInterface(Type iface)
@@ -51,6 +65,7 @@ namespace Bolt.Generators
 
             _generatedInterfaces.Add(iface);
             string name = iface.Name + "Async";
+            _generatedAsyncInterfaces.Add(name);
 
             using (WithNamespace(iface.Namespace))
             {
