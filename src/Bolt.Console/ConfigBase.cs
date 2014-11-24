@@ -28,7 +28,11 @@ namespace Bolt.Console
 
         private ContractDefinition CoerceDescriptor(ContractDefinition definition)
         {
-            return new ContractDefinition(definition.Root, definition.ExcludedContracts.Concat(GetExcludedTypes()).Distinct().ToArray());
+            return new ContractDefinition(definition.Root,
+                definition.ExcludedContracts.Concat(GetExcludedTypes()).Distinct().ToArray())
+            {
+                ParametersBase = definition.ParametersBase
+            };
         }
 
         private IEnumerable<Type> GetExcludedTypes()

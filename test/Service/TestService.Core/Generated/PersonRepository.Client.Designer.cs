@@ -19,6 +19,42 @@ using TestService.Core.Parameters;
 
 namespace TestService.Core
 {
+    public interface IPersonRepositoryInnerAsync : IPersonRepositoryInner
+    {
+        Task InnerOperationAsync();
+    }
+}
+
+namespace TestService.Core
+{
+    public interface IPersonRepositoryInner2Async : IPersonRepositoryInner2
+    {
+        Task InnerOperation2Async();
+    }
+}
+
+namespace TestService.Core
+{
+    public interface IPersonRepositoryAsync : IPersonRepository, IPersonRepositoryInnerAsync, IPersonRepositoryInner2Async
+    {
+        Task<Person> UpdatePersonAsync(Person person, System.Threading.CancellationToken cancellation);
+
+        Task<Person> UpdatePersonThatThrowsInvalidOperationExceptionAsync(Person person);
+
+        Task DoNothingAsync();
+
+        Task DoNothingWithComplexParameterAsync(List<Person> person);
+
+        Task<int> GetSimpleTypeAsync(int arg);
+
+        Task<Person> GetSinglePersonAsync(Person person);
+
+        Task<List<Person>> GetManyPersonsAsync(Person person);
+    }
+}
+
+namespace TestService.Core
+{
     public partial class PersonRepositoryChannel : Bolt.Client.Channel, TestService.Core.IPersonRepository, Bolt.Client.IContractDescriptorProvider<PersonRepositoryDescriptor>
     {
         public TestService.Core.PersonRepositoryDescriptor PersonRepositoryDescriptor { get; set; }
@@ -56,6 +92,13 @@ namespace TestService.Core
             return Send<Person, UpdatePersonThatThrowsInvalidOperationExceptionParameters>(request, PersonRepositoryDescriptor.UpdatePersonThatThrowsInvalidOperationException, GetCancellationToken(PersonRepositoryDescriptor.UpdatePersonThatThrowsInvalidOperationException));
         }
 
+        public virtual Task<Person> UpdatePersonThatThrowsInvalidOperationExceptionAsync(Person person)
+        {
+            var request = new UpdatePersonThatThrowsInvalidOperationExceptionParameters();
+            request.Person = person;
+            return SendAsync<Person, UpdatePersonThatThrowsInvalidOperationExceptionParameters>(request, PersonRepositoryDescriptor.UpdatePersonThatThrowsInvalidOperationException, GetCancellationToken(PersonRepositoryDescriptor.UpdatePersonThatThrowsInvalidOperationException));
+        }
+
         public virtual Task DoLongRunningOperationAsync(Person person, System.Threading.CancellationToken cancellation)
         {
             var request = new DoLongRunningOperationAsyncParameters();
@@ -65,14 +108,12 @@ namespace TestService.Core
 
         public virtual Task DoLongRunningOperation2Async(System.Threading.CancellationToken cancellation)
         {
-            var request = new DoLongRunningOperation2AsyncParameters();
-            return SendAsync(request, PersonRepositoryDescriptor.DoLongRunningOperation2Async, cancellation);
+            return SendAsync(Bolt.Empty.Instance, PersonRepositoryDescriptor.DoLongRunningOperation2Async, cancellation);
         }
 
-        public virtual void LongRunningOperation2Async(System.Threading.CancellationToken cancellation)
+        public virtual Task LongRunningOperation2Async(System.Threading.CancellationToken cancellation)
         {
-            var request = new LongRunningOperation2AsyncParameters();
-            Send(request, PersonRepositoryDescriptor.LongRunningOperation2Async, cancellation);
+            return SendAsync(Bolt.Empty.Instance, PersonRepositoryDescriptor.LongRunningOperation2Async, cancellation);
         }
 
         public virtual Task DoNothingAsAsync()
@@ -83,6 +124,11 @@ namespace TestService.Core
         public virtual void DoNothing()
         {
             Send(Bolt.Empty.Instance, PersonRepositoryDescriptor.DoNothing, GetCancellationToken(PersonRepositoryDescriptor.DoNothing));
+        }
+
+        public virtual Task DoNothingAsync()
+        {
+            return SendAsync(Bolt.Empty.Instance, PersonRepositoryDescriptor.DoNothing, GetCancellationToken(PersonRepositoryDescriptor.DoNothing));
         }
 
         public virtual Task DoNothingWithComplexParameterAsAsync(List<Person> person)
@@ -99,11 +145,25 @@ namespace TestService.Core
             Send(request, PersonRepositoryDescriptor.DoNothingWithComplexParameter, GetCancellationToken(PersonRepositoryDescriptor.DoNothingWithComplexParameter));
         }
 
+        public virtual Task DoNothingWithComplexParameterAsync(List<Person> person)
+        {
+            var request = new DoNothingWithComplexParameterParameters();
+            request.Person = person;
+            return SendAsync(request, PersonRepositoryDescriptor.DoNothingWithComplexParameter, GetCancellationToken(PersonRepositoryDescriptor.DoNothingWithComplexParameter));
+        }
+
         public virtual int GetSimpleType(int arg)
         {
             var request = new GetSimpleTypeParameters();
             request.Arg = arg;
             return Send<int, GetSimpleTypeParameters>(request, PersonRepositoryDescriptor.GetSimpleType, GetCancellationToken(PersonRepositoryDescriptor.GetSimpleType));
+        }
+
+        public virtual Task<int> GetSimpleTypeAsync(int arg)
+        {
+            var request = new GetSimpleTypeParameters();
+            request.Arg = arg;
+            return SendAsync<int, GetSimpleTypeParameters>(request, PersonRepositoryDescriptor.GetSimpleType, GetCancellationToken(PersonRepositoryDescriptor.GetSimpleType));
         }
 
         public virtual Task GetSimpleTypeAsAsync(int arg)
@@ -120,6 +180,13 @@ namespace TestService.Core
             return Send<Person, GetSinglePersonParameters>(request, PersonRepositoryDescriptor.GetSinglePerson, GetCancellationToken(PersonRepositoryDescriptor.GetSinglePerson));
         }
 
+        public virtual Task<Person> GetSinglePersonAsync(Person person)
+        {
+            var request = new GetSinglePersonParameters();
+            request.Person = person;
+            return SendAsync<Person, GetSinglePersonParameters>(request, PersonRepositoryDescriptor.GetSinglePerson, GetCancellationToken(PersonRepositoryDescriptor.GetSinglePerson));
+        }
+
         public virtual Task<Person> GetSinglePersonAsAsync(Person person)
         {
             var request = new GetSinglePersonAsAsyncParameters();
@@ -132,6 +199,13 @@ namespace TestService.Core
             var request = new GetManyPersonsParameters();
             request.Person = person;
             return Send<List<Person>, GetManyPersonsParameters>(request, PersonRepositoryDescriptor.GetManyPersons, GetCancellationToken(PersonRepositoryDescriptor.GetManyPersons));
+        }
+
+        public virtual Task<List<Person>> GetManyPersonsAsync(Person person)
+        {
+            var request = new GetManyPersonsParameters();
+            request.Person = person;
+            return SendAsync<List<Person>, GetManyPersonsParameters>(request, PersonRepositoryDescriptor.GetManyPersons, GetCancellationToken(PersonRepositoryDescriptor.GetManyPersons));
         }
 
         public virtual Task<List<Person>> GetManyPersonsAsAsync(Person person)

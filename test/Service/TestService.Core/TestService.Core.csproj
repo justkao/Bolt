@@ -43,6 +43,7 @@
     <None Include="Generated\PersonRepository.Server.Designer.cs" />
     <Compile Include="IPersonRepository.cs" />
     <Compile Include="IPersonRepositoryInner.cs" />
+    <Compile Include="ParametersBase.cs" />
     <Compile Include="Person.cs" />
     <Compile Include="PersonRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

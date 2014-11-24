@@ -16,7 +16,7 @@ namespace Bolt.Generators
 
         public MethodDescriptor MethodDescriptor { get; set; }
 
-        public bool IncludeNamepsace { get; set; }
+        public bool IncludeNamespace { get; set; }
 
         public override void Generate()
         {
@@ -44,7 +44,7 @@ namespace Bolt.Generators
                     }
                 },
                 g => g.WriteAttribute<DataContractAttribute>(),
-                IncludeNamepsace);
+                IncludeNamespace);
         }
     }
 }

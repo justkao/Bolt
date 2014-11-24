@@ -1,4 +1,6 @@
-﻿using System.Reflection;
+﻿using System.Linq;
+using System.Reflection;
+using System.Threading;
 
 namespace Bolt.Generators
 {
@@ -23,15 +25,15 @@ namespace Bolt.Generators
 
         protected virtual ClassDescriptor GetParameterDescriptor(ContractDefinition contract, MethodInfo method)
         {
-            if (method.GetParameters().Length == 0)
+            if (contract.ParametersBase == null && method.GetParameters().Count(m => m.ParameterType != typeof(CancellationToken)) == 0)
             {
-                return null;
+                return new ClassDescriptor(typeof(Empty));
             }
 
             string ns = method.DeclaringType.Namespace + ".Parameters";
             string name = method.Name + "Parameters";
 
-            return new ClassDescriptor(name, ns);
+            return new ClassDescriptor(name, ns, contract.ParametersBase != null ? new[] { contract.ParametersBase.FullName } : new string[0] { });
         }
     }
 }

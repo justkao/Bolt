@@ -1,3 +1,6 @@
+using Bolt.Generators;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -5,11 +8,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-
-using Bolt.Generators;
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 
 namespace Bolt.Console
 {
@@ -72,7 +70,18 @@ namespace Bolt.Console
                 foreach (KeyValuePair<string, DocumentGenerator> documentGenerator in _documents)
                 {
                     string result = documentGenerator.Value.GetResult();
-                    File.WriteAllText(documentGenerator.Key, result);
+                    if (File.Exists(documentGenerator.Key))
+                    {
+                        string prev = File.ReadAllText(documentGenerator.Key);
+                        if (prev != result)
+                        {
+                            File.WriteAllText(documentGenerator.Key, result);
+                        }
+                    }
+                    else
+                    {
+                        File.WriteAllText(documentGenerator.Key, result);
+                    }
                 }
             }
             finally

@@ -111,10 +111,6 @@
       <Project>{9975CC72-8C2F-4515-B93D-A6A58324087C}</Project>
       <Name>TestService.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\TestService.Server\TestService.Server.Bolt.csproj">
-      <Project>{018058F0-31E9-4C23-A9D9-A338E6EB177B}</Project>
-      <Name>TestService.Server.Bolt</Name>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

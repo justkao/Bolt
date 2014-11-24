@@ -40,9 +40,7 @@ namespace Bolt.Generators
                         {
                             MethodDescriptor methodDescriptor = MetadataProvider.GetMethodDescriptor(ContractDefinition, method);
 
-                            string parametersType = HasParameters(method)
-                                                        ? methodDescriptor.Parameters.FullName
-                                                        : typeof(Empty).FullName;
+                            string parametersType = methodDescriptor.Parameters.FullName;
 
                             WriteLine(
                                 "{0} = Add(\"{0}\", typeof({1}), typeof({2}).GetTypeInfo().GetMethod(\"{3}\"));",

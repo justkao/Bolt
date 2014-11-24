@@ -93,14 +93,12 @@ namespace Bolt.Service.Test.Core
 
         public virtual void SimpleMethodWithCancellation(System.Threading.CancellationToken cancellation)
         {
-            var request = new SimpleMethodWithCancellationParameters();
-            Send(request, TestContractDescriptor.SimpleMethodWithCancellation, cancellation);
+            Send(Bolt.Empty.Instance, TestContractDescriptor.SimpleMethodWithCancellation, cancellation);
         }
 
         public virtual Task SimpleMethodWithCancellationAsync(System.Threading.CancellationToken cancellation)
         {
-            var request = new SimpleMethodWithCancellationParameters();
-            return SendAsync(request, TestContractDescriptor.SimpleMethodWithCancellation, cancellation);
+            return SendAsync(Bolt.Empty.Instance, TestContractDescriptor.SimpleMethodWithCancellation, cancellation);
         }
 
         public virtual CompositeType ComplexFunction()

@@ -218,7 +218,7 @@ namespace Bolt.Generators
 
         protected virtual GenerateRequestCodeResult GenerateRequestCode(MethodDescriptor methodDescriptor, Dictionary<ParameterInfo, string> variables)
         {
-            if (!methodDescriptor.HasParameters())
+            if (!methodDescriptor.HasParameterClass())
             {
                 return new GenerateRequestCodeResult()
                 {

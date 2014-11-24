@@ -44,16 +44,6 @@ namespace TestService.Core.Parameters
     }
 
     [DataContract]
-    public partial class DoLongRunningOperation2AsyncParameters
-    {
-    }
-
-    [DataContract]
-    public partial class LongRunningOperation2AsyncParameters
-    {
-    }
-
-    [DataContract]
     public partial class DoNothingWithComplexParameterAsAsyncParameters
     {
         [DataMember(Order = 1)]
@@ -120,8 +110,8 @@ namespace TestService.Core
             UpdatePerson = Add("UpdatePerson", typeof(TestService.Core.Parameters.UpdatePersonParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("UpdatePerson"));
             UpdatePersonThatThrowsInvalidOperationException = Add("UpdatePersonThatThrowsInvalidOperationException", typeof(TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("UpdatePersonThatThrowsInvalidOperationException"));
             DoLongRunningOperationAsync = Add("DoLongRunningOperationAsync", typeof(TestService.Core.Parameters.DoLongRunningOperationAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoLongRunningOperationAsync"));
-            DoLongRunningOperation2Async = Add("DoLongRunningOperation2Async", typeof(TestService.Core.Parameters.DoLongRunningOperation2AsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoLongRunningOperation2Async"));
-            LongRunningOperation2Async = Add("LongRunningOperation2Async", typeof(TestService.Core.Parameters.LongRunningOperation2AsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("LongRunningOperation2Async"));
+            DoLongRunningOperation2Async = Add("DoLongRunningOperation2Async", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoLongRunningOperation2Async"));
+            LongRunningOperation2Async = Add("LongRunningOperation2Async", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("LongRunningOperation2Async"));
             DoNothingAsAsync = Add("DoNothingAsAsync", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingAsAsync"));
             DoNothing = Add("DoNothing", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothing"));
             DoNothingWithComplexParameterAsAsync = Add("DoNothingWithComplexParameterAsAsync", typeof(TestService.Core.Parameters.DoNothingWithComplexParameterAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingWithComplexParameterAsAsync"));

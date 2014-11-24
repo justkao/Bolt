@@ -23,7 +23,7 @@ namespace Bolt.Generators
 
         public ClassDescriptor Parameters { get; private set; }
 
-        public bool HasParameters()
+        public bool HasParameterClass()
         {
             return Parameters != null && Parameters.FullName != typeof(Empty).FullName;
         }

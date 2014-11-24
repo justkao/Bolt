@@ -99,7 +99,10 @@ namespace Bolt.Console
                 excluded = Excluded.Select(TypeHelper.GetTypeOrThrow).ToList();
             }
 
-            return new ContractDefinition(type, excluded.ToArray());
+            return new ContractDefinition(type, excluded.ToArray())
+            {
+                ParametersBase = string.IsNullOrEmpty(ParametersBase) ? null : TypeHelper.GetTypeOrThrow(ParametersBase)
+            };
         }
 
     }

@@ -68,7 +68,6 @@ namespace Bolt.Server
 
         protected virtual async Task TestContract_SimpleMethodWithCancellation(Bolt.Server.ServerExecutionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<SimpleMethodWithCancellationParameters>(context);
             var instance = await InstanceProvider.GetInstanceAsync<ITestContract>(context);
             instance.SimpleMethodWithCancellation(context.CallCancelled);
             await ResponseHandler.Handle(context);

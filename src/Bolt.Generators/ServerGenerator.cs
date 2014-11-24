@@ -109,7 +109,7 @@ namespace Bolt.Generators
 
         private void WriteInvocationMethodBody(MethodDescriptor methodDescriptor)
         {
-            if (methodDescriptor.HasParameters())
+            if (methodDescriptor.HasParameterClass())
             {
                 AddUsings(methodDescriptor.Parameters.Namespace);
                 WriteLine("var parameters = await DataHandler.ReadParametersAsync<{0}>(context);", methodDescriptor.Parameters.Name);
@@ -133,7 +133,7 @@ namespace Bolt.Generators
         {
             string parametersBody = string.Empty;
 
-            if (method.HasParameters())
+            if (method.GetAllParameters().Any())
             {
                 StringBuilder sb = new StringBuilder();
 

@@ -1,5 +1,5 @@
-using System.Threading.Tasks;
 using Bolt.Server;
+using System.Threading.Tasks;
 
 namespace Bolt.Service.Test
 {
@@ -7,9 +7,9 @@ namespace Bolt.Service.Test
     {
         public object CurrentInstance { get; set; }
 
-        public async Task<T> GetInstanceAsync<T>(ServerExecutionContext context)
+        public Task<T> GetInstanceAsync<T>(ServerExecutionContext context)
         {
-            return (T)CurrentInstance;
+            return Task.FromResult((T)CurrentInstance);
         }
     }
 }

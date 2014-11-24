@@ -30,11 +30,6 @@ namespace Bolt.Service.Test.Core.Parameters
     }
 
     [DataContract]
-    public partial class SimpleMethodWithCancellationParameters
-    {
-    }
-
-    [DataContract]
     public partial class SimpleMethodWithComplexParameterParameters
     {
         [DataMember(Order = 1)]
@@ -65,7 +60,7 @@ namespace Bolt.Service.Test.Core
             SimpleMethodWithSimpleArguments = Add("SimpleMethodWithSimpleArguments", typeof(Bolt.Service.Test.Core.Parameters.SimpleMethodWithSimpleArgumentsParameters), typeof(ITestContract).GetTypeInfo().GetMethod("SimpleMethodWithSimpleArguments"));
             SimpleMethod = Add("SimpleMethod", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("SimpleMethod"));
             SimpleMethodExAsync = Add("SimpleMethodExAsync", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("SimpleMethodExAsync"));
-            SimpleMethodWithCancellation = Add("SimpleMethodWithCancellation", typeof(Bolt.Service.Test.Core.Parameters.SimpleMethodWithCancellationParameters), typeof(ITestContract).GetTypeInfo().GetMethod("SimpleMethodWithCancellation"));
+            SimpleMethodWithCancellation = Add("SimpleMethodWithCancellation", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("SimpleMethodWithCancellation"));
             ComplexFunction = Add("ComplexFunction", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("ComplexFunction"));
             SimpleMethodWithComplexParameter = Add("SimpleMethodWithComplexParameter", typeof(Bolt.Service.Test.Core.Parameters.SimpleMethodWithComplexParameterParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleMethodWithComplexParameter"));
             SimpleFunction = Add("SimpleFunction", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleFunction"));

@@ -21,7 +21,7 @@ namespace Bolt.Generators
             List<MethodDescriptor> methods =
                 ContractDefinition.GetEffectiveMethods()
                     .Select(m => MetadataProvider.GetMethodDescriptor(ContractDefinition, m))
-                    .Where(m => m.HasParameters())
+                    .Where(m => m.HasParameterClass())
                     .ToList();
 
             foreach (IGrouping<string, MethodDescriptor> grouping in methods.GroupBy(m => m.Parameters.Namespace))
@@ -32,8 +32,14 @@ namespace Bolt.Generators
                     {
                         ParametersGenerator parametersGenerator = new ParametersGenerator(method, Output, Formatter, IntendProvider)
                         {
-                            IncludeNamepsace = false
+                            IncludeNamespace = false
                         };
+
+                        if (!method.HasParameterClass())
+                        {
+                            continue;
+                        }
+
                         parametersGenerator.Generate();
                     }
                 }

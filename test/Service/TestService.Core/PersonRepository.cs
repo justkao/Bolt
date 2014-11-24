@@ -28,9 +28,9 @@ namespace TestService.Core
             return Task.Delay(TimeSpan.FromMinutes(1), cancellation);
         }
 
-        public void LongRunningOperation2Async(CancellationToken cancellation)
+        public async Task LongRunningOperation2Async(CancellationToken cancellation)
         {
-            Task.Delay(TimeSpan.FromMinutes(1), cancellation).GetAwaiter().GetResult();
+            await Task.Delay(TimeSpan.FromMinutes(1), cancellation);
         }
 
         public Task DoNothingAsAsync()

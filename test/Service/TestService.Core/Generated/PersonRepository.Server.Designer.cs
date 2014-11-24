@@ -80,7 +80,6 @@ namespace Bolt.Server
 
         protected virtual async Task PersonRepository_DoLongRunningOperation2Async(Bolt.Server.ServerExecutionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<DoLongRunningOperation2AsyncParameters>(context);
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
             await instance.DoLongRunningOperation2Async(context.CallCancelled);
             await ResponseHandler.Handle(context);
@@ -88,9 +87,8 @@ namespace Bolt.Server
 
         protected virtual async Task PersonRepository_LongRunningOperation2Async(Bolt.Server.ServerExecutionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<LongRunningOperation2AsyncParameters>(context);
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
-            instance.LongRunningOperation2Async(context.CallCancelled);
+            await instance.LongRunningOperation2Async(context.CallCancelled);
             await ResponseHandler.Handle(context);
         }
 
