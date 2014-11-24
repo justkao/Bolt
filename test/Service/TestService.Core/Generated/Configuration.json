@@ -1,0 +1,10 @@
+﻿{
+    "contracts": [
+        {
+            "contract": "TestService.Core.IPersonRepository",
+            "assemblies": [ "TestService.Core.dll" ],
+            "client": {},
+            "server": {}
+        }
+    ]
+}

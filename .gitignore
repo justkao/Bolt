@@ -35,3 +35,12 @@
 /test/Automatic/Bolt.Service.Test/bin/Debug
 /test/Automatic/Bolt.Service.Test/obj/Debug
 /Bolt.sln.DotSettings.user
+/src/Bolt.Console/bin/Debug
+/src/Bolt.Console/obj/Debug
+/src/Bolt.Server/SigningKey.snk
+*.snk
+/src/Bolt.Core.Serialization/bin/Debug
+/src/Bolt.Core.Serialization/obj/Debug
+/test/Console/Bolt.Console.Test/bin/Debug
+/test/Console/Bolt.Console.Test/obj/Debug
+/test/Console/Bolt.Console.Test.Contracts/obj/Debug

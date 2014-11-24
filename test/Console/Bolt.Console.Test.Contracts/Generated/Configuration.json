@@ -1,0 +1,10 @@
+﻿{
+    "contracts": [
+        {
+            "contract": "Bolt.Console.Test.Contracts.IPersonRepository",
+            "assemblies": [ "Bolt.Console.Test.Contracts.dll" ],
+            "client": {},
+            "server": {}
+        }
+    ]
+}
