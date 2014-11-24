@@ -1,13 +1,13 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-using Bolt.Client;
+﻿using Bolt.Client;
 using Bolt.Core.Serialization;
 using Bolt.Server;
 using Bolt.Service.Test.Core;
 using Microsoft.Owin.Hosting;
 using Moq;
 using NUnit.Framework;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Bolt.Service.Test
 {
@@ -261,7 +261,7 @@ namespace Bolt.Service.Test
             return mock;
         }
 
-        public virtual ITestContractAsync GetChannel()
+        public virtual TestContractChannel GetChannel()
         {
             TestContractChannelFactory factory = new TestContractChannelFactory()
                                                      {

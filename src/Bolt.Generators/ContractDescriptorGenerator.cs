@@ -60,7 +60,7 @@ namespace Bolt.Generators
                     foreach (MethodInfo method in methods)
                     {
                         MethodDescriptor methodDescriptor = MetadataProvider.GetMethodDescriptor(ContractDefinition, method);
-                        g.WritePublicProperty(FormatType<ActionDescriptor>(), methodDescriptor.Name);
+                        g.WritePublicReadonlyProperty(FormatType<ActionDescriptor>(), methodDescriptor.Name);
                         if (!Equals(method, methods.Last()))
                         {
                             WriteLine();

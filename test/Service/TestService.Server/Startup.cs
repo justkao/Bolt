@@ -1,7 +1,4 @@
-﻿
-using Bolt;
-using Bolt.Console.Test.Contracts;
-using Bolt.Core.Serialization;
+﻿using Bolt.Core.Serialization;
 using Bolt.Server;
 
 using Owin;

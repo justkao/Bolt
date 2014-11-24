@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 
 namespace Bolt
@@ -26,6 +27,11 @@ namespace Bolt
         public Type Type { get; private set; }
 
         public string Name { get; private set; }
+
+        public ActionDescriptor Find(MethodInfo info)
+        {
+            return this.FirstOrDefault(v => Equals(v.Method, info));
+        }
 
         private readonly List<ActionDescriptor> _actions = new List<ActionDescriptor>();
 

@@ -3,7 +3,6 @@ using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
 
-
 namespace Bolt.Client
 {
     public partial class Channel
@@ -29,10 +28,12 @@ namespace Bolt.Client
             ActionDescriptor descriptor,
             CancellationToken cancellation)
         {
-            return RetrieveResponse<T, TParameters>(ConnectionProvider, parameters, descriptor, cancellation);
+            return RetrieveResponse<T, TParameters>(ConnectionProvider, parameters, descriptor, cancellation, Retries, RetryDelay);
         }
 
-        protected virtual T RetrieveResponse<T, TParameters>(IConnectionProvider connectionProvider, TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        protected virtual T RetrieveResponse<T, TParameters>(IConnectionProvider connectionProvider,
+            TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation, int retries = 0,
+            TimeSpan? retryDelay = null)
         {
             int tries = 0;
             while (true)
@@ -86,14 +87,19 @@ namespace Bolt.Client
                 cancellation.ThrowIfCancellationRequested();
 
                 tries++;
-                if (tries > Retries)
+                if (tries > retries)
                 {
-                    OnProxyFailed(connectionProvider, channel.Server, error, descriptor);
+
+                    if (connectionProvider == ConnectionProvider)
+                    {
+                        OnProxyFailed(connectionProvider, channel.Server, error, descriptor);
+                    }
+
                     throw error;
                 }
-                if (RetryDelay != null)
+                if (retryDelay != null)
                 {
-                    TaskExtensions.Sleep(RetryDelay.Value, cancellation);
+                    TaskExtensions.Sleep(retryDelay.Value, cancellation);
                 }
             }
         }
@@ -117,10 +123,12 @@ namespace Bolt.Client
             ActionDescriptor descriptor,
             CancellationToken cancellation)
         {
-            return RetrieveResponseAsync<T, TParameters>(ConnectionProvider, parameters, descriptor, cancellation);
+            return RetrieveResponseAsync<T, TParameters>(ConnectionProvider, parameters, descriptor, cancellation, Retries, RetryDelay);
         }
 
-        protected virtual async Task<T> RetrieveResponseAsync<T, TParameters>(IConnectionProvider connectionProvider, TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        protected virtual async Task<T> RetrieveResponseAsync<T, TParameters>(IConnectionProvider connectionProvider,
+            TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation, int retries = 0,
+            TimeSpan? retryDelay = null)
         {
             int tries = 0;
             while (true)
@@ -148,7 +156,9 @@ namespace Bolt.Client
                     error = e;
                 }
 
-                using (ClientExecutionContext context = new ClientExecutionContext(descriptor, channel.Request, channel.Server, cancellation, connectionProvider))
+                using (
+                    ClientExecutionContext context = new ClientExecutionContext(descriptor, channel.Request,
+                        channel.Server, cancellation, connectionProvider))
                 {
                     if (error != null)
                     {
@@ -161,7 +171,8 @@ namespace Bolt.Client
 
                     if (channel.IsValid())
                     {
-                        ResponseDescriptor<T> response = await RetrieveResponseAsync<T, TParameters>(context, parameters, tries);
+                        ResponseDescriptor<T> response =
+                            await RetrieveResponseAsync<T, TParameters>(context, parameters, tries);
                         if (response.IsSuccess)
                         {
                             return response.GetResultOrThrow();
@@ -174,14 +185,18 @@ namespace Bolt.Client
                 cancellation.ThrowIfCancellationRequested();
 
                 tries++;
-                if (tries > Retries)
+                if (tries > retries)
                 {
-                    OnProxyFailed(connectionProvider, channel.Server, error, descriptor);
+                    if (connectionProvider == ConnectionProvider)
+                    {
+                        OnProxyFailed(connectionProvider, channel.Server, error, descriptor);
+                    }
+
                     throw error;
                 }
-                if (RetryDelay != null)
+                if (retryDelay != null)
                 {
-                    await Task.Delay(RetryDelay.Value, cancellation);
+                    await Task.Delay(retryDelay.Value, cancellation);
                 }
             }
         }

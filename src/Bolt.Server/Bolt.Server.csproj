@@ -34,7 +34,8 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>SigningKey.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Owin">
@@ -73,6 +74,7 @@
     <Compile Include="ServerConfiguration.cs" />
     <Compile Include="SimpleInstanceProvider.cs" />
     <Compile Include="StateFullInstanceProvider.cs" />
+    <Compile Include="StaticInstanceProvider.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Bolt.Core\Bolt.Core.csproj">
@@ -82,7 +84,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="SigningKey.snk" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -140,43 +140,43 @@ namespace TestService.Core
 
         public static readonly PersonRepositoryDescriptor Default = new PersonRepositoryDescriptor();
 
-        public virtual Bolt.ActionDescriptor UpdatePerson { get; set; }
+        public virtual Bolt.ActionDescriptor UpdatePerson { get; private set; }
 
-        public virtual Bolt.ActionDescriptor UpdatePersonThatThrowsInvalidOperationException { get; set; }
+        public virtual Bolt.ActionDescriptor UpdatePersonThatThrowsInvalidOperationException { get; private set; }
 
-        public virtual Bolt.ActionDescriptor DoLongRunningOperationAsync { get; set; }
+        public virtual Bolt.ActionDescriptor DoLongRunningOperationAsync { get; private set; }
 
-        public virtual Bolt.ActionDescriptor DoLongRunningOperation2Async { get; set; }
+        public virtual Bolt.ActionDescriptor DoLongRunningOperation2Async { get; private set; }
 
-        public virtual Bolt.ActionDescriptor LongRunningOperation2Async { get; set; }
+        public virtual Bolt.ActionDescriptor LongRunningOperation2Async { get; private set; }
 
-        public virtual Bolt.ActionDescriptor DoNothingAsAsync { get; set; }
+        public virtual Bolt.ActionDescriptor DoNothingAsAsync { get; private set; }
 
-        public virtual Bolt.ActionDescriptor DoNothing { get; set; }
+        public virtual Bolt.ActionDescriptor DoNothing { get; private set; }
 
-        public virtual Bolt.ActionDescriptor DoNothingWithComplexParameterAsAsync { get; set; }
+        public virtual Bolt.ActionDescriptor DoNothingWithComplexParameterAsAsync { get; private set; }
 
-        public virtual Bolt.ActionDescriptor DoNothingWithComplexParameter { get; set; }
+        public virtual Bolt.ActionDescriptor DoNothingWithComplexParameter { get; private set; }
 
-        public virtual Bolt.ActionDescriptor GetSimpleType { get; set; }
+        public virtual Bolt.ActionDescriptor GetSimpleType { get; private set; }
 
-        public virtual Bolt.ActionDescriptor GetSimpleTypeAsAsync { get; set; }
+        public virtual Bolt.ActionDescriptor GetSimpleTypeAsAsync { get; private set; }
 
-        public virtual Bolt.ActionDescriptor GetSinglePerson { get; set; }
+        public virtual Bolt.ActionDescriptor GetSinglePerson { get; private set; }
 
-        public virtual Bolt.ActionDescriptor GetSinglePersonAsAsync { get; set; }
+        public virtual Bolt.ActionDescriptor GetSinglePersonAsAsync { get; private set; }
 
-        public virtual Bolt.ActionDescriptor GetManyPersons { get; set; }
+        public virtual Bolt.ActionDescriptor GetManyPersons { get; private set; }
 
-        public virtual Bolt.ActionDescriptor GetManyPersonsAsAsync { get; set; }
+        public virtual Bolt.ActionDescriptor GetManyPersonsAsAsync { get; private set; }
 
-        public virtual Bolt.ActionDescriptor InnerOperation { get; set; }
+        public virtual Bolt.ActionDescriptor InnerOperation { get; private set; }
 
-        public virtual Bolt.ActionDescriptor InnerOperationExAsync { get; set; }
+        public virtual Bolt.ActionDescriptor InnerOperationExAsync { get; private set; }
 
-        public virtual Bolt.ActionDescriptor InnerOperation2 { get; set; }
+        public virtual Bolt.ActionDescriptor InnerOperation2 { get; private set; }
 
-        public virtual Bolt.ActionDescriptor InnerOperationExAsync2 { get; set; }
+        public virtual Bolt.ActionDescriptor InnerOperationExAsync2 { get; private set; }
     }
 }
 

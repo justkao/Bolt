@@ -72,6 +72,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -79,6 +80,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\TestService.Core\Generated\PersonRepository.Contract.Designer.cs">
+      <Link>PersonRepository.Contract.Designer.cs</Link>
+    </Compile>
+    <Compile Include="..\TestService.Core\Generated\PersonRepository.Server.Designer.cs">
+      <Link>PersonRepository.Server.Designer.cs</Link>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -95,10 +102,6 @@
     <ProjectReference Include="..\..\..\src\Bolt.Core\Bolt.Core.csproj">
       <Project>{6d1f7d95-3346-4308-8b6f-2b5aab0d022f}</Project>
       <Name>Bolt.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\Console\Bolt.Console.Test.Contracts\Bolt.Console.Test.Contracts.csproj">
-      <Project>{365A8974-3DD9-4F32-B23E-2FEAE6B14015}</Project>
-      <Name>Bolt.Console.Test.Contracts</Name>
     </ProjectReference>
     <ProjectReference Include="..\TestService.Core\TestService.Core.csproj">
       <Project>{9975CC72-8C2F-4515-B93D-A6A58324087C}</Project>

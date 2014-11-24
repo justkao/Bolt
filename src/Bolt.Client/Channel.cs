@@ -3,7 +3,6 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-
 namespace Bolt.Client
 {
     public partial class Channel : IChannel
@@ -101,6 +100,13 @@ namespace Bolt.Client
 
         protected virtual ResponseDescriptor<T> RetrieveResponse<T, TParameters>(ClientExecutionContext context, TParameters parameters, int retry = 0)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+
+            ValidateParameters(parameters, context);
+
             context.Cancellation.ThrowIfCancellationRequested();
 
             BeforeSending(context, parameters);
@@ -169,6 +175,13 @@ namespace Bolt.Client
 
         protected virtual async Task<ResponseDescriptor<T>> RetrieveResponseAsync<T, TParameters>(ClientExecutionContext context, TParameters parameters, int retry = 0)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+
+            ValidateParameters(parameters, context);
+
             BeforeSending(context, parameters);
             ResponseDescriptor<T> response = await RequestForwarder.GetResponseAsync<T, TParameters>(context, parameters);
 
@@ -305,6 +318,37 @@ namespace Bolt.Client
             public bool IsValid()
             {
                 return Request != null;
+            }
+        }
+
+        private void ValidateParameters<TParams>(TParams parameters, ClientExecutionContext context)
+        {
+            if (!context.ActionDescriptor.HasParameters)
+            {
+                if (context.ActionDescriptor.Parameters != typeof(Empty))
+                {
+                    throw new InvalidOperationException(
+                        string.Format(
+                            "Invalid parameters type provided for action '{0}'. Expected parameter type object should be '{1}', but was '{2}' instead.",
+                            context.ActionDescriptor.Name, typeof(Empty).FullName, typeof(TParams).FullName));
+                }
+            }
+            else
+            {
+                if (Equals(parameters, default(TParams)))
+                {
+                    throw new InvalidOperationException(string.Format("Parameters must not be null. Action '{0}'.",
+                        context.ActionDescriptor.Name));
+                }
+
+                if (context.ActionDescriptor.Parameters != typeof(TParams))
+                {
+                    throw new InvalidOperationException(
+                        string.Format(
+                            "Invalid parameters type provided for action '{0}'. Expected parameter type object should be '{1}', but was '{2}' instead.",
+                            context.ActionDescriptor.Name, typeof(TParams).FullName, typeof(TParams).FullName));
+                }
+
             }
         }
 
