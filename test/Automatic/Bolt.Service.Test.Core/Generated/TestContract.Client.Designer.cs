@@ -54,11 +54,11 @@ namespace Bolt.Service.Test.Core
         {
             get
             {
-                return TestContractDescriptor;
+                return this.TestContractDescriptor;
             }
             set
             {
-                TestContractDescriptor = value;
+                this.TestContractDescriptor = value;
             }
         }
 

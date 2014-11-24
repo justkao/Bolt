@@ -6,12 +6,13 @@ namespace Bolt.Client
 {
     public class ClientExecutionContext : ExecutionContextBase, IDisposable
     {
-        public ClientExecutionContext(ActionDescriptor actionDescriptor, HttpWebRequest request, Uri server, CancellationToken cancellation)
+        public ClientExecutionContext(ActionDescriptor actionDescriptor, HttpWebRequest request, Uri server, CancellationToken cancellation, IConnectionProvider connectionProvider)
             : base(actionDescriptor)
         {
             Request = request;
             Server = server;
             Cancellation = cancellation;
+            ConnectionProvider = connectionProvider;
         }
 
         public Uri Server { get; private set; }
@@ -20,7 +21,9 @@ namespace Bolt.Client
 
         public CancellationToken Cancellation { get; private set; }
 
-        public HttpWebResponse Response { get; internal set; }
+        public HttpWebResponse Response { get; set; }
+
+        public IConnectionProvider ConnectionProvider { get; private set; }
 
         public void Dispose()
         {

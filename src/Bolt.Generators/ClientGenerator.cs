@@ -48,6 +48,8 @@ namespace Bolt.Generators
 
         public string Namespace { get; set; }
 
+        public string Name { get; set; }
+
         public string BaseClass
         {
             get
@@ -83,12 +85,12 @@ namespace Bolt.Generators
                         WriteLine("get");
                         using (WithBlock())
                         {
-                            WriteLine("return {0};", ContractDescriptorProperty);
+                            WriteLine("return this.{0};", ContractDescriptorProperty);
                         }
                         WriteLine("set");
                         using (WithBlock())
                         {
-                            WriteLine("{0} = value;", ContractDescriptorProperty);
+                            WriteLine("this.{0} = value;", ContractDescriptorProperty);
                         }
                     }
                     WriteLine();
@@ -264,7 +266,7 @@ namespace Bolt.Generators
             string descriptorProvider = FormatDescriptorProvider();
 
             return new ClassDescriptor(
-                ContractDefinition.Name + Suffix,
+                Name ?? ContractDefinition.Name + Suffix,
                 Namespace ?? ContractDefinition.Namespace,
                 BaseClass,
                 ContractDefinition.Root.FullName,

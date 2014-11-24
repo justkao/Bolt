@@ -37,6 +37,8 @@ namespace Bolt.Generators
 
         public string Namespace { get; set; }
 
+        public string Name { get; set; }
+
         public override void Generate()
         {
             AddUsings(BoltServerNamespace);
@@ -93,10 +95,10 @@ namespace Bolt.Generators
         {
             if (String.IsNullOrEmpty(BaseClass))
             {
-                return new ClassDescriptor(ContractDefinition.Name + Suffix, Namespace ?? BoltServerNamespace);
+                return new ClassDescriptor(Name ?? ContractDefinition.Name + Suffix, Namespace ?? BoltServerNamespace);
             }
 
-            return new ClassDescriptor(ContractDefinition.Name + Suffix, Namespace ?? BoltServerNamespace, BaseClass);
+            return new ClassDescriptor(Name ?? ContractDefinition.Name + Suffix, Namespace ?? BoltServerNamespace, BaseClass);
         }
 
         private void WriteInvocationMethod(MethodDescriptor methodDescriptor, ClassGenerator classGenerator)

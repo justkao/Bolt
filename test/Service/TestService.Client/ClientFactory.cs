@@ -11,7 +11,7 @@ namespace TestService.Client
         public static IPersonRepository CreateIISBolt()
         {
             PersonRepositoryChannel repository = new PersonRepositoryChannel();
-            repository.ConnectionProvider = new ConnectionProvider(() => Servers.IISBoltServer);
+            repository.ConnectionProvider = new ConnectionProvider(Servers.IISBoltServer);
             repository.Prefix = Servers.Prefix;
             repository.PersonRepositoryDescriptor = new PersonRepositoryDescriptor();
             repository.Retries = 10;
@@ -28,7 +28,7 @@ namespace TestService.Client
             repository.PersonRepositoryDescriptor = new PersonRepositoryDescriptor();
             repository.Retries = 10;
             repository.RetryDelay = TimeSpan.FromSeconds(2);
-            repository.ConnectionProvider = new ConnectionProvider(() => Servers.BoltServer);
+            repository.ConnectionProvider = new ConnectionProvider(Servers.BoltServer);
             new ClientConfiguration(new JsonSerializer(), new JsonExceptionSerializer()).Update(repository);
             return repository;
         }

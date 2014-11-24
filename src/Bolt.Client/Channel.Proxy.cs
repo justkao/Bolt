@@ -24,7 +24,15 @@ namespace Bolt.Client
             return RetrieveResponse<TResult, TRequestParameters>(parameters, descriptor, cancellation);
         }
 
-        protected virtual T RetrieveResponse<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        protected virtual T RetrieveResponse<T, TParameters>(
+            TParameters parameters,
+            ActionDescriptor descriptor,
+            CancellationToken cancellation)
+        {
+            return RetrieveResponse<T, TParameters>(ConnectionProvider, parameters, descriptor, cancellation);
+        }
+
+        protected virtual T RetrieveResponse<T, TParameters>(IConnectionProvider connectionProvider, TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
             int tries = 0;
             while (true)
@@ -36,7 +44,7 @@ namespace Bolt.Client
 
                 try
                 {
-                    channel = OpenConnection(descriptor, cancellation);
+                    channel = OpenConnection(connectionProvider, descriptor, cancellation);
                 }
                 catch (OperationCanceledException)
                 {
@@ -52,13 +60,13 @@ namespace Bolt.Client
                     error = e;
                 }
 
-                using (ClientExecutionContext context = new ClientExecutionContext(descriptor, channel.Request, channel.Server, cancellation))
+                using (ClientExecutionContext context = new ClientExecutionContext(descriptor, channel.Request, channel.Server, cancellation, connectionProvider))
                 {
                     if (error != null)
                     {
                         if (!HandleCommunicationError(context, error, tries))
                         {
-                            ConnectionProvider.CloseConnection(channel.Server);
+                            connectionProvider.CloseConnection(channel.Server);
                             throw error;
                         }
                     }
@@ -80,7 +88,7 @@ namespace Bolt.Client
                 tries++;
                 if (tries > Retries)
                 {
-                    OnProxyFailed(channel.Server, error, descriptor);
+                    OnProxyFailed(connectionProvider, channel.Server, error, descriptor);
                     throw error;
                 }
                 if (RetryDelay != null)
@@ -104,7 +112,15 @@ namespace Bolt.Client
             return await RetrieveResponseAsync<TResult, TRequestParameters>(parameters, descriptor, cancellation);
         }
 
-        protected virtual async Task<T> RetrieveResponseAsync<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        protected virtual Task<T> RetrieveResponseAsync<T, TParameters>(
+            TParameters parameters,
+            ActionDescriptor descriptor,
+            CancellationToken cancellation)
+        {
+            return RetrieveResponseAsync<T, TParameters>(ConnectionProvider, parameters, descriptor, cancellation);
+        }
+
+        protected virtual async Task<T> RetrieveResponseAsync<T, TParameters>(IConnectionProvider connectionProvider, TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
             int tries = 0;
             while (true)
@@ -116,7 +132,7 @@ namespace Bolt.Client
 
                 try
                 {
-                    channel = await OpenConnectionAsync(descriptor, cancellation);
+                    channel = await OpenConnectionAsync(connectionProvider, descriptor, cancellation);
                 }
                 catch (OperationCanceledException)
                 {
@@ -132,13 +148,13 @@ namespace Bolt.Client
                     error = e;
                 }
 
-                using (ClientExecutionContext context = new ClientExecutionContext(descriptor, channel.Request, channel.Server, cancellation))
+                using (ClientExecutionContext context = new ClientExecutionContext(descriptor, channel.Request, channel.Server, cancellation, connectionProvider))
                 {
                     if (error != null)
                     {
                         if (!HandleCommunicationError(context, error, tries))
                         {
-                            ConnectionProvider.CloseConnection(channel.Server);
+                            connectionProvider.CloseConnection(channel.Server);
                             throw error;
                         }
                     }
@@ -160,7 +176,7 @@ namespace Bolt.Client
                 tries++;
                 if (tries > Retries)
                 {
-                    OnProxyFailed(channel.Server, error, descriptor);
+                    OnProxyFailed(connectionProvider, channel.Server, error, descriptor);
                     throw error;
                 }
                 if (RetryDelay != null)

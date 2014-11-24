@@ -1,4 +1,5 @@
-﻿using Bolt.Client;
+﻿
+using Bolt.Client;
 using Bolt.Generators;
 
 namespace Bolt.Console
@@ -13,6 +14,8 @@ namespace Bolt.Console
 
         public string Namespace { get; set; }
 
+        public string Name { get; set; }
+
         public string Suffix { get; set; }
 
         protected override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
@@ -22,7 +25,8 @@ namespace Bolt.Console
                                     ForceAsync = ForceAsync,
                                     ContractDefinition = definition,
                                     GenerateFactory = GenerateFactory,
-                                    Namespace = Namespace
+                                    Namespace = Namespace,
+                                    Name = Name
                                 };
 
             if (CustomBaseClass)

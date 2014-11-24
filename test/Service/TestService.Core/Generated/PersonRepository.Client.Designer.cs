@@ -27,11 +27,11 @@ namespace TestService.Core
         {
             get
             {
-                return PersonRepositoryDescriptor;
+                return this.PersonRepositoryDescriptor;
             }
             set
             {
-                PersonRepositoryDescriptor = value;
+                this.PersonRepositoryDescriptor = value;
             }
         }
 

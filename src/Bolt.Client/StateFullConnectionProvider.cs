@@ -9,17 +9,13 @@ namespace Bolt.Client
         private readonly object _syncRoot = new object();
         private bool _asyncConnectionOpening;
 
-        public StateFullConnectionProvider()
+        public StateFullConnectionProvider(IServerProvider serverProvider)
+            : base(serverProvider)
         {
         }
 
         public StateFullConnectionProvider(Uri serverUri)
             : base(serverUri)
-        {
-        }
-
-        public StateFullConnectionProvider(Func<Uri> serverProvider)
-            : base(serverProvider)
         {
         }
 

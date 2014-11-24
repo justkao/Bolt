@@ -27,11 +27,11 @@ namespace Bolt.Console.Test.Contracts
         {
             get
             {
-                return PersonRepositoryDescriptor;
+                return this.PersonRepositoryDescriptor;
             }
             set
             {
-                PersonRepositoryDescriptor = value;
+                this.PersonRepositoryDescriptor = value;
             }
         }
 

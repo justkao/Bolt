@@ -117,7 +117,6 @@ namespace Bolt.Client
                 case ResponseErrorType.Deserialization:
                     throw response.Error;
                 case ResponseErrorType.Communication:
-                    ConnectionProvider.ConnectionFailed(context.Server, response.Error);
                     if (!HandleCommunicationError(context, response.Error, retry))
                     {
                         throw response.Error;
@@ -134,9 +133,9 @@ namespace Bolt.Client
             return response;
         }
 
-        protected virtual ConnectionOpenedResult OpenConnection(ActionDescriptor action, CancellationToken cancellation)
+        protected virtual ConnectionOpenedResult OpenConnection(IConnectionProvider connectionProvider, ActionDescriptor action, CancellationToken cancellation)
         {
-            ConnectionDescriptor connection = ConnectionProvider.GetConnection(descriptor => OnConnectionOpening(descriptor, cancellation), cancellation);
+            ConnectionDescriptor connection = connectionProvider.GetConnection(descriptor => OnConnectionOpening(descriptor, cancellation), cancellation);
             HttpWebRequest request = CreateWebRequest(CrateRemoteAddress(connection.Server, action), connection.SessionId);
             return new ConnectionOpenedResult(request, connection.Server);
         }
@@ -145,20 +144,20 @@ namespace Bolt.Client
         {
         }
 
-        protected virtual TResult Open<TResult, TParameters>(ConnectionDescriptor connectionDescriptor, ActionDescriptor descriptor, TParameters parameters, CancellationToken cancellation)
+        protected virtual TResult Open<TResult, TParameters>(IConnectionProvider connectionProvider, ConnectionDescriptor connectionDescriptor, ActionDescriptor descriptor, TParameters parameters, CancellationToken cancellation)
         {
             HttpWebRequest request = CreateWebRequest(
                 CrateRemoteAddress(connectionDescriptor.Server, descriptor),
                 connectionDescriptor.SessionId);
 
 
-            using (ClientExecutionContext ctxt = new ClientExecutionContext(descriptor, request, connectionDescriptor.Server, cancellation))
+            using (ClientExecutionContext ctxt = new ClientExecutionContext(descriptor, request, connectionDescriptor.Server, cancellation, connectionProvider))
             {
                 BeforeSending(ctxt, parameters);
                 ResponseDescriptor<TResult> response = RequestForwarder.GetResponse<TResult, TParameters>(ctxt, parameters);
                 if (response.ErrorType == ResponseErrorType.Communication)
                 {
-                    ConnectionProvider.ConnectionFailed(ctxt.Server, response.Error);
+                    connectionProvider.ConnectionFailed(ctxt.Server, response.Error);
                 }
                 return response.GetResultOrThrow();
             }
@@ -200,9 +199,9 @@ namespace Bolt.Client
             return response;
         }
 
-        protected virtual async Task<ConnectionOpenedResult> OpenConnectionAsync(ActionDescriptor action, CancellationToken cancellation)
+        protected virtual async Task<ConnectionOpenedResult> OpenConnectionAsync(IConnectionProvider connectionProvider, ActionDescriptor action, CancellationToken cancellation)
         {
-            ConnectionDescriptor connection = await ConnectionProvider.GetConnectionAsync(descriptor => OnConnectionOpeningAsync(descriptor, cancellation), cancellation);
+            ConnectionDescriptor connection = await connectionProvider.GetConnectionAsync(descriptor => OnConnectionOpeningAsync(descriptor, cancellation), cancellation);
             HttpWebRequest requets = CreateWebRequest(CrateRemoteAddress(connection.Server, action), connection.SessionId);
             return new ConnectionOpenedResult(requets, connection.Server);
         }
@@ -212,19 +211,19 @@ namespace Bolt.Client
             return Task.FromResult(true);
         }
 
-        protected virtual async Task<TResult> OpenAsync<TResult, TParameters>(ConnectionDescriptor connectionDescriptor, ActionDescriptor descriptor, TParameters parameters, CancellationToken cancellation)
+        protected virtual async Task<TResult> OpenAsync<TResult, TParameters>(IConnectionProvider connectionProvider, ConnectionDescriptor connectionDescriptor, ActionDescriptor descriptor, TParameters parameters, CancellationToken cancellation)
         {
             HttpWebRequest request = CreateWebRequest(
                 CrateRemoteAddress(connectionDescriptor.Server, descriptor),
                 connectionDescriptor.SessionId);
 
-            using (ClientExecutionContext ctxt = new ClientExecutionContext(descriptor, request, connectionDescriptor.Server, cancellation))
+            using (ClientExecutionContext ctxt = new ClientExecutionContext(descriptor, request, connectionDescriptor.Server, cancellation, connectionProvider))
             {
                 BeforeSending(ctxt, parameters);
                 ResponseDescriptor<TResult> response = await RequestForwarder.GetResponseAsync<TResult, TParameters>(ctxt, parameters);
                 if (response.ErrorType == ResponseErrorType.Communication)
                 {
-                    ConnectionProvider.ConnectionFailed(ctxt.Server, response.Error);
+                    connectionProvider.ConnectionFailed(ctxt.Server, response.Error);
                 }
                 return response.GetResultOrThrow();
             }
@@ -236,7 +235,7 @@ namespace Bolt.Client
 
         protected virtual bool HandleResponseError(ClientExecutionContext context, Exception error)
         {
-            ConnectionProvider.CloseConnection(context.Server);
+            context.ConnectionProvider.CloseConnection(context.Server);
             return false;
         }
 
@@ -250,12 +249,13 @@ namespace Bolt.Client
 
         protected virtual bool HandleCommunicationError(ClientExecutionContext context, Exception error, int retries)
         {
+            context.ConnectionProvider.ConnectionFailed(context.Server, error);
             return false;
         }
 
-        protected virtual void OnProxyFailed(Uri server, Exception error, ActionDescriptor action)
+        protected virtual void OnProxyFailed(IConnectionProvider connectionProvider, Uri server, Exception error, ActionDescriptor action)
         {
-            ConnectionProvider.CloseConnection(server);
+            connectionProvider.CloseConnection(server);
         }
 
         protected virtual Uri CrateRemoteAddress(Uri server, ActionDescriptor descriptor)

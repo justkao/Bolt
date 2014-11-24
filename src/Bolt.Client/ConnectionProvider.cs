@@ -6,21 +6,19 @@ namespace Bolt.Client
 {
     public class ConnectionProvider : IConnectionProvider
     {
-        private readonly Func<Uri> _serverProvider;
+        private readonly Uri _serverUri;
+        private readonly IServerProvider _serverProvider;
 
-        public ConnectionProvider()
-        {
-        }
-
-        public ConnectionProvider(Uri serverUri)
-            : this(() => serverUri)
-        {
-        }
-
-        public ConnectionProvider(Func<Uri> serverProvider)
+        public ConnectionProvider(IServerProvider serverProvider)
         {
             _serverProvider = serverProvider;
         }
+
+        public ConnectionProvider(Uri serverUri)
+        {
+            _serverUri = serverUri;
+        }
+
 
         public virtual ConnectionDescriptor GetConnection(Action<ConnectionDescriptor> connectionOpening, CancellationToken cancellationToken)
         {
@@ -38,11 +36,20 @@ namespace Bolt.Client
 
         public virtual void ConnectionFailed(Uri server, Exception error)
         {
+            if (_serverProvider != null)
+            {
+                _serverProvider.ConnectionFailed(server, error);
+            }
         }
 
         protected virtual Uri GetServer()
         {
-            return _serverProvider();
+            if (_serverProvider != null)
+            {
+                return _serverProvider.GetServer();
+            }
+
+            return _serverUri;
         }
     }
 }

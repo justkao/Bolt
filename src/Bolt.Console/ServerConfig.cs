@@ -14,9 +14,11 @@ namespace Bolt.Console
 
         public string Suffix { get; set; }
 
+        public string Name { get; set; }
+
         protected override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
         {
-            ServerGenerator serverGenerator = new ServerGenerator { ContractDefinition = definition, Namespace = Namespace };
+            ServerGenerator serverGenerator = new ServerGenerator { ContractDefinition = definition, Namespace = Namespace, Name = Name };
 
             if (CustomBaseClass)
             {
