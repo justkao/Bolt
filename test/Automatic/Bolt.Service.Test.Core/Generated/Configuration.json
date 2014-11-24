@@ -5,7 +5,6 @@
             "excluded": [ "Bolt.Service.Test.Core.IExcludedContract" ],
             "assemblies": [ "Bolt.Service.Test.Core.dll" ],
             "client": {
-                "forceAsync": "true",
                 "generateFactory": "true"
             },
             "server": {

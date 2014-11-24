@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace Bolt.Generators
 {
@@ -30,7 +29,7 @@ namespace Bolt.Generators
         }
 
         public bool ForceAsync { get; set; }
-        
+
         public override void Generate()
         {
             bool hasAsyncInterfaces = ContractDefinition.GetEffectiveContracts().Any(ShouldHaveAsyncMethods);
@@ -67,43 +66,27 @@ namespace Bolt.Generators
             string name = iface.Name + "Async";
             _generatedAsyncInterfaces.Add(name);
 
-            using (WithNamespace(iface.Namespace))
+            List<string> asyncBase = (from i in ContractDefinition.GetEffectiveContracts(iface).Where(ShouldHaveAsyncMethods)
+                                      select FormatType(i) + "Async").ToList();
+            asyncBase.Insert(0, FormatType(iface));
+
+            ClassGenerator classGenerator = CreateClassGenerator(new ClassDescriptor(name, iface.Namespace, asyncBase.ToArray()) { IsInterface = true });
+            classGenerator.GenerateClass((g) =>
             {
-                IEnumerable<string> asyncBase = (from i in ContractDefinition.GetEffectiveContracts(iface).Where(ShouldHaveAsyncMethods)
-                                                 select FormatType(i) + "Async").ToList();
+                List<MethodInfo> methods = (from m in ContractDefinition.GetEffectiveMethods(iface)
+                                            where ShouldBeAsync(m, ForceAsync)
+                                            select m).ToList();
 
-                StringBuilder sb = new StringBuilder();
-                foreach (string s in asyncBase)
+
+                foreach (MethodInfo method in methods)
                 {
-                    sb.AppendFormat("{0}, ", s);
-                }
-
-                if (sb.Length > 0)
-                {
-                    sb.Remove(sb.Length - 2, 2);
-                    sb.Insert(0, ", ");
-                }
-
-                WriteLine("public interface {0} : {1}{2}", name, FormatType(iface), sb.ToString());
-                using (WithBlock())
-                {
-                    List<MethodInfo> methods = (from m in ContractDefinition.GetEffectiveMethods(iface)
-                                                where ShouldBeAsync(m, ForceAsync)
-                                                select m).ToList();
-
-
-                    foreach (MethodInfo method in methods)
+                    g.WriteLine(FormatMethodDeclaration(method, true) + ";");
+                    if (!Equals(method, methods.Last()))
                     {
-                        WriteLine(FormatMethodDeclaration(method, true) + ";");
-                        if (method != methods.Last())
-                        {
-                            WriteLine();
-                        }
+                        g.WriteLine();
                     }
                 }
-            }
-
-            WriteLine();
+            });
         }
 
         private bool ShouldHaveAsyncMethods(Type iface)

@@ -20,27 +20,17 @@ using System.Threading.Tasks;
 
 namespace Bolt.Service.Test.Core
 {
-    public interface ITestContractInnerAsync : ITestContractInner
+    public partial interface ITestContractInnerAsync : ITestContractInner
     {
         Task SimpleMethodWithComplexParameterAsync(CompositeType compositeType);
-
-        Task<int> SimpleFunctionAsync();
-
-        Task MethodWithManyArgumentsAsync(CompositeType arg1, CompositeType arg2, DateTime time);
     }
 }
 
 namespace Bolt.Service.Test.Core
 {
-    public interface ITestContractAsync : ITestContract, ITestContractInnerAsync
+    public partial interface ITestContractAsync : ITestContract, ITestContractInnerAsync
     {
-        Task SimpleMethodWithSimpleArgumentsAsync(int val);
-
         Task SimpleMethodAsync();
-
-        Task SimpleMethodWithCancellationAsync(System.Threading.CancellationToken cancellation);
-
-        Task<CompositeType> ComplexFunctionAsync();
     }
 }
 
@@ -69,13 +59,6 @@ namespace Bolt.Service.Test.Core
             Send(request, TestContractDescriptor.SimpleMethodWithSimpleArguments, GetCancellationToken(TestContractDescriptor.SimpleMethodWithSimpleArguments));
         }
 
-        public virtual Task SimpleMethodWithSimpleArgumentsAsync(int val)
-        {
-            var request = new SimpleMethodWithSimpleArgumentsParameters();
-            request.Val = val;
-            return SendAsync(request, TestContractDescriptor.SimpleMethodWithSimpleArguments, GetCancellationToken(TestContractDescriptor.SimpleMethodWithSimpleArguments));
-        }
-
         public virtual void SimpleMethod()
         {
             Send(Bolt.Empty.Instance, TestContractDescriptor.SimpleMethod, GetCancellationToken(TestContractDescriptor.SimpleMethod));
@@ -96,21 +79,10 @@ namespace Bolt.Service.Test.Core
             Send(Bolt.Empty.Instance, TestContractDescriptor.SimpleMethodWithCancellation, cancellation);
         }
 
-        public virtual Task SimpleMethodWithCancellationAsync(System.Threading.CancellationToken cancellation)
-        {
-            return SendAsync(Bolt.Empty.Instance, TestContractDescriptor.SimpleMethodWithCancellation, cancellation);
-        }
-
         public virtual CompositeType ComplexFunction()
         {
             return Send<CompositeType, Bolt.Empty>(Bolt.Empty.Instance, TestContractDescriptor.ComplexFunction, GetCancellationToken(TestContractDescriptor.ComplexFunction));
         }
-
-        public virtual Task<CompositeType> ComplexFunctionAsync()
-        {
-            return SendAsync<CompositeType, Bolt.Empty>(Bolt.Empty.Instance, TestContractDescriptor.ComplexFunction, GetCancellationToken(TestContractDescriptor.ComplexFunction));
-        }
-
         public virtual void SimpleMethodWithComplexParameter(CompositeType compositeType)
         {
             var request = new SimpleMethodWithComplexParameterParameters();
@@ -130,11 +102,6 @@ namespace Bolt.Service.Test.Core
             return Send<int, Bolt.Empty>(Bolt.Empty.Instance, TestContractDescriptor.SimpleFunction, GetCancellationToken(TestContractDescriptor.SimpleFunction));
         }
 
-        public virtual Task<int> SimpleFunctionAsync()
-        {
-            return SendAsync<int, Bolt.Empty>(Bolt.Empty.Instance, TestContractDescriptor.SimpleFunction, GetCancellationToken(TestContractDescriptor.SimpleFunction));
-        }
-
         public virtual Task<int> SimpleAsyncFunction()
         {
             return SendAsync<int, Bolt.Empty>(Bolt.Empty.Instance, TestContractDescriptor.SimpleAsyncFunction, GetCancellationToken(TestContractDescriptor.SimpleAsyncFunction));
@@ -148,16 +115,6 @@ namespace Bolt.Service.Test.Core
             request.Time = time;
             Send(request, TestContractDescriptor.MethodWithManyArguments, GetCancellationToken(TestContractDescriptor.MethodWithManyArguments));
         }
-
-        public virtual Task MethodWithManyArgumentsAsync(CompositeType arg1, CompositeType arg2, DateTime time)
-        {
-            var request = new MethodWithManyArgumentsParameters();
-            request.Arg1 = arg1;
-            request.Arg2 = arg2;
-            request.Time = time;
-            return SendAsync(request, TestContractDescriptor.MethodWithManyArguments, GetCancellationToken(TestContractDescriptor.MethodWithManyArguments));
-        }
-
     }
 }
 

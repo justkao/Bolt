@@ -30,20 +30,17 @@ namespace Bolt.Console
                 Name = Name
             };
 
-            if (ForceAsync)
+            InterfaceGenerator interfaceGenerator = new InterfaceGenerator()
             {
-                InterfaceGenerator interfaceGenerator = new InterfaceGenerator()
-                {
-                    ContractDefinition = definition,
-                    ForceAsync = ForceAsync
-                };
+                ContractDefinition = definition,
+                ForceAsync = ForceAsync
+            };
 
-                generator.Add(interfaceGenerator);
-                interfaceGenerator.Generated += (s, e) =>
-                {
-                    clientGenerator.BaseInterfaces = interfaceGenerator.GeneratedAsyncInterfaces.ToList();
-                };
-            }
+            generator.Add(interfaceGenerator);
+            interfaceGenerator.Generated += (s, e) =>
+            {
+                clientGenerator.BaseInterfaces = interfaceGenerator.GeneratedAsyncInterfaces.ToList();
+            };
 
             if (CustomBaseClass)
             {

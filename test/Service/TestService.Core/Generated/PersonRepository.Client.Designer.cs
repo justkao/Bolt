@@ -19,23 +19,25 @@ using TestService.Core.Parameters;
 
 namespace TestService.Core
 {
-    public interface IPersonRepositoryInnerAsync : IPersonRepositoryInner
+    public partial interface IPersonRepositoryInnerAsync : IPersonRepositoryInner
     {
         Task InnerOperationAsync();
     }
 }
 
+
 namespace TestService.Core
 {
-    public interface IPersonRepositoryInner2Async : IPersonRepositoryInner2
+    public partial interface IPersonRepositoryInner2Async : IPersonRepositoryInner2
     {
         Task InnerOperation2Async();
     }
 }
 
+
 namespace TestService.Core
 {
-    public interface IPersonRepositoryAsync : IPersonRepository, IPersonRepositoryInnerAsync, IPersonRepositoryInner2Async
+    public partial interface IPersonRepositoryAsync : IPersonRepository, IPersonRepositoryInnerAsync, IPersonRepositoryInner2Async
     {
         Task<Person> UpdatePersonAsync(Person person, System.Threading.CancellationToken cancellation);
 
@@ -52,6 +54,7 @@ namespace TestService.Core
         Task<List<Person>> GetManyPersonsAsync(Person person);
     }
 }
+
 
 namespace TestService.Core
 {
