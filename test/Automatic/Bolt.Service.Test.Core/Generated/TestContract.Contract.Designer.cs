@@ -66,6 +66,7 @@ namespace Bolt.Service.Test.Core
             SimpleFunction = Add("SimpleFunction", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleFunction"));
             SimpleAsyncFunction = Add("SimpleAsyncFunction", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleAsyncFunction"));
             MethodWithManyArguments = Add("MethodWithManyArguments", typeof(Bolt.Service.Test.Core.Parameters.MethodWithManyArgumentsParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("MethodWithManyArguments"));
+            ThisMethodShouldBeExcluded = Add("ThisMethodShouldBeExcluded", typeof(Bolt.Empty), typeof(IExcludedContract).GetTypeInfo().GetMethod("ThisMethodShouldBeExcluded"));
         }
 
         public static readonly TestContractDescriptor Default = new TestContractDescriptor();
@@ -87,6 +88,8 @@ namespace Bolt.Service.Test.Core
         public virtual Bolt.ActionDescriptor SimpleAsyncFunction { get; private set; }
 
         public virtual Bolt.ActionDescriptor MethodWithManyArguments { get; private set; }
+
+        public virtual Bolt.ActionDescriptor ThisMethodShouldBeExcluded { get; private set; }
     }
 }
 

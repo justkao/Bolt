@@ -7,16 +7,16 @@ namespace Bolt.Client
     {
         string ContentType { get; }
 
-        void WriteParameters<T>(ClientExecutionContext context, T parameters);
+        void WriteParameters<T>(ClientActionContext context, T parameters);
 
-        Task WriteParametersAsync<T>(ClientExecutionContext context, T parameters);
+        Task WriteParametersAsync<T>(ClientActionContext context, T parameters);
 
-        Task<T> ReadResponseAsync<T>(ClientExecutionContext context);
+        Task<T> ReadResponseAsync<T>(ClientActionContext context);
 
-        T ReadResponse<T>(ClientExecutionContext context);
+        T ReadResponse<T>(ClientActionContext context);
 
-        Exception ReadException(ClientExecutionContext context);
+        Exception ReadException(ClientActionContext context);
 
-        Task<Exception> ReadExceptionAsync(ClientExecutionContext context);
+        Task<Exception> ReadExceptionAsync(ClientActionContext context);
     }
 }

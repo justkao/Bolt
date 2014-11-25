@@ -61,59 +61,6 @@ namespace TestService.Core.Parameters
     }
 
     [DataContract]
-    public partial class DoLongRunningOperationAsyncParameters : TestService.Core.ParametersBase
-    {
-        public DoLongRunningOperationAsyncParameters() : base()
-        {
-        }
-
-        public DoLongRunningOperationAsyncParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected DoLongRunningOperationAsyncParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        [DataMember(Order = 1)]
-        public Person Person { get; set; }
-    }
-
-    [DataContract]
-    public partial class DoLongRunningOperation2AsyncParameters : TestService.Core.ParametersBase
-    {
-        public DoLongRunningOperation2AsyncParameters() : base()
-        {
-        }
-
-        public DoLongRunningOperation2AsyncParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected DoLongRunningOperation2AsyncParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
-    }
-
-    [DataContract]
-    public partial class LongRunningOperation2AsyncParameters : TestService.Core.ParametersBase
-    {
-        public LongRunningOperation2AsyncParameters() : base()
-        {
-        }
-
-        public LongRunningOperation2AsyncParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected LongRunningOperation2AsyncParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
-    }
-
-    [DataContract]
     public partial class DoNothingAsAsyncParameters : TestService.Core.ParametersBase
     {
         public DoNothingAsAsyncParameters() : base()
@@ -377,9 +324,6 @@ namespace TestService.Core
         {
             UpdatePerson = Add("UpdatePerson", typeof(TestService.Core.Parameters.UpdatePersonParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("UpdatePerson"));
             UpdatePersonThatThrowsInvalidOperationException = Add("UpdatePersonThatThrowsInvalidOperationException", typeof(TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("UpdatePersonThatThrowsInvalidOperationException"));
-            DoLongRunningOperationAsync = Add("DoLongRunningOperationAsync", typeof(TestService.Core.Parameters.DoLongRunningOperationAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoLongRunningOperationAsync"));
-            DoLongRunningOperation2Async = Add("DoLongRunningOperation2Async", typeof(TestService.Core.Parameters.DoLongRunningOperation2AsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoLongRunningOperation2Async"));
-            LongRunningOperation2Async = Add("LongRunningOperation2Async", typeof(TestService.Core.Parameters.LongRunningOperation2AsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("LongRunningOperation2Async"));
             DoNothingAsAsync = Add("DoNothingAsAsync", typeof(TestService.Core.Parameters.DoNothingAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingAsAsync"));
             DoNothing = Add("DoNothing", typeof(TestService.Core.Parameters.DoNothingParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothing"));
             DoNothingWithComplexParameterAsAsync = Add("DoNothingWithComplexParameterAsAsync", typeof(TestService.Core.Parameters.DoNothingWithComplexParameterAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingWithComplexParameterAsAsync"));
@@ -401,12 +345,6 @@ namespace TestService.Core
         public virtual Bolt.ActionDescriptor UpdatePerson { get; private set; }
 
         public virtual Bolt.ActionDescriptor UpdatePersonThatThrowsInvalidOperationException { get; private set; }
-
-        public virtual Bolt.ActionDescriptor DoLongRunningOperationAsync { get; private set; }
-
-        public virtual Bolt.ActionDescriptor DoLongRunningOperation2Async { get; private set; }
-
-        public virtual Bolt.ActionDescriptor LongRunningOperation2Async { get; private set; }
 
         public virtual Bolt.ActionDescriptor DoNothingAsAsync { get; private set; }
 

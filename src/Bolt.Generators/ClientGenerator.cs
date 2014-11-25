@@ -1,17 +1,15 @@
-﻿using System;
+﻿using Bolt.Client;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Bolt.Client;
 
 namespace Bolt.Generators
 {
     public class ClientGenerator : ContractGeneratorBase
     {
         private string _contractDescriptorProperty;
-
-        private string _baseClass;
 
         public ClientGenerator()
             : this(new StringWriter(), new TypeFormatter(), new IntendProvider())
@@ -21,7 +19,7 @@ namespace Bolt.Generators
         public ClientGenerator(StringWriter output, TypeFormatter formatter, IntendProvider intendProvider)
             : base(output, formatter, intendProvider)
         {
-            Suffix = "Channel";
+            Suffix = "Proxy";
         }
 
         public virtual string ContractDescriptorProperty
@@ -48,24 +46,6 @@ namespace Bolt.Generators
 
         public string Name { get; set; }
 
-        public string BaseClass
-        {
-            get
-            {
-                if (_baseClass == null)
-                {
-                    return FormatType<Channel>();
-                }
-
-                return _baseClass;
-            }
-
-            set
-            {
-                _baseClass = value;
-            }
-        }
-
         public IEnumerable<string> BaseInterfaces { get; set; }
 
         public override void Generate()
@@ -73,34 +53,25 @@ namespace Bolt.Generators
             ClassDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
 
-            string descriptorField = "_" + ContractDescriptorProperty.LowerCaseFirstLetter();
-
             generator.GenerateClass(
                 g =>
                 {
-                    WriteLine("public virtual {0} {1}", contractDescriptor.FullName, ContractDescriptorProperty);
-                    using (WithBlock())
-                    {
-                        WriteLine("get");
-                        using (WithBlock())
-                        {
-                            WriteLine("return {0} ?? {1}.Default;", descriptorField, contractDescriptor.FullName);
-                        }
-                        WriteLine("set");
-                        using (WithBlock())
-                        {
-                            WriteLine("{0} = value;", descriptorField);
-                        }
-                    }
-                    WriteLine();
+                    g.GenerateConstructor(g.Descriptor.FullName + " proxy", "proxy");
+
+                    g.GenerateConstructor(
+                        string.Format("{0} descriptor, {1} channel", contractDescriptor.FullName, FormatType<IChannel>()),
+                        "descriptor, channel");
+
+                    g.GenerateConstructor(
+                        string.Format("{0} channel", FormatType<IChannel>()),
+                        string.Format("{0}.Default, channel", contractDescriptor.FullName));
 
                     List<Type> contracts = ContractDefinition.GetEffectiveContracts().ToList();
                     foreach (Type type in contracts)
                     {
                         GenerateMethods(g, type);
                     }
-                },
-                introduceFields: (g) => WriteLine("private {0} {1};", contractDescriptor.FullName, descriptorField));
+                });
 
             WriteLine();
         }
@@ -155,7 +126,7 @@ namespace Bolt.Generators
                         if (IsAsync(method))
                         {
                             WriteLine(
-                                "return SendAsync<{0}, {1}>({2}, {3});",
+                                "return Channel.SendAsync<{0}, {1}>({2}, {3});",
                                 FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType),
                                 result.TypeName,
                                 result.VariableName,
@@ -164,7 +135,7 @@ namespace Bolt.Generators
                         else if (forceAsync)
                         {
                             WriteLine(
-                                "return SendAsync<{0}, {1}>({2}, {3});",
+                                "return Channel.SendAsync<{0}, {1}>({2}, {3});",
                                 FormatType(method.ReturnType),
                                 result.TypeName,
                                 result.VariableName,
@@ -173,7 +144,7 @@ namespace Bolt.Generators
                         else
                         {
                             WriteLine(
-                                "return Send<{0}, {1}>({2}, {3});",
+                                "return Channel.Send<{0}, {1}>({2}, {3});",
                                 FormatType(method.ReturnType),
                                 result.TypeName,
                                 result.VariableName,
@@ -184,15 +155,15 @@ namespace Bolt.Generators
                     {
                         if (IsAsync(method))
                         {
-                            WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
+                            WriteLine("return Channel.SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
                         }
                         else if (forceAsync)
                         {
-                            WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
+                            WriteLine("return Channel.SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
                         }
                         else
                         {
-                            WriteLine("Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
+                            WriteLine("Channel.Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
                         }
                     }
                 });
@@ -231,9 +202,9 @@ namespace Bolt.Generators
             public string TypeName { get; set; }
         }
 
-        private string DeclareEndpoint(MethodDescriptor descriptor, ParameterInfo cancellationTokenParameter)
+        private string DeclareEndpoint(MethodDescriptor action, ParameterInfo cancellationTokenParameter)
         {
-            string descriptorReference = string.Format("{0}.{1}", ContractDescriptorProperty, descriptor.Name);
+            string descriptorReference = string.Format("Descriptor.{0}", action.Name);
 
             if (cancellationTokenParameter == null)
             {
@@ -245,8 +216,10 @@ namespace Bolt.Generators
 
         protected override ClassDescriptor CreateDefaultDescriptor()
         {
+            ClassDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
             List<string> baseClasses = new List<string>();
-            baseClasses.Add(BaseClass);
+            string baseClass = string.Format("Bolt.Client.ContractProxy<{0}>", contractDescriptor.FullName);
+            baseClasses.Add(baseClass);
             baseClasses.Add(ContractDefinition.Root.FullName);
 
             if (BaseInterfaces != null)

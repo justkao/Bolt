@@ -29,7 +29,7 @@ namespace Bolt.Client
             get { return _serializer.ContentType; }
         }
 
-        public virtual void WriteParameters<T>(ClientExecutionContext context, T parameters)
+        public virtual void WriteParameters<T>(ClientActionContext context, T parameters)
         {
             if (typeof(T) == typeof(Empty))
             {
@@ -40,14 +40,15 @@ namespace Bolt.Client
                 }
             }
 
-            byte[] raw = _serializer.Serialize(parameters);
+            byte[] raw = _serializer.SerializeParameters(parameters, context.ActionDescriptor);
+
             using (Stream stream = TaskExtensions.Execute(context.Request.GetRequestStreamAsync))
             {
                 stream.Write(raw, 0, raw.Length);
             }
         }
 
-        public virtual async Task WriteParametersAsync<T>(ClientExecutionContext context, T parameters)
+        public virtual async Task WriteParametersAsync<T>(ClientActionContext context, T parameters)
         {
             if (typeof(T) == typeof(Empty))
             {
@@ -60,27 +61,15 @@ namespace Bolt.Client
 
             context.Cancellation.ThrowIfCancellationRequested();
 
-            byte[] raw = _serializer.Serialize(parameters);
+            byte[] raw = _serializer.SerializeParameters(parameters, context.ActionDescriptor);
+
             using (Stream stream = await context.Request.GetRequestStreamAsync())
             {
                 await stream.WriteAsync(raw, 0, raw.Length, context.Cancellation);
             }
         }
 
-        public virtual Task<T> ReadResponseAsync<T>(ClientExecutionContext context)
-        {
-            if (typeof(T) == typeof(Empty))
-            {
-                return Task.FromResult(default(T));
-            }
-
-            using (Stream stream = context.Response.GetResponseStream())
-            {
-                return _serializer.DeserializeAsync<T>(stream, true, context.Cancellation);
-            }
-        }
-
-        public virtual T ReadResponse<T>(ClientExecutionContext context)
+        public virtual async Task<T> ReadResponseAsync<T>(ClientActionContext context)
         {
             if (typeof(T) == typeof(Empty))
             {
@@ -89,34 +78,49 @@ namespace Bolt.Client
 
             using (Stream stream = context.Response.GetResponseStream())
             {
-                return _serializer.Deserialize<T>(stream, true);
+                return _serializer.DeserializeResponse<T>(await stream.CopyAsync(context.Cancellation), context.ActionDescriptor);
             }
         }
 
-        public virtual Exception ReadException(ClientExecutionContext context)
+        public virtual T ReadResponse<T>(ClientActionContext context)
+        {
+            if (typeof(T) == typeof(Empty))
+            {
+                return default(T);
+            }
+
+            using (Stream stream = context.Response.GetResponseStream())
+            {
+                return _serializer.DeserializeResponse<T>(stream.Copy(), context.ActionDescriptor);
+            }
+        }
+
+        public virtual Exception ReadException(ClientActionContext context)
         {
             using (Stream stream = context.Response.GetResponseStream())
             {
-                return ReadException(_serializer.Deserialize<ErrorResponse>(stream, true));
+                ErrorResponse data = _serializer.DeserializeResponse<ErrorResponse>(stream.Copy(), context.ActionDescriptor);
+                return ReadException(data, context.ActionDescriptor);
             }
         }
 
-        public virtual async Task<Exception> ReadExceptionAsync(ClientExecutionContext context)
+        public virtual async Task<Exception> ReadExceptionAsync(ClientActionContext context)
         {
             using (Stream stream = context.Response.GetResponseStream())
             {
-                return ReadException(await _serializer.DeserializeAsync<ErrorResponse>(stream, true, context.Cancellation));
+                ErrorResponse data = _serializer.DeserializeResponse<ErrorResponse>(await stream.CopyAsync(context.Cancellation), context.ActionDescriptor);
+                return ReadException(data, context.ActionDescriptor);
             }
         }
 
-        protected virtual Exception ReadException(ErrorResponse response)
+        protected virtual Exception ReadException(ErrorResponse response, ActionDescriptor descriptor)
         {
             if (response == null || response.RawException == null || response.RawException.Length == 0)
             {
                 return null;
             }
 
-            return _exceptionSerializer.Deserialize(response.RawException);
+            return _exceptionSerializer.DeserializeExceptionResponse(response.RawException, descriptor);
         }
     }
 }

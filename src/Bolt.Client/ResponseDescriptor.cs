@@ -5,7 +5,7 @@ namespace Bolt.Client
 {
     public struct ResponseDescriptor<TResponse>
     {
-        public ResponseDescriptor(HttpWebResponse response, ClientExecutionContext context, Exception error, ResponseErrorType errorType)
+        public ResponseDescriptor(HttpWebResponse response, ClientActionContext context, Exception error, ResponseErrorType errorType)
             : this()
         {
             Context = context;
@@ -14,7 +14,7 @@ namespace Bolt.Client
             Response = response;
         }
 
-        public ResponseDescriptor(HttpWebResponse response, ClientExecutionContext context, TResponse result)
+        public ResponseDescriptor(HttpWebResponse response, ClientActionContext context, TResponse result)
             : this()
         {
             Response = response;
@@ -26,7 +26,7 @@ namespace Bolt.Client
 
         public HttpWebResponse Response { get; private set; }
 
-        public ClientExecutionContext Context { get; private set; }
+        public ClientActionContext Context { get; private set; }
 
         public Exception Error { get; private set; }
 

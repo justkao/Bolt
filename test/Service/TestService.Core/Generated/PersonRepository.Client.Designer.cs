@@ -7,13 +7,8 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using TestService.Core;
 using TestService.Core.Parameters;
 
 
@@ -55,203 +50,186 @@ namespace TestService.Core
 
 namespace TestService.Core
 {
-    public partial class PersonRepositoryChannel : Bolt.Client.Channel, TestService.Core.IPersonRepository, IPersonRepositoryInnerAsync, IPersonRepositoryInner2Async, IPersonRepositoryAsync
+    public partial class PersonRepositoryProxy : Bolt.Client.ContractProxy<TestService.Core.PersonRepositoryDescriptor>, TestService.Core.IPersonRepository, IPersonRepositoryInnerAsync, IPersonRepositoryInner2Async, IPersonRepositoryAsync
     {
-        private TestService.Core.PersonRepositoryDescriptor _personRepositoryDescriptor;
-
-        public virtual TestService.Core.PersonRepositoryDescriptor PersonRepositoryDescriptor
+        public PersonRepositoryProxy(TestService.Core.PersonRepositoryProxy proxy)
+            : base(proxy)
         {
-            get
-            {
-                return _personRepositoryDescriptor ?? TestService.Core.PersonRepositoryDescriptor.Default;
-            }
-            set
-            {
-                _personRepositoryDescriptor = value;
-            }
+        }
+
+        public PersonRepositoryProxy(TestService.Core.PersonRepositoryDescriptor descriptor,
+            Bolt.Client.IChannel channel)
+            : base(descriptor, channel)
+        {
+        }
+
+        public PersonRepositoryProxy(Bolt.Client.IChannel channel)
+            : base(TestService.Core.PersonRepositoryDescriptor.Default, channel)
+        {
         }
 
         public virtual Person UpdatePerson(Person person, System.Threading.CancellationToken cancellation)
         {
             var request = new UpdatePersonParameters();
             request.Person = person;
-            return Send<Person, UpdatePersonParameters>(request, PersonRepositoryDescriptor.UpdatePerson, cancellation);
+            return Channel.Send<Person, UpdatePersonParameters>(request, Descriptor.UpdatePerson, cancellation);
         }
 
         public virtual Task<Person> UpdatePersonAsync(Person person, System.Threading.CancellationToken cancellation)
         {
             var request = new UpdatePersonParameters();
             request.Person = person;
-            return SendAsync<Person, UpdatePersonParameters>(request, PersonRepositoryDescriptor.UpdatePerson, cancellation);
+            return Channel.SendAsync<Person, UpdatePersonParameters>(request, Descriptor.UpdatePerson, cancellation);
         }
 
         public virtual Person UpdatePersonThatThrowsInvalidOperationException(Person person)
         {
             var request = new UpdatePersonThatThrowsInvalidOperationExceptionParameters();
             request.Person = person;
-            return Send<Person, UpdatePersonThatThrowsInvalidOperationExceptionParameters>(request, PersonRepositoryDescriptor.UpdatePersonThatThrowsInvalidOperationException, GetCancellationToken(PersonRepositoryDescriptor.UpdatePersonThatThrowsInvalidOperationException));
+            return Channel.Send<Person, UpdatePersonThatThrowsInvalidOperationExceptionParameters>(request, Descriptor.UpdatePersonThatThrowsInvalidOperationException, GetCancellationToken(Descriptor.UpdatePersonThatThrowsInvalidOperationException));
         }
 
         public virtual Task<Person> UpdatePersonThatThrowsInvalidOperationExceptionAsync(Person person)
         {
             var request = new UpdatePersonThatThrowsInvalidOperationExceptionParameters();
             request.Person = person;
-            return SendAsync<Person, UpdatePersonThatThrowsInvalidOperationExceptionParameters>(request, PersonRepositoryDescriptor.UpdatePersonThatThrowsInvalidOperationException, GetCancellationToken(PersonRepositoryDescriptor.UpdatePersonThatThrowsInvalidOperationException));
-        }
-
-        public virtual Task DoLongRunningOperationAsync(Person person, System.Threading.CancellationToken cancellation)
-        {
-            var request = new DoLongRunningOperationAsyncParameters();
-            request.Person = person;
-            return SendAsync(request, PersonRepositoryDescriptor.DoLongRunningOperationAsync, cancellation);
-        }
-
-        public virtual Task DoLongRunningOperation2Async(System.Threading.CancellationToken cancellation)
-        {
-            var request = new DoLongRunningOperation2AsyncParameters();
-            return SendAsync(request, PersonRepositoryDescriptor.DoLongRunningOperation2Async, cancellation);
-        }
-
-        public virtual Task LongRunningOperation2Async(System.Threading.CancellationToken cancellation)
-        {
-            var request = new LongRunningOperation2AsyncParameters();
-            return SendAsync(request, PersonRepositoryDescriptor.LongRunningOperation2Async, cancellation);
+            return Channel.SendAsync<Person, UpdatePersonThatThrowsInvalidOperationExceptionParameters>(request, Descriptor.UpdatePersonThatThrowsInvalidOperationException, GetCancellationToken(Descriptor.UpdatePersonThatThrowsInvalidOperationException));
         }
 
         public virtual Task DoNothingAsAsync()
         {
             var request = new DoNothingAsAsyncParameters();
-            return SendAsync(request, PersonRepositoryDescriptor.DoNothingAsAsync, GetCancellationToken(PersonRepositoryDescriptor.DoNothingAsAsync));
+            return Channel.SendAsync(request, Descriptor.DoNothingAsAsync, GetCancellationToken(Descriptor.DoNothingAsAsync));
         }
 
         public virtual void DoNothing()
         {
             var request = new DoNothingParameters();
-            Send(request, PersonRepositoryDescriptor.DoNothing, GetCancellationToken(PersonRepositoryDescriptor.DoNothing));
+            Channel.Send(request, Descriptor.DoNothing, GetCancellationToken(Descriptor.DoNothing));
         }
 
         public virtual Task DoNothingAsync()
         {
             var request = new DoNothingParameters();
-            return SendAsync(request, PersonRepositoryDescriptor.DoNothing, GetCancellationToken(PersonRepositoryDescriptor.DoNothing));
+            return Channel.SendAsync(request, Descriptor.DoNothing, GetCancellationToken(Descriptor.DoNothing));
         }
 
         public virtual Task DoNothingWithComplexParameterAsAsync(List<Person> person)
         {
             var request = new DoNothingWithComplexParameterAsAsyncParameters();
             request.Person = person;
-            return SendAsync(request, PersonRepositoryDescriptor.DoNothingWithComplexParameterAsAsync, GetCancellationToken(PersonRepositoryDescriptor.DoNothingWithComplexParameterAsAsync));
+            return Channel.SendAsync(request, Descriptor.DoNothingWithComplexParameterAsAsync, GetCancellationToken(Descriptor.DoNothingWithComplexParameterAsAsync));
         }
 
         public virtual void DoNothingWithComplexParameter(List<Person> person)
         {
             var request = new DoNothingWithComplexParameterParameters();
             request.Person = person;
-            Send(request, PersonRepositoryDescriptor.DoNothingWithComplexParameter, GetCancellationToken(PersonRepositoryDescriptor.DoNothingWithComplexParameter));
+            Channel.Send(request, Descriptor.DoNothingWithComplexParameter, GetCancellationToken(Descriptor.DoNothingWithComplexParameter));
         }
 
         public virtual Task DoNothingWithComplexParameterAsync(List<Person> person)
         {
             var request = new DoNothingWithComplexParameterParameters();
             request.Person = person;
-            return SendAsync(request, PersonRepositoryDescriptor.DoNothingWithComplexParameter, GetCancellationToken(PersonRepositoryDescriptor.DoNothingWithComplexParameter));
+            return Channel.SendAsync(request, Descriptor.DoNothingWithComplexParameter, GetCancellationToken(Descriptor.DoNothingWithComplexParameter));
         }
 
         public virtual int GetSimpleType(int arg)
         {
             var request = new GetSimpleTypeParameters();
             request.Arg = arg;
-            return Send<int, GetSimpleTypeParameters>(request, PersonRepositoryDescriptor.GetSimpleType, GetCancellationToken(PersonRepositoryDescriptor.GetSimpleType));
+            return Channel.Send<int, GetSimpleTypeParameters>(request, Descriptor.GetSimpleType, GetCancellationToken(Descriptor.GetSimpleType));
         }
 
         public virtual Task<int> GetSimpleTypeAsync(int arg)
         {
             var request = new GetSimpleTypeParameters();
             request.Arg = arg;
-            return SendAsync<int, GetSimpleTypeParameters>(request, PersonRepositoryDescriptor.GetSimpleType, GetCancellationToken(PersonRepositoryDescriptor.GetSimpleType));
+            return Channel.SendAsync<int, GetSimpleTypeParameters>(request, Descriptor.GetSimpleType, GetCancellationToken(Descriptor.GetSimpleType));
         }
 
         public virtual Task GetSimpleTypeAsAsync(int arg)
         {
             var request = new GetSimpleTypeAsAsyncParameters();
             request.Arg = arg;
-            return SendAsync(request, PersonRepositoryDescriptor.GetSimpleTypeAsAsync, GetCancellationToken(PersonRepositoryDescriptor.GetSimpleTypeAsAsync));
+            return Channel.SendAsync(request, Descriptor.GetSimpleTypeAsAsync, GetCancellationToken(Descriptor.GetSimpleTypeAsAsync));
         }
 
         public virtual Person GetSinglePerson(Person person)
         {
             var request = new GetSinglePersonParameters();
             request.Person = person;
-            return Send<Person, GetSinglePersonParameters>(request, PersonRepositoryDescriptor.GetSinglePerson, GetCancellationToken(PersonRepositoryDescriptor.GetSinglePerson));
+            return Channel.Send<Person, GetSinglePersonParameters>(request, Descriptor.GetSinglePerson, GetCancellationToken(Descriptor.GetSinglePerson));
         }
 
         public virtual Task<Person> GetSinglePersonAsync(Person person)
         {
             var request = new GetSinglePersonParameters();
             request.Person = person;
-            return SendAsync<Person, GetSinglePersonParameters>(request, PersonRepositoryDescriptor.GetSinglePerson, GetCancellationToken(PersonRepositoryDescriptor.GetSinglePerson));
+            return Channel.SendAsync<Person, GetSinglePersonParameters>(request, Descriptor.GetSinglePerson, GetCancellationToken(Descriptor.GetSinglePerson));
         }
 
         public virtual Task<Person> GetSinglePersonAsAsync(Person person)
         {
             var request = new GetSinglePersonAsAsyncParameters();
             request.Person = person;
-            return SendAsync<Person, GetSinglePersonAsAsyncParameters>(request, PersonRepositoryDescriptor.GetSinglePersonAsAsync, GetCancellationToken(PersonRepositoryDescriptor.GetSinglePersonAsAsync));
+            return Channel.SendAsync<Person, GetSinglePersonAsAsyncParameters>(request, Descriptor.GetSinglePersonAsAsync, GetCancellationToken(Descriptor.GetSinglePersonAsAsync));
         }
 
         public virtual List<Person> GetManyPersons(Person person)
         {
             var request = new GetManyPersonsParameters();
             request.Person = person;
-            return Send<List<Person>, GetManyPersonsParameters>(request, PersonRepositoryDescriptor.GetManyPersons, GetCancellationToken(PersonRepositoryDescriptor.GetManyPersons));
+            return Channel.Send<List<Person>, GetManyPersonsParameters>(request, Descriptor.GetManyPersons, GetCancellationToken(Descriptor.GetManyPersons));
         }
 
         public virtual Task<List<Person>> GetManyPersonsAsync(Person person)
         {
             var request = new GetManyPersonsParameters();
             request.Person = person;
-            return SendAsync<List<Person>, GetManyPersonsParameters>(request, PersonRepositoryDescriptor.GetManyPersons, GetCancellationToken(PersonRepositoryDescriptor.GetManyPersons));
+            return Channel.SendAsync<List<Person>, GetManyPersonsParameters>(request, Descriptor.GetManyPersons, GetCancellationToken(Descriptor.GetManyPersons));
         }
 
         public virtual Task<List<Person>> GetManyPersonsAsAsync(Person person)
         {
             var request = new GetManyPersonsAsAsyncParameters();
             request.Person = person;
-            return SendAsync<List<Person>, GetManyPersonsAsAsyncParameters>(request, PersonRepositoryDescriptor.GetManyPersonsAsAsync, GetCancellationToken(PersonRepositoryDescriptor.GetManyPersonsAsAsync));
+            return Channel.SendAsync<List<Person>, GetManyPersonsAsAsyncParameters>(request, Descriptor.GetManyPersonsAsAsync, GetCancellationToken(Descriptor.GetManyPersonsAsAsync));
         }
         public virtual void InnerOperation()
         {
             var request = new InnerOperationParameters();
-            Send(request, PersonRepositoryDescriptor.InnerOperation, GetCancellationToken(PersonRepositoryDescriptor.InnerOperation));
+            Channel.Send(request, Descriptor.InnerOperation, GetCancellationToken(Descriptor.InnerOperation));
         }
 
         public virtual Task InnerOperationAsync()
         {
             var request = new InnerOperationParameters();
-            return SendAsync(request, PersonRepositoryDescriptor.InnerOperation, GetCancellationToken(PersonRepositoryDescriptor.InnerOperation));
+            return Channel.SendAsync(request, Descriptor.InnerOperation, GetCancellationToken(Descriptor.InnerOperation));
         }
 
         public virtual Task InnerOperationExAsync()
         {
             var request = new InnerOperationExAsyncParameters();
-            return SendAsync(request, PersonRepositoryDescriptor.InnerOperationExAsync, GetCancellationToken(PersonRepositoryDescriptor.InnerOperationExAsync));
+            return Channel.SendAsync(request, Descriptor.InnerOperationExAsync, GetCancellationToken(Descriptor.InnerOperationExAsync));
         }
         public virtual void InnerOperation2()
         {
             var request = new InnerOperation2Parameters();
-            Send(request, PersonRepositoryDescriptor.InnerOperation2, GetCancellationToken(PersonRepositoryDescriptor.InnerOperation2));
+            Channel.Send(request, Descriptor.InnerOperation2, GetCancellationToken(Descriptor.InnerOperation2));
         }
 
         public virtual Task InnerOperation2Async()
         {
             var request = new InnerOperation2Parameters();
-            return SendAsync(request, PersonRepositoryDescriptor.InnerOperation2, GetCancellationToken(PersonRepositoryDescriptor.InnerOperation2));
+            return Channel.SendAsync(request, Descriptor.InnerOperation2, GetCancellationToken(Descriptor.InnerOperation2));
         }
 
         public virtual Task InnerOperationExAsync2()
         {
             var request = new InnerOperationExAsync2Parameters();
-            return SendAsync(request, PersonRepositoryDescriptor.InnerOperationExAsync2, GetCancellationToken(PersonRepositoryDescriptor.InnerOperationExAsync2));
+            return Channel.SendAsync(request, Descriptor.InnerOperationExAsync2, GetCancellationToken(Descriptor.InnerOperationExAsync2));
         }
     }
 }

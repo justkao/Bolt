@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
-using System.Threading;
 
 using TestService.Core;
 
@@ -15,9 +14,6 @@ namespace TestService.Client
         {
             ServicePointManager.DefaultConnectionLimit = 1000;
             ServicePointManager.MaxServicePoints = 1000;
-
-            CancellationTokenSource cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
-            ClientFactory.CreateBolt().LongRunningOperation2Async(cts.Token);
 
             int cnt = 10000;
 
@@ -36,7 +32,7 @@ namespace TestService.Client
             Console.WriteLine("Executing '{0}', Repeats = '{1}' ", actionName, count);
             Console.WriteLine();
 
-            // Execute(action, count, ClientFactory.CreateWcf(), "WCF", actionName);
+            Execute(action, count, ClientFactory.CreateWcf(), "WCF", actionName);
             Execute(action, count, ClientFactory.CreateBolt(), "Bolt", actionName);
             // Execute(action, count, ClientFactory.CreateIISBolt(), "Bolt-IIS", actionName);
             // Execute(action, count, ClientFactory.CreateIISWcf(), "WCF-IIS", actionName);

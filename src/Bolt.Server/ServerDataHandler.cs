@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Bolt.Server
@@ -29,18 +30,16 @@ namespace Bolt.Server
             get { return _serializer.ContentType; }
         }
 
-        public virtual Task<T> ReadParametersAsync<T>(ServerExecutionContext context)
+        public virtual async Task<T> ReadParametersAsync<T>(ServerExecutionContext context)
         {
             context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
-
-            return _serializer.DeserializeAsync<T>(context.Context.Request.Body, true, context.Context.Request.CallCancelled);
+            return _serializer.DeserializeParameters<T>(await context.Context.Request.Body.CopyAsync(context.CallCancelled), context.ActionDescriptor);
         }
 
         public virtual Task WriteResponseAsync<T>(ServerExecutionContext context, T data)
         {
             context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
-
-            byte[] raw = _serializer.Serialize(data);
+            byte[] raw = _serializer.SerializeResponse(data, context.ActionDescriptor);
             return context.Context.Response.Body.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
         }
 
@@ -48,15 +47,15 @@ namespace Bolt.Server
         {
             context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
 
-            byte[] raw = _serializer.Serialize(Create(exception));
+            byte[] raw = _serializer.SerializeResponse(Create(exception, context.ActionDescriptor), context.ActionDescriptor);
             return context.Context.Response.Body.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
         }
 
-        protected virtual ErrorResponse Create(Exception e)
+        protected virtual ErrorResponse Create(Exception e, ActionDescriptor actionDescriptor)
         {
             return new ErrorResponse
             {
-                RawException = _exceptionSerializer.Serialize(e)
+                RawException = _exceptionSerializer.SerializeExceptionResponse(e, actionDescriptor)
             };
         }
     }

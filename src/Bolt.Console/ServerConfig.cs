@@ -8,8 +8,6 @@ namespace Bolt.Console
 
         public bool GenerateFactory { get; set; }
 
-        public bool CustomBaseClass { get; set; }
-
         public string Namespace { get; set; }
 
         public string Suffix { get; set; }
@@ -19,11 +17,6 @@ namespace Bolt.Console
         protected override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
         {
             ServerGenerator serverGenerator = new ServerGenerator { ContractDefinition = definition, Namespace = Namespace, Name = Name };
-
-            if (CustomBaseClass)
-            {
-                serverGenerator.BaseClass = null;
-            }
 
             if (!string.IsNullOrEmpty(Suffix))
             {

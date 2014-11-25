@@ -31,9 +31,6 @@ namespace Bolt.Server
 
             AddAction(ContractDescriptor.UpdatePerson, PersonRepository_UpdatePerson);
             AddAction(ContractDescriptor.UpdatePersonThatThrowsInvalidOperationException, PersonRepository_UpdatePersonThatThrowsInvalidOperationException);
-            AddAction(ContractDescriptor.DoLongRunningOperationAsync, PersonRepository_DoLongRunningOperationAsync);
-            AddAction(ContractDescriptor.DoLongRunningOperation2Async, PersonRepository_DoLongRunningOperation2Async);
-            AddAction(ContractDescriptor.LongRunningOperation2Async, PersonRepository_LongRunningOperation2Async);
             AddAction(ContractDescriptor.DoNothingAsAsync, PersonRepository_DoNothingAsAsync);
             AddAction(ContractDescriptor.DoNothing, PersonRepository_DoNothing);
             AddAction(ContractDescriptor.DoNothingWithComplexParameterAsAsync, PersonRepository_DoNothingWithComplexParameterAsAsync);
@@ -68,30 +65,6 @@ namespace Bolt.Server
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
             var result = instance.UpdatePersonThatThrowsInvalidOperationException(parameters.Person);
             await ResponseHandler.Handle(context, result);
-        }
-
-        protected virtual async Task PersonRepository_DoLongRunningOperationAsync(Bolt.Server.ServerExecutionContext context)
-        {
-            var parameters = await DataHandler.ReadParametersAsync<DoLongRunningOperationAsyncParameters>(context);
-            var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
-            await instance.DoLongRunningOperationAsync(parameters.Person, context.CallCancelled);
-            await ResponseHandler.Handle(context);
-        }
-
-        protected virtual async Task PersonRepository_DoLongRunningOperation2Async(Bolt.Server.ServerExecutionContext context)
-        {
-            var parameters = await DataHandler.ReadParametersAsync<DoLongRunningOperation2AsyncParameters>(context);
-            var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
-            await instance.DoLongRunningOperation2Async(context.CallCancelled);
-            await ResponseHandler.Handle(context);
-        }
-
-        protected virtual async Task PersonRepository_LongRunningOperation2Async(Bolt.Server.ServerExecutionContext context)
-        {
-            var parameters = await DataHandler.ReadParametersAsync<LongRunningOperation2AsyncParameters>(context);
-            var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
-            await instance.LongRunningOperation2Async(context.CallCancelled);
-            await ResponseHandler.Handle(context);
         }
 
         protected virtual async Task PersonRepository_DoNothingAsAsync(Bolt.Server.ServerExecutionContext context)

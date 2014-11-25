@@ -35,75 +35,73 @@ namespace Bolt.Service.Test.Core
 
 namespace Bolt.Service.Test.Core
 {
-    public partial class TestContractChannel : Bolt.Client.Channel, Bolt.Service.Test.Core.ITestContract, ITestContractInnerAsync, ITestContractAsync
+    public partial class TestContractProxy : Bolt.Client.ContractProxy<Bolt.Service.Test.Core.TestContractDescriptor>, Bolt.Service.Test.Core.ITestContract, ITestContractInnerAsync, ITestContractAsync
     {
-        private Bolt.Service.Test.Core.TestContractDescriptor _testContractDescriptor;
-
-        public virtual Bolt.Service.Test.Core.TestContractDescriptor TestContractDescriptor
+        public TestContractProxy(Bolt.Service.Test.Core.TestContractProxy proxy) : base(proxy)
         {
-            get
-            {
-                return _testContractDescriptor ?? Bolt.Service.Test.Core.TestContractDescriptor.Default;
-            }
-            set
-            {
-                _testContractDescriptor = value;
-            }
+        }
+
+        public TestContractProxy(Bolt.Service.Test.Core.TestContractDescriptor descriptor, Bolt.Client.IChannel channel) : base(descriptor, channel)
+        {
+        }
+
+        public TestContractProxy(Bolt.Client.IChannel channel) : base(Bolt.Service.Test.Core.TestContractDescriptor.Default, channel)
+        {
         }
 
         public virtual void SimpleMethodWithSimpleArguments(int val)
         {
             var request = new SimpleMethodWithSimpleArgumentsParameters();
             request.Val = val;
-            Send(request, TestContractDescriptor.SimpleMethodWithSimpleArguments, GetCancellationToken(TestContractDescriptor.SimpleMethodWithSimpleArguments));
+            Channel.Send(request, Descriptor.SimpleMethodWithSimpleArguments, GetCancellationToken(Descriptor.SimpleMethodWithSimpleArguments));
         }
 
         public virtual void SimpleMethod()
         {
-            Send(Bolt.Empty.Instance, TestContractDescriptor.SimpleMethod, GetCancellationToken(TestContractDescriptor.SimpleMethod));
+            Channel.Send(Bolt.Empty.Instance, Descriptor.SimpleMethod, GetCancellationToken(Descriptor.SimpleMethod));
         }
 
         public virtual Task SimpleMethodAsync()
         {
-            return SendAsync(Bolt.Empty.Instance, TestContractDescriptor.SimpleMethod, GetCancellationToken(TestContractDescriptor.SimpleMethod));
+            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.SimpleMethod, GetCancellationToken(Descriptor.SimpleMethod));
         }
 
         public virtual Task SimpleMethodExAsync()
         {
-            return SendAsync(Bolt.Empty.Instance, TestContractDescriptor.SimpleMethodExAsync, GetCancellationToken(TestContractDescriptor.SimpleMethodExAsync));
+            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.SimpleMethodExAsync, GetCancellationToken(Descriptor.SimpleMethodExAsync));
         }
 
         public virtual void SimpleMethodWithCancellation(System.Threading.CancellationToken cancellation)
         {
-            Send(Bolt.Empty.Instance, TestContractDescriptor.SimpleMethodWithCancellation, cancellation);
+            Channel.Send(Bolt.Empty.Instance, Descriptor.SimpleMethodWithCancellation, cancellation);
         }
 
         public virtual CompositeType ComplexFunction()
         {
-            return Send<CompositeType, Bolt.Empty>(Bolt.Empty.Instance, TestContractDescriptor.ComplexFunction, GetCancellationToken(TestContractDescriptor.ComplexFunction));
+            return Channel.Send<CompositeType, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.ComplexFunction, GetCancellationToken(Descriptor.ComplexFunction));
         }
         public virtual void SimpleMethodWithComplexParameter(CompositeType compositeType)
         {
             var request = new SimpleMethodWithComplexParameterParameters();
             request.CompositeType = compositeType;
-            Send(request, TestContractDescriptor.SimpleMethodWithComplexParameter, GetCancellationToken(TestContractDescriptor.SimpleMethodWithComplexParameter));
+            Channel.Send(request, Descriptor.SimpleMethodWithComplexParameter, GetCancellationToken(Descriptor.SimpleMethodWithComplexParameter));
         }
 
         public virtual Task SimpleMethodWithComplexParameterAsync(CompositeType compositeType)
         {
             var request = new SimpleMethodWithComplexParameterParameters();
             request.CompositeType = compositeType;
-            return SendAsync(request, TestContractDescriptor.SimpleMethodWithComplexParameter, GetCancellationToken(TestContractDescriptor.SimpleMethodWithComplexParameter));
+            return Channel.SendAsync(request, Descriptor.SimpleMethodWithComplexParameter, GetCancellationToken(Descriptor.SimpleMethodWithComplexParameter));
         }
 
         public virtual int SimpleFunction()
         {
-            return Send<int, Bolt.Empty>(Bolt.Empty.Instance, TestContractDescriptor.SimpleFunction, GetCancellationToken(TestContractDescriptor.SimpleFunction));
+            return Channel.Send<int, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.SimpleFunction, GetCancellationToken(Descriptor.SimpleFunction));
         }
 
         public virtual Task<int> SimpleAsyncFunction()
         {
-            return SendAsync<int, Bolt.Empty>(Bolt.Empty.Instance, TestContractDescriptor.SimpleAsyncFunction, GetCancellationToken(TestContractDescriptor.SimpleAsyncFunction));
+            return Channel.SendAsync<int, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.SimpleAsyncFunction, GetCancellationToken(Descriptor.SimpleAsyncFunction));
         }
 
         public virtual void MethodWithManyArguments(CompositeType arg1, CompositeType arg2, DateTime time)
@@ -112,7 +110,11 @@ namespace Bolt.Service.Test.Core
             request.Arg1 = arg1;
             request.Arg2 = arg2;
             request.Time = time;
-            Send(request, TestContractDescriptor.MethodWithManyArguments, GetCancellationToken(TestContractDescriptor.MethodWithManyArguments));
+            Channel.Send(request, Descriptor.MethodWithManyArguments, GetCancellationToken(Descriptor.MethodWithManyArguments));
+        }
+        public virtual void ThisMethodShouldBeExcluded()
+        {
+            Channel.Send(Bolt.Empty.Instance, Descriptor.ThisMethodShouldBeExcluded, GetCancellationToken(Descriptor.ThisMethodShouldBeExcluded));
         }
     }
 }

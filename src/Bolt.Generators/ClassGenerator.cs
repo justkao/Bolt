@@ -109,6 +109,23 @@ namespace Bolt.Generators
             WriteLine();
         }
 
+        public virtual void GenerateConstructor(string parameters, string baseCall = null, string modifier = "public")
+        {
+            if (!string.IsNullOrEmpty(baseCall))
+            {
+                WriteLine("{0} {1}({2}) : base({3})", modifier, Descriptor.Name, parameters, baseCall);
+            }
+            else
+            {
+                WriteLine("{0} {1}({2})", modifier, Descriptor.Name, parameters);
+            }
+            using (WithBlock())
+            {
+            }
+
+            WriteLine();
+        }
+
         private void GenerateConstructors()
         {
             Type baseClass =

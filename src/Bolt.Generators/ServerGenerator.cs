@@ -31,7 +31,7 @@ namespace Bolt.Generators
 
         public string ContractDescriptorPropertyName { get; set; }
 
-        public string BaseClass { get; set; }
+        public string BaseClass { get; private set; }
 
         public string Suffix { get; set; }
 

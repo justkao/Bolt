@@ -50,7 +50,6 @@ namespace Bolt.Console
                 ParametersBase = "<Base Class For Generated Parameters or null>",
                 Client = new ClientConfig()
                 {
-                    CustomBaseClass = true,
                     ForceAsync = true,
                     Output = "<Directory or File Path>",
                     Excluded = new List<string>() { "<Additional Excluded Type >" },

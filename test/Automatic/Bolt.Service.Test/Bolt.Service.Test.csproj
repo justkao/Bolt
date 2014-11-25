@@ -79,7 +79,6 @@
     <Compile Include="ServiceTest.cs" />
     <Compile Include="MockInstanceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TestContractChannel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Bolt.Core.Serialization\Bolt.Core.Serialization.csproj">

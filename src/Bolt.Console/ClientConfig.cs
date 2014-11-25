@@ -1,15 +1,11 @@
-﻿using System.Linq;
-
-using Bolt.Client;
-using Bolt.Generators;
+﻿using Bolt.Generators;
+using System.Linq;
 
 namespace Bolt.Console
 {
     public class ClientConfig : ConfigBase
     {
         public bool ForceAsync { get; set; }
-
-        public bool CustomBaseClass { get; set; }
 
         public string Namespace { get; set; }
 
@@ -38,11 +34,6 @@ namespace Bolt.Console
             {
                 clientGenerator.BaseInterfaces = interfaceGenerator.GeneratedAsyncInterfaces.ToList();
             };
-
-            if (CustomBaseClass)
-            {
-                clientGenerator.BaseClass = clientGenerator.FormatType<IChannel>();
-            }
 
             if (!string.IsNullOrEmpty(Suffix))
             {

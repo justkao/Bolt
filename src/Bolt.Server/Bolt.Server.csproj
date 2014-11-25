@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ActionProvider.cs" />
+    <Compile Include="ServerSerializerExtensions.cs" />
     <Compile Include="IActionProvider.cs" />
     <Compile Include="ServerDataHandler.cs" />
     <Compile Include="ContractInvoker.cs" />

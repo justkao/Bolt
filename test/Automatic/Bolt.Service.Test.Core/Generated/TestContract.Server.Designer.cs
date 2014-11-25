@@ -38,6 +38,7 @@ namespace Bolt.Server
             AddAction(ContractDescriptor.SimpleFunction, TestContractInner_SimpleFunction);
             AddAction(ContractDescriptor.SimpleAsyncFunction, TestContractInner_SimpleAsyncFunction);
             AddAction(ContractDescriptor.MethodWithManyArguments, TestContractInner_MethodWithManyArguments);
+            AddAction(ContractDescriptor.ThisMethodShouldBeExcluded, ExcludedContract_ThisMethodShouldBeExcluded);
 
             base.Init();
         }
@@ -107,6 +108,13 @@ namespace Bolt.Server
             var parameters = await DataHandler.ReadParametersAsync<MethodWithManyArgumentsParameters>(context);
             var instance = await InstanceProvider.GetInstanceAsync<ITestContractInner>(context);
             instance.MethodWithManyArguments(parameters.Arg1, parameters.Arg2, parameters.Time);
+            await ResponseHandler.Handle(context);
+        }
+
+        protected virtual async Task ExcludedContract_ThisMethodShouldBeExcluded(Bolt.Server.ServerExecutionContext context)
+        {
+            var instance = await InstanceProvider.GetInstanceAsync<IExcludedContract>(context);
+            instance.ThisMethodShouldBeExcluded();
             await ResponseHandler.Handle(context);
         }
     }

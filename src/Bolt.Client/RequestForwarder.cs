@@ -19,7 +19,7 @@ namespace Bolt.Client
             _dataHandler = dataHandler;
         }
 
-        public virtual ResponseDescriptor<T> GetResponse<T, TParameters>(ClientExecutionContext context, TParameters parameters)
+        public virtual ResponseDescriptor<T> GetResponse<T, TParameters>(ClientActionContext context, TParameters parameters)
         {
             context.Cancellation.ThrowIfCancellationRequested();
 
@@ -84,7 +84,7 @@ namespace Bolt.Client
         }
 
         public virtual async Task<ResponseDescriptor<T>> GetResponseAsync<T, TParameters>(
-            ClientExecutionContext context,
+            ClientActionContext context,
             TParameters parameters)
         {
             Exception clientException = null;
@@ -147,7 +147,7 @@ namespace Bolt.Client
         }
 
         protected virtual async Task<ResponseDescriptor<T>> CreateResponseAsync<T>(
-            ClientExecutionContext context,
+            ClientActionContext context,
             Exception clientException)
         {
             if (clientException != null)
@@ -194,7 +194,7 @@ namespace Bolt.Client
             }
         }
 
-        protected virtual ResponseDescriptor<T> CreateResponse<T>(ClientExecutionContext context, Exception clientException)
+        protected virtual ResponseDescriptor<T> CreateResponse<T>(ClientActionContext context, Exception clientException)
         {
             if (clientException != null)
             {
