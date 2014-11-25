@@ -55,9 +55,16 @@ namespace Bolt.Generators
             WriteLine();
         }
 
+        public virtual string FormatMethodParameters(IEnumerable<ParameterInfo> parameters, bool includeTypes)
+        {
+            return FormatMethodParameters(
+                includeTypes,
+                parameters.Select(v => new KeyValuePair<string, Type>(v.Name, v.ParameterType)).ToArray());
+        }
+
         public virtual string FormatMethodParameters(MethodInfo method, bool includeTypes)
         {
-            return FormatMethodParameters(includeTypes, method.GetParameters().Select(v => new KeyValuePair<string, Type>(v.Name, v.ParameterType)).ToArray());
+            return FormatMethodParameters(method.GetParameters(), includeTypes);
         }
 
         public virtual bool HasParameters(MethodInfo method)
@@ -99,25 +106,16 @@ namespace Bolt.Generators
                 if (includeTypes)
                 {
                     builder.AppendFormat("{0} {1}, ", Formatter.FormatType(pair.Value), pair.Key);
-
                 }
                 else
                 {
                     builder.AppendFormat("{0}, ", pair.Key);
-
                 }
             }
 
             if (builder.Length > 0)
             {
-                if (includeTypes)
-                {
-                    builder.Remove(builder.Length - 2, 2);
-                }
-                else
-                {
-                    builder.Remove(builder.Length - 1, 1);
-                }
+                builder.Remove(builder.Length - 2, 2);
             }
 
             return builder.ToString();

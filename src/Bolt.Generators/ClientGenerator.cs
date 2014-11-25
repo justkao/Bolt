@@ -1,9 +1,9 @@
-﻿using Bolt.Client;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Bolt.Client;
 
 namespace Bolt.Generators
 {
@@ -42,8 +42,6 @@ namespace Bolt.Generators
 
         public bool ForceAsync { get; set; }
 
-        public bool GenerateFactory { get; set; }
-
         public string Suffix { get; set; }
 
         public string Namespace { get; set; }
@@ -75,24 +73,23 @@ namespace Bolt.Generators
             ClassDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
 
+            string descriptorField = "_" + ContractDescriptorProperty.LowerCaseFirstLetter();
+
             generator.GenerateClass(
                 g =>
                 {
-                    WriteLine("public {0} {1} {{ get; set; }}", contractDescriptor.FullName, ContractDescriptorProperty);
-                    WriteLine();
-
-                    WriteLine("{0} {1}.Descriptor", contractDescriptor.Name, FormatDescriptorProvider(contractDescriptor));
+                    WriteLine("public virtual {0} {1}", contractDescriptor.FullName, ContractDescriptorProperty);
                     using (WithBlock())
                     {
                         WriteLine("get");
                         using (WithBlock())
                         {
-                            WriteLine("return this.{0};", ContractDescriptorProperty);
+                            WriteLine("return {0} ?? {1}.Default;", descriptorField, contractDescriptor.FullName);
                         }
                         WriteLine("set");
                         using (WithBlock())
                         {
-                            WriteLine("this.{0} = value;", ContractDescriptorProperty);
+                            WriteLine("{0} = value;", descriptorField);
                         }
                     }
                     WriteLine();
@@ -102,27 +99,10 @@ namespace Bolt.Generators
                     {
                         GenerateMethods(g, type);
                     }
-                });
+                },
+                introduceFields: (g) => WriteLine("private {0} {1};", contractDescriptor.FullName, descriptorField));
+
             WriteLine();
-
-            if (GenerateFactory)
-            {
-                ClassDescriptor descriptor = new ClassDescriptor(
-                    generator.Descriptor.Name + "Factory",
-                    generator.Descriptor.Namespace,
-                    string.Format("Bolt.Client.ChannelFactory<{0}, {1}>", generator.Descriptor.Name, contractDescriptor.Name));
-
-                ClientFactoryGenerator clientFactoryGenerator = new ClientFactoryGenerator(Output, Formatter, IntendProvider)
-                                                                    {
-                                                                        ContractDefinition =
-                                                                            ContractDefinition,
-                                                                        ContractDescriptor =
-                                                                            descriptor
-                                                                    };
-
-                clientFactoryGenerator.Generate();
-                WriteLine();
-            }
         }
 
         private void GenerateMethods(ClassGenerator classGenerator, Type contract)
@@ -265,11 +245,9 @@ namespace Bolt.Generators
 
         protected override ClassDescriptor CreateDefaultDescriptor()
         {
-            string descriptorProvider = FormatDescriptorProvider();
             List<string> baseClasses = new List<string>();
             baseClasses.Add(BaseClass);
             baseClasses.Add(ContractDefinition.Root.FullName);
-            baseClasses.Add(descriptorProvider);
 
             if (BaseInterfaces != null)
             {
@@ -280,13 +258,6 @@ namespace Bolt.Generators
                 Name ?? ContractDefinition.Name + Suffix,
                 Namespace ?? ContractDefinition.Namespace,
                 baseClasses.Distinct().ToArray());
-        }
-
-        private string FormatDescriptorProvider(ClassDescriptor contractDescriptor = null)
-        {
-            ClassDescriptor descriptor = contractDescriptor ?? MetadataProvider.GetContractDescriptor(ContractDefinition);
-            string descriptorProvider = string.Format("Bolt.Client.IContractDescriptorProvider<{0}>", descriptor.Name);
-            return descriptorProvider;
         }
     }
 }

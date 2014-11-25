@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -55,7 +56,7 @@ namespace Bolt.Generators
             WriteMethod(FormatMethodDeclaration(method, forceAsync), bodyGenerator, modifier, returnValue);
         }
 
-        public virtual void GenerateClass(Action<ClassGenerator> bodyGenerator, Action<ClassGenerator> annotateClassAction = null, bool addNamespace = true)
+        public virtual void GenerateClass(Action<ClassGenerator> bodyGenerator, Action<ClassGenerator> annotateClassAction = null, bool addNamespace = true, Action<ClassGenerator> introduceFields = null)
         {
             AddUsings(Descriptor.Namespace);
 
@@ -90,11 +91,47 @@ namespace Bolt.Generators
 
                 using (WithBlock())
                 {
+                    if (introduceFields != null)
+                    {
+                        introduceFields(this);
+                        WriteLine();
+                    }
+
+                    if (!Descriptor.IsInterface)
+                    {
+                        GenerateConstructors();
+                    }
+
                     bodyGenerator(this);
                 }
             }
 
             WriteLine();
+        }
+
+        private void GenerateConstructors()
+        {
+            Type baseClass =
+                Descriptor.BaseClasses.EmptyIfNull()
+                    .Select(n => Formatter != null ? Formatter.GetType(n) : Type.GetType(n))
+                    .FirstOrDefault(t => t != null && !t.GetTypeInfo().IsInterface);
+
+            if (baseClass == null)
+            {
+                return;
+            }
+
+            IEnumerable<ConstructorInfo> constructors = baseClass.GetTypeInfo().DeclaredConstructors.ToList();
+
+            foreach (ConstructorInfo constructor in constructors)
+            {
+                WriteLine("{0} {1}({2}) : base({3})", constructor.IsPublic ? "public" : "protected", Descriptor.Name, FormatMethodParameters(constructor.GetParameters(), true), FormatMethodParameters(constructor.GetParameters(), false));
+                using (WithBlock())
+                {
+                }
+
+                WriteLine();
+            }
         }
     }
 }

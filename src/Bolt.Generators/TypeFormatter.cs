@@ -20,14 +20,19 @@ namespace Bolt.Generators
         };
 
         private readonly Dictionary<Type, string> _aliases = new Dictionary<Type, string>()
+                                                                 {
+                                                                     { typeof(string), "string" },
+                                                                     { typeof(bool), "bool" },
+                                                                     { typeof(int), "int" },
+                                                                     { typeof(short), "short" },
+                                                                     { typeof(long), "long" },
+                                                                     { typeof(double), "double" },
+                                                                 };
+
+        public TypeFormatter()
         {
-            {typeof (string), "string"},
-            {typeof (bool), "bool"},
-            {typeof (int), "int"},
-            {typeof (short), "short"},
-            {typeof (long), "long"},
-            {typeof (double), "double"},
-        };
+            Assemblies = new List<Assembly>();
+        }
 
         public virtual string FormatType(Type type)
         {
@@ -45,6 +50,28 @@ namespace Bolt.Generators
         public virtual IEnumerable<string> GetNamespaces()
         {
             return _namespaces.Distinct().OrderBy(n => n).Distinct().ToList();
+        }
+
+        public List<Assembly> Assemblies { get; set; }
+
+        public Type GetType(string name)
+        {
+            Type type = Type.GetType(name);
+            if (type != null)
+            {
+                return null;
+            }
+
+            foreach (Assembly assembly in Assemblies.EmptyIfNull())
+            {
+                type = assembly.GetType(name);
+                if (type != null)
+                {
+                    return type;
+                }
+            }
+
+            return null;
         }
 
         private string DoFormat(Type type)

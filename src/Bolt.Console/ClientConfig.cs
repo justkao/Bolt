@@ -1,15 +1,13 @@
-﻿
+﻿using System.Linq;
+
 using Bolt.Client;
 using Bolt.Generators;
-using System.Linq;
 
 namespace Bolt.Console
 {
     public class ClientConfig : ConfigBase
     {
         public bool ForceAsync { get; set; }
-
-        public bool GenerateFactory { get; set; }
 
         public bool CustomBaseClass { get; set; }
 
@@ -25,7 +23,6 @@ namespace Bolt.Console
             {
                 ForceAsync = ForceAsync,
                 ContractDefinition = definition,
-                GenerateFactory = GenerateFactory,
                 Namespace = Namespace,
                 Name = Name
             };

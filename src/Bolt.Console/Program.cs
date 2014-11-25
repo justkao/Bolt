@@ -54,7 +54,6 @@ namespace Bolt.Console
                     ForceAsync = true,
                     Output = "<Directory or File Path>",
                     Excluded = new List<string>() { "<Additional Excluded Type >" },
-                    GenerateFactory = false,
                     Suffix = "<Generated Client Classes Suffix>"
                 }
             });

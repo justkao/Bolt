@@ -6,6 +6,11 @@ namespace Bolt.Generators
 {
     public static class Extensions
     {
+        public static string LowerCaseFirstLetter(this string name)
+        {
+            return name.Substring(0, 1).ToLower() + name.Substring(1);
+        }
+
         public static string CapitalizeFirstLetter(this string name)
         {
             return name.Substring(0, 1).ToUpper() + name.Substring(1);

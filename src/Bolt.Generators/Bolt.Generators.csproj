@@ -46,7 +46,6 @@
   <ItemGroup>
     <Compile Include="ClassDescriptor.cs" />
     <Compile Include="ClassGenerator.cs" />
-    <Compile Include="ClientFactoryGenerator.cs" />
     <Compile Include="ContractDefinition.cs" />
     <Compile Include="EasyDispose.cs" />
     <Compile Include="Extensions.cs" />

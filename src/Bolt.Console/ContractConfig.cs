@@ -1,15 +1,19 @@
-﻿using Bolt.Generators;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Bolt.Generators;
+using Newtonsoft.Json;
 
 namespace Bolt.Console
 {
     public class ContractConfig
     {
+        [JsonIgnore]
+        private List<Assembly> _assemblies = new List<Assembly>();
+
+        [JsonIgnore]
         private ContractDefinition _contractDefinition;
 
         [JsonProperty(Required = Required.Always)]
@@ -57,22 +61,23 @@ namespace Bolt.Console
                 Server.Parent = this;
             }
 
+            ContractDefinition definition = ContractDefinition;
             string output = PathHelpers.GetOutput(Parent.OutputDirectory, Output, ContractDefinition.Name + ".Contract.Designer.cs");
-
             DocumentGenerator document = Parent.GetDocument(output);
+            document.Formatter.Assemblies = _assemblies;
 
             document.Add(new ContractGenerator()
                              {
-                                 ContractDefinition = ContractDefinition
+                                 ContractDefinition = definition
                              });
 
             document.Add(new ContractDescriptorGenerator()
                              {
-                                 ContractDefinition = ContractDefinition
+                                 ContractDefinition = definition
                              });
 
 
-            ContractExecution execution = new ContractExecution(ContractDefinition, Path.GetDirectoryName(output));
+            ContractExecution execution = new ContractExecution(definition, Path.GetDirectoryName(output));
             if (Client != null)
             {
                 Client.Execute(execution);
@@ -88,7 +93,7 @@ namespace Bolt.Console
         {
             foreach (string assembly in Assemblies)
             {
-                Assembly.Load(File.ReadAllBytes(assembly));
+                _assemblies.Add(Assembly.Load(File.ReadAllBytes(assembly)));
             }
 
             Type type = TypeHelper.GetTypeOrThrow(Contract);

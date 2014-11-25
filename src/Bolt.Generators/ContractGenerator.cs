@@ -32,7 +32,7 @@ namespace Bolt.Generators
                     {
                         ParametersGenerator parametersGenerator = new ParametersGenerator(method, Output, Formatter, IntendProvider)
                         {
-                            IncludeNamespace = false
+                            IncludeNamespace = false,
                         };
 
                         if (!method.HasParameterClass())

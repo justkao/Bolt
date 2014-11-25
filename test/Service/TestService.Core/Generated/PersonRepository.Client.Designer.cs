@@ -25,7 +25,6 @@ namespace TestService.Core
     }
 }
 
-
 namespace TestService.Core
 {
     public partial interface IPersonRepositoryInner2Async : IPersonRepositoryInner2
@@ -33,7 +32,6 @@ namespace TestService.Core
         Task InnerOperation2Async();
     }
 }
-
 
 namespace TestService.Core
 {
@@ -55,22 +53,21 @@ namespace TestService.Core
     }
 }
 
-
 namespace TestService.Core
 {
-    public partial class PersonRepositoryChannel : Bolt.Client.Channel, TestService.Core.IPersonRepository, Bolt.Client.IContractDescriptorProvider<PersonRepositoryDescriptor>, IPersonRepositoryInnerAsync, IPersonRepositoryInner2Async, IPersonRepositoryAsync
+    public partial class PersonRepositoryChannel : Bolt.Client.Channel, TestService.Core.IPersonRepository, IPersonRepositoryInnerAsync, IPersonRepositoryInner2Async, IPersonRepositoryAsync
     {
-        public TestService.Core.PersonRepositoryDescriptor PersonRepositoryDescriptor { get; set; }
+        private TestService.Core.PersonRepositoryDescriptor _personRepositoryDescriptor;
 
-        PersonRepositoryDescriptor Bolt.Client.IContractDescriptorProvider<PersonRepositoryDescriptor>.Descriptor
+        public virtual TestService.Core.PersonRepositoryDescriptor PersonRepositoryDescriptor
         {
             get
             {
-                return this.PersonRepositoryDescriptor;
+                return _personRepositoryDescriptor ?? TestService.Core.PersonRepositoryDescriptor.Default;
             }
             set
             {
-                this.PersonRepositoryDescriptor = value;
+                _personRepositoryDescriptor = value;
             }
         }
 
@@ -111,27 +108,32 @@ namespace TestService.Core
 
         public virtual Task DoLongRunningOperation2Async(System.Threading.CancellationToken cancellation)
         {
-            return SendAsync(Bolt.Empty.Instance, PersonRepositoryDescriptor.DoLongRunningOperation2Async, cancellation);
+            var request = new DoLongRunningOperation2AsyncParameters();
+            return SendAsync(request, PersonRepositoryDescriptor.DoLongRunningOperation2Async, cancellation);
         }
 
         public virtual Task LongRunningOperation2Async(System.Threading.CancellationToken cancellation)
         {
-            return SendAsync(Bolt.Empty.Instance, PersonRepositoryDescriptor.LongRunningOperation2Async, cancellation);
+            var request = new LongRunningOperation2AsyncParameters();
+            return SendAsync(request, PersonRepositoryDescriptor.LongRunningOperation2Async, cancellation);
         }
 
         public virtual Task DoNothingAsAsync()
         {
-            return SendAsync(Bolt.Empty.Instance, PersonRepositoryDescriptor.DoNothingAsAsync, GetCancellationToken(PersonRepositoryDescriptor.DoNothingAsAsync));
+            var request = new DoNothingAsAsyncParameters();
+            return SendAsync(request, PersonRepositoryDescriptor.DoNothingAsAsync, GetCancellationToken(PersonRepositoryDescriptor.DoNothingAsAsync));
         }
 
         public virtual void DoNothing()
         {
-            Send(Bolt.Empty.Instance, PersonRepositoryDescriptor.DoNothing, GetCancellationToken(PersonRepositoryDescriptor.DoNothing));
+            var request = new DoNothingParameters();
+            Send(request, PersonRepositoryDescriptor.DoNothing, GetCancellationToken(PersonRepositoryDescriptor.DoNothing));
         }
 
         public virtual Task DoNothingAsync()
         {
-            return SendAsync(Bolt.Empty.Instance, PersonRepositoryDescriptor.DoNothing, GetCancellationToken(PersonRepositoryDescriptor.DoNothing));
+            var request = new DoNothingParameters();
+            return SendAsync(request, PersonRepositoryDescriptor.DoNothing, GetCancellationToken(PersonRepositoryDescriptor.DoNothing));
         }
 
         public virtual Task DoNothingWithComplexParameterAsAsync(List<Person> person)
@@ -219,31 +221,37 @@ namespace TestService.Core
         }
         public virtual void InnerOperation()
         {
-            Send(Bolt.Empty.Instance, PersonRepositoryDescriptor.InnerOperation, GetCancellationToken(PersonRepositoryDescriptor.InnerOperation));
+            var request = new InnerOperationParameters();
+            Send(request, PersonRepositoryDescriptor.InnerOperation, GetCancellationToken(PersonRepositoryDescriptor.InnerOperation));
         }
 
         public virtual Task InnerOperationAsync()
         {
-            return SendAsync(Bolt.Empty.Instance, PersonRepositoryDescriptor.InnerOperation, GetCancellationToken(PersonRepositoryDescriptor.InnerOperation));
+            var request = new InnerOperationParameters();
+            return SendAsync(request, PersonRepositoryDescriptor.InnerOperation, GetCancellationToken(PersonRepositoryDescriptor.InnerOperation));
         }
 
         public virtual Task InnerOperationExAsync()
         {
-            return SendAsync(Bolt.Empty.Instance, PersonRepositoryDescriptor.InnerOperationExAsync, GetCancellationToken(PersonRepositoryDescriptor.InnerOperationExAsync));
+            var request = new InnerOperationExAsyncParameters();
+            return SendAsync(request, PersonRepositoryDescriptor.InnerOperationExAsync, GetCancellationToken(PersonRepositoryDescriptor.InnerOperationExAsync));
         }
         public virtual void InnerOperation2()
         {
-            Send(Bolt.Empty.Instance, PersonRepositoryDescriptor.InnerOperation2, GetCancellationToken(PersonRepositoryDescriptor.InnerOperation2));
+            var request = new InnerOperation2Parameters();
+            Send(request, PersonRepositoryDescriptor.InnerOperation2, GetCancellationToken(PersonRepositoryDescriptor.InnerOperation2));
         }
 
         public virtual Task InnerOperation2Async()
         {
-            return SendAsync(Bolt.Empty.Instance, PersonRepositoryDescriptor.InnerOperation2, GetCancellationToken(PersonRepositoryDescriptor.InnerOperation2));
+            var request = new InnerOperation2Parameters();
+            return SendAsync(request, PersonRepositoryDescriptor.InnerOperation2, GetCancellationToken(PersonRepositoryDescriptor.InnerOperation2));
         }
 
         public virtual Task InnerOperationExAsync2()
         {
-            return SendAsync(Bolt.Empty.Instance, PersonRepositoryDescriptor.InnerOperationExAsync2, GetCancellationToken(PersonRepositoryDescriptor.InnerOperationExAsync2));
+            var request = new InnerOperationExAsync2Parameters();
+            return SendAsync(request, PersonRepositoryDescriptor.InnerOperationExAsync2, GetCancellationToken(PersonRepositoryDescriptor.InnerOperationExAsync2));
         }
     }
 }

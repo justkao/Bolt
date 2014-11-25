@@ -2,22 +2,9 @@
 
 namespace Bolt.Client
 {
-    public class ChannelFactory<TChannel, TContractDescriptor>
-        where TChannel : Channel, IContractDescriptorProvider<TContractDescriptor>, new()
-        where TContractDescriptor : ContractDescriptor
+    public class ChannelFactory<TChannel>
+        where TChannel : Channel, new()
     {
-        public ChannelFactory(TContractDescriptor contractDescriptor)
-        {
-            if (contractDescriptor == null)
-            {
-                throw new ArgumentNullException("contractDescriptor");
-            }
-
-            ContractDescriptor = contractDescriptor;
-        }
-
-        public TContractDescriptor ContractDescriptor { get; private set; }
-
         public ClientConfiguration ClientConfiguration { get; set; }
 
         public string Prefix { get; set; }
@@ -48,7 +35,6 @@ namespace Bolt.Client
             TChannel channel = new TChannel();
             ClientConfiguration.Update(channel);
             channel.Prefix = Prefix;
-            channel.Descriptor = ContractDescriptor;
             channel.ConnectionProvider = connectionProvider;
 
             return channel;

@@ -3,8 +3,12 @@
         {
             "contract": "TestService.Core.IPersonRepository",
             "assemblies": [ "TestService.Core.dll" ],
-            "client": { "forceAsync": "true"},
-            "server": {}
+                "parametersBase": "TestService.Core.ParametersBase",
+
+            "client": {
+                "forceAsync": "true"
+            },
+            "server": { }
         }
     ]
 }

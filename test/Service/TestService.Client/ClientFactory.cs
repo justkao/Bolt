@@ -35,14 +35,14 @@ namespace TestService.Client
 
         public static IPersonRepository CreateWcf()
         {
-            ChannelFactory<IPersonRepository> respository = new ChannelFactory<IPersonRepository>(new BasicHttpBinding());
+            System.ServiceModel.ChannelFactory<IPersonRepository> respository = new System.ServiceModel.ChannelFactory<IPersonRepository>(new BasicHttpBinding());
             IPersonRepository channel = respository.CreateChannel(new EndpointAddress(Servers.WcfServer));
             return channel;
         }
 
         public static IPersonRepository CreateIISWcf()
         {
-            ChannelFactory<IPersonRepository> respository = new ChannelFactory<IPersonRepository>(new BasicHttpBinding());
+            System.ServiceModel.ChannelFactory<IPersonRepository> respository = new System.ServiceModel.ChannelFactory<IPersonRepository>(new BasicHttpBinding());
             IPersonRepository channel = respository.CreateChannel(new EndpointAddress(Servers.IISWcfServer));
             return channel;
         }

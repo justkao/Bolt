@@ -63,7 +63,6 @@
     <Compile Include="IChannel.cs" />
     <Compile Include="IClientDataHandler.cs" />
     <Compile Include="IConnectionProvider.cs" />
-    <Compile Include="IContractDescriptorProvider.cs" />
     <Compile Include="IRequestForwarder.cs" />
     <Compile Include="IServerProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -7,7 +7,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using Bolt.Generators;
 using Bolt.Service.Test.Core;
 using Bolt.Service.Test.Core.Parameters;
 using System;
@@ -36,19 +35,19 @@ namespace Bolt.Service.Test.Core
 
 namespace Bolt.Service.Test.Core
 {
-    public partial class TestContractChannel : Bolt.Client.Channel, Bolt.Service.Test.Core.ITestContract, Bolt.Client.IContractDescriptorProvider<TestContractDescriptor>, ITestContractInnerAsync, ITestContractAsync
+    public partial class TestContractChannel : Bolt.Client.Channel, Bolt.Service.Test.Core.ITestContract, ITestContractInnerAsync, ITestContractAsync
     {
-        public Bolt.Service.Test.Core.TestContractDescriptor TestContractDescriptor { get; set; }
+        private Bolt.Service.Test.Core.TestContractDescriptor _testContractDescriptor;
 
-        TestContractDescriptor Bolt.Client.IContractDescriptorProvider<TestContractDescriptor>.Descriptor
+        public virtual Bolt.Service.Test.Core.TestContractDescriptor TestContractDescriptor
         {
             get
             {
-                return this.TestContractDescriptor;
+                return _testContractDescriptor ?? Bolt.Service.Test.Core.TestContractDescriptor.Default;
             }
             set
             {
-                this.TestContractDescriptor = value;
+                _testContractDescriptor = value;
             }
         }
 
@@ -114,21 +113,6 @@ namespace Bolt.Service.Test.Core
             request.Arg2 = arg2;
             request.Time = time;
             Send(request, TestContractDescriptor.MethodWithManyArguments, GetCancellationToken(TestContractDescriptor.MethodWithManyArguments));
-        }
-    }
-}
-
-
-namespace Bolt.Service.Test.Core
-{
-    public partial class TestContractChannelFactory : Bolt.Client.ChannelFactory<TestContractChannel, TestContractDescriptor>
-    {
-        public TestContractChannelFactory() : this(TestContractDescriptor.Default)
-        {
-        }
-
-        public TestContractChannelFactory(TestContractDescriptor descriptor) : base(descriptor)
-        {
         }
     }
 }
