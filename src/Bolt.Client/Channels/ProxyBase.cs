@@ -3,22 +3,22 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Bolt.Client
+namespace Bolt.Client.Channels
 {
-    public abstract class ChannelProxyBase : ChannelBase
+    public abstract class ProxyBase : ChannelBase
     {
         private Exception _failedReason;
 
-        protected ChannelProxyBase(ChannelProxyBase channel)
-            : base(channel)
+        protected ProxyBase(ProxyBase proxy)
+            : base(proxy)
         {
-            Retries = channel.Retries;
-            RetryDelay = channel.RetryDelay;
-            IsFailed = channel.IsFailed;
-            _failedReason = channel._failedReason;
+            Retries = proxy.Retries;
+            RetryDelay = proxy.RetryDelay;
+            IsFailed = proxy.IsFailed;
+            _failedReason = proxy._failedReason;
         }
 
-        protected ChannelProxyBase(IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+        protected ProxyBase(IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
             : base(requestForwarder, endpointProvider)
         {
         }

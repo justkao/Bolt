@@ -9,6 +9,16 @@ namespace Bolt.Client
         public ClientActionContext(ActionDescriptor actionDescriptor, HttpWebRequest request, Uri server, CancellationToken cancellation)
             : base(actionDescriptor)
         {
+            if (request == null)
+            {
+                throw new ArgumentNullException("request");
+            }
+
+            if (server == null)
+            {
+                throw new ArgumentNullException("server");
+            }
+
             Request = request;
             Server = server;
             Cancellation = cancellation;

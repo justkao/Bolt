@@ -7,8 +7,13 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
+using TestService.Core;
 using TestService.Core.Parameters;
 
 
@@ -50,21 +55,17 @@ namespace TestService.Core
 
 namespace TestService.Core
 {
-    public partial class PersonRepositoryProxy : Bolt.Client.ContractProxy<TestService.Core.PersonRepositoryDescriptor>, TestService.Core.IPersonRepository, IPersonRepositoryInnerAsync, IPersonRepositoryInner2Async, IPersonRepositoryAsync
+    public partial class PersonRepositoryProxy : Bolt.Client.Channels.ContractProxy<TestService.Core.PersonRepositoryDescriptor>, TestService.Core.IPersonRepository, IPersonRepositoryInnerAsync, IPersonRepositoryInner2Async, IPersonRepositoryAsync
     {
-        public PersonRepositoryProxy(TestService.Core.PersonRepositoryProxy proxy)
-            : base(proxy)
+        public PersonRepositoryProxy(TestService.Core.PersonRepositoryProxy proxy) : base(proxy)
         {
         }
 
-        public PersonRepositoryProxy(TestService.Core.PersonRepositoryDescriptor descriptor,
-            Bolt.Client.IChannel channel)
-            : base(descriptor, channel)
+        public PersonRepositoryProxy(TestService.Core.PersonRepositoryDescriptor descriptor, Bolt.Client.IChannel channel) : base(descriptor, channel)
         {
         }
 
-        public PersonRepositoryProxy(Bolt.Client.IChannel channel)
-            : base(TestService.Core.PersonRepositoryDescriptor.Default, channel)
+        public PersonRepositoryProxy(Bolt.Client.IChannel channel) : base(TestService.Core.PersonRepositoryDescriptor.Default, channel)
         {
         }
 

@@ -3,28 +3,47 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Bolt.Client
+namespace Bolt.Client.Channels
 {
-    public class StateFullChannel<TContract, TContractDescriptor> : ChannelProxyBase
+    public class StateFullProxy<TContract, TContractDescriptor> : ProxyBase
         where TContract : ContractProxy<TContractDescriptor>
         where TContractDescriptor : ContractDescriptor
     {
         private readonly object _syncRoot = new object();
-        private readonly TContractDescriptor _descriptor;
-        private readonly string _prefix;
-        private readonly Func<IChannel, TContract> _contractFactory;
-        private readonly IServerProvider _serverProvider;
         private Uri _activeConnection;
         private string _sessionId;
 
-        public StateFullChannel(TContractDescriptor descriptor, IServerProvider serverProvider, string prefix, Func<IChannel, TContract> contractFactory, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+        public StateFullProxy(TContractDescriptor descriptor, IServerProvider serverProvider, string prefix, Func<IChannel, TContract> contractFactory, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
             : base(requestForwarder, endpointProvider)
         {
-            _descriptor = descriptor;
-            _prefix = prefix;
-            _contractFactory = contractFactory;
-            _serverProvider = serverProvider;
+            if (descriptor == null)
+            {
+                throw new ArgumentNullException("descriptor");
+            }
+
+            if (serverProvider == null)
+            {
+                throw new ArgumentNullException("serverProvider");
+            }
+
+            if (contractFactory == null)
+            {
+                throw new ArgumentNullException("contractFactory");
+            }
+
+            Descriptor = descriptor;
+            Prefix = prefix;
+            ContractFactory = contractFactory;
+            ServerProvider = serverProvider;
         }
+
+        public TContractDescriptor Descriptor { get; private set; }
+
+        public Func<IChannel, TContract> ContractFactory { get; private set; }
+
+        public IServerProvider ServerProvider { get; private set; }
+
+        public string Prefix { get; private set; }
 
         protected override ClientActionContext CreateContext(ActionDescriptor actionDescriptor, CancellationToken cancellation, object parameters)
         {
@@ -37,24 +56,24 @@ namespace Bolt.Client
             {
                 if (_activeConnection != null)
                 {
-                    HttpWebRequest request = CreateWebRequest(_activeConnection, _prefix, _descriptor, actionDescriptor);
+                    HttpWebRequest request = CreateWebRequest(_activeConnection, Prefix, Descriptor, actionDescriptor);
                     request.Headers["Session-Id"] = _sessionId;
                     ClientActionContext clientContext = new ClientActionContext(actionDescriptor, request, _activeConnection, cancellation);
                     return new ConnectionDescriptor(clientContext, new ActionChannel(RequestForwarder, EndpointProvider, clientContext));
                 }
                 else
                 {
-                    Uri serverUrl = _serverProvider.GetServer();
+                    Uri serverUrl = ServerProvider.GetServer();
                     string session = Guid.NewGuid().ToString();
 
-                    DelegatedChannel delegatedChannel = new DelegatedChannel(RequestForwarder, EndpointProvider, serverUrl, _prefix, _descriptor, null);
-                    TContract contract = _contractFactory(delegatedChannel);
+                    DelegatedChannel delegatedChannel = new DelegatedChannel(RequestForwarder, EndpointProvider, serverUrl, Prefix, Descriptor, null);
+                    TContract contract = ContractFactory(delegatedChannel);
                     OnProxyOpening(contract);
 
                     _activeConnection = serverUrl;
                     _sessionId = session;
 
-                    HttpWebRequest request = CreateWebRequest(_activeConnection, _prefix, _descriptor, actionDescriptor);
+                    HttpWebRequest request = CreateWebRequest(_activeConnection, Prefix, Descriptor, actionDescriptor);
                     request.Headers["Session-Id"] = _sessionId;
                     ClientActionContext clientContext = new ClientActionContext(actionDescriptor, request, _activeConnection, cancellation);
                     return new ConnectionDescriptor(clientContext, new ActionChannel(RequestForwarder, EndpointProvider, clientContext));
@@ -70,12 +89,22 @@ namespace Bolt.Client
         {
         }
 
+        public override void Open()
+        {
+            base.Open();
+        }
+
+        public override Task OpenAsync()
+        {
+            return base.OpenAsync();
+        }
+
         public override void Close()
         {
             if (_activeConnection != null)
             {
-                DelegatedChannel delegatedChannel = new DelegatedChannel(RequestForwarder, EndpointProvider, _activeConnection, _prefix, _descriptor, null);
-                TContract contract = _contractFactory(delegatedChannel);
+                DelegatedChannel delegatedChannel = new DelegatedChannel(RequestForwarder, EndpointProvider, _activeConnection, Prefix, Descriptor, null);
+                TContract contract = ContractFactory(delegatedChannel);
                 OnProxyClosing(contract);
             }
 

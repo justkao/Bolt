@@ -3,19 +3,34 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Bolt.Client
+namespace Bolt.Client.Channels
 {
     public abstract class ChannelBase : IChannel
     {
-        protected ChannelBase(ChannelBase channel)
+        protected ChannelBase(ChannelBase proxy)
         {
-            RequestForwarder = channel.RequestForwarder;
-            EndpointProvider = channel.EndpointProvider;
-            IsClosed = channel.IsClosed;
+            if (proxy == null)
+            {
+                throw new ArgumentNullException("proxy");
+            }
+
+            RequestForwarder = proxy.RequestForwarder;
+            EndpointProvider = proxy.EndpointProvider;
+            IsClosed = proxy.IsClosed;
         }
 
         protected ChannelBase(IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
         {
+            if (requestForwarder == null)
+            {
+                throw new ArgumentNullException("requestForwarder");
+            }
+
+            if (endpointProvider == null)
+            {
+                throw new ArgumentNullException("endpointProvider");
+            }
+
             RequestForwarder = requestForwarder;
             EndpointProvider = endpointProvider;
         }
@@ -26,9 +41,29 @@ namespace Bolt.Client
 
         public bool IsClosed { get; protected set; }
 
+        public bool IsOpened { get; protected set; }
+
         public virtual CancellationToken GetCancellationToken(ActionDescriptor descriptor)
         {
             return CancellationToken.None;
+        }
+
+        public virtual void Open()
+        {
+            EnsureNotClosed();
+
+            if (IsOpened)
+            {
+                return;
+            }
+
+            IsOpened = true;
+        }
+
+        public virtual Task OpenAsync()
+        {
+            Open();
+            return Task.FromResult(0);
         }
 
         public Task SendAsync<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)

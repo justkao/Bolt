@@ -1,15 +1,15 @@
 ﻿using System.Threading;
 
-namespace Bolt.Client
+namespace Bolt.Client.Channels
 {
     public class ActionChannel : ChannelBase
     {
         private readonly ClientActionContext _context;
 
-        public ActionChannel(ActionChannel channel)
-            : base(channel)
+        public ActionChannel(ActionChannel proxy)
+            : base(proxy)
         {
-            _context = channel._context;
+            _context = proxy._context;
         }
 
         public ActionChannel(IRequestForwarder requestForwarder, IEndpointProvider endpointProvider, ClientActionContext context)

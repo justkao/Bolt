@@ -2,7 +2,7 @@
 using System.Net;
 using System.Threading;
 
-namespace Bolt.Client
+namespace Bolt.Client.Channels
 {
     public class DelegatedChannel : ChannelBase
     {

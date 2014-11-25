@@ -8,6 +8,11 @@ namespace Bolt.Client
 
         public UriServerProvider(Uri url)
         {
+            if (url == null)
+            {
+                throw new ArgumentNullException("url");
+            }
+
             _url = url;
         }
 

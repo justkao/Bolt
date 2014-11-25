@@ -35,7 +35,7 @@ namespace Bolt.Service.Test.Core
 
 namespace Bolt.Service.Test.Core
 {
-    public partial class TestContractProxy : Bolt.Client.ContractProxy<Bolt.Service.Test.Core.TestContractDescriptor>, Bolt.Service.Test.Core.ITestContract, ITestContractInnerAsync, ITestContractAsync
+    public partial class TestContractProxy : Bolt.Client.Channels.ContractProxy<Bolt.Service.Test.Core.TestContractDescriptor>, Bolt.Service.Test.Core.ITestContract, ITestContractInnerAsync, ITestContractAsync
     {
         public TestContractProxy(Bolt.Service.Test.Core.TestContractProxy proxy) : base(proxy)
         {

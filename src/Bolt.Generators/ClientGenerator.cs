@@ -1,4 +1,5 @@
 ﻿using Bolt.Client;
+using Bolt.Client.Channels;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -218,7 +219,7 @@ namespace Bolt.Generators
         {
             ClassDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
             List<string> baseClasses = new List<string>();
-            string baseClass = string.Format("Bolt.Client.ContractProxy<{0}>", contractDescriptor.FullName);
+            string baseClass = string.Format("{0}.ContractProxy<{1}>", typeof(ChannelBase).Namespace, contractDescriptor.FullName);
             baseClasses.Add(baseClass);
             baseClasses.Add(ContractDefinition.Root.FullName);
 

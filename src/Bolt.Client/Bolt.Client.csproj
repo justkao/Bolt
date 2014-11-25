@@ -51,30 +51,28 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ChannelBase.cs" />
-    <Compile Include="ChannelProxyBase.cs" />
+    <Compile Include="Channels\ChannelBase.cs" />
+    <Compile Include="Channels\ProxyBase.cs" />
     <Compile Include="ClientConfiguration.cs" />
     <Compile Include="ClientDataHandler.cs" />
     <Compile Include="ClientActionContext.cs" />
-    <Compile Include="ConnectionDescriptor.cs" />
-    <Compile Include="ActionChannel.cs" />
-    <Compile Include="DelegatedChannel.cs" />
+    <Compile Include="Channels\ActionChannel.cs" />
+    <Compile Include="Channels\DelegatedChannel.cs" />
     <Compile Include="ICancellationTokenProvider.cs" />
     <Compile Include="IChannel.cs" />
-    <Compile Include="IChannelProvider.cs" />
     <Compile Include="IClientDataHandler.cs" />
     <Compile Include="ICloseable.cs" />
     <Compile Include="IRequestForwarder.cs" />
     <Compile Include="IServerProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ContractProxy.cs" />
+    <Compile Include="Channels\ContractProxy.cs" />
     <Compile Include="ProxyFailedException.cs" />
     <Compile Include="RequestForwarder.cs" />
     <Compile Include="ClientSerializerExtensions.cs" />
     <Compile Include="ResponseDescriptor.cs" />
     <Compile Include="ResponseErrorType.cs" />
-    <Compile Include="StateFullChannel.cs" />
-    <Compile Include="StateLessChannel.cs" />
+    <Compile Include="Channels\StateFullProxy.cs" />
+    <Compile Include="Channels\StateLessProxy.cs" />
     <Compile Include="UriServerProvider.cs" />
   </ItemGroup>
   <ItemGroup>
