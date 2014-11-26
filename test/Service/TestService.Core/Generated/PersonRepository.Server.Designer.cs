@@ -20,7 +20,7 @@ using TestService.Core;
 using TestService.Core.Parameters;
 
 
-namespace Bolt.Server
+namespace TestService.Core
 {
     public partial class PersonRepositoryInvoker : Bolt.Server.ContractInvoker<TestService.Core.PersonRepositoryDescriptor>
     {
@@ -185,7 +185,7 @@ namespace Bolt.Server
 
 namespace Bolt.Server
 {
-    public static partial class PersonRepositoryExtensions
+    public static partial class PersonRepositoryInvokerExtensions
     {
         public static IAppBuilder UsePersonRepository(this IAppBuilder app, TestService.Core.IPersonRepository instance)
         {
@@ -195,7 +195,7 @@ namespace Bolt.Server
         public static IAppBuilder UsePersonRepository(this IAppBuilder app, IInstanceProvider instanceProvider)
         {
             var boltExecutor = app.GetBolt();
-            var invoker = new Bolt.Server.PersonRepositoryInvoker();
+            var invoker = new TestService.Core.PersonRepositoryInvoker();
             invoker.Descriptor = TestService.Core.PersonRepositoryDescriptor.Default;
             invoker.Init(boltExecutor.Configuration);
             invoker.InstanceProvider = instanceProvider;

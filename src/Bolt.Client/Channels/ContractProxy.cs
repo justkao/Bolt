@@ -1,9 +1,10 @@
 using System;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Bolt.Client.Channels
 {
-    public abstract class ContractProxy<TContractDescriptor> : ICancellationTokenProvider, IDisposable, IContractDescriptorProvider<TContractDescriptor>
+    public abstract class ContractProxy<TContractDescriptor> : IContractDescriptorProvider<TContractDescriptor>, IChannel
         where TContractDescriptor : ContractDescriptor
     {
         protected ContractProxy(ContractProxy<TContractDescriptor> proxy)
@@ -48,6 +49,8 @@ namespace Bolt.Client.Channels
             return proxy;
         }
 
+        #region IChannel Implementation
+
         public virtual CancellationToken GetCancellationToken(ActionDescriptor descriptor)
         {
             return Channel.GetCancellationToken(descriptor);
@@ -57,5 +60,57 @@ namespace Bolt.Client.Channels
         {
             Channel.Dispose();
         }
+
+        void IChannel.Open()
+        {
+            Channel.Open();
+        }
+
+        Task IChannel.OpenAsync()
+        {
+            return Channel.OpenAsync();
+        }
+
+        bool IChannel.IsOpened
+        {
+            get { return Channel.IsOpened; }
+        }
+
+        void IChannel.Close()
+        {
+            Channel.Close();
+        }
+
+        Task IChannel.CloseAsync()
+        {
+            return Channel.CloseAsync();
+        }
+
+        bool IChannel.IsClosed
+        {
+            get { return Channel.IsClosed; }
+        }
+
+        Task IChannel.SendAsync<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        {
+            return Channel.SendAsync(parameters, descriptor, cancellation);
+        }
+
+        Task<TResult> IChannel.SendAsync<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        {
+            return Channel.SendAsync<TResult, TRequestParameters>(parameters, descriptor, cancellation);
+        }
+
+        void IChannel.Send<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        {
+            Channel.Send(parameters, descriptor, cancellation);
+        }
+
+        TResult IChannel.Send<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        {
+            return Channel.Send<TResult, TRequestParameters>(parameters, descriptor, cancellation);
+        }
+
+        #endregion
     }
 }
