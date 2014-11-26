@@ -1,11 +1,13 @@
-﻿using System;
+﻿using Microsoft.Owin;
+using System;
 using System.Threading.Tasks;
-using Microsoft.Owin;
 
 namespace Bolt.Server
 {
     public class BoltMiddleware : OwinMiddleware
     {
+        public const string BoltKey = "bolt.executor";
+
         public BoltMiddleware(OwinMiddleware next, BoltMiddlewareOptions options)
             : base(next)
         {
@@ -21,8 +23,8 @@ namespace Bolt.Server
 
         public override async Task Invoke(IOwinContext context)
         {
-            await Options.BoltContainer.Execute(context);
-            await Next.Invoke(context);
+            context.Set(BoltKey, Options.BoltExecutor);
+            await Options.BoltExecutor.Execute(context);
         }
     }
 }

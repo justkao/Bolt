@@ -55,7 +55,6 @@ namespace Bolt.Generators
 
                 if (value != null)
                 {
-                    AddUsings(typeof(ContractDefinition).Namespace);
                     AddUsings(ContractDefinition.Namespace);
                 }
             }
@@ -104,6 +103,17 @@ namespace Bolt.Generators
         public virtual ClassGenerator CreateClassGenerator(ClassDescriptor descriptor)
         {
             return new ClassGenerator(descriptor, Output, Formatter, IntendProvider);
+        }
+
+        public T CreateEx<T>() where T : ContractGeneratorBase, new()
+        {
+            T res = new T();
+            res.Output = Output;
+            res.Formatter = Formatter;
+            res.IntendProvider = IntendProvider;
+            res.MetadataProvider = MetadataProvider;
+            res.ContractDefinition = ContractDefinition;
+            return res;
         }
     }
 }

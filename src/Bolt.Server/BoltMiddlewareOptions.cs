@@ -4,16 +4,16 @@ namespace Bolt.Server
 {
     public class BoltMiddlewareOptions
     {
-        public BoltMiddlewareOptions(BoltContainer boltContainer)
+        public BoltMiddlewareOptions(IBoltExecutor boltExecutor)
         {
-            if (boltContainer == null)
+            if (boltExecutor == null)
             {
-                throw new ArgumentNullException("boltContainer");
+                throw new ArgumentNullException("boltExecutor");
             }
 
-            BoltContainer = boltContainer;
+            BoltExecutor = boltExecutor;
         }
 
-        public BoltContainer BoltContainer { get; private set; }
+        public IBoltExecutor BoltExecutor { get; private set; }
     }
 }

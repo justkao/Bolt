@@ -44,12 +44,12 @@ namespace Bolt.Server
 
             if (error is DeserializeParametersException)
             {
-                context.Context.WriteErrorCode(_errorCodesHeader, ServerErrorCode.Deserialization);
+                context.Context.CloseWithError(_errorCodesHeader, ServerErrorCode.Deserialization);
                 return Task.FromResult(0);
             }
             if (error is SerializeResponseException)
             {
-                context.Context.WriteErrorCode(_errorCodesHeader, ServerErrorCode.Serialization);
+                context.Context.CloseWithError(_errorCodesHeader, ServerErrorCode.Serialization);
                 return Task.FromResult(0);
             }
 

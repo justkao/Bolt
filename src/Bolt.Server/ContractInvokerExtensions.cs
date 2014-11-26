@@ -50,7 +50,6 @@ namespace Bolt.Server
             this IAppBuilder builder,
             ContractDescriptor descriptor,
             ServerConfiguration configuration,
-            string prefix,
             Action<IAppBuilder> configure)
         {
             if (configuration == null)
@@ -58,7 +57,7 @@ namespace Bolt.Server
                 throw new ArgumentNullException("configuration");
             }
 
-            Uri url = configuration.EndpointProvider.GetEndpoint(null, prefix, descriptor, null);
+            Uri url = configuration.EndpointProvider.GetEndpoint(null, descriptor, null);
             return builder.Map(url.ToString(), configure);
         }
     }

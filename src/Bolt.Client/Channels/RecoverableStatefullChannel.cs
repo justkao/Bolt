@@ -13,8 +13,8 @@ namespace Bolt.Client.Channels
         private Uri _activeConnection;
         private string _sessionId;
 
-        public RecoverableStatefullChannel(TContractDescriptor descriptor, IServerProvider serverProvider, string prefix, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
-            : base(descriptor, prefix, serverProvider, requestForwarder, endpointProvider)
+        public RecoverableStatefullChannel(TContractDescriptor descriptor, IServerProvider serverProvider, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+            : base(descriptor, serverProvider, requestForwarder, endpointProvider)
         {
         }
 
@@ -29,7 +29,7 @@ namespace Bolt.Client.Channels
             {
                 if (_activeConnection != null)
                 {
-                    HttpWebRequest request = CreateWebRequest(_activeConnection, Prefix, Descriptor, actionDescriptor);
+                    HttpWebRequest request = CreateWebRequest(_activeConnection, Descriptor, actionDescriptor);
                     request.Headers["Session-Id"] = _sessionId;
                     ClientActionContext clientContext = new ClientActionContext(actionDescriptor, request, _activeConnection, cancellation);
                     return new ConnectionDescriptor(clientContext, new ActionChannel(RequestForwarder, EndpointProvider, clientContext));
@@ -45,7 +45,7 @@ namespace Bolt.Client.Channels
                     _activeConnection = serverUrl;
                     _sessionId = session;
 
-                    HttpWebRequest request = CreateWebRequest(_activeConnection, Prefix, Descriptor, actionDescriptor);
+                    HttpWebRequest request = CreateWebRequest(_activeConnection, Descriptor, actionDescriptor);
                     request.Headers["Session-Id"] = _sessionId;
                     ClientActionContext clientContext = new ClientActionContext(actionDescriptor, request, _activeConnection, cancellation);
                     return new ConnectionDescriptor(clientContext, new ActionChannel(RequestForwarder, EndpointProvider, clientContext));

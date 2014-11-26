@@ -12,7 +12,7 @@ namespace TestService.Server
         public void Configuration(IAppBuilder app)
         {
             ServerConfiguration configuration = new ServerConfiguration(new ProtocolBufferSerializer(), new JsonExceptionSerializer());
-            app.MapContract(PersonRepositoryDescriptor.Default, configuration, "api", b => ConfigurePersonRepository(b, configuration));
+            app.MapContract(PersonRepositoryDescriptor.Default, configuration, b => ConfigurePersonRepository(b, configuration));
         }
 
         private void ConfigurePersonRepository(IAppBuilder obj, ServerConfiguration configuration)

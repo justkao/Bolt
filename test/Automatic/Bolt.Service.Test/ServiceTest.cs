@@ -5,7 +5,6 @@ using Bolt.Service.Test.Core;
 using Microsoft.Owin.Hosting;
 using Moq;
 using NUnit.Framework;
-using Owin;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -253,8 +252,6 @@ namespace Bolt.Service.Test
 
         public ClientConfiguration ClientConfiguration { get; set; }
 
-        public string Prefix { get; set; }
-
         public MockInstanceProvider InstanceProvider = new MockInstanceProvider();
 
         public Mock<ITestContract> Server()
@@ -268,12 +265,12 @@ namespace Bolt.Service.Test
         {
             return GetStateFullChannel();
 
-            return ClientConfiguration.CreateStateLessProxy<TestContractProxy, TestContractDescriptor>(ServerUrl, Prefix);
+            return ClientConfiguration.CreateStateLessProxy<TestContractProxy, TestContractDescriptor>(ServerUrl);
         }
 
         public virtual ITestContract GetStateFullChannel()
         {
-            return ClientConfiguration.CreateStateFullProxy<TestContractProxy, TestContractDescriptor>(ServerUrl, Prefix);
+            return ClientConfiguration.CreateStateFullProxy<TestContractProxy, TestContractDescriptor>(ServerUrl);
         }
 
         [TestFixtureSetUp]
@@ -297,23 +294,15 @@ namespace Bolt.Service.Test
             ServerConfiguration = new ServerConfiguration(serializer, jsonExceptionSerializer);
             ClientConfiguration = new ClientConfiguration(serializer, jsonExceptionSerializer);
 
-            Prefix = "test";
-
             _runningServer = WebApp.Start(
                 ServerUrl.ToString(),
-                (b) =>
-                {
-                    IAppBuilder contractEndpointBuilder = b.MapContract(
-                        TestContractDescriptor.Default,
-                        ServerConfiguration,
-                        Prefix, (endpointBuilder) =>
-                            {
-                                endpointBuilder.UseContractInvoker<TestContractInvoker, TestContractDescriptor>(
-                                    ServerConfiguration,
-                                    TestContractDescriptor.Default,
-                                    InstanceProvider);
-                            });
-                });
+                (b) => b.MapContract(
+                    TestContractDescriptor.Default,
+                    ServerConfiguration, (endpointBuilder) =>
+                    {
+                        endpointBuilder.UseBolt(ServerConfiguration);
+                        endpointBuilder.UseTestContract(InstanceProvider);
+                    }));
         }
 
         [TestFixtureTearDown]

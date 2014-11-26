@@ -1,8 +1,7 @@
+using Microsoft.Owin;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
-using Microsoft.Owin;
 
 namespace Bolt.Server
 {
@@ -72,6 +71,14 @@ namespace Bolt.Server
             set { _responseHandler = value; }
         }
 
+        public void Init(ServerConfiguration configuration)
+        {
+            DataHandler = configuration.ServerDataHandler;
+            ResponseHandler = configuration.ResponseHandler;
+
+            Init();
+        }
+
         public virtual void Init()
         {
         }
@@ -109,7 +116,7 @@ namespace Bolt.Server
             }
             else
             {
-                context.WriteErrorCode(ErrorCodesHeader, ServerErrorCode.ActionNotImplemented);
+                context.CloseWithError(ErrorCodesHeader, ServerErrorCode.ActionNotImplemented);
             }
         }
 

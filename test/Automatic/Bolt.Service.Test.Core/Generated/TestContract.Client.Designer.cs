@@ -7,14 +7,15 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using Bolt.Service.Test.Core;
-using Bolt.Service.Test.Core.Parameters;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using Bolt.Service.Test.Core;
+using Bolt.Service.Test.Core.Parameters;
 
 
 namespace Bolt.Service.Test.Core

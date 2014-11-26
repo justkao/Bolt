@@ -7,9 +7,6 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using Bolt.Server;
-using Bolt.Service.Test.Core;
-using Bolt.Service.Test.Core.Parameters;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -17,8 +14,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Bolt.Server;
+using Bolt.Service.Test.Core;
+using Bolt.Service.Test.Core.Parameters;
+using Owin;
 
-namespace Bolt.Server
+
+namespace Bolt.Service.Test.Core
 {
     public partial class TestContractInvoker : Bolt.Server.ContractInvoker<Bolt.Service.Test.Core.TestContractDescriptor>
     {
@@ -116,6 +118,29 @@ namespace Bolt.Server
             var instance = await InstanceProvider.GetInstanceAsync<IExcludedContract>(context);
             instance.ThisMethodShouldBeExcluded();
             await ResponseHandler.Handle(context);
+        }
+    }
+}
+
+namespace Bolt.Server
+{
+    public static partial class TestContractInvokerExtensions
+    {
+        public static IAppBuilder UseTestContract(this IAppBuilder app, Bolt.Service.Test.Core.ITestContract instance)
+        {
+            return app.UseTestContract(new StaticInstanceProvider(instance));
+        }
+
+        public static IAppBuilder UseTestContract(this IAppBuilder app, IInstanceProvider instanceProvider)
+        {
+            var boltExecutor = app.GetBolt();
+            var invoker = new Bolt.Service.Test.Core.TestContractInvoker();
+            invoker.Descriptor = Bolt.Service.Test.Core.TestContractDescriptor.Default;
+            invoker.Init(boltExecutor.Configuration);
+            invoker.InstanceProvider = instanceProvider;
+            boltExecutor.Add(invoker);
+
+            return app;
         }
     }
 }

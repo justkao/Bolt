@@ -122,9 +122,9 @@ namespace Bolt.Client.Channels
             }
         }
 
-        protected virtual HttpWebRequest CreateWebRequest(Uri server, string prefix, ContractDescriptor contract, ActionDescriptor descriptor)
+        protected virtual HttpWebRequest CreateWebRequest(Uri server, ContractDescriptor contract, ActionDescriptor descriptor)
         {
-            Uri uri = EndpointProvider.GetEndpoint(server, prefix, contract, descriptor);
+            Uri uri = EndpointProvider.GetEndpoint(server, contract, descriptor);
             HttpWebRequest request = WebRequest.CreateHttp(uri);
             request.Proxy = WebRequest.DefaultWebProxy;
             request.Method = "Post";

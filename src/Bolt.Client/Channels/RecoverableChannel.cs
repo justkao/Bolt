@@ -18,16 +18,14 @@ namespace Bolt.Client.Channels
             RetryDelay = proxy.RetryDelay;
             IsFailed = proxy.IsFailed;
             ServerProvider = proxy.ServerProvider;
-            Prefix = proxy.Prefix;
             Descriptor = proxy.Descriptor;
             _failedReason = proxy._failedReason;
         }
 
-        public RecoverableChannel(TContractDescriptor descriptor, string prefix, IServerProvider serverProvider, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+        public RecoverableChannel(TContractDescriptor descriptor, IServerProvider serverProvider, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
             : base(requestForwarder, endpointProvider)
         {
             Descriptor = descriptor;
-            Prefix = prefix;
             ServerProvider = serverProvider;
         }
 
@@ -36,8 +34,6 @@ namespace Bolt.Client.Channels
         public TimeSpan RetryDelay { get; set; }
 
         public TContractDescriptor Descriptor { get; private set; }
-
-        public string Prefix { get; private set; }
 
         public IServerProvider ServerProvider { get; private set; }
 
@@ -236,7 +232,7 @@ namespace Bolt.Client.Channels
         protected override ClientActionContext CreateContext(ActionDescriptor actionDescriptor, CancellationToken cancellation, object parameters)
         {
             Uri server = ServerProvider.GetServer();
-            HttpWebRequest webRequest = CreateWebRequest(server, Prefix, Descriptor, actionDescriptor);
+            HttpWebRequest webRequest = CreateWebRequest(server, Descriptor, actionDescriptor);
             return new ClientActionContext(actionDescriptor, webRequest, server, cancellation);
         }
 
@@ -258,7 +254,7 @@ namespace Bolt.Client.Channels
 
         protected TContract CreateContract(Uri server)
         {
-            return CreateContract(new DelegatedChannel(RequestForwarder, EndpointProvider, server, Prefix, Descriptor, BeforeSending));
+            return CreateContract(new DelegatedChannel(RequestForwarder, EndpointProvider, server, Descriptor, BeforeSending));
         }
 
         protected virtual void FailProxy(Exception error)

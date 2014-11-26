@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Bolt.Generators
@@ -64,7 +65,17 @@ namespace Bolt.Generators
             sb.AppendLine(Warning);
             sb.AppendLine();
 
-            foreach (string ns in Formatter.GetNamespaces())
+            IEnumerable<string> systemNamespaces = Formatter.GetNamespaces().Where(n => n.StartsWith("System")).ToList();
+            foreach (string ns in Formatter.GetNamespaces().Where(n => n.StartsWith("System")))
+            {
+                sb.AppendFormat("using {0};\n", ns);
+            }
+            if (systemNamespaces.Any())
+            {
+                sb.AppendLine();
+            }
+
+            foreach (string ns in Formatter.GetNamespaces().Except(systemNamespaces))
             {
                 sb.AppendFormat("using {0};\n", ns);
             }

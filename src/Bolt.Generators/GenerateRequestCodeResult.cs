@@ -1,4 +1,0 @@
-namespace Bolt.Generators
-{
-
-}

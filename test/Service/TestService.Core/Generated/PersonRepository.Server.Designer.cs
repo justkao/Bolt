@@ -7,13 +7,15 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using Bolt.Server;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using Bolt.Server;
+using Owin;
 using TestService.Core;
 using TestService.Core.Parameters;
 
@@ -177,6 +179,29 @@ namespace Bolt.Server
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepositoryInner2>(context);
             await instance.InnerOperationExAsync2();
             await ResponseHandler.Handle(context);
+        }
+    }
+}
+
+namespace Bolt.Server
+{
+    public static partial class PersonRepositoryExtensions
+    {
+        public static IAppBuilder UsePersonRepository(this IAppBuilder app, TestService.Core.IPersonRepository instance)
+        {
+            return app.UsePersonRepository(new StaticInstanceProvider(instance));
+        }
+
+        public static IAppBuilder UsePersonRepository(this IAppBuilder app, IInstanceProvider instanceProvider)
+        {
+            var boltExecutor = app.GetBolt();
+            var invoker = new Bolt.Server.PersonRepositoryInvoker();
+            invoker.Descriptor = TestService.Core.PersonRepositoryDescriptor.Default;
+            invoker.Init(boltExecutor.Configuration);
+            invoker.InstanceProvider = instanceProvider;
+            boltExecutor.Add(invoker);
+
+            return app;
         }
     }
 }

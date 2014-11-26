@@ -11,9 +11,9 @@ namespace Bolt.Generators
     public class ServerGenerator : ContractGeneratorBase
     {
         private string _baseClass;
-        private const string ExecutorName = "ContractInvoker";
+        private const string InvokerName = "ContractInvoker";
         private const string ServerExecutionContext = "Bolt.Server.ServerExecutionContext";
-        private const string BoltServerNamespace = "Bolt.Server";
+        public const string BoltServerNamespace = "Bolt.Server";
 
         public ServerGenerator()
             : this(new StringWriter(), new TypeFormatter(), new IntendProvider())
@@ -36,7 +36,7 @@ namespace Bolt.Generators
             {
                 if (_baseClass == null)
                 {
-                    return string.Format("{0}.{1}<{2}>", BoltServerNamespace, ExecutorName, MetadataProvider.GetContractDescriptor(ContractDefinition).FullName);
+                    return string.Format("{0}.{1}<{2}>", BoltServerNamespace, InvokerName, MetadataProvider.GetContractDescriptor(ContractDefinition).FullName);
                 }
 
                 return _baseClass;
@@ -104,11 +104,15 @@ namespace Bolt.Generators
                         }
                     }
                 });
+
+            ContractInvokerExtensionGenerator generator = CreateEx<ContractInvokerExtensionGenerator>();
+            generator.ContractInvoker = classGenerator.Descriptor;
+            generator.Generate();
         }
 
         protected override ClassDescriptor CreateDefaultDescriptor()
         {
-            return new ClassDescriptor(Name ?? ContractDefinition.Name + Suffix, Namespace ?? BoltServerNamespace, BaseClass);
+            return new ClassDescriptor(Name ?? ContractDefinition.Name + Suffix, Namespace ?? ContractDefinition.Namespace, BaseClass);
         }
 
         private void WriteInvocationMethod(MethodDescriptor methodDescriptor, ClassGenerator classGenerator)
