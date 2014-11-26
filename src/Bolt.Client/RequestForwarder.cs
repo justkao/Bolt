@@ -201,7 +201,7 @@ namespace Bolt.Client
             {
                 if (context.Response != null)
                 {
-                    Exception serverError = ReadBoltServerErrorIfAvailable(context.ActionDescriptor, context.Response, _boltServerErrorsHeader);
+                    Exception serverError = ReadBoltServerErrorIfAvailable(context.ActionDescriptor, context.Request, context.Response, _boltServerErrorsHeader);
                     if (serverError != null)
                     {
                         return new ResponseDescriptor<T>(context.Response, context, serverError, ResponseErrorType.Server);
@@ -248,23 +248,18 @@ namespace Bolt.Client
             }
         }
 
-        protected virtual Exception ReadBoltServerErrorIfAvailable(ActionDescriptor action, HttpWebResponse response, string header)
+        protected virtual Exception ReadBoltServerErrorIfAvailable(ActionDescriptor action, HttpWebRequest request, HttpWebResponse response, string header)
         {
-            if (response.StatusCode == HttpStatusCode.NotFound)
-            {
-                return new BoltServerException(ServerErrorCodes.ActionNotFound, action);
-            }
-
             string value = response.Headers[header];
             if (string.IsNullOrEmpty(value))
             {
                 return null;
             }
 
-            ServerErrorCodes code;
+            ServerErrorCode code;
             if (Enum.TryParse(value, true, out code))
             {
-                return new BoltServerException(code, action);
+                return new BoltServerException(code, action, request.RequestUri.ToString());
             }
 
             return null;

@@ -85,7 +85,7 @@ namespace Bolt.Client.Channels
             {
                 switch (((BoltServerException)error).Error)
                 {
-                    case ServerErrorCodes.ContractNotFound:
+                    case ServerErrorCode.ContractNotFound:
                         FailProxy(error);
                         throw error;
                     default:

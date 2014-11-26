@@ -20,25 +20,25 @@ using System.Threading.Tasks;
 
 namespace Bolt.Server
 {
-    public partial class TestContractInvoker : Bolt.Server.ContractInvoker
+    public partial class TestContractInvoker : Bolt.Server.ContractInvoker<Bolt.Service.Test.Core.TestContractDescriptor>
     {
         public override void Init()
         {
-            if (ContractDescriptor == null)
+            if (Descriptor == null)
             {
-                ContractDescriptor = Bolt.Service.Test.Core.TestContractDescriptor.Default;
+                Descriptor = Bolt.Service.Test.Core.TestContractDescriptor.Default;
             }
 
-            AddAction(ContractDescriptor.SimpleMethodWithSimpleArguments, TestContract_SimpleMethodWithSimpleArguments);
-            AddAction(ContractDescriptor.SimpleMethod, TestContract_SimpleMethod);
-            AddAction(ContractDescriptor.SimpleMethodExAsync, TestContract_SimpleMethodExAsync);
-            AddAction(ContractDescriptor.SimpleMethodWithCancellation, TestContract_SimpleMethodWithCancellation);
-            AddAction(ContractDescriptor.ComplexFunction, TestContract_ComplexFunction);
-            AddAction(ContractDescriptor.SimpleMethodWithComplexParameter, TestContractInner_SimpleMethodWithComplexParameter);
-            AddAction(ContractDescriptor.SimpleFunction, TestContractInner_SimpleFunction);
-            AddAction(ContractDescriptor.SimpleAsyncFunction, TestContractInner_SimpleAsyncFunction);
-            AddAction(ContractDescriptor.MethodWithManyArguments, TestContractInner_MethodWithManyArguments);
-            AddAction(ContractDescriptor.ThisMethodShouldBeExcluded, ExcludedContract_ThisMethodShouldBeExcluded);
+            AddAction(Descriptor.SimpleMethodWithSimpleArguments, TestContract_SimpleMethodWithSimpleArguments);
+            AddAction(Descriptor.SimpleMethod, TestContract_SimpleMethod);
+            AddAction(Descriptor.SimpleMethodExAsync, TestContract_SimpleMethodExAsync);
+            AddAction(Descriptor.SimpleMethodWithCancellation, TestContract_SimpleMethodWithCancellation);
+            AddAction(Descriptor.ComplexFunction, TestContract_ComplexFunction);
+            AddAction(Descriptor.SimpleMethodWithComplexParameter, TestContractInner_SimpleMethodWithComplexParameter);
+            AddAction(Descriptor.SimpleFunction, TestContractInner_SimpleFunction);
+            AddAction(Descriptor.SimpleAsyncFunction, TestContractInner_SimpleAsyncFunction);
+            AddAction(Descriptor.MethodWithManyArguments, TestContractInner_MethodWithManyArguments);
+            AddAction(Descriptor.ThisMethodShouldBeExcluded, ExcludedContract_ThisMethodShouldBeExcluded);
 
             base.Init();
         }

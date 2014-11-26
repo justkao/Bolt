@@ -29,7 +29,15 @@ namespace Bolt
 
             if (contractDescriptor != null)
             {
-                sb.Append("/" + contractDescriptor.Name);
+                if (sb[sb.Length - 1] == '/')
+                {
+                    sb.Append(contractDescriptor.Name);
+
+                }
+                else
+                {
+                    sb.Append("/" + contractDescriptor.Name);
+                }
 
                 if (actionDescriptor != null)
                 {

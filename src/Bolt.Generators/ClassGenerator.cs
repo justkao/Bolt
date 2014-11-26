@@ -13,9 +13,12 @@ namespace Bolt.Generators
             : base(output, formatter, intendProvider)
         {
             Descriptor = descriptor;
+            Modifier = "public";
         }
 
         public ClassDescriptor Descriptor { get; private set; }
+
+        public string Modifier { get; set; }
 
         public virtual void WritePublicProperty(string type, string name)
         {
@@ -82,11 +85,11 @@ namespace Bolt.Generators
                         sb.Remove(sb.Length - 2, 2);
                     }
 
-                    WriteLine("public partial {0} {1} : {2}", type, Descriptor.Name, sb.ToString());
+                    WriteLine("{3} partial {0} {1} : {2}", type, Descriptor.Name, sb.ToString(), Modifier);
                 }
                 else
                 {
-                    WriteLine("public partial {0} {1}", type, Descriptor.Name);
+                    WriteLine("{2} partial {0} {1}", type, Descriptor.Name, Modifier);
                 }
 
                 using (WithBlock())
@@ -108,6 +111,7 @@ namespace Bolt.Generators
 
             WriteLine();
         }
+
 
         public virtual void GenerateConstructor(string parameters, string baseCall = null, string modifier = "public")
         {

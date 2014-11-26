@@ -1,5 +1,6 @@
-﻿using Bolt.Generators;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Bolt.Generators;
 
 namespace Bolt.Console
 {
@@ -13,6 +14,10 @@ namespace Bolt.Console
 
         public string Suffix { get; set; }
 
+        public List<string> ExcludedInterfaces { get; set; }
+
+        public string Modifier { get; set; }
+
         protected override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
         {
             ClientGenerator clientGenerator = new ClientGenerator()
@@ -23,10 +28,16 @@ namespace Bolt.Console
                 Name = Name
             };
 
+            if (!string.IsNullOrEmpty(Modifier))
+            {
+                clientGenerator.Modifier = Modifier;
+            }
+
             InterfaceGenerator interfaceGenerator = new InterfaceGenerator()
             {
                 ContractDefinition = definition,
-                ForceAsync = ForceAsync
+                ForceAsync = ForceAsync,
+                ExcludedInterfaces = ExcludedInterfaces
             };
 
             generator.Add(interfaceGenerator);

@@ -30,6 +30,8 @@ namespace Bolt.Generators
 
         public bool ForceAsync { get; set; }
 
+        public List<string> ExcludedInterfaces { get; set; }
+
         public override void Generate()
         {
             bool hasAsyncInterfaces = ContractDefinition.GetEffectiveContracts().Any(ShouldHaveAsyncMethods);
@@ -52,6 +54,14 @@ namespace Bolt.Generators
 
         private void GenerateAsyncInterface(Type iface)
         {
+            if (ExcludedInterfaces != null)
+            {
+                if (ExcludedInterfaces.Contains(iface.FullName) || ExcludedInterfaces.Contains(iface.FullName + "Async"))
+                {
+                    return;
+                }
+            }
+
             if (_generatedInterfaces.Contains(iface))
             {
                 return;
@@ -66,8 +76,19 @@ namespace Bolt.Generators
             string name = iface.Name + "Async";
             _generatedAsyncInterfaces.Add(name);
 
-            List<string> asyncBase = (from i in ContractDefinition.GetEffectiveContracts(iface).Where(ShouldHaveAsyncMethods)
-                                      select FormatType(i) + "Async").ToList();
+            List<string> asyncBase = ContractDefinition.GetEffectiveContracts(iface).Where(ShouldHaveAsyncMethods).Where(
+                i =>
+                {
+                    if (ExcludedInterfaces != null)
+                    {
+                        if (ExcludedInterfaces.Contains(i.FullName))
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }).Select(t => FormatType(t) + "Async").ToList();
+
             asyncBase.Insert(0, FormatType(iface));
 
             ClassGenerator classGenerator = CreateClassGenerator(new ClassDescriptor(name, iface.Namespace, asyncBase.ToArray()) { IsInterface = true });

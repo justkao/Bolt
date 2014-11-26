@@ -1,12 +1,13 @@
-using Microsoft.Owin;
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
+
+using Microsoft.Owin;
 
 namespace Bolt.Server
 {
-    public class ContractInvoker : IContractInvoker
+    public class ContractInvoker<T> : IContractInvoker<T>
+        where T : ContractDescriptor
     {
         private readonly IDictionary<ActionDescriptor, ActionMetadata> _actions = new Dictionary<ActionDescriptor, ActionMetadata>();
 
@@ -15,6 +16,16 @@ namespace Bolt.Server
         private IResponseHandler _responseHandler;
 
         private IServerDataHandler _dataHandler;
+
+        public string ErrorCodesHeader { get; set; }
+
+        public ContractDescriptor DescriptorCore
+        {
+            get { return Descriptor; }
+            set { Descriptor = (T)value; }
+        }
+
+        public virtual T Descriptor { get; set; }
 
         public IInstanceProvider InstanceProvider
         {
@@ -98,7 +109,7 @@ namespace Bolt.Server
             }
             else
             {
-                context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                context.WriteErrorCode(ErrorCodesHeader, ServerErrorCode.ActionNotImplemented);
             }
         }
 

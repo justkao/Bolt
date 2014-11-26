@@ -307,13 +307,12 @@ namespace Bolt.Service.Test
                         TestContractDescriptor.Default,
                         ServerConfiguration,
                         Prefix, (endpointBuilder) =>
-                        {
-
-                            endpointBuilder.UseContractInvoker<TestContractInvoker>(
-                                ServerConfiguration,
-                                TestContractDescriptor.Default,
-                                InstanceProvider);
-                        });
+                            {
+                                endpointBuilder.UseContractInvoker<TestContractInvoker, TestContractDescriptor>(
+                                    ServerConfiguration,
+                                    TestContractDescriptor.Default,
+                                    InstanceProvider);
+                            });
                 });
         }
 

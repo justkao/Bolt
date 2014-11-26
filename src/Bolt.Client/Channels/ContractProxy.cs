@@ -3,7 +3,7 @@ using System.Threading;
 
 namespace Bolt.Client.Channels
 {
-    public abstract class ContractProxy<TContractDescriptor> : ICancellationTokenProvider, IDisposable
+    public abstract class ContractProxy<TContractDescriptor> : ICancellationTokenProvider, IDisposable, IContractDescriptorProvider<TContractDescriptor>
         where TContractDescriptor : ContractDescriptor
     {
         protected ContractProxy(ContractProxy<TContractDescriptor> proxy)

@@ -34,14 +34,14 @@ namespace Bolt.Client
                 e.EnsureNotCancelled();
 
                 throw new SerializeParametersException(
-                    string.Format("Failed to serialize parameters for action '{0}'. Parameters type - '{1}'",
-                        actionDescriptor, typeof(TParameters).FullName), e);
+                    string.Format("Failed to serialize parameters for action '{0}'. Parameters type - '{1}'", actionDescriptor, typeof(TParameters).FullName),
+                    e);
             }
         }
 
         public static T DeserializeResponse<T>(this ISerializer serializer, Stream stream, ActionDescriptor actionDescriptor)
         {
-            if (stream == null)
+            if (stream == null || stream.Length == 0)
             {
                 return default(T);
             }

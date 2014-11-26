@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,6 +10,7 @@ namespace Bolt.Generators
 {
     public class ServerGenerator : ContractGeneratorBase
     {
+        private string _baseClass;
         private const string ExecutorName = "ContractInvoker";
         private const string ServerExecutionContext = "Bolt.Server.ServerExecutionContext";
         private const string BoltServerNamespace = "Bolt.Server";
@@ -18,20 +18,35 @@ namespace Bolt.Generators
         public ServerGenerator()
             : this(new StringWriter(), new TypeFormatter(), new IntendProvider())
         {
-            ContractDescriptorPropertyName = "ContractDescriptor";
+            ContractDescriptorPropertyName = "Descriptor";
         }
 
         public ServerGenerator(StringWriter output, TypeFormatter formatter, IntendProvider intendProvider)
             : base(output, formatter, intendProvider)
         {
-            ContractDescriptorPropertyName = "ContractDescriptor";
-            BaseClass = BoltServerNamespace + "." + ExecutorName;
+            ContractDescriptorPropertyName = "Descriptor";
             Suffix = "Invoker";
         }
 
         public string ContractDescriptorPropertyName { get; set; }
 
-        public string BaseClass { get; private set; }
+        public string BaseClass
+        {
+            get
+            {
+                if (_baseClass == null)
+                {
+                    return string.Format("{0}.{1}<{2}>", BoltServerNamespace, ExecutorName, MetadataProvider.GetContractDescriptor(ContractDefinition).FullName);
+                }
+
+                return _baseClass;
+            }
+
+            set
+            {
+                _baseClass = value;
+            }
+        }
 
         public string Suffix { get; set; }
 
@@ -93,11 +108,6 @@ namespace Bolt.Generators
 
         protected override ClassDescriptor CreateDefaultDescriptor()
         {
-            if (String.IsNullOrEmpty(BaseClass))
-            {
-                return new ClassDescriptor(Name ?? ContractDefinition.Name + Suffix, Namespace ?? BoltServerNamespace);
-            }
-
             return new ClassDescriptor(Name ?? ContractDefinition.Name + Suffix, Namespace ?? BoltServerNamespace, BaseClass);
         }
 

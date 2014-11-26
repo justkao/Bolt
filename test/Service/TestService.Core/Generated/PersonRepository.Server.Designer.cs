@@ -20,31 +20,31 @@ using TestService.Core.Parameters;
 
 namespace Bolt.Server
 {
-    public partial class PersonRepositoryInvoker : Bolt.Server.ContractInvoker
+    public partial class PersonRepositoryInvoker : Bolt.Server.ContractInvoker<TestService.Core.PersonRepositoryDescriptor>
     {
         public override void Init()
         {
-            if (ContractDescriptor == null)
+            if (Descriptor == null)
             {
-                ContractDescriptor = TestService.Core.PersonRepositoryDescriptor.Default;
+                Descriptor = TestService.Core.PersonRepositoryDescriptor.Default;
             }
 
-            AddAction(ContractDescriptor.UpdatePerson, PersonRepository_UpdatePerson);
-            AddAction(ContractDescriptor.UpdatePersonThatThrowsInvalidOperationException, PersonRepository_UpdatePersonThatThrowsInvalidOperationException);
-            AddAction(ContractDescriptor.DoNothingAsAsync, PersonRepository_DoNothingAsAsync);
-            AddAction(ContractDescriptor.DoNothing, PersonRepository_DoNothing);
-            AddAction(ContractDescriptor.DoNothingWithComplexParameterAsAsync, PersonRepository_DoNothingWithComplexParameterAsAsync);
-            AddAction(ContractDescriptor.DoNothingWithComplexParameter, PersonRepository_DoNothingWithComplexParameter);
-            AddAction(ContractDescriptor.GetSimpleType, PersonRepository_GetSimpleType);
-            AddAction(ContractDescriptor.GetSimpleTypeAsAsync, PersonRepository_GetSimpleTypeAsAsync);
-            AddAction(ContractDescriptor.GetSinglePerson, PersonRepository_GetSinglePerson);
-            AddAction(ContractDescriptor.GetSinglePersonAsAsync, PersonRepository_GetSinglePersonAsAsync);
-            AddAction(ContractDescriptor.GetManyPersons, PersonRepository_GetManyPersons);
-            AddAction(ContractDescriptor.GetManyPersonsAsAsync, PersonRepository_GetManyPersonsAsAsync);
-            AddAction(ContractDescriptor.InnerOperation, PersonRepositoryInner_InnerOperation);
-            AddAction(ContractDescriptor.InnerOperationExAsync, PersonRepositoryInner_InnerOperationExAsync);
-            AddAction(ContractDescriptor.InnerOperation2, PersonRepositoryInner2_InnerOperation2);
-            AddAction(ContractDescriptor.InnerOperationExAsync2, PersonRepositoryInner2_InnerOperationExAsync2);
+            AddAction(Descriptor.UpdatePerson, PersonRepository_UpdatePerson);
+            AddAction(Descriptor.UpdatePersonThatThrowsInvalidOperationException, PersonRepository_UpdatePersonThatThrowsInvalidOperationException);
+            AddAction(Descriptor.DoNothingAsAsync, PersonRepository_DoNothingAsAsync);
+            AddAction(Descriptor.DoNothing, PersonRepository_DoNothing);
+            AddAction(Descriptor.DoNothingWithComplexParameterAsAsync, PersonRepository_DoNothingWithComplexParameterAsAsync);
+            AddAction(Descriptor.DoNothingWithComplexParameter, PersonRepository_DoNothingWithComplexParameter);
+            AddAction(Descriptor.GetSimpleType, PersonRepository_GetSimpleType);
+            AddAction(Descriptor.GetSimpleTypeAsAsync, PersonRepository_GetSimpleTypeAsAsync);
+            AddAction(Descriptor.GetSinglePerson, PersonRepository_GetSinglePerson);
+            AddAction(Descriptor.GetSinglePersonAsAsync, PersonRepository_GetSinglePersonAsAsync);
+            AddAction(Descriptor.GetManyPersons, PersonRepository_GetManyPersons);
+            AddAction(Descriptor.GetManyPersonsAsAsync, PersonRepository_GetManyPersonsAsAsync);
+            AddAction(Descriptor.InnerOperation, PersonRepositoryInner_InnerOperation);
+            AddAction(Descriptor.InnerOperationExAsync, PersonRepositoryInner_InnerOperationExAsync);
+            AddAction(Descriptor.InnerOperation2, PersonRepositoryInner2_InnerOperation2);
+            AddAction(Descriptor.InnerOperationExAsync2, PersonRepositoryInner2_InnerOperationExAsync2);
 
             base.Init();
         }

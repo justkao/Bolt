@@ -57,7 +57,7 @@ namespace Bolt.Client
 
             if (serverPool.Count == 1)
             {
-                return serverPool[1];
+                return serverPool[0];
             }
 
             if (lastServer != null)
@@ -77,7 +77,7 @@ namespace Bolt.Client
 
             if (serverPool.Count == 1)
             {
-                return serverPool[1];
+                return serverPool[0];
             }
 
             int index = _random.Next(0, serverPool.Count - 1);

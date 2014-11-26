@@ -1,10 +1,10 @@
-﻿using Bolt.Client;
-using Bolt.Client.Channels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Bolt.Client;
+using Bolt.Client.Channels;
 
 namespace Bolt.Generators
 {
@@ -21,6 +21,7 @@ namespace Bolt.Generators
             : base(output, formatter, intendProvider)
         {
             Suffix = "Proxy";
+            Modifier = "public";
         }
 
         public virtual string ContractDescriptorProperty
@@ -47,12 +48,15 @@ namespace Bolt.Generators
 
         public string Name { get; set; }
 
+        public string Modifier { get; set; }
+
         public IEnumerable<string> BaseInterfaces { get; set; }
 
         public override void Generate()
         {
             ClassDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
+            generator.Modifier = Modifier;
 
             generator.GenerateClass(
                 g =>

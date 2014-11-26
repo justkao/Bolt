@@ -17,8 +17,10 @@ namespace TestService.IIS.Bolt
 
         private void ConfigurePersonRepository(IAppBuilder obj, ServerConfiguration configuration)
         {
-            obj.UseContractInvoker<PersonRepositoryInvoker>(configuration,
-                PersonRepositoryDescriptor.Default, new StaticInstanceProvider(new PersonRepository()));
+            obj.UseContractInvoker<PersonRepositoryInvoker, PersonRepositoryDescriptor>(
+                configuration,
+                PersonRepositoryDescriptor.Default,
+                new StaticInstanceProvider(new PersonRepository()));
         }
     }
 }
