@@ -4,7 +4,9 @@ namespace Bolt
 {
     public class Configuration
     {
-        public const string DefaultSessionHeaderName = "Bolt-Session-ID";
+        public const string DefaultSessionHeader = "Bolt-Session-Id";
+        public const string DefaultServerErrorCodesHeader = "Bolt-Server-Error-Code";
+
 
         public Configuration(ISerializer serializer, IExceptionSerializer exceptionSerializer)
         {
@@ -21,7 +23,8 @@ namespace Bolt
             Serializer = serializer;
             ExceptionSerializer = exceptionSerializer;
             EndpointProvider = new EndpointProvider();
-            SessionHeaderName = DefaultSessionHeaderName;
+            SessionHeader = DefaultSessionHeader;
+            ServerErrorCodesHeader = DefaultServerErrorCodesHeader;
         }
 
         public ISerializer Serializer { get; private set; }
@@ -30,6 +33,8 @@ namespace Bolt
 
         public IEndpointProvider EndpointProvider { get; set; }
 
-        public string SessionHeaderName { get; set; }
+        public string SessionHeader { get; set; }
+
+        public string ServerErrorCodesHeader { get; set; }
     }
 }

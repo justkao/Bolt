@@ -6,7 +6,7 @@
             : base(serializer, exceptionSerializer)
         {
             ServerDataHandler = new ServerDataHandler(serializer, ExceptionSerializer);
-            ResponseHandler = new ResponseHandler(ServerDataHandler);
+            ResponseHandler = new ResponseHandler(ServerDataHandler, DefaultServerErrorCodesHeader);
         }
 
 

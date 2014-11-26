@@ -1,6 +1,5 @@
 using System;
 using System.Net;
-using System.Runtime.Serialization;
 using System.Threading.Tasks;
 
 namespace Bolt.Client
@@ -8,8 +7,9 @@ namespace Bolt.Client
     public class RequestForwarder : IRequestForwarder
     {
         private readonly IClientDataHandler _dataHandler;
+        private readonly string _boltServerErrorsHeader;
 
-        public RequestForwarder(IClientDataHandler dataHandler)
+        public RequestForwarder(IClientDataHandler dataHandler, string boltServerErrorsHeader)
         {
             if (dataHandler == null)
             {
@@ -17,6 +17,7 @@ namespace Bolt.Client
             }
 
             _dataHandler = dataHandler;
+            _boltServerErrorsHeader = boltServerErrorsHeader;
         }
 
         public virtual ResponseDescriptor<T> GetResponse<T, TParameters>(ClientActionContext context, TParameters parameters)
@@ -34,7 +35,7 @@ namespace Bolt.Client
             {
                 throw;
             }
-            catch (SerializationException e)
+            catch (BoltSerializationException e)
             {
                 return new ResponseDescriptor<T>(null, context, e, ResponseErrorType.Serialization);
             }
@@ -98,7 +99,7 @@ namespace Bolt.Client
             {
                 throw;
             }
-            catch (SerializationException e)
+            catch (BoltSerializationException e)
             {
                 return new ResponseDescriptor<T>(null, context, e, ResponseErrorType.Serialization);
             }
@@ -160,7 +161,7 @@ namespace Bolt.Client
                         return new ResponseDescriptor<T>(context.Response, context, clientException, ResponseErrorType.Client);
                     }
                 }
-                catch (SerializationException e)
+                catch (BoltSerializationException e)
                 {
                     return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Deserialization);
                 }
@@ -183,7 +184,7 @@ namespace Bolt.Client
             {
                 throw;
             }
-            catch (SerializationException e)
+            catch (BoltSerializationException e)
             {
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Deserialization);
             }
@@ -198,13 +199,22 @@ namespace Bolt.Client
         {
             if (clientException != null)
             {
+                if (context.Response != null)
+                {
+                    Exception serverError = ReadBoltServerErrorIfAvailable(context.ActionDescriptor, context.Response, _boltServerErrorsHeader);
+                    if (serverError != null)
+                    {
+                        return new ResponseDescriptor<T>(context.Response, context, serverError, ResponseErrorType.Server);
+                    }
+                }
+
                 try
                 {
                     Exception error = _dataHandler.ReadException(context);
                     return new ResponseDescriptor<T>(context.Response, context, error ?? clientException, ResponseErrorType.Client);
 
                 }
-                catch (SerializationException e)
+                catch (BoltSerializationException e)
                 {
                     return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Deserialization);
                 }
@@ -223,7 +233,7 @@ namespace Bolt.Client
             {
                 return new ResponseDescriptor<T>(context.Response, context, _dataHandler.ReadResponse<T>(context));
             }
-            catch (SerializationException e)
+            catch (BoltSerializationException e)
             {
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Deserialization);
             }
@@ -236,6 +246,28 @@ namespace Bolt.Client
                 e.EnsureNotCancelled();
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
             }
+        }
+
+        protected virtual Exception ReadBoltServerErrorIfAvailable(ActionDescriptor action, HttpWebResponse response, string header)
+        {
+            if (response.StatusCode == HttpStatusCode.NotFound)
+            {
+                return new BoltServerException(ServerErrorCodes.ActionNotFound, action);
+            }
+
+            string value = response.Headers[header];
+            if (string.IsNullOrEmpty(value))
+            {
+                return null;
+            }
+
+            ServerErrorCodes code;
+            if (Enum.TryParse(value, true, out code))
+            {
+                return new BoltServerException(code, action);
+            }
+
+            return null;
         }
 
         protected virtual bool IsCommunicationException(WebException e)

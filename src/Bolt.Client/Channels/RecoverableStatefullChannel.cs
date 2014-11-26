@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Bolt.Client.Channels
 {
-    public class StateFullProxy<TContract, TContractDescriptor> : ProxyBase
+    public class RecoverableStatefullChannel<TContract, TContractDescriptor> : RecoverableChannelBase
         where TContract : ContractProxy<TContractDescriptor>
         where TContractDescriptor : ContractDescriptor
     {
@@ -13,8 +13,8 @@ namespace Bolt.Client.Channels
         private Uri _activeConnection;
         private string _sessionId;
 
-        public StateFullProxy(TContractDescriptor descriptor, IServerProvider serverProvider, string prefix, Func<IChannel, TContract> contractFactory, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
-            : base(requestForwarder, endpointProvider)
+        public RecoverableStatefullChannel(TContractDescriptor descriptor, IServerProvider serverProvider, string prefix, Func<IChannel, TContract> contractFactory, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+            : base(serverProvider, requestForwarder, endpointProvider)
         {
             if (descriptor == null)
             {
@@ -34,14 +34,11 @@ namespace Bolt.Client.Channels
             Descriptor = descriptor;
             Prefix = prefix;
             ContractFactory = contractFactory;
-            ServerProvider = serverProvider;
         }
 
         public TContractDescriptor Descriptor { get; private set; }
 
         public Func<IChannel, TContract> ContractFactory { get; private set; }
-
-        public IServerProvider ServerProvider { get; private set; }
 
         public string Prefix { get; private set; }
 

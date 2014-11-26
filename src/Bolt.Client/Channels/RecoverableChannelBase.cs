@@ -5,27 +5,32 @@ using System.Threading.Tasks;
 
 namespace Bolt.Client.Channels
 {
-    public abstract class ProxyBase : ChannelBase
+    public abstract class RecoverableChannelBase : ChannelBase
     {
         private Exception _failedReason;
 
-        protected ProxyBase(ProxyBase proxy)
+        protected RecoverableChannelBase(RecoverableChannelBase proxy)
             : base(proxy)
         {
             Retries = proxy.Retries;
             RetryDelay = proxy.RetryDelay;
             IsFailed = proxy.IsFailed;
+            ServerProvider = proxy.ServerProvider;
             _failedReason = proxy._failedReason;
         }
 
-        protected ProxyBase(IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+        protected RecoverableChannelBase(IServerProvider serverProvider, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
             : base(requestForwarder, endpointProvider)
         {
+            ServerProvider = serverProvider;
         }
 
         public int Retries { get; set; }
 
         public TimeSpan RetryDelay { get; set; }
+
+        public IServerProvider ServerProvider { get; private set; }
+
 
         public bool IsFailed { get; private set; }
 
@@ -39,14 +44,35 @@ namespace Bolt.Client.Channels
 
         protected virtual bool HandleError(ClientActionContext context, Exception error)
         {
+            if (error is NoServersAvailableException)
+            {
+                return true;
+            }
+
             if (error is BoltSerializationException)
             {
                 throw error;
             }
 
+            if (error is BoltServerException)
+            {
+                switch (((BoltServerException)error).Error)
+                {
+                    case ServerErrorCodes.ContractNotFound:
+                        FailProxy(error);
+                        throw error;
+                    default:
+                        throw error;
+                }
+            }
+
             if (error is WebException)
             {
-                return true;
+                if ((error as WebException).Response == null)
+                {
+                    ServerProvider.OnServerUnavailable(context.Server);
+                    return true;
+                }
             }
 
             return false;
@@ -86,8 +112,7 @@ namespace Bolt.Client.Channels
                     tries++;
                     if (tries > Retries)
                     {
-                        _failedReason = error;
-                        IsFailed = true;
+                        FailProxy(error);
                         throw error;
                     }
 
@@ -130,8 +155,7 @@ namespace Bolt.Client.Channels
                     tries++;
                     if (tries > Retries)
                     {
-                        _failedReason = error;
-                        IsFailed = true;
+                        FailProxy(error);
                         throw error;
                     }
 
@@ -148,6 +172,12 @@ namespace Bolt.Client.Channels
         protected abstract ConnectionDescriptor GetConnection(ActionDescriptor actionDescriptor, CancellationToken cancellation, object parameters);
 
         protected abstract Task<ConnectionDescriptor> GetConnectionAsync(ActionDescriptor descriptor, CancellationToken cancellation, object parameters);
+
+        protected void FailProxy(Exception error)
+        {
+            _failedReason = error;
+            IsFailed = true;
+        }
 
         private void EnsureNotFailed()
         {

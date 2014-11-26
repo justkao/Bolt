@@ -25,7 +25,7 @@ namespace Bolt.Server
             return builder.UseContractInvoker<TInvoker>(
                 configuration,
                 descriptor,
-                new StateFullInstanceProvider<TContractImplementation>() { SessionHeader = configuration.SessionHeaderName });
+                new StateFullInstanceProvider<TContractImplementation>() { SessionHeader = configuration.SessionHeader });
         }
 
         public static IAppBuilder UseContractInvoker<TInvoker>(

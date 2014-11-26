@@ -6,6 +6,7 @@
         Serialization,
         Deserialization,
         Communication,
-        Client
+        Client,
+        Server
     }
 }

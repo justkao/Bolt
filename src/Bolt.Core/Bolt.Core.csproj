@@ -48,6 +48,7 @@
   <ItemGroup>
     <Compile Include="AsyncOperationAttribute.cs" />
     <Compile Include="BoltSerializationException.cs" />
+    <Compile Include="BoltServerException.cs" />
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="ContractDescriptor.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Response.cs" />
     <Compile Include="SerializerExtensions.cs" />
+    <Compile Include="ServerErrorCodes.cs" />
     <Compile Include="StreamExtensions.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="WebRequestExtensions.cs" />

@@ -5,18 +5,17 @@ using System.Threading.Tasks;
 
 namespace Bolt.Client.Channels
 {
-    public class StateLessProxy : ProxyBase
+    public class RecoverableChannel : RecoverableChannelBase
     {
-        public StateLessProxy(StateLessProxy proxy)
+        public RecoverableChannel(RecoverableChannel proxy)
             : base(proxy)
         {
             ContractDescriptor = proxy.ContractDescriptor;
-            ServerProvider = proxy.ServerProvider;
             Prefix = proxy.Prefix;
         }
 
-        public StateLessProxy(ContractDescriptor contractDescriptor, IServerProvider serverProvider, string prefix, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
-            : base(requestForwarder, endpointProvider)
+        public RecoverableChannel(ContractDescriptor contractDescriptor, IServerProvider serverProvider, string prefix, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+            : base(serverProvider, requestForwarder, endpointProvider)
         {
             if (contractDescriptor == null)
             {
@@ -29,13 +28,10 @@ namespace Bolt.Client.Channels
             }
 
             ContractDescriptor = contractDescriptor;
-            ServerProvider = serverProvider;
             Prefix = prefix;
         }
 
         public ContractDescriptor ContractDescriptor { get; private set; }
-
-        public IServerProvider ServerProvider { get; private set; }
 
         public string Prefix { get; private set; }
 

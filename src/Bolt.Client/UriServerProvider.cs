@@ -20,5 +20,9 @@ namespace Bolt.Client
         {
             return _url;
         }
+
+        public void OnServerUnavailable(Uri server)
+        {
+        }
     }
 }

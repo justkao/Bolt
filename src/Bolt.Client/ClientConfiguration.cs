@@ -1,7 +1,7 @@
+using Bolt.Client.Channels;
 using System;
 using System.Linq;
 using System.Reflection;
-using Bolt.Client.Channels;
 
 namespace Bolt.Client
 {
@@ -11,7 +11,7 @@ namespace Bolt.Client
             : base(serializer, exceptionSerializer)
         {
             ClientDataHandler = new ClientDataHandler(serializer, ExceptionSerializer);
-            RequestForwarder = new RequestForwarder(ClientDataHandler);
+            RequestForwarder = new RequestForwarder(ClientDataHandler, ServerErrorCodesHeader);
         }
 
         public IRequestForwarder RequestForwarder { get; set; }
@@ -38,7 +38,7 @@ namespace Bolt.Client
         {
             return
                 CreateProxy<TContract, TDescriptor>(
-                    new StateFullProxy<TContract, TDescriptor>(descriptor ?? CreateDefaultDescriptor<TDescriptor>(),
+                    new RecoverableStatefullChannel<TContract, TDescriptor>(descriptor ?? CreateDefaultDescriptor<TDescriptor>(),
                         serverProvider, prefix, (c) => (TContract)Activator.CreateInstance(typeof(TContract), c), RequestForwarder, EndpointProvider));
         }
 
@@ -46,7 +46,7 @@ namespace Bolt.Client
             where TContract : ContractProxy<TDescriptor>
             where TDescriptor : ContractDescriptor
         {
-            return CreateProxy<TContract, TDescriptor>(new StateLessProxy(descriptor ?? CreateDefaultDescriptor<TDescriptor>(), serverProvider, prefix, RequestForwarder, EndpointProvider));
+            return CreateProxy<TContract, TDescriptor>(new RecoverableChannel(descriptor ?? CreateDefaultDescriptor<TDescriptor>(), serverProvider, prefix, RequestForwarder, EndpointProvider));
         }
 
         public TContract CreateProxy<TContract, TDescriptor>(IChannel channel)

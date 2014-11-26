@@ -7,8 +7,9 @@ namespace Bolt.Server
     public class ResponseHandler : IResponseHandler
     {
         private readonly IServerDataHandler _serverDataHandler;
+        private readonly string _errorCodesHeader;
 
-        public ResponseHandler(IServerDataHandler serverDataHandler)
+        public ResponseHandler(IServerDataHandler serverDataHandler, string errorCodesHeader)
         {
             if (serverDataHandler == null)
             {
@@ -16,6 +17,7 @@ namespace Bolt.Server
             }
 
             _serverDataHandler = serverDataHandler;
+            _errorCodesHeader = errorCodesHeader;
         }
 
         public virtual Task Handle(ServerExecutionContext context)
@@ -38,10 +40,21 @@ namespace Bolt.Server
         public virtual Task HandleErrorResponse(ServerExecutionContext context, Exception error)
         {
             context.CallCancelled.ThrowIfCancellationRequested();
-
             context.Context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            context.Context.Response.ContentType = _serverDataHandler.ContentType;
 
+            if (error is DeserializeParametersException)
+            {
+                context.Context.Response.Headers[_errorCodesHeader] = ServerErrorCodes.Deserialization.ToString();
+                return Task.FromResult(0);
+            }
+            if (error is SerializeResponseException)
+            {
+                context.Context.Response.Headers[_errorCodesHeader] = ServerErrorCodes.Serialization.ToString();
+                return Task.FromResult(0);
+            }
+
+
+            context.Context.Response.ContentType = _serverDataHandler.ContentType;
             return _serverDataHandler.WriteExceptionAsync(context, error);
         }
     }
