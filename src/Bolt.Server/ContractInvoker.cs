@@ -75,6 +75,7 @@ namespace Bolt.Server
         {
             DataHandler = configuration.ServerDataHandler;
             ResponseHandler = configuration.ResponseHandler;
+            ErrorCodesHeader = configuration.ServerErrorCodesHeader;
 
             Init();
         }

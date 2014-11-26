@@ -8,6 +8,8 @@ namespace Bolt
 {
     public abstract class ContractDescriptor : IEnumerable<ActionDescriptor>
     {
+        private readonly List<ActionDescriptor> _actions = new List<ActionDescriptor>();
+
         protected ContractDescriptor(Type type, string name)
         {
             if (type == null)
@@ -33,7 +35,10 @@ namespace Bolt
             return this.FirstOrDefault(v => Equals(v.Method, info));
         }
 
-        private readonly List<ActionDescriptor> _actions = new List<ActionDescriptor>();
+        public IEnumerator<ActionDescriptor> GetEnumerator()
+        {
+            return _actions.GetEnumerator();
+        }
 
         protected ActionDescriptor Add(string action, Type parameters, MethodInfo method)
         {
@@ -42,14 +47,14 @@ namespace Bolt
             return descriptor;
         }
 
-        public IEnumerator<ActionDescriptor> GetEnumerator()
-        {
-            return _actions.GetEnumerator();
-        }
-
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
     }
 }

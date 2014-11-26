@@ -296,13 +296,11 @@ namespace Bolt.Service.Test
 
             _runningServer = WebApp.Start(
                 ServerUrl.ToString(),
-                (b) => b.MapContract(
-                    TestContractDescriptor.Default,
-                    ServerConfiguration, (endpointBuilder) =>
-                    {
-                        endpointBuilder.UseBolt(ServerConfiguration);
-                        endpointBuilder.UseTestContract(InstanceProvider);
-                    }));
+                (appBuilder) =>
+                {
+                    appBuilder.UseBolt(ServerConfiguration);
+                    appBuilder.UseTestContract(InstanceProvider);
+                });
         }
 
         [TestFixtureTearDown]

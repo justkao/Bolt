@@ -63,7 +63,6 @@
     <Compile Include="ServerSerializerExtensions.cs" />
     <Compile Include="ServerDataHandler.cs" />
     <Compile Include="ContractInvoker.cs" />
-    <Compile Include="ContractInvokerFactory.cs" />
     <Compile Include="ContractInvokerExtensions.cs" />
     <Compile Include="IAsyncContractInitializer.cs" />
     <Compile Include="IContractInitializer.cs" />
