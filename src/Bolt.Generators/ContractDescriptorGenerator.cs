@@ -16,9 +16,12 @@ namespace Bolt.Generators
             : base(output, formatter, provider)
         {
             StaticAccessorProperty = "Default";
+            Modifier = "public";
         }
 
         public string StaticAccessorProperty { get; set; }
+
+        public string Modifier { get; set; }
 
         public override void Generate()
         {
@@ -30,6 +33,8 @@ namespace Bolt.Generators
             List<MethodInfo> methods = ContractDefinition.GetEffectiveMethods().ToList();
 
             ClassGenerator classGenerator = CreateClassGenerator(descriptor);
+            classGenerator.Modifier = Modifier;
+
             classGenerator.GenerateClass(
                 g =>
                 {

@@ -26,6 +26,7 @@ namespace Bolt.Generators
         {
             ContractDescriptorPropertyName = "Descriptor";
             Suffix = "Invoker";
+            Modifier = "public";
         }
 
         public string ContractDescriptorPropertyName { get; set; }
@@ -54,12 +55,15 @@ namespace Bolt.Generators
 
         public string Name { get; set; }
 
+        public string Modifier { get; set; }
+
         public override void Generate()
         {
             AddUsings(BoltServerNamespace);
 
             ClassDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
             ClassGenerator classGenerator = CreateClassGenerator(ContractDescriptor);
+            classGenerator.Modifier = Modifier;
 
             classGenerator.GenerateClass(
                 g =>
@@ -106,6 +110,7 @@ namespace Bolt.Generators
                 });
 
             ContractInvokerExtensionGenerator generator = CreateEx<ContractInvokerExtensionGenerator>();
+            generator.Modifier = Modifier;
             generator.ContractInvoker = classGenerator.Descriptor;
             generator.Generate();
         }

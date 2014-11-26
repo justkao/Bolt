@@ -100,20 +100,17 @@ namespace TestService.Core
 
         public virtual Task DoNothingAsAsync()
         {
-            var request = new DoNothingAsAsyncParameters();
-            return Channel.SendAsync(request, Descriptor.DoNothingAsAsync, GetCancellationToken(Descriptor.DoNothingAsAsync));
+            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.DoNothingAsAsync, GetCancellationToken(Descriptor.DoNothingAsAsync));
         }
 
         public virtual void DoNothing()
         {
-            var request = new DoNothingParameters();
-            Channel.Send(request, Descriptor.DoNothing, GetCancellationToken(Descriptor.DoNothing));
+            Channel.Send(Bolt.Empty.Instance, Descriptor.DoNothing, GetCancellationToken(Descriptor.DoNothing));
         }
 
         public virtual Task DoNothingAsync()
         {
-            var request = new DoNothingParameters();
-            return Channel.SendAsync(request, Descriptor.DoNothing, GetCancellationToken(Descriptor.DoNothing));
+            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.DoNothing, GetCancellationToken(Descriptor.DoNothing));
         }
 
         public virtual Task DoNothingWithComplexParameterAsAsync(List<Person> person)
@@ -201,37 +198,31 @@ namespace TestService.Core
         }
         public virtual void InnerOperation()
         {
-            var request = new InnerOperationParameters();
-            Channel.Send(request, Descriptor.InnerOperation, GetCancellationToken(Descriptor.InnerOperation));
+            Channel.Send(Bolt.Empty.Instance, Descriptor.InnerOperation, GetCancellationToken(Descriptor.InnerOperation));
         }
 
         public virtual Task InnerOperationAsync()
         {
-            var request = new InnerOperationParameters();
-            return Channel.SendAsync(request, Descriptor.InnerOperation, GetCancellationToken(Descriptor.InnerOperation));
+            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.InnerOperation, GetCancellationToken(Descriptor.InnerOperation));
         }
 
         public virtual Task InnerOperationExAsync()
         {
-            var request = new InnerOperationExAsyncParameters();
-            return Channel.SendAsync(request, Descriptor.InnerOperationExAsync, GetCancellationToken(Descriptor.InnerOperationExAsync));
+            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.InnerOperationExAsync, GetCancellationToken(Descriptor.InnerOperationExAsync));
         }
         public virtual void InnerOperation2()
         {
-            var request = new InnerOperation2Parameters();
-            Channel.Send(request, Descriptor.InnerOperation2, GetCancellationToken(Descriptor.InnerOperation2));
+            Channel.Send(Bolt.Empty.Instance, Descriptor.InnerOperation2, GetCancellationToken(Descriptor.InnerOperation2));
         }
 
         public virtual Task InnerOperation2Async()
         {
-            var request = new InnerOperation2Parameters();
-            return Channel.SendAsync(request, Descriptor.InnerOperation2, GetCancellationToken(Descriptor.InnerOperation2));
+            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.InnerOperation2, GetCancellationToken(Descriptor.InnerOperation2));
         }
 
         public virtual Task InnerOperationExAsync2()
         {
-            var request = new InnerOperationExAsync2Parameters();
-            return Channel.SendAsync(request, Descriptor.InnerOperationExAsync2, GetCancellationToken(Descriptor.InnerOperationExAsync2));
+            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.InnerOperationExAsync2, GetCancellationToken(Descriptor.InnerOperationExAsync2));
         }
     }
 }

@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Bolt.Generators;
+using System.Collections.Generic;
 using System.Linq;
-using Bolt.Generators;
 
 namespace Bolt.Console
 {
@@ -37,7 +37,7 @@ namespace Bolt.Console
             {
                 ContractDefinition = definition,
                 ForceAsync = ForceAsync,
-                ExcludedInterfaces = ExcludedInterfaces
+                ExcludedInterfaces = ExcludedInterfaces,
             };
 
             generator.Add(interfaceGenerator);

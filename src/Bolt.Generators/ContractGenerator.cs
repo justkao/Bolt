@@ -14,7 +14,10 @@ namespace Bolt.Generators
         public ContractGenerator(StringWriter output, TypeFormatter formatter, IntendProvider provider)
             : base(output, formatter, provider)
         {
+            Modifier = "public";
         }
+
+        public string Modifier { get; set; }
 
         public override void Generate()
         {
@@ -35,6 +38,7 @@ namespace Bolt.Generators
                             IncludeNamespace = false,
                         };
 
+                        parametersGenerator.Modifier = Modifier;
                         if (!method.HasParameterClass())
                         {
                             continue;

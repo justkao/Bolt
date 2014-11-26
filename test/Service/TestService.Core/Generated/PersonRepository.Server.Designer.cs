@@ -71,7 +71,6 @@ namespace TestService.Core
 
         protected virtual async Task PersonRepository_DoNothingAsAsync(Bolt.Server.ServerExecutionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<DoNothingAsAsyncParameters>(context);
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
             await instance.DoNothingAsAsync();
             await ResponseHandler.Handle(context);
@@ -79,7 +78,6 @@ namespace TestService.Core
 
         protected virtual async Task PersonRepository_DoNothing(Bolt.Server.ServerExecutionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<DoNothingParameters>(context);
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepository>(context);
             instance.DoNothing();
             await ResponseHandler.Handle(context);
@@ -151,7 +149,6 @@ namespace TestService.Core
 
         protected virtual async Task PersonRepositoryInner_InnerOperation(Bolt.Server.ServerExecutionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<InnerOperationParameters>(context);
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepositoryInner>(context);
             instance.InnerOperation();
             await ResponseHandler.Handle(context);
@@ -159,7 +156,6 @@ namespace TestService.Core
 
         protected virtual async Task PersonRepositoryInner_InnerOperationExAsync(Bolt.Server.ServerExecutionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<InnerOperationExAsyncParameters>(context);
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepositoryInner>(context);
             await instance.InnerOperationExAsync();
             await ResponseHandler.Handle(context);
@@ -167,7 +163,6 @@ namespace TestService.Core
 
         protected virtual async Task PersonRepositoryInner2_InnerOperation2(Bolt.Server.ServerExecutionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<InnerOperation2Parameters>(context);
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepositoryInner2>(context);
             instance.InnerOperation2();
             await ResponseHandler.Handle(context);
@@ -175,7 +170,6 @@ namespace TestService.Core
 
         protected virtual async Task PersonRepositoryInner2_InnerOperationExAsync2(Bolt.Server.ServerExecutionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<InnerOperationExAsync2Parameters>(context);
             var instance = await InstanceProvider.GetInstanceAsync<IPersonRepositoryInner2>(context);
             await instance.InnerOperationExAsync2();
             await ResponseHandler.Handle(context);

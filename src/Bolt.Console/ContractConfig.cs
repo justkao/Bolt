@@ -1,17 +1,17 @@
-﻿using System;
+﻿using Bolt.Generators;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Bolt.Generators;
-using Newtonsoft.Json;
 
 namespace Bolt.Console
 {
     public class ContractConfig
     {
         [JsonIgnore]
-        private List<Assembly> _assemblies = new List<Assembly>();
+        private readonly List<Assembly> _assemblies = new List<Assembly>();
 
         [JsonIgnore]
         private ContractDefinition _contractDefinition;
@@ -24,13 +24,13 @@ namespace Bolt.Console
 
         public string Output { get; set; }
 
-        public string ParametersBase { get; set; }
-
         public List<string> Excluded { get; set; }
 
         public ClientConfig Client { get; set; }
 
         public ServerConfig Server { get; set; }
+
+        public string Modifier { get; set; }
 
         [JsonIgnore]
         public RootConfig Parent { get; set; }
@@ -68,14 +68,16 @@ namespace Bolt.Console
 
             document.Add(new ContractGenerator()
                              {
-                                 ContractDefinition = definition
+                                 ContractDefinition = definition,
+                                 Modifier = Modifier ?? "public"
+
                              });
 
             document.Add(new ContractDescriptorGenerator()
                              {
-                                 ContractDefinition = definition
+                                 ContractDefinition = definition,
+                                 Modifier = Modifier ?? "public"
                              });
-
 
             ContractExecution execution = new ContractExecution(definition, Path.GetDirectoryName(output));
             if (Client != null)
@@ -104,10 +106,7 @@ namespace Bolt.Console
                 excluded = Excluded.Select(TypeHelper.GetTypeOrThrow).ToList();
             }
 
-            return new ContractDefinition(type, excluded.ToArray())
-            {
-                ParametersBase = string.IsNullOrEmpty(ParametersBase) ? null : TypeHelper.GetTypeOrThrow(ParametersBase)
-            };
+            return new ContractDefinition(type, excluded.ToArray());
         }
 
     }

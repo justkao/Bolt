@@ -24,295 +24,73 @@ using TestService.Core.Parameters;
 namespace TestService.Core.Parameters
 {
     [DataContract]
-    public partial class UpdatePersonParameters : TestService.Core.ParametersBase
+    public partial class UpdatePersonParameters
     {
-        public UpdatePersonParameters() : base()
-        {
-        }
-
-        public UpdatePersonParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected UpdatePersonParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
         [DataMember(Order = 1)]
         public Person Person { get; set; }
     }
 
     [DataContract]
-    public partial class UpdatePersonThatThrowsInvalidOperationExceptionParameters : TestService.Core.ParametersBase
+    public partial class UpdatePersonThatThrowsInvalidOperationExceptionParameters
     {
-        public UpdatePersonThatThrowsInvalidOperationExceptionParameters() : base()
-        {
-        }
-
-        public UpdatePersonThatThrowsInvalidOperationExceptionParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected UpdatePersonThatThrowsInvalidOperationExceptionParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
         [DataMember(Order = 1)]
         public Person Person { get; set; }
     }
 
     [DataContract]
-    public partial class DoNothingAsAsyncParameters : TestService.Core.ParametersBase
+    public partial class DoNothingWithComplexParameterAsAsyncParameters
     {
-        public DoNothingAsAsyncParameters() : base()
-        {
-        }
-
-        public DoNothingAsAsyncParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected DoNothingAsAsyncParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
-    }
-
-    [DataContract]
-    public partial class DoNothingParameters : TestService.Core.ParametersBase
-    {
-        public DoNothingParameters() : base()
-        {
-        }
-
-        public DoNothingParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected DoNothingParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
-    }
-
-    [DataContract]
-    public partial class DoNothingWithComplexParameterAsAsyncParameters : TestService.Core.ParametersBase
-    {
-        public DoNothingWithComplexParameterAsAsyncParameters() : base()
-        {
-        }
-
-        public DoNothingWithComplexParameterAsAsyncParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected DoNothingWithComplexParameterAsAsyncParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
         [DataMember(Order = 1)]
         public List<Person> Person { get; set; }
     }
 
     [DataContract]
-    public partial class DoNothingWithComplexParameterParameters : TestService.Core.ParametersBase
+    public partial class DoNothingWithComplexParameterParameters
     {
-        public DoNothingWithComplexParameterParameters() : base()
-        {
-        }
-
-        public DoNothingWithComplexParameterParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected DoNothingWithComplexParameterParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
         [DataMember(Order = 1)]
         public List<Person> Person { get; set; }
     }
 
     [DataContract]
-    public partial class GetSimpleTypeParameters : TestService.Core.ParametersBase
+    public partial class GetSimpleTypeParameters
     {
-        public GetSimpleTypeParameters() : base()
-        {
-        }
-
-        public GetSimpleTypeParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected GetSimpleTypeParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
         [DataMember(Order = 1)]
         public int Arg { get; set; }
     }
 
     [DataContract]
-    public partial class GetSimpleTypeAsAsyncParameters : TestService.Core.ParametersBase
+    public partial class GetSimpleTypeAsAsyncParameters
     {
-        public GetSimpleTypeAsAsyncParameters() : base()
-        {
-        }
-
-        public GetSimpleTypeAsAsyncParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected GetSimpleTypeAsAsyncParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
         [DataMember(Order = 1)]
         public int Arg { get; set; }
     }
 
     [DataContract]
-    public partial class GetSinglePersonParameters : TestService.Core.ParametersBase
+    public partial class GetSinglePersonParameters
     {
-        public GetSinglePersonParameters() : base()
-        {
-        }
-
-        public GetSinglePersonParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected GetSinglePersonParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
         [DataMember(Order = 1)]
         public Person Person { get; set; }
     }
 
     [DataContract]
-    public partial class GetSinglePersonAsAsyncParameters : TestService.Core.ParametersBase
+    public partial class GetSinglePersonAsAsyncParameters
     {
-        public GetSinglePersonAsAsyncParameters() : base()
-        {
-        }
-
-        public GetSinglePersonAsAsyncParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected GetSinglePersonAsAsyncParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
         [DataMember(Order = 1)]
         public Person Person { get; set; }
     }
 
     [DataContract]
-    public partial class GetManyPersonsParameters : TestService.Core.ParametersBase
+    public partial class GetManyPersonsParameters
     {
-        public GetManyPersonsParameters() : base()
-        {
-        }
-
-        public GetManyPersonsParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected GetManyPersonsParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
         [DataMember(Order = 1)]
         public Person Person { get; set; }
     }
 
     [DataContract]
-    public partial class GetManyPersonsAsAsyncParameters : TestService.Core.ParametersBase
+    public partial class GetManyPersonsAsAsyncParameters
     {
-        public GetManyPersonsAsAsyncParameters() : base()
-        {
-        }
-
-        public GetManyPersonsAsAsyncParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected GetManyPersonsAsAsyncParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
         [DataMember(Order = 1)]
         public Person Person { get; set; }
-    }
-
-    [DataContract]
-    public partial class InnerOperationParameters : TestService.Core.ParametersBase
-    {
-        public InnerOperationParameters() : base()
-        {
-        }
-
-        public InnerOperationParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected InnerOperationParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
-    }
-
-    [DataContract]
-    public partial class InnerOperationExAsyncParameters : TestService.Core.ParametersBase
-    {
-        public InnerOperationExAsyncParameters() : base()
-        {
-        }
-
-        public InnerOperationExAsyncParameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected InnerOperationExAsyncParameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
-    }
-
-    [DataContract]
-    public partial class InnerOperation2Parameters : TestService.Core.ParametersBase
-    {
-        public InnerOperation2Parameters() : base()
-        {
-        }
-
-        public InnerOperation2Parameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected InnerOperation2Parameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
-    }
-
-    [DataContract]
-    public partial class InnerOperationExAsync2Parameters : TestService.Core.ParametersBase
-    {
-        public InnerOperationExAsync2Parameters() : base()
-        {
-        }
-
-        public InnerOperationExAsync2Parameters(string someeeeeee) : base(someeeeeee)
-        {
-        }
-
-        protected InnerOperationExAsync2Parameters(int someeeeeee) : base(someeeeeee)
-        {
-        }
-
     }
 
 }
@@ -325,8 +103,8 @@ namespace TestService.Core
         {
             UpdatePerson = Add("UpdatePerson", typeof(TestService.Core.Parameters.UpdatePersonParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("UpdatePerson"));
             UpdatePersonThatThrowsInvalidOperationException = Add("UpdatePersonThatThrowsInvalidOperationException", typeof(TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("UpdatePersonThatThrowsInvalidOperationException"));
-            DoNothingAsAsync = Add("DoNothingAsAsync", typeof(TestService.Core.Parameters.DoNothingAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingAsAsync"));
-            DoNothing = Add("DoNothing", typeof(TestService.Core.Parameters.DoNothingParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothing"));
+            DoNothingAsAsync = Add("DoNothingAsAsync", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingAsAsync"));
+            DoNothing = Add("DoNothing", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothing"));
             DoNothingWithComplexParameterAsAsync = Add("DoNothingWithComplexParameterAsAsync", typeof(TestService.Core.Parameters.DoNothingWithComplexParameterAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingWithComplexParameterAsAsync"));
             DoNothingWithComplexParameter = Add("DoNothingWithComplexParameter", typeof(TestService.Core.Parameters.DoNothingWithComplexParameterParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("DoNothingWithComplexParameter"));
             GetSimpleType = Add("GetSimpleType", typeof(TestService.Core.Parameters.GetSimpleTypeParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetSimpleType"));
@@ -335,10 +113,10 @@ namespace TestService.Core
             GetSinglePersonAsAsync = Add("GetSinglePersonAsAsync", typeof(TestService.Core.Parameters.GetSinglePersonAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetSinglePersonAsAsync"));
             GetManyPersons = Add("GetManyPersons", typeof(TestService.Core.Parameters.GetManyPersonsParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetManyPersons"));
             GetManyPersonsAsAsync = Add("GetManyPersonsAsAsync", typeof(TestService.Core.Parameters.GetManyPersonsAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetManyPersonsAsAsync"));
-            InnerOperation = Add("InnerOperation", typeof(TestService.Core.Parameters.InnerOperationParameters), typeof(IPersonRepositoryInner).GetTypeInfo().GetMethod("InnerOperation"));
-            InnerOperationExAsync = Add("InnerOperationExAsync", typeof(TestService.Core.Parameters.InnerOperationExAsyncParameters), typeof(IPersonRepositoryInner).GetTypeInfo().GetMethod("InnerOperationExAsync"));
-            InnerOperation2 = Add("InnerOperation2", typeof(TestService.Core.Parameters.InnerOperation2Parameters), typeof(IPersonRepositoryInner2).GetTypeInfo().GetMethod("InnerOperation2"));
-            InnerOperationExAsync2 = Add("InnerOperationExAsync2", typeof(TestService.Core.Parameters.InnerOperationExAsync2Parameters), typeof(IPersonRepositoryInner2).GetTypeInfo().GetMethod("InnerOperationExAsync2"));
+            InnerOperation = Add("InnerOperation", typeof(Bolt.Empty), typeof(IPersonRepositoryInner).GetTypeInfo().GetMethod("InnerOperation"));
+            InnerOperationExAsync = Add("InnerOperationExAsync", typeof(Bolt.Empty), typeof(IPersonRepositoryInner).GetTypeInfo().GetMethod("InnerOperationExAsync"));
+            InnerOperation2 = Add("InnerOperation2", typeof(Bolt.Empty), typeof(IPersonRepositoryInner2).GetTypeInfo().GetMethod("InnerOperation2"));
+            InnerOperationExAsync2 = Add("InnerOperationExAsync2", typeof(Bolt.Empty), typeof(IPersonRepositoryInner2).GetTypeInfo().GetMethod("InnerOperationExAsync2"));
         }
 
         public static readonly PersonRepositoryDescriptor Default = new PersonRepositoryDescriptor();

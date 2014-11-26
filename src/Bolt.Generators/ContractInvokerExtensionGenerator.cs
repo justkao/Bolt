@@ -3,14 +3,21 @@ namespace Bolt.Generators
 {
     public class ContractInvokerExtensionGenerator : ContractGeneratorBase
     {
+        public ContractInvokerExtensionGenerator()
+        {
+            Modifier = "public";
+        }
+
         public ClassDescriptor ContractInvoker { get; set; }
+
+        public string Modifier { get; set; }
 
         public override void Generate()
         {
             AddUsings(ServerGenerator.BoltServerNamespace, "Owin");
 
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
-            generator.Modifier = "public static";
+            generator.Modifier = Modifier + " static";
 
             generator.GenerateClass((v) =>
             {

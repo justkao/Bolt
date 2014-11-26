@@ -6,17 +6,17 @@ namespace Bolt.Console
     {
         public bool ForceAsync { get; set; }
 
-        public bool GenerateFactory { get; set; }
-
         public string Namespace { get; set; }
 
         public string Suffix { get; set; }
 
         public string Name { get; set; }
 
+        public string Modifier { get; set; }
+
         protected override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
         {
-            ServerGenerator serverGenerator = new ServerGenerator { ContractDefinition = definition, Namespace = Namespace, Name = Name };
+            ServerGenerator serverGenerator = new ServerGenerator { ContractDefinition = definition, Namespace = Namespace, Name = Name, Modifier = Modifier ?? "public" };
 
             if (!string.IsNullOrEmpty(Suffix))
             {

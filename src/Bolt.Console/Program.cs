@@ -45,15 +45,29 @@ namespace Bolt.Console
             {
                 Assemblies = new List<string>() { "<AssemblyPath>" },
                 Contract = "<Type>",
+                Modifier = "public",
                 Output = "<Directory or File Path>",
                 Excluded = new List<string> { "<ExcludedType1>", "<ExcludedType2>" },
-                ParametersBase = "<Base Class For Generated Parameters or null>",
                 Client = new ClientConfig()
                 {
                     ForceAsync = true,
                     Output = "<Directory or File Path>",
                     Excluded = new List<string>() { "<Additional Excluded Type >" },
-                    Suffix = "<Generated Client Classes Suffix>"
+                    Suffix = "<Generated Client Classes Suffix>",
+                    Modifier = "public",
+                    Namespace = "Client.Proxy.Namespace",
+                    Name = "ProxyName",
+                    ExcludedInterfaces = new List<string>() { "<Interface that will be excluded from Async proxy generation>" },
+                },
+                Server = new ServerConfig()
+                {
+                    ForceAsync = true,
+                    Output = "<Directory or File Path>",
+                    Excluded = new List<string>() { "<Additional Excluded Type >" },
+                    Suffix = "<Generated Server Classes Suffix>",
+                    Modifier = "public",
+                    Namespace = "Server.Invoker.Namespace",
+                    Name = "ServerInvokerName"
                 }
             });
 
