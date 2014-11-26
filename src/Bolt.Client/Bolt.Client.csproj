@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Channels\ChannelBase.cs" />
-    <Compile Include="Channels\RecoverableChannelBase.cs" />
+    <Compile Include="Channels\RecoverableChannel.cs" />
     <Compile Include="ClientConfiguration.cs" />
     <Compile Include="ClientDataHandler.cs" />
     <Compile Include="ClientActionContext.cs" />
@@ -74,7 +74,6 @@
     <Compile Include="ResponseDescriptor.cs" />
     <Compile Include="ResponseErrorType.cs" />
     <Compile Include="Channels\RecoverableStatefullChannel.cs" />
-    <Compile Include="Channels\RecoverableChannel.cs" />
     <Compile Include="UriServerProvider.cs" />
   </ItemGroup>
   <ItemGroup>

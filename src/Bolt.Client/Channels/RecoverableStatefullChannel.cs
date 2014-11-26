@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Bolt.Client.Channels
 {
-    public class RecoverableStatefullChannel<TContract, TContractDescriptor> : RecoverableChannelBase
+    public class RecoverableStatefullChannel<TContract, TContractDescriptor> : RecoverableChannel<TContract, TContractDescriptor>
         where TContract : ContractProxy<TContractDescriptor>
         where TContractDescriptor : ContractDescriptor
     {
@@ -13,34 +13,10 @@ namespace Bolt.Client.Channels
         private Uri _activeConnection;
         private string _sessionId;
 
-        public RecoverableStatefullChannel(TContractDescriptor descriptor, IServerProvider serverProvider, string prefix, Func<IChannel, TContract> contractFactory, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
-            : base(serverProvider, requestForwarder, endpointProvider)
+        public RecoverableStatefullChannel(TContractDescriptor descriptor, IServerProvider serverProvider, string prefix, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+            : base(descriptor, prefix, serverProvider, requestForwarder, endpointProvider)
         {
-            if (descriptor == null)
-            {
-                throw new ArgumentNullException("descriptor");
-            }
-
-            if (serverProvider == null)
-            {
-                throw new ArgumentNullException("serverProvider");
-            }
-
-            if (contractFactory == null)
-            {
-                throw new ArgumentNullException("contractFactory");
-            }
-
-            Descriptor = descriptor;
-            Prefix = prefix;
-            ContractFactory = contractFactory;
         }
-
-        public TContractDescriptor Descriptor { get; private set; }
-
-        public Func<IChannel, TContract> ContractFactory { get; private set; }
-
-        public string Prefix { get; private set; }
 
         protected override ClientActionContext CreateContext(ActionDescriptor actionDescriptor, CancellationToken cancellation, object parameters)
         {
@@ -63,8 +39,7 @@ namespace Bolt.Client.Channels
                     Uri serverUrl = ServerProvider.GetServer();
                     string session = Guid.NewGuid().ToString();
 
-                    DelegatedChannel delegatedChannel = new DelegatedChannel(RequestForwarder, EndpointProvider, serverUrl, Prefix, Descriptor, null);
-                    TContract contract = ContractFactory(delegatedChannel);
+                    TContract contract = CreateContract(serverUrl);
                     OnProxyOpening(contract);
 
                     _activeConnection = serverUrl;
@@ -100,8 +75,7 @@ namespace Bolt.Client.Channels
         {
             if (_activeConnection != null)
             {
-                DelegatedChannel delegatedChannel = new DelegatedChannel(RequestForwarder, EndpointProvider, _activeConnection, Prefix, Descriptor, null);
-                TContract contract = ContractFactory(delegatedChannel);
+                TContract contract = CreateContract(_activeConnection);
                 OnProxyClosing(contract);
             }
 

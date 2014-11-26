@@ -39,3 +39,5 @@
 /src/Bolt.Console/obj
 /src/Bolt.Server/bin
 /src/Bolt.Core.Serialization/bin
+/test/Console/Bolt.Console.Test/bin/Debug
+/test/Console/Bolt.Console.Test/obj/Debug

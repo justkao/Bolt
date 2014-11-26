@@ -7,6 +7,16 @@ namespace Bolt
 {
     public static class WebRequestExtensions
     {
+        public static bool ResponseReceived(this WebException e)
+        {
+            if (e == null)
+            {
+                throw new ArgumentNullException("e");
+            }
+
+            return e.Response != null;
+        }
+
         public static HttpWebResponse GetResponse(this HttpWebRequest request, CancellationToken cancellation)
         {
             return TaskExtensions.Execute(() => GetResponseAsync(request, cancellation));
