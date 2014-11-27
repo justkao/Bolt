@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Threading;
 
 namespace Bolt.Client.Channels
@@ -7,29 +6,34 @@ namespace Bolt.Client.Channels
     public class DelegatedChannel : ChannelBase
     {
         private readonly Uri _server;
-        private readonly ContractDescriptor _descriptor;
         private readonly Action<ClientActionContext> _contextCreated;
 
-        public DelegatedChannel(IRequestForwarder requestForwarder, IEndpointProvider endpointProvider, Uri server, ContractDescriptor descriptor, Action<ClientActionContext> contextCreated)
-            : base(requestForwarder, endpointProvider)
+        public DelegatedChannel(
+            Uri server,
+            ContractDescriptor descriptor,
+            IRequestForwarder requestForwarder,
+            IEndpointProvider endpointProvider,
+            Action<ClientActionContext> contextCreated)
+            : base(descriptor, requestForwarder, endpointProvider)
         {
             _server = server;
-            _descriptor = descriptor;
             _contextCreated = contextCreated;
         }
 
-        protected override ClientActionContext CreateContext(ActionDescriptor actionDescriptor, CancellationToken cancellation, object parameters)
+        protected override ClientActionContext CreateContext(Uri server, ActionDescriptor actionDescriptor, CancellationToken cancellation, object parameters)
         {
-            HttpWebRequest webRequest = CreateWebRequest(_server, _descriptor, actionDescriptor);
-
-            ClientActionContext ctxt = new ClientActionContext(actionDescriptor, webRequest, _server, cancellation);
-
+            ClientActionContext ctxt = base.CreateContext(server, actionDescriptor, cancellation, parameters);
             if (_contextCreated != null)
             {
                 _contextCreated(ctxt);
             }
 
             return ctxt;
+        }
+
+        protected override Uri GetRemoteConnection()
+        {
+            return _server;
         }
     }
 }

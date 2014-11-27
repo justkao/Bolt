@@ -135,7 +135,7 @@ namespace Bolt.Generators
             }
 
             string instanceType = FormatType(methodDescriptor.Method.DeclaringType);
-            WriteLine("var instance = await InstanceProvider.GetInstanceAsync<{0}>(context);", instanceType);
+            WriteLine("var instance = InstanceProvider.GetInstance<{0}>(context);", instanceType);
 
             string result = GenerateInvocationCode("instance", "parameters", methodDescriptor);
             if (!string.IsNullOrEmpty(result))

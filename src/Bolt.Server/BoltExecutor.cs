@@ -1,8 +1,8 @@
-﻿using Microsoft.Owin;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Owin;
 
 namespace Bolt.Server
 {
@@ -27,6 +27,12 @@ namespace Bolt.Server
             if (invoker == null)
             {
                 throw new ArgumentNullException("invoker");
+            }
+
+            if (_invokers.FirstOrDefault(i => i.DescriptorCore.Name == invoker.DescriptorCore.Name) != null)
+            {
+                throw new InvalidOperationException(
+                    string.Format("Invoker for contract '{0}' already registered.", invoker.DescriptorCore.Name));
             }
 
             _invokers.Add(invoker);

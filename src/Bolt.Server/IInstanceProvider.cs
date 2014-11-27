@@ -1,9 +1,7 @@
-﻿using System.Threading.Tasks;
-
-namespace Bolt.Server
+﻿namespace Bolt.Server
 {
     public interface IInstanceProvider
     {
-        Task<T> GetInstanceAsync<T>(ServerExecutionContext context);
+        T GetInstance<T>(ServerExecutionContext context);
     }
 }

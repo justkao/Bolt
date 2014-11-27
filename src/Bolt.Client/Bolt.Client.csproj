@@ -59,7 +59,6 @@
     <Compile Include="ClientConfiguration.cs" />
     <Compile Include="ClientDataHandler.cs" />
     <Compile Include="ClientActionContext.cs" />
-    <Compile Include="Channels\ActionChannel.cs" />
     <Compile Include="Channels\DelegatedChannel.cs" />
     <Compile Include="ICancellationTokenProvider.cs" />
     <Compile Include="IChannel.cs" />

@@ -1,57 +1,59 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using System.Timers;
 
 namespace Bolt.Server
 {
-    public class StateFullInstanceProvider<T> : StateFullInstanceProvider where T : new()
-    {
-        protected override object CreateInstance(Type type)
-        {
-            return new T();
-        }
-    }
-
     public class StateFullInstanceProvider : InstanceProvider, IDisposable
     {
         private readonly ConcurrentDictionary<string, InstanceMetadata> _instances = new ConcurrentDictionary<string, InstanceMetadata>();
         private readonly Timer _timer;
 
-        public StateFullInstanceProvider()
+        public StateFullInstanceProvider(string sessionHeader, TimeSpan? instanceTimeout)
         {
-            _timer = new Timer();
-            _timer.Interval = TimeSpan.FromMinutes(1).TotalMilliseconds;
-            _timer.Elapsed += OnTimerElapsed;
-            _timer.Enabled = true;
+            if (string.IsNullOrEmpty(sessionHeader))
+            {
+                throw new ArgumentNullException("sessionHeader");
+            }
+
+            SessionHeader = sessionHeader;
+            InstanceTimeout = instanceTimeout;
+
+            if (InstanceTimeout != null)
+            {
+                _timer = new Timer();
+                _timer.Interval = TimeSpan.FromMinutes(1).TotalMilliseconds;
+                _timer.Elapsed += OnTimerElapsed;
+                _timer.Enabled = true;
+            }
         }
 
-        public string SessionHeader { get; set; }
+        public string SessionHeader { get; private set; }
 
-        public TimeSpan? InstanceTimeout { get; set; }
+        public TimeSpan? InstanceTimeout { get; private set; }
 
-        public override async Task<TInstance> GetInstanceAsync<TInstance>(ServerExecutionContext context)
+        public override TInstance GetInstance<TInstance>(ServerExecutionContext context)
         {
             string sessionId = context.Context.Request.Headers[SessionHeader];
             if (string.IsNullOrEmpty(sessionId))
             {
-                return await base.GetInstanceAsync<TInstance>(context);
+                return base.GetInstance<TInstance>(context);
             }
 
             InstanceMetadata instance;
             if (_instances.TryGetValue(sessionId, out instance))
             {
                 instance.Timestamp = DateTime.UtcNow;
-                return await Task.FromResult((TInstance)instance.Instance);
+                return (TInstance)instance.Instance;
             }
 
-            instance = new InstanceMetadata(await base.GetInstanceAsync<TInstance>(context));
+            instance = new InstanceMetadata(base.GetInstance<TInstance>(context));
             _instances[sessionId] = instance;
             return (TInstance)instance.Instance;
         }
 
-        public virtual void DestroyInstance(string key)
+        public virtual void ReleaseInstance(string key)
         {
             InstanceMetadata instance;
             if (_instances.TryRemove(key, out instance))
@@ -83,14 +85,17 @@ namespace Bolt.Server
             {
                 if (ShouldTimeoutInstance(pair.Value.Instance, pair.Value.Timestamp))
                 {
-                    DestroyInstance(pair.Key);
+                    ReleaseInstance(pair.Key);
                 }
             }
         }
 
         public virtual void Dispose()
         {
-            _timer.Dispose();
+            if (_timer != null)
+            {
+                _timer.Dispose();
+            }
         }
 
         private class InstanceMetadata

@@ -32,7 +32,7 @@ namespace Bolt.Client
             return CreateStateFullProxy<TContract, TDescriptor>(new UriServerProvider(uri), descriptor);
         }
 
-        public TContract CreateStateFullProxy<TContract, TDescriptor>(IServerProvider serverProvider,TDescriptor descriptor = null)
+        public TContract CreateStateFullProxy<TContract, TDescriptor>(IServerProvider serverProvider, TDescriptor descriptor = null)
             where TContract : ContractProxy<TDescriptor>
             where TDescriptor : ContractDescriptor
         {
@@ -41,6 +41,7 @@ namespace Bolt.Client
                     new RecoverableStatefullChannel<TContract, TDescriptor>(
                         descriptor ?? CreateDefaultDescriptor<TDescriptor>(),
                         serverProvider,
+                        SessionHeader,
                         RequestForwarder,
                         EndpointProvider));
         }

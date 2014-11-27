@@ -19,8 +19,12 @@ namespace Bolt.Client.Channels
             IsClosed = proxy.IsClosed;
         }
 
-        protected ChannelBase(IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+        protected ChannelBase(ContractDescriptor descriptor, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
         {
+            if (descriptor == null)
+            {
+                throw new ArgumentNullException("descriptor");
+            }
             if (requestForwarder == null)
             {
                 throw new ArgumentNullException("requestForwarder");
@@ -31,9 +35,12 @@ namespace Bolt.Client.Channels
                 throw new ArgumentNullException("endpointProvider");
             }
 
+            Descriptor = descriptor;
             RequestForwarder = requestForwarder;
             EndpointProvider = endpointProvider;
         }
+
+        public ContractDescriptor Descriptor { get; private set; }
 
         public IRequestForwarder RequestForwarder { get; private set; }
 
@@ -81,7 +88,9 @@ namespace Bolt.Client.Channels
             SendCore<Empty, TRequestParameters>(parameters, descriptor, cancellation);
         }
 
-        public TResult Send<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor,
+        public TResult Send<TResult, TRequestParameters>(
+            TRequestParameters parameters,
+            ActionDescriptor descriptor,
             CancellationToken cancellation)
         {
             return SendCore<TResult, TRequestParameters>(parameters, descriptor, cancellation);
@@ -98,27 +107,48 @@ namespace Bolt.Client.Channels
             return Task.FromResult(0);
         }
 
-        protected abstract ClientActionContext CreateContext(ActionDescriptor actionDescriptor, CancellationToken cancellation, object parameters);
+        protected abstract Uri GetRemoteConnection();
+
+        protected virtual Task<Uri> GetRemoteConnectionAsync()
+        {
+            return Task.FromResult(GetRemoteConnection());
+        }
+
+        protected virtual ClientActionContext CreateContext(
+            Uri server,
+            ActionDescriptor actionDescriptor,
+            CancellationToken cancellation,
+            object parameters)
+        {
+            return new ClientActionContext(actionDescriptor, CreateWebRequest(server, Descriptor, actionDescriptor), server, cancellation);
+        }
 
         public virtual T SendCore<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
             EnsureNotClosed();
             ValidateParameters(parameters, descriptor);
 
-            using (ClientActionContext ctxt = CreateContext(descriptor, cancellation, parameters))
+            Uri server = GetRemoteConnection();
+
+            using (ClientActionContext ctxt = CreateContext(server, descriptor, cancellation, parameters))
             {
                 return RequestForwarder.GetResponse<T, TParameters>(ctxt, parameters).GetResultOrThrow();
             }
         }
 
-        public virtual async Task<T> SendCoreAsync<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        public virtual async Task<T> SendCoreAsync<T, TParameters>(
+            TParameters parameters,
+            ActionDescriptor descriptor,
+            CancellationToken cancellation)
         {
             EnsureNotClosed();
             ValidateParameters(parameters, descriptor);
 
-            using (ClientActionContext ctxt = CreateContext(descriptor, cancellation, parameters))
+            Uri server = await GetRemoteConnectionAsync();
+
+            using (ClientActionContext ctxt = CreateContext(server, descriptor, cancellation, parameters))
             {
-                return (await (RequestForwarder.GetResponseAsync<T, TParameters>(ctxt, parameters))).GetResultOrThrow();
+                return (await RequestForwarder.GetResponseAsync<T, TParameters>(ctxt, parameters)).GetResultOrThrow();
             }
         }
 
@@ -148,15 +178,16 @@ namespace Bolt.Client.Channels
                     throw new InvalidOperationException(
                         string.Format(
                             "Invalid parameters type provided for action '{0}'. Expected parameter type object should be '{1}', but was '{2}' instead.",
-                            action.Name, typeof(Empty).FullName, typeof(TParams).FullName));
+                            action.Name,
+                            typeof(Empty).FullName,
+                            typeof(TParams).FullName));
                 }
             }
             else
             {
                 if (Equals(parameters, default(TParams)))
                 {
-                    throw new InvalidOperationException(string.Format("Parameters must not be null. Action '{0}'.",
-                        action.Name));
+                    throw new InvalidOperationException(string.Format("Parameters must not be null. Action '{0}'.", action.Name));
                 }
 
                 if (action.Parameters != typeof(TParams))
@@ -164,9 +195,10 @@ namespace Bolt.Client.Channels
                     throw new InvalidOperationException(
                         string.Format(
                             "Invalid parameters type provided for action '{0}'. Expected parameter type object should be '{1}', but was '{2}' instead.",
-                            action.Name, typeof(TParams).FullName, typeof(TParams).FullName));
+                            action.Name,
+                            typeof(TParams).FullName,
+                            typeof(TParams).FullName));
                 }
-
             }
         }
 

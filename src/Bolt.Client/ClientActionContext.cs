@@ -37,6 +37,7 @@ namespace Bolt.Client
             if (Response != null)
             {
                 Response.Dispose();
+                Response = null;
             }
 
             GC.SuppressFinalize(this);

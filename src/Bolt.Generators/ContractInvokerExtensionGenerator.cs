@@ -26,6 +26,20 @@ namespace Bolt.Generators
                 {
                     WriteLine("return app.Use{0}(new StaticInstanceProvider(instance));", ContractDefinition.Name);
                 }
+                WriteLine();
+
+                WriteLine("public static IAppBuilder Use{0}<TImplementation>(this IAppBuilder app) where TImplementation: {1}, new()", ContractDefinition.Name, ContractDefinition.Root.FullName);
+                using (WithBlock())
+                {
+                    WriteLine("return app.Use{0}(new InstanceProvider<TImplementation>());", ContractDefinition.Name);
+                }
+                WriteLine();
+
+                WriteLine("public static IAppBuilder UseStateFull{0}<TImplementation>(this IAppBuilder app, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: {1}, new()", ContractDefinition.Name, ContractDefinition.Root.FullName);
+                using (WithBlock())
+                {
+                    WriteLine("return app.Use{0}(new StateFullInstanceProvider<TImplementation>(sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));", ContractDefinition.Name);
+                }
 
                 WriteLine();
 
@@ -41,6 +55,9 @@ namespace Bolt.Generators
                     WriteLine();
                     WriteLine("return app;");
                 }
+
+                WriteLine();
+
             });
 
             base.Generate();

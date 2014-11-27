@@ -9,23 +9,17 @@ namespace Bolt.Client.Channels
         where TContract : ContractProxy<TContractDescriptor>
         where TContractDescriptor : ContractDescriptor
     {
-        private Exception _failedReason;
-
         public RecoverableChannel(RecoverableChannel<TContract, TContractDescriptor> proxy)
             : base(proxy)
         {
             Retries = proxy.Retries;
             RetryDelay = proxy.RetryDelay;
-            IsFailed = proxy.IsFailed;
             ServerProvider = proxy.ServerProvider;
-            Descriptor = proxy.Descriptor;
-            _failedReason = proxy._failedReason;
         }
 
         public RecoverableChannel(TContractDescriptor descriptor, IServerProvider serverProvider, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
-            : base(requestForwarder, endpointProvider)
+            : base(descriptor, requestForwarder, endpointProvider)
         {
-            Descriptor = descriptor;
             ServerProvider = serverProvider;
         }
 
@@ -33,11 +27,7 @@ namespace Bolt.Client.Channels
 
         public TimeSpan RetryDelay { get; set; }
 
-        public TContractDescriptor Descriptor { get; private set; }
-
         public IServerProvider ServerProvider { get; private set; }
-
-        public bool IsFailed { get; private set; }
 
         protected virtual void BeforeSending(ClientActionContext context)
         {
@@ -82,7 +72,7 @@ namespace Bolt.Client.Channels
                 switch (((BoltServerException)error).Error)
                 {
                     case ServerErrorCode.ContractNotFound:
-                        FailProxy(error);
+                        IsClosed = true;
                         throw error;
                     default:
                         throw error;
@@ -105,71 +95,16 @@ namespace Bolt.Client.Channels
             return Task.FromResult(HandleError(context, error));
         }
 
-        public sealed override T SendCore<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        public override sealed T SendCore<T, TParameters>(
+            TParameters parameters,
+            ActionDescriptor descriptor,
+            CancellationToken cancellation)
         {
-            EnsureNotFailed();
-            EnsureNotClosed();
-
-            int tries = 0;
-
-            while (true)
-            {
-                Exception error = null;
-                ConnectionDescriptor connection = ConnectionDescriptor.Invalid;
-                try
-                {
-                    connection = GetConnection(descriptor, cancellation, parameters);
-                }
-                catch (Exception e)
-                {
-                    e.EnsureNotCancelled();
-
-                    if (!HandleOpenConnectionError(e))
-                    {
-                        throw;
-                    }
-
-                    error = e;
-                }
-
-                if (connection.IsValid())
-                {
-                    using (connection)
-                    {
-                        try
-                        {
-                            BeforeSending(connection.Context);
-                            T result = connection.Connection.SendCore<T, TParameters>(parameters, descriptor, cancellation);
-                            AfterReceived(connection.Context);
-                            return result;
-                        }
-                        catch (Exception e)
-                        {
-                            e.EnsureNotCancelled();
-                            error = e;
-                        }
-                    }
-                }
-
-                tries++;
-                if (tries > Retries)
-                {
-                    FailProxy(error);
-                    throw error;
-                }
-
-                if (!HandleError(connection.Context, error))
-                {
-                    throw error;
-                }
-
-                TaskExtensions.Sleep(RetryDelay, connection.Context.Cancellation);
-            }
+            return SendCoreAsync<T, TParameters>(parameters, descriptor, cancellation).GetAwaiter().GetResult();
         }
 
         public sealed override async Task<T> SendCoreAsync<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
-            EnsureNotFailed();
             EnsureNotClosed();
 
             int tries = 0;
@@ -177,10 +112,10 @@ namespace Bolt.Client.Channels
             while (true)
             {
                 Exception error = null;
-                ConnectionDescriptor connection = ConnectionDescriptor.Invalid;
+                Uri connection = null;
                 try
                 {
-                    connection = await GetConnectionAsync(descriptor, cancellation, parameters);
+                    connection = await GetRemoteConnectionAsync();
                 }
                 catch (Exception e)
                 {
@@ -194,21 +129,26 @@ namespace Bolt.Client.Channels
                     error = e;
                 }
 
-                if (connection.IsValid())
+                if (connection != null)
                 {
-                    using (connection)
+                    using (ClientActionContext ctxt = CreateContext(connection, descriptor, cancellation, parameters))
                     {
                         try
                         {
-                            BeforeSending(connection.Context);
-                            T result = await connection.Connection.SendCoreAsync<T, TParameters>(parameters, descriptor, cancellation);
-                            AfterReceived(connection.Context);
-                            return result;
+                            BeforeSending(ctxt);
+                            ResponseDescriptor<T> result = await RequestForwarder.GetResponseAsync<T, TParameters>(ctxt, parameters);
+                            AfterReceived(ctxt);
+                            return result.GetResultOrThrow();
                         }
                         catch (Exception e)
                         {
                             e.EnsureNotCancelled();
                             error = e;
+                        }
+
+                        if (!await HandleErrorAsync(ctxt, error))
+                        {
+                            throw error;
                         }
                     }
                 }
@@ -216,35 +156,17 @@ namespace Bolt.Client.Channels
                 tries++;
                 if (tries > Retries)
                 {
-                    FailProxy(error);
+                    IsClosed = true;
                     throw error;
                 }
 
-                if (!await HandleErrorAsync(connection.Context, error))
-                {
-                    throw error;
-                }
-
-                await Task.Delay(RetryDelay, connection.Context.Cancellation);
+                await Task.Delay(RetryDelay, cancellation);
             }
         }
 
-        protected override ClientActionContext CreateContext(ActionDescriptor actionDescriptor, CancellationToken cancellation, object parameters)
+        protected override Uri GetRemoteConnection()
         {
-            Uri server = ServerProvider.GetServer();
-            HttpWebRequest webRequest = CreateWebRequest(server, Descriptor, actionDescriptor);
-            return new ClientActionContext(actionDescriptor, webRequest, server, cancellation);
-        }
-
-        protected virtual ConnectionDescriptor GetConnection(ActionDescriptor actionDescriptor, CancellationToken cancellation, object parameters)
-        {
-            ClientActionContext ctxt = CreateContext(actionDescriptor, cancellation, parameters);
-            return new ConnectionDescriptor(ctxt, new ActionChannel(RequestForwarder, EndpointProvider, ctxt));
-        }
-
-        protected virtual Task<ConnectionDescriptor> GetConnectionAsync(ActionDescriptor descriptor, CancellationToken cancellation, object parameters)
-        {
-            return Task.FromResult(GetConnection(descriptor, cancellation, parameters));
+            return ServerProvider.GetServer();
         }
 
         protected virtual TContract CreateContract(IChannel channel)
@@ -254,51 +176,7 @@ namespace Bolt.Client.Channels
 
         protected TContract CreateContract(Uri server)
         {
-            return CreateContract(new DelegatedChannel(RequestForwarder, EndpointProvider, server, Descriptor, BeforeSending));
-        }
-
-        protected virtual void FailProxy(Exception error)
-        {
-            _failedReason = error;
-            IsFailed = true;
-        }
-
-        private void EnsureNotFailed()
-        {
-            if (IsFailed)
-            {
-                throw new ProxyFailedException("Proxy failed.", _failedReason);
-            }
-        }
-
-        protected struct ConnectionDescriptor : IDisposable
-        {
-            public ConnectionDescriptor(ClientActionContext context, ChannelBase connection)
-                : this()
-            {
-                Context = context;
-                Connection = connection;
-            }
-
-            public bool IsValid()
-            {
-                return Context != null;
-            }
-
-            public static readonly ConnectionDescriptor Invalid = new ConnectionDescriptor();
-
-            public ClientActionContext Context { get; private set; }
-
-            public ChannelBase Connection { get; private set; }
-
-            public void Dispose()
-            {
-                if (IsValid())
-                {
-                    Context.Dispose();
-                    Connection.Dispose();
-                }
-            }
+            return CreateContract(new DelegatedChannel(server, Descriptor, RequestForwarder, EndpointProvider, BeforeSending));
         }
     }
 }

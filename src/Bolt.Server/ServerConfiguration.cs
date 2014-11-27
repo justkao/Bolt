@@ -1,4 +1,7 @@
-﻿namespace Bolt.Server
+﻿using System;
+using System.Threading;
+
+namespace Bolt.Server
 {
     public class ServerConfiguration : Configuration
     {
@@ -13,5 +16,7 @@
         public IResponseHandler ResponseHandler { get; set; }
 
         public IServerDataHandler ServerDataHandler { get; set; }
+
+        public TimeSpan? StateFullInstanceLifetime { get; set; }
     }
 }

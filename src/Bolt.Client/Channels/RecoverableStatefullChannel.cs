@@ -1,7 +1,5 @@
 using System;
-using System.Net;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace Bolt.Client.Channels
 {
@@ -9,48 +7,32 @@ namespace Bolt.Client.Channels
         where TContract : ContractProxy<TContractDescriptor>
         where TContractDescriptor : ContractDescriptor
     {
+        private readonly string _sessionHeaderName;
         private readonly object _syncRoot = new object();
+
         private Uri _activeConnection;
         private string _sessionId;
 
-        public RecoverableStatefullChannel(TContractDescriptor descriptor, IServerProvider serverProvider, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+        public RecoverableStatefullChannel(
+            TContractDescriptor descriptor,
+            IServerProvider serverProvider,
+            string sessionHeaderName,
+            IRequestForwarder requestForwarder,
+            IEndpointProvider endpointProvider)
             : base(descriptor, serverProvider, requestForwarder, endpointProvider)
         {
+            _sessionHeaderName = sessionHeaderName;
         }
 
-        protected override ClientActionContext CreateContext(ActionDescriptor actionDescriptor, CancellationToken cancellation, object parameters)
+        protected override void BeforeSending(ClientActionContext context)
         {
-            throw new NotSupportedException();
+            context.Request.Headers[_sessionHeaderName] = _sessionId;
+            base.BeforeSending(context);
         }
 
-        protected override ConnectionDescriptor GetConnection(ActionDescriptor actionDescriptor, CancellationToken cancellation, object parameters)
+        protected override Uri GetRemoteConnection()
         {
-            lock (_syncRoot)
-            {
-                if (_activeConnection != null)
-                {
-                    HttpWebRequest request = CreateWebRequest(_activeConnection, Descriptor, actionDescriptor);
-                    request.Headers["Session-Id"] = _sessionId;
-                    ClientActionContext clientContext = new ClientActionContext(actionDescriptor, request, _activeConnection, cancellation);
-                    return new ConnectionDescriptor(clientContext, new ActionChannel(RequestForwarder, EndpointProvider, clientContext));
-                }
-                else
-                {
-                    Uri serverUrl = ServerProvider.GetServer();
-                    string session = Guid.NewGuid().ToString();
-
-                    TContract contract = CreateContract(serverUrl);
-                    OnProxyOpening(contract);
-
-                    _activeConnection = serverUrl;
-                    _sessionId = session;
-
-                    HttpWebRequest request = CreateWebRequest(_activeConnection, Descriptor, actionDescriptor);
-                    request.Headers["Session-Id"] = _sessionId;
-                    ClientActionContext clientContext = new ClientActionContext(actionDescriptor, request, _activeConnection, cancellation);
-                    return new ConnectionDescriptor(clientContext, new ActionChannel(RequestForwarder, EndpointProvider, clientContext));
-                }
-            }
+            return EnsureConnection();
         }
 
         protected virtual void OnProxyOpening(TContract contract)
@@ -63,28 +45,103 @@ namespace Bolt.Client.Channels
 
         public override void Open()
         {
+            EnsureNotClosed();
+            EnsureConnection();
             base.Open();
-        }
-
-        public override Task OpenAsync()
-        {
-            return base.OpenAsync();
         }
 
         public override void Close()
         {
-            if (_activeConnection != null)
+            if (IsClosed)
             {
-                TContract contract = CreateContract(_activeConnection);
-                OnProxyClosing(contract);
+                return;
             }
 
-            base.Close();
+            lock (_syncRoot)
+            {
+                try
+                {
+                    if (_activeConnection != null)
+                    {
+                        TContract contract = CreateContract(_activeConnection);
+                        OnProxyClosing(contract);
+                    }
+                }
+                finally
+                {
+                    _activeConnection = null;
+                    _sessionId = null;
+                    base.Close();
+                }
+            }
         }
 
-        protected override Task<ConnectionDescriptor> GetConnectionAsync(ActionDescriptor descriptor, CancellationToken cancellation, object parameters)
+        protected virtual string CreateSessionId()
         {
-            return Task.FromResult(GetConnection(descriptor, cancellation, parameters));
+            return Guid.NewGuid().ToString();
+        }
+
+        private Uri EnsureConnection()
+        {
+            return ThreadHelper.EnsureInitialized(
+                ref _activeConnection,
+                () =>
+                {
+                    try
+                    {
+                        Uri connection = GetRemoteConnection();
+                        string sessionId = CreateSessionId();
+                        _sessionId = sessionId;
+                        TContract contract = CreateContract(connection);
+                        OnProxyOpening(contract);
+                        _activeConnection = connection;
+                        return connection;
+                    }
+                    catch (Exception)
+                    {
+                        _sessionId = null;
+                        throw;
+                    }
+                },
+                _syncRoot);
+        }
+
+        private static class ThreadHelper
+        {
+            /// <summary>
+            /// Ensure that <see cref="currentValue"/> is initialized in thread safe way.
+            /// </summary>
+            /// <typeparam name="T">Type of class.</typeparam>
+            /// <param name="currentValue">Reference to current value. If this value is null <paramref name="factory"/> is called and output value assigned to <paramref name="currentValue"/>.</param>
+            /// <param name="factory">Factory used to create <typeparamref name="T"/> if <paramref name="currentValue"/> is not initialized.</param>
+            /// <param name="syncRoot">Locking object used when <paramref name="currentValue"/> is not initialized.</param>
+            /// <returns>Initialized value of <typeparamref name="T"/>.</returns>
+            /// <remarks>
+            /// Double checked locking is used to avoid unnecessary locking.
+            /// </remarks>
+            public static T EnsureInitialized<T>(ref T currentValue, Func<T> factory, object syncRoot) where T : class
+            {
+                T tmp = currentValue;
+
+                if (tmp == null)
+                {
+                    lock (syncRoot)
+                    {
+                        if (currentValue == null)
+                        {
+                            T value = factory();
+                            // not supported in PCL
+                            // Thread.MemoryBarrier();
+                            currentValue = value;
+                        }
+
+                        tmp = currentValue;
+                    }
+                }
+
+                Debug.Assert(tmp != null, string.Format("Lazy initialization of {0} returned null value.", typeof(T).Name));
+                return tmp;
+            }
         }
     }
 }
