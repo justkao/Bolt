@@ -72,25 +72,25 @@ namespace Bolt.Service.Test.Core
 
         public static readonly TestContractDescriptor Default = new TestContractDescriptor();
 
-        public virtual Bolt.ActionDescriptor SimpleMethodWithSimpleArguments { get; private set; }
+        public  Bolt.ActionDescriptor SimpleMethodWithSimpleArguments { get; private set; }
 
-        public virtual Bolt.ActionDescriptor SimpleMethod { get; private set; }
+        public  Bolt.ActionDescriptor SimpleMethod { get; private set; }
 
-        public virtual Bolt.ActionDescriptor SimpleMethodExAsync { get; private set; }
+        public  Bolt.ActionDescriptor SimpleMethodExAsync { get; private set; }
 
-        public virtual Bolt.ActionDescriptor SimpleMethodWithCancellation { get; private set; }
+        public  Bolt.ActionDescriptor SimpleMethodWithCancellation { get; private set; }
 
-        public virtual Bolt.ActionDescriptor ComplexFunction { get; private set; }
+        public  Bolt.ActionDescriptor ComplexFunction { get; private set; }
 
-        public virtual Bolt.ActionDescriptor SimpleMethodWithComplexParameter { get; private set; }
+        public  Bolt.ActionDescriptor SimpleMethodWithComplexParameter { get; private set; }
 
-        public virtual Bolt.ActionDescriptor SimpleFunction { get; private set; }
+        public  Bolt.ActionDescriptor SimpleFunction { get; private set; }
 
-        public virtual Bolt.ActionDescriptor SimpleAsyncFunction { get; private set; }
+        public  Bolt.ActionDescriptor SimpleAsyncFunction { get; private set; }
 
-        public virtual Bolt.ActionDescriptor MethodWithManyArguments { get; private set; }
+        public  Bolt.ActionDescriptor MethodWithManyArguments { get; private set; }
 
-        public virtual Bolt.ActionDescriptor ThisMethodShouldBeExcluded { get; private set; }
+        public  Bolt.ActionDescriptor ThisMethodShouldBeExcluded { get; private set; }
     }
 }
 

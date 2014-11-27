@@ -25,9 +25,9 @@ namespace Bolt.Generators
             WriteLine("public virtual {0} {1} {{ get; set; }}", type, name);
         }
 
-        public virtual void WritePublicReadonlyProperty(string type, string name)
+        public virtual void WritePublicReadonlyProperty(string type, string name, bool isVirtual = true)
         {
-            WriteLine("public virtual {0} {1} {{ get; private set; }}", type, name);
+            WriteLine("public {2} {0} {1} {{ get; private set; }}", type, name, isVirtual ? "virtual" : string.Empty);
         }
 
         public virtual void WriteAttribute<T>()

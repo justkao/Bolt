@@ -11,15 +11,8 @@ namespace TestService.IIS.Bolt
     {
         public void Configuration(IAppBuilder app)
         {
-            ServerConfiguration configuration = new ServerConfiguration(new ProtocolBufferSerializer(), new JsonExceptionSerializer());
-        }
-
-        private void ConfigurePersonRepository(IAppBuilder obj, ServerConfiguration configuration)
-        {
-            obj.UseContractInvoker<PersonRepositoryInvoker, PersonRepositoryDescriptor>(
-                configuration,
-                PersonRepositoryDescriptor.Default,
-                new StaticInstanceProvider(new PersonRepository()));
+            app.UseBolt(new ServerConfiguration(new ProtocolBufferSerializer(), new JsonExceptionSerializer()));
+            app.UsePersonRepository<PersonRepository>();
         }
     }
 }

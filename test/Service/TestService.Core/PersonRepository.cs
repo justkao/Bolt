@@ -63,8 +63,6 @@ namespace TestService.Core
 
         public Person GetSinglePerson(Person person)
         {
-            Console.WriteLine(GetHashCode());
-
             return Person.Create(0);
         }
 
