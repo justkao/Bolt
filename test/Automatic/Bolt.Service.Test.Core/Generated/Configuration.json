@@ -5,6 +5,12 @@
             "assemblies": [ "Bolt.Service.Test.Core.dll" ],
             "client": { },
             "server": { }
+        },
+                {
+            "contract": "Bolt.Service.Test.Core.ITestContractStateFull",
+            "assemblies": [ "Bolt.Service.Test.Core.dll" ],
+            "client": { },
+            "server": { }
         }
     ]
 }

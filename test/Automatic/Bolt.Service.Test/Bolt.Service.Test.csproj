@@ -77,11 +77,22 @@
     <Compile Include="..\Bolt.Service.Test.Core\Generated\TestContract.Server.Designer.cs">
       <Link>TestContract.Server.Designer.cs</Link>
     </Compile>
+    <Compile Include="..\Bolt.Service.Test.Core\Generated\TestContractStateFull.Client.Designer.cs">
+      <Link>TestContractStateFull.Client.Designer.cs</Link>
+    </Compile>
+    <Compile Include="..\Bolt.Service.Test.Core\Generated\TestContractStateFull.Contract.Designer.cs">
+      <Link>TestContractStateFull.Contract.Designer.cs</Link>
+    </Compile>
+    <Compile Include="..\Bolt.Service.Test.Core\Generated\TestContractStateFull.Server.Designer.cs">
+      <Link>TestContractStateFull.Server.Designer.cs</Link>
+    </Compile>
     <Compile Include="CustomException.cs" />
     <Compile Include="SerializerType.cs" />
+    <Compile Include="StateFullServiceTest.cs" />
     <Compile Include="ServiceTest.cs" />
     <Compile Include="MockInstanceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestContractStateFullChannel.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Bolt.Core.Serialization\Bolt.Core.Serialization.csproj">

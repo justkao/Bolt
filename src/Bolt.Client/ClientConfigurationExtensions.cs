@@ -23,17 +23,17 @@ namespace Bolt.Client
             where TContract : ContractProxy<TDescriptor>
             where TDescriptor : ContractDescriptor
         {
-            return CreateProxy<TContract, TDescriptor>(clientConfiguration.CreateStateFullRecoverable<TContract, TDescriptor>(serverProvider, descriptor));
+            return clientConfiguration.CreateProxy<TContract, TDescriptor>(clientConfiguration.CreateStateFullRecoverable<TContract, TDescriptor>(serverProvider, descriptor));
         }
 
         public static TContract CreateProxy<TContract, TDescriptor>(this ClientConfiguration clientConfiguration, IServerProvider serverProvider, TDescriptor descriptor = null)
             where TContract : ContractProxy<TDescriptor>
             where TDescriptor : ContractDescriptor
         {
-            return CreateProxy<TContract, TDescriptor>(clientConfiguration.CreateRecoverable<TContract, TDescriptor>(serverProvider, descriptor));
+            return clientConfiguration.CreateProxy<TContract, TDescriptor>(clientConfiguration.CreateRecoverable<TContract, TDescriptor>(serverProvider, descriptor));
         }
 
-        public static TContract CreateProxy<TContract, TDescriptor>(IChannel channel)
+        public static TContract CreateProxy<TContract, TDescriptor>(this ClientConfiguration clientConfiguration, IChannel channel)
             where TContract : ContractProxy<TDescriptor>
             where TDescriptor : ContractDescriptor
         {

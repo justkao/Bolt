@@ -89,7 +89,7 @@ namespace Bolt.Client.Channels
                 {
                     try
                     {
-                        Uri connection = GetRemoteConnection();
+                        Uri connection = ServerProvider.GetServer();
                         string sessionId = CreateSessionId();
                         _sessionId = sessionId;
                         TContract contract = CreateContract(connection);
