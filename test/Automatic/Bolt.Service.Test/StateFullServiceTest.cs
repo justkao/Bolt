@@ -50,8 +50,7 @@ namespace Bolt.Service.Test
         {
             return
                 ClientConfiguration.CreateProxy<TestContractStateFullProxy, TestContractStateFullDescriptor>(
-                    new TestContractStateFullChannel(new UriServerProvider(ServerUrl), ClientConfiguration.SessionHeader,
-                        ClientConfiguration.RequestForwarder, ClientConfiguration.EndpointProvider));
+                    new TestContractStateFullChannel(ServerUrl, ClientConfiguration));
         }
 
         [TestFixtureSetUp]

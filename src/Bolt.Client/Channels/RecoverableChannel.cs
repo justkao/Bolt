@@ -17,6 +17,36 @@ namespace Bolt.Client.Channels
             ServerProvider = proxy.ServerProvider;
         }
 
+        public RecoverableChannel(Uri server, ClientConfiguration clientConfiguration)
+            : base(ContractDescriptor.GetDefaultValue<TContractDescriptor>(), clientConfiguration)
+        {
+            ServerProvider = new UriServerProvider(server);
+        }
+
+        public RecoverableChannel(TContractDescriptor descriptor, Uri server, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+            : base(descriptor, requestForwarder, endpointProvider)
+        {
+            ServerProvider = new UriServerProvider(server);
+        }
+
+        public RecoverableChannel(IServerProvider serverProvider, ClientConfiguration clientConfiguration)
+            : base(ContractDescriptor.GetDefaultValue<TContractDescriptor>(), clientConfiguration)
+        {
+            ServerProvider = serverProvider;
+        }
+
+        public RecoverableChannel(IServerProvider serverProvider, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+            : base(ContractDescriptor.GetDefaultValue<TContractDescriptor>(), requestForwarder, endpointProvider)
+        {
+            ServerProvider = serverProvider;
+        }
+
+        public RecoverableChannel(TContractDescriptor descriptor, IServerProvider serverProvider, ClientConfiguration clientConfiguration)
+            : base(descriptor, clientConfiguration)
+        {
+            ServerProvider = serverProvider;
+        }
+
         public RecoverableChannel(TContractDescriptor descriptor, IServerProvider serverProvider, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
             : base(descriptor, requestForwarder, endpointProvider)
         {

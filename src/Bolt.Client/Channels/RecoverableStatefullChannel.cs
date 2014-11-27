@@ -13,6 +13,36 @@ namespace Bolt.Client.Channels
         private Uri _activeConnection;
         private string _sessionId;
 
+        public RecoverableStatefullChannel(Uri server, ClientConfiguration clientConfiguration)
+            : base(ContractDescriptor.GetDefaultValue<TContractDescriptor>(), new UriServerProvider(server), clientConfiguration)
+        {
+            _sessionHeaderName = clientConfiguration.SessionHeader;
+        }
+
+        public RecoverableStatefullChannel(TContractDescriptor descriptor, Uri server, ClientConfiguration clientConfiguration)
+            : base(descriptor, new UriServerProvider(server), clientConfiguration)
+        {
+            _sessionHeaderName = clientConfiguration.SessionHeader;
+        }
+
+        public RecoverableStatefullChannel(IServerProvider serverProvider, ClientConfiguration clientConfiguration)
+            : base(ContractDescriptor.GetDefaultValue<TContractDescriptor>(), serverProvider, clientConfiguration)
+        {
+            _sessionHeaderName = clientConfiguration.SessionHeader;
+        }
+
+        public RecoverableStatefullChannel(TContractDescriptor descriptor, IServerProvider serverProvider, ClientConfiguration clientConfiguration)
+            : base(descriptor, serverProvider, clientConfiguration)
+        {
+            _sessionHeaderName = clientConfiguration.SessionHeader;
+        }
+
+        public RecoverableStatefullChannel(RecoverableStatefullChannel<TContract, TContractDescriptor> proxy)
+            : base(proxy)
+        {
+            _sessionHeaderName = proxy._sessionHeaderName;
+        }
+
         public RecoverableStatefullChannel(
             TContractDescriptor descriptor,
             IServerProvider serverProvider,

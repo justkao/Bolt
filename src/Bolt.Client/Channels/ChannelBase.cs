@@ -19,6 +19,11 @@ namespace Bolt.Client.Channels
             IsClosed = proxy.IsClosed;
         }
 
+        protected ChannelBase(ContractDescriptor descriptor, ClientConfiguration configuration)
+            : this(descriptor, configuration.RequestForwarder, configuration.EndpointProvider)
+        {
+        }
+
         protected ChannelBase(ContractDescriptor descriptor, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
         {
             if (descriptor == null)

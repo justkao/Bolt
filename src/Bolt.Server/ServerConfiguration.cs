@@ -17,6 +17,6 @@ namespace Bolt.Server
 
         public IServerDataHandler ServerDataHandler { get; set; }
 
-        public TimeSpan? StateFullInstanceLifetime { get; set; }
+        public TimeSpan StateFullInstanceLifetime { get; set; }
     }
 }

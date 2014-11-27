@@ -12,7 +12,7 @@ namespace Bolt.Server
         private readonly ConcurrentDictionary<string, InstanceMetadata> _instances = new ConcurrentDictionary<string, InstanceMetadata>();
         private readonly Timer _timer;
 
-        public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader, TimeSpan? instanceTimeout)
+        public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader, TimeSpan instanceTimeout)
         {
             if (initInstanceAction == null)
             {
@@ -34,7 +34,7 @@ namespace Bolt.Server
             _initInstanceAction = initInstanceAction;
             _releaseInstanceAction = releaseInstanceAction;
 
-            if (InstanceTimeout != null)
+            if (InstanceTimeout != TimeSpan.Zero)
             {
                 _timer = new Timer();
                 _timer.Interval = TimeSpan.FromMinutes(1).TotalMilliseconds;
@@ -45,7 +45,7 @@ namespace Bolt.Server
 
         public string SessionHeader { get; private set; }
 
-        public TimeSpan? InstanceTimeout { get; private set; }
+        public TimeSpan InstanceTimeout { get; private set; }
 
         public override TInstance GetInstance<TInstance>(ServerExecutionContext context)
         {

@@ -4,7 +4,7 @@ namespace Bolt.Server
 {
     public class StateFullInstanceProvider<T> : StateFullInstanceProvider where T : new()
     {
-        public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader, TimeSpan? instanceTimeout)
+        public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader, TimeSpan instanceTimeout)
             : base(initInstanceAction, releaseInstanceAction, sessionHeader, instanceTimeout)
         {
         }
