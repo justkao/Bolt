@@ -100,7 +100,7 @@ namespace Bolt.Client.Channels
             ActionDescriptor descriptor,
             CancellationToken cancellation)
         {
-            return SendCoreAsync<T, TParameters>(parameters, descriptor, cancellation).GetAwaiter().GetResult();
+            return TaskExtensions.Execute(() => SendCoreAsync<T, TParameters>(parameters, descriptor, cancellation));
         }
 
         public sealed override async Task<T> SendCoreAsync<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)

@@ -55,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Channels\ChannelBase.cs" />
+    <Compile Include="Channels\ChannelExtensions.cs" />
     <Compile Include="Channels\RecoverableChannel.cs" />
     <Compile Include="ClientConfiguration.cs" />
     <Compile Include="ClientDataHandler.cs" />

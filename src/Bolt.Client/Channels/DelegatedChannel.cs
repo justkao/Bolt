@@ -8,6 +8,11 @@ namespace Bolt.Client.Channels
         private readonly Uri _server;
         private readonly Action<ClientActionContext> _contextCreated;
 
+        public DelegatedChannel(ChannelBase proxy)
+            : base(proxy)
+        {
+        }
+
         public DelegatedChannel(
             Uri server,
             ContractDescriptor descriptor,
