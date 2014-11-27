@@ -85,6 +85,16 @@ namespace Bolt.Generators
             return GetInterfacesInternal(contract.GetTypeInfo().ImplementedInterfaces).Distinct();
         }
 
+        public MethodInfo GetInitSessionMethod()
+        {
+            return GetEffectiveMethods().FirstOrDefault(m => m.GetCustomAttribute<InitSessionAttribute>() != null);
+        }
+
+        public MethodInfo GetCloseSessionMethod()
+        {
+            return GetEffectiveMethods().FirstOrDefault(m => m.GetCustomAttribute<CloseSessionAttribute>() != null);
+        }
+
         private IEnumerable<Type> GetInterfacesInternal(IEnumerable<Type> interfaces)
         {
             foreach (Type @interface in interfaces)

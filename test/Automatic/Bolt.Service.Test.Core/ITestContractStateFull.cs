@@ -4,12 +4,14 @@ namespace Bolt.Service.Test.Core
 {
     public interface ITestContractStateFull
     {
+        [InitSession]
         void Init();
 
         void SetState(string state);
 
         string GetState();
 
+        [CloseSession]
         void Destroy();
     }
 

@@ -52,6 +52,16 @@ namespace Bolt.Server
                 context.Context.CloseWithError(_errorCodesHeader, ServerErrorCode.Serialization);
                 return Task.FromResult(0);
             }
+            if (error is SessionHeaderNotFoundException)
+            {
+                context.Context.CloseWithError(_errorCodesHeader, ServerErrorCode.NoSessionHeader);
+                return Task.FromResult(0);
+            }
+            if (error is SessionNotFoundException)
+            {
+                context.Context.CloseWithError(_errorCodesHeader, ServerErrorCode.SessionNotFound);
+                return Task.FromResult(0);
+            }
 
             context.Context.Response.ContentType = _serverDataHandler.ContentType;
             return _serverDataHandler.WriteExceptionAsync(context, error);

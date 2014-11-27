@@ -8,5 +8,7 @@
         ActionNotFound = 3,
         ContractNotFound = 4,
         ActionNotImplemented = 5,
+        NoSessionHeader = 6,
+        SessionNotFound = 7,
     }
 }

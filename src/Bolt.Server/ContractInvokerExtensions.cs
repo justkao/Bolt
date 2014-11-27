@@ -18,7 +18,7 @@ namespace Bolt.Server
         public static IAppBuilder UseStateFullContractInvoker<TInvoker, TContractImplementation, TContractDescriptor>(
             this IAppBuilder builder,
             ServerConfiguration configuration,
-            TContractDescriptor descriptor,
+            TContractDescriptor descriptor, ActionDescriptor initInstanceAction,
             ActionDescriptor releaseInstanceAction)
             where TInvoker : IContractInvoker<TContractDescriptor>, new()
             where TContractImplementation : new()
@@ -27,7 +27,7 @@ namespace Bolt.Server
             return builder.UseContractInvoker<TInvoker, TContractDescriptor>(
                 configuration,
                 descriptor,
-                new StateFullInstanceProvider<TContractImplementation>(releaseInstanceAction, configuration.SessionHeader, configuration.StateFullInstanceLifetime));
+                new StateFullInstanceProvider<TContractImplementation>(initInstanceAction, releaseInstanceAction, configuration.SessionHeader, configuration.StateFullInstanceLifetime));
         }
 
         public static IAppBuilder UseContractInvoker<TInvoker, TDescriptor>(

@@ -80,6 +80,8 @@
     <Compile Include="InstanceProviders\DelegatedInstanceProvider.cs" />
     <Compile Include="InstanceProviders\StateFullInstanceProvider.cs" />
     <Compile Include="InstanceProviders\StaticInstanceProvider.cs" />
+    <Compile Include="SessionHeaderNotFoundException.cs" />
+    <Compile Include="SessionNotFoundException.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Bolt.Core\Bolt.Core.csproj">

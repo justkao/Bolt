@@ -7,12 +7,23 @@ namespace Bolt.Server
 {
     public class StateFullInstanceProvider : InstanceProvider, IDisposable
     {
+        private readonly ActionDescriptor _initInstanceAction;
         private readonly ActionDescriptor _releaseInstanceAction;
         private readonly ConcurrentDictionary<string, InstanceMetadata> _instances = new ConcurrentDictionary<string, InstanceMetadata>();
         private readonly Timer _timer;
 
-        public StateFullInstanceProvider(ActionDescriptor releaseInstanceAction, string sessionHeader, TimeSpan? instanceTimeout)
+        public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader, TimeSpan? instanceTimeout)
         {
+            if (initInstanceAction == null)
+            {
+                throw new ArgumentNullException("initInstanceAction");
+            }
+
+            if (releaseInstanceAction == null)
+            {
+                throw new ArgumentNullException("releaseInstanceAction");
+            }
+
             if (string.IsNullOrEmpty(sessionHeader))
             {
                 throw new ArgumentNullException("sessionHeader");
@@ -20,6 +31,7 @@ namespace Bolt.Server
 
             SessionHeader = sessionHeader;
             InstanceTimeout = instanceTimeout;
+            _initInstanceAction = initInstanceAction;
             _releaseInstanceAction = releaseInstanceAction;
 
             if (InstanceTimeout != null)
@@ -40,7 +52,7 @@ namespace Bolt.Server
             string sessionId = context.Context.Request.Headers[SessionHeader];
             if (string.IsNullOrEmpty(sessionId))
             {
-                return base.GetInstance<TInstance>(context);
+                throw new SessionHeaderNotFoundException();
             }
 
             InstanceMetadata instance;
@@ -48,6 +60,11 @@ namespace Bolt.Server
             {
                 instance.Timestamp = DateTime.UtcNow;
                 return (TInstance)instance.Instance;
+            }
+
+            if (context.ActionDescriptor != _initInstanceAction)
+            {
+                throw new SessionNotFoundException(sessionId);
             }
 
             instance = new InstanceMetadata(base.GetInstance<TInstance>(context));

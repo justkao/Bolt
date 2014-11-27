@@ -35,6 +35,7 @@ namespace Bolt.Service.Test
             TestContractStateFullProxy client = GetChannel();
             client.SetState("test state");
             client.Dispose();
+            client.GetState();
         }
 
         private IDisposable _runningServer;
@@ -79,7 +80,7 @@ namespace Bolt.Service.Test
                 (appBuilder) =>
                 {
                     appBuilder.UseBolt(ServerConfiguration);
-                    appBuilder.UseStateFullTestContractStateFull<TestContractStateFull>(TestContractStateFullDescriptor.Default.Destroy);
+                    appBuilder.UseStateFullTestContractStateFull<TestContractStateFull>();
                 });
         }
 

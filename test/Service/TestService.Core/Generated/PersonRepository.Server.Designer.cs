@@ -303,9 +303,9 @@ namespace Bolt.Server
             return app.UsePersonRepository(new InstanceProvider<TImplementation>());
         }
 
-        public static IAppBuilder UseStateFullPersonRepository<TImplementation>(this IAppBuilder app, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: TestService.Core.IPersonRepository, new()
+        public static IAppBuilder UseStateFullPersonRepository<TImplementation>(this IAppBuilder app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: TestService.Core.IPersonRepository, new()
         {
-            return app.UsePersonRepository(new StateFullInstanceProvider<TImplementation>(releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));
+            return app.UsePersonRepository(new StateFullInstanceProvider<TImplementation>(initInstanceAction, releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));
         }
 
         public static IAppBuilder UsePersonRepository(this IAppBuilder app, IInstanceProvider instanceProvider)

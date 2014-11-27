@@ -114,9 +114,16 @@ namespace Bolt.Server
             return app.UseTestContractStateFull(new InstanceProvider<TImplementation>());
         }
 
-        public static IAppBuilder UseStateFullTestContractStateFull<TImplementation>(this IAppBuilder app, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: Bolt.Service.Test.Core.ITestContractStateFull, new()
+        public static IAppBuilder UseStateFullTestContractStateFull<TImplementation>(this IAppBuilder app, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: Bolt.Service.Test.Core.ITestContractStateFull, new()
         {
-            return app.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));
+            var initSessionAction = TestContractStateFullDescriptor.Default.Init;
+            var closeSessionAction = TestContractStateFullDescriptor.Default.Destroy;
+            return app.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(initSessionAction, closeSessionAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));
+        }
+
+        public static IAppBuilder UseStateFullTestContractStateFull<TImplementation>(this IAppBuilder app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: Bolt.Service.Test.Core.ITestContractStateFull, new()
+        {
+            return app.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(initInstanceAction, releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));
         }
 
         public static IAppBuilder UseTestContractStateFull(this IAppBuilder app, IInstanceProvider instanceProvider)
