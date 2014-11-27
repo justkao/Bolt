@@ -18,21 +18,4 @@ namespace Bolt.Client
         {
         }
     }
-
-    public class ProxyFailedException : Exception
-    {
-        public ProxyFailedException()
-        {
-        }
-
-        public ProxyFailedException(string message)
-            : base(message)
-        {
-        }
-
-        public ProxyFailedException(string message, Exception innerException)
-            : base(message, innerException)
-        {
-        }
-    }
 }

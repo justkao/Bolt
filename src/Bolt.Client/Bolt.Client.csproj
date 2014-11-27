@@ -58,6 +58,7 @@
     <Compile Include="Channels\ChannelExtensions.cs" />
     <Compile Include="Channels\RecoverableChannel.cs" />
     <Compile Include="ClientConfiguration.cs" />
+    <Compile Include="ClientConfigurationExtensions.cs" />
     <Compile Include="ClientDataHandler.cs" />
     <Compile Include="ClientActionContext.cs" />
     <Compile Include="Channels\DelegatedChannel.cs" />
@@ -71,7 +72,7 @@
     <Compile Include="NoServersAvailableException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Channels\ContractProxy.cs" />
-    <Compile Include="ProxyFailedException.cs" />
+    <Compile Include="ProxyClosedException.cs" />
     <Compile Include="RequestForwarder.cs" />
     <Compile Include="ClientSerializerExtensions.cs" />
     <Compile Include="ResponseDescriptor.cs" />
