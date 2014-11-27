@@ -35,10 +35,10 @@ namespace Bolt.Generators
                 }
                 WriteLine();
 
-                WriteLine("public static IAppBuilder UseStateFull{0}<TImplementation>(this IAppBuilder app, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: {1}, new()", ContractDefinition.Name, ContractDefinition.Root.FullName);
+                WriteLine("public static IAppBuilder UseStateFull{0}<TImplementation>(this IAppBuilder app, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: {1}, new()", ContractDefinition.Name, ContractDefinition.Root.FullName);
                 using (WithBlock())
                 {
-                    WriteLine("return app.Use{0}(new StateFullInstanceProvider<TImplementation>(sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));", ContractDefinition.Name);
+                    WriteLine("return app.Use{0}(new StateFullInstanceProvider<TImplementation>(releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));", ContractDefinition.Name);
                 }
 
                 WriteLine();

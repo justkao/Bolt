@@ -29,6 +29,14 @@ namespace Bolt.Service.Test
             Assert.AreEqual("test state", client.GetState());
         }
 
+        [Test]
+        public void CloseTest()
+        {
+            TestContractStateFullProxy client = GetChannel();
+            client.SetState("test state");
+            client.Dispose();
+        }
+
         private IDisposable _runningServer;
 
         public Uri ServerUrl = new Uri("http://localhost:9999");
@@ -71,7 +79,7 @@ namespace Bolt.Service.Test
                 (appBuilder) =>
                 {
                     appBuilder.UseBolt(ServerConfiguration);
-                    appBuilder.UseStateFullTestContractStateFull<TestContractStateFull>();
+                    appBuilder.UseStateFullTestContractStateFull<TestContractStateFull>(TestContractStateFullDescriptor.Default.Destroy);
                 });
         }
 

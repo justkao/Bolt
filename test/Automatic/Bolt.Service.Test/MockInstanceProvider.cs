@@ -10,5 +10,9 @@ namespace Bolt.Service.Test
         {
             return (T)CurrentInstance;
         }
+
+        public void ReleaseInstance(ServerExecutionContext context, object obj)
+        {
+        }
     }
 }

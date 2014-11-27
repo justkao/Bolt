@@ -20,5 +20,13 @@ namespace Bolt.Server
         {
             return (T)(object)_factory(context);
         }
+
+        public void ReleaseInstance(ServerExecutionContext context, object obj)
+        {
+            if (obj is IDisposable)
+            {
+                (obj as IDisposable).Dispose();
+            }
+        }
     }
 }

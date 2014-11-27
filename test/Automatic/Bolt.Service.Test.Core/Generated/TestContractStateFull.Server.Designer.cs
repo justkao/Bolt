@@ -44,30 +44,58 @@ namespace Bolt.Service.Test.Core
         protected virtual async Task TestContractStateFull_Init(Bolt.Server.ServerExecutionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
-            instance.Init();
-            await ResponseHandler.Handle(context);
+            try
+            {
+                instance.Init();
+                await ResponseHandler.Handle(context);
+            }
+            finally
+            {
+                InstanceProvider.ReleaseInstance(context, instance);
+            }
         }
 
         protected virtual async Task TestContractStateFull_SetState(Bolt.Server.ServerExecutionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<SetStateParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
-            instance.SetState(parameters.State);
-            await ResponseHandler.Handle(context);
+            try
+            {
+                instance.SetState(parameters.State);
+                await ResponseHandler.Handle(context);
+            }
+            finally
+            {
+                InstanceProvider.ReleaseInstance(context, instance);
+            }
         }
 
         protected virtual async Task TestContractStateFull_GetState(Bolt.Server.ServerExecutionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
-            var result = instance.GetState();
-            await ResponseHandler.Handle(context, result);
+            try
+            {
+                var result = instance.GetState();
+                await ResponseHandler.Handle(context, result);
+            }
+            finally
+            {
+                InstanceProvider.ReleaseInstance(context, instance);
+            }
         }
 
         protected virtual async Task TestContractStateFull_Destroy(Bolt.Server.ServerExecutionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
-            instance.Destroy();
-            await ResponseHandler.Handle(context);
+            try
+            {
+                instance.Destroy();
+                await ResponseHandler.Handle(context);
+            }
+            finally
+            {
+                InstanceProvider.ReleaseInstance(context, instance);
+            }
         }
     }
 }
@@ -86,9 +114,9 @@ namespace Bolt.Server
             return app.UseTestContractStateFull(new InstanceProvider<TImplementation>());
         }
 
-        public static IAppBuilder UseStateFullTestContractStateFull<TImplementation>(this IAppBuilder app, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: Bolt.Service.Test.Core.ITestContractStateFull, new()
+        public static IAppBuilder UseStateFullTestContractStateFull<TImplementation>(this IAppBuilder app, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: Bolt.Service.Test.Core.ITestContractStateFull, new()
         {
-            return app.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));
+            return app.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));
         }
 
         public static IAppBuilder UseTestContractStateFull(this IAppBuilder app, IInstanceProvider instanceProvider)

@@ -9,6 +9,14 @@ namespace Bolt.Server
             return (T)CreateInstance(typeof(T));
         }
 
+        public virtual void ReleaseInstance(ServerExecutionContext context, object obj)
+        {
+            if (obj is IDisposable)
+            {
+                (obj as IDisposable).Dispose();
+            }
+        }
+
         protected virtual object CreateInstance(Type type)
         {
             return Activator.CreateInstance(type);

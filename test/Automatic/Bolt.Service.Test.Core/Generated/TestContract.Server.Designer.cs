@@ -51,73 +51,143 @@ namespace Bolt.Service.Test.Core
         {
             var parameters = await DataHandler.ReadParametersAsync<SimpleMethodWithSimpleArgumentsParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
-            instance.SimpleMethodWithSimpleArguments(parameters.Val);
-            await ResponseHandler.Handle(context);
+            try
+            {
+                instance.SimpleMethodWithSimpleArguments(parameters.Val);
+                await ResponseHandler.Handle(context);
+            }
+            finally
+            {
+                InstanceProvider.ReleaseInstance(context, instance);
+            }
         }
 
         protected virtual async Task TestContract_SimpleMethod(Bolt.Server.ServerExecutionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
-            instance.SimpleMethod();
-            await ResponseHandler.Handle(context);
+            try
+            {
+                instance.SimpleMethod();
+                await ResponseHandler.Handle(context);
+            }
+            finally
+            {
+                InstanceProvider.ReleaseInstance(context, instance);
+            }
         }
 
         protected virtual async Task TestContract_SimpleMethodExAsync(Bolt.Server.ServerExecutionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
-            await instance.SimpleMethodExAsync();
-            await ResponseHandler.Handle(context);
+            try
+            {
+                await instance.SimpleMethodExAsync();
+                await ResponseHandler.Handle(context);
+            }
+            finally
+            {
+                InstanceProvider.ReleaseInstance(context, instance);
+            }
         }
 
         protected virtual async Task TestContract_SimpleMethodWithCancellation(Bolt.Server.ServerExecutionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
-            instance.SimpleMethodWithCancellation(context.CallCancelled);
-            await ResponseHandler.Handle(context);
+            try
+            {
+                instance.SimpleMethodWithCancellation(context.CallCancelled);
+                await ResponseHandler.Handle(context);
+            }
+            finally
+            {
+                InstanceProvider.ReleaseInstance(context, instance);
+            }
         }
 
         protected virtual async Task TestContract_ComplexFunction(Bolt.Server.ServerExecutionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
-            var result = instance.ComplexFunction();
-            await ResponseHandler.Handle(context, result);
+            try
+            {
+                var result = instance.ComplexFunction();
+                await ResponseHandler.Handle(context, result);
+            }
+            finally
+            {
+                InstanceProvider.ReleaseInstance(context, instance);
+            }
         }
 
         protected virtual async Task TestContractInner_SimpleMethodWithComplexParameter(Bolt.Server.ServerExecutionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<SimpleMethodWithComplexParameterParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
-            instance.SimpleMethodWithComplexParameter(parameters.CompositeType);
-            await ResponseHandler.Handle(context);
+            try
+            {
+                instance.SimpleMethodWithComplexParameter(parameters.CompositeType);
+                await ResponseHandler.Handle(context);
+            }
+            finally
+            {
+                InstanceProvider.ReleaseInstance(context, instance);
+            }
         }
 
         protected virtual async Task TestContractInner_SimpleFunction(Bolt.Server.ServerExecutionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
-            var result = instance.SimpleFunction();
-            await ResponseHandler.Handle(context, result);
+            try
+            {
+                var result = instance.SimpleFunction();
+                await ResponseHandler.Handle(context, result);
+            }
+            finally
+            {
+                InstanceProvider.ReleaseInstance(context, instance);
+            }
         }
 
         protected virtual async Task TestContractInner_SimpleAsyncFunction(Bolt.Server.ServerExecutionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
-            var result = await instance.SimpleAsyncFunction();
-            await ResponseHandler.Handle(context, result);
+            try
+            {
+                var result = await instance.SimpleAsyncFunction();
+                await ResponseHandler.Handle(context, result);
+            }
+            finally
+            {
+                InstanceProvider.ReleaseInstance(context, instance);
+            }
         }
 
         protected virtual async Task TestContractInner_MethodWithManyArguments(Bolt.Server.ServerExecutionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<MethodWithManyArgumentsParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
-            instance.MethodWithManyArguments(parameters.Arg1, parameters.Arg2, parameters.Time);
-            await ResponseHandler.Handle(context);
+            try
+            {
+                instance.MethodWithManyArguments(parameters.Arg1, parameters.Arg2, parameters.Time);
+                await ResponseHandler.Handle(context);
+            }
+            finally
+            {
+                InstanceProvider.ReleaseInstance(context, instance);
+            }
         }
 
         protected virtual async Task ExcludedContract_ThisMethodShouldBeExcluded(Bolt.Server.ServerExecutionContext context)
         {
             var instance = InstanceProvider.GetInstance<IExcludedContract>(context);
-            instance.ThisMethodShouldBeExcluded();
-            await ResponseHandler.Handle(context);
+            try
+            {
+                instance.ThisMethodShouldBeExcluded();
+                await ResponseHandler.Handle(context);
+            }
+            finally
+            {
+                InstanceProvider.ReleaseInstance(context, instance);
+            }
         }
     }
 }
@@ -136,9 +206,9 @@ namespace Bolt.Server
             return app.UseTestContract(new InstanceProvider<TImplementation>());
         }
 
-        public static IAppBuilder UseStateFullTestContract<TImplementation>(this IAppBuilder app, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: Bolt.Service.Test.Core.ITestContract, new()
+        public static IAppBuilder UseStateFullTestContract<TImplementation>(this IAppBuilder app, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: Bolt.Service.Test.Core.ITestContract, new()
         {
-            return app.UseTestContract(new StateFullInstanceProvider<TImplementation>(sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));
+            return app.UseTestContract(new StateFullInstanceProvider<TImplementation>(releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));
         }
 
         public static IAppBuilder UseTestContract(this IAppBuilder app, IInstanceProvider instanceProvider)

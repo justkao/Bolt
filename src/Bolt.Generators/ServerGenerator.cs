@@ -136,15 +136,23 @@ namespace Bolt.Generators
 
             string instanceType = FormatType(methodDescriptor.Method.DeclaringType);
             WriteLine("var instance = InstanceProvider.GetInstance<{0}>(context);", instanceType);
-
-            string result = GenerateInvocationCode("instance", "parameters", methodDescriptor);
-            if (!string.IsNullOrEmpty(result))
+            WriteLine("try");
+            using (WithBlock())
             {
-                WriteLine("await ResponseHandler.Handle(context, result);");
+                string result = GenerateInvocationCode("instance", "parameters", methodDescriptor);
+                if (!string.IsNullOrEmpty(result))
+                {
+                    WriteLine("await ResponseHandler.Handle(context, result);");
+                }
+                else
+                {
+                    WriteLine("await ResponseHandler.Handle(context);");
+                }
             }
-            else
+            WriteLine("finally");
+            using (WithBlock())
             {
-                WriteLine("await ResponseHandler.Handle(context);");
+                WriteLine("InstanceProvider.ReleaseInstance(context, instance);", instanceType);
             }
         }
 

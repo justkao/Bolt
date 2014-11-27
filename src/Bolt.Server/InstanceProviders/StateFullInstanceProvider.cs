@@ -7,10 +7,11 @@ namespace Bolt.Server
 {
     public class StateFullInstanceProvider : InstanceProvider, IDisposable
     {
+        private readonly ActionDescriptor _releaseInstanceAction;
         private readonly ConcurrentDictionary<string, InstanceMetadata> _instances = new ConcurrentDictionary<string, InstanceMetadata>();
         private readonly Timer _timer;
 
-        public StateFullInstanceProvider(string sessionHeader, TimeSpan? instanceTimeout)
+        public StateFullInstanceProvider(ActionDescriptor releaseInstanceAction, string sessionHeader, TimeSpan? instanceTimeout)
         {
             if (string.IsNullOrEmpty(sessionHeader))
             {
@@ -19,6 +20,7 @@ namespace Bolt.Server
 
             SessionHeader = sessionHeader;
             InstanceTimeout = instanceTimeout;
+            _releaseInstanceAction = releaseInstanceAction;
 
             if (InstanceTimeout != null)
             {
@@ -51,6 +53,18 @@ namespace Bolt.Server
             instance = new InstanceMetadata(base.GetInstance<TInstance>(context));
             _instances[sessionId] = instance;
             return (TInstance)instance.Instance;
+        }
+
+        public override void ReleaseInstance(ServerExecutionContext context, object obj)
+        {
+            if (context.ActionDescriptor == _releaseInstanceAction)
+            {
+                string sessionId = context.Context.Request.Headers[SessionHeader];
+                if (!string.IsNullOrEmpty(sessionId))
+                {
+                    ReleaseInstance(sessionId);
+                }
+            }
         }
 
         public virtual void ReleaseInstance(string key)
