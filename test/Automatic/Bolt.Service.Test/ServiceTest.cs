@@ -1,4 +1,5 @@
 ﻿using Bolt.Client;
+using Bolt.Client.Channels;
 using Bolt.Core.Serialization;
 using Bolt.Server;
 using Bolt.Service.Test.Core;
@@ -6,6 +7,7 @@ using Microsoft.Owin.Hosting;
 using Moq;
 using NUnit.Framework;
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -207,6 +209,45 @@ namespace Bolt.Service.Test
         }
 
         [Test]
+        public void CreateProxyPerformance()
+        {
+            Stopwatch watch = Stopwatch.StartNew();
+
+            for (int i = 0; i < 10000; i++)
+            {
+                using (ClientConfiguration.CreateProxy<TestContractProxy, TestContractDescriptor>(ServerUrl))
+                {
+                }
+            }
+
+            Console.WriteLine("Creating {0} proxies by helpers has taken {1}ms", 10000, watch.ElapsedMilliseconds);
+
+            watch.Restart();
+            for (int i = 0; i < 10000; i++)
+            {
+                using (
+                    new TestContractProxy(
+                        new RecoverableChannel<TestContractProxy, TestContractDescriptor>(
+                            TestContractDescriptor.Default, new UriServerProvider(ServerUrl),
+                            ClientConfiguration.RequestForwarder, ClientConfiguration.EndpointProvider)))
+                {
+                }
+            }
+
+            Console.WriteLine("Creating {0} proxies manually has taken {1}ms", 10000, watch.ElapsedMilliseconds);
+
+            watch.Restart();
+            for (int i = 0; i < 10000; i++)
+            {
+                using (ClientConfiguration.CreateProxy<TestContractProxy, TestContractDescriptor>(ServerUrl, TestContractDescriptor.Default))
+                {
+                }
+            }
+
+            Console.WriteLine("Creating {0} proxies by helpers with descriptor provided has taken {1}ms", 10000, watch.ElapsedMilliseconds);
+        }
+
+        [Test]
         public void Server_ThrowsWithInner_EnsureInnerReceivedOnClient()
         {
             ITestContract client = GetChannel();
@@ -244,6 +285,18 @@ namespace Bolt.Service.Test
             }
         }
 
+        [Test]
+        public void LongOperation_TimeoutSet_EnsureCallTimeouted()
+        {
+            TestContractProxy client = GetChannel();
+            ((ChannelBase)client.Channel).DefaultResponseTimeout = TimeSpan.FromSeconds(1);
+            CompositeType arg = CompositeType.CreateRandom();
+
+            Mock<ITestContract> server = Server();
+            server.Setup(v => v.SimpleMethodWithComplexParameter(arg)).Callback(() => Thread.Sleep(TimeSpan.FromSeconds(10)));
+            Assert.Throws<TimeoutException>(() => client.SimpleMethodWithComplexParameter(arg));
+        }
+
         private IDisposable _runningServer;
 
         public Uri ServerUrl = new Uri("http://localhost:9999");
@@ -261,14 +314,12 @@ namespace Bolt.Service.Test
             return mock;
         }
 
-        public virtual ITestContract GetChannel()
+        public virtual TestContractProxy GetChannel()
         {
-            return GetStateFullChannel();
-
-            return ClientConfiguration.CreateStateLessProxy<TestContractProxy, TestContractDescriptor>(ServerUrl);
+            return ClientConfiguration.CreateProxy<TestContractProxy, TestContractDescriptor>(ServerUrl, TestContractDescriptor.Default);
         }
 
-        public virtual ITestContract GetStateFullChannel()
+        public virtual TestContractProxy GetStateFullChannel()
         {
             return ClientConfiguration.CreateStateFullProxy<TestContractProxy, TestContractDescriptor>(ServerUrl);
         }
@@ -292,7 +343,7 @@ namespace Bolt.Service.Test
             JsonExceptionSerializer jsonExceptionSerializer = new JsonExceptionSerializer();
 
             ServerConfiguration = new ServerConfiguration(serializer, jsonExceptionSerializer);
-            ClientConfiguration = new ClientConfiguration(serializer, jsonExceptionSerializer);
+            ClientConfiguration = new ClientConfiguration(serializer, jsonExceptionSerializer, new DefaultWebRequestHandlerEx());
 
             _runningServer = WebApp.Start(
                 ServerUrl.ToString(),

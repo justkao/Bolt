@@ -1,28 +1,28 @@
-using System;
-using System.Linq;
-using System.Reflection;
 using Bolt.Client.Channels;
+using System;
 
 namespace Bolt.Client
 {
     public class ClientConfiguration : Configuration
     {
-        public ClientConfiguration(ISerializer serializer, IExceptionSerializer exceptionSerializer)
+        public ClientConfiguration(ISerializer serializer, IExceptionSerializer exceptionSerializer, IWebRequestHandler webRequestHandler = null)
             : base(serializer, exceptionSerializer)
         {
             ClientDataHandler = new ClientDataHandler(serializer, ExceptionSerializer);
-            RequestForwarder = new RequestForwarder(ClientDataHandler, ServerErrorCodesHeader);
+            RequestForwarder = new RequestForwarder(ClientDataHandler, webRequestHandler, ServerErrorCodesHeader);
         }
 
         public IRequestForwarder RequestForwarder { get; set; }
 
         public IClientDataHandler ClientDataHandler { get; set; }
 
-        public TContract CreateStateLessProxy<TContract, TDescriptor>(Uri uri, TDescriptor descriptor = null)
+        public TimeSpan DefaultResponseTimeout { get; set; }
+
+        public TContract CreateProxy<TContract, TDescriptor>(Uri uri, TDescriptor descriptor = null)
             where TContract : ContractProxy<TDescriptor>
             where TDescriptor : ContractDescriptor
         {
-            return CreateStateLessProxy<TContract, TDescriptor>(new UriServerProvider(uri), descriptor);
+            return CreateProxy<TContract, TDescriptor>(new UriServerProvider(uri), descriptor);
         }
 
         public TContract CreateStateFullProxy<TContract, TDescriptor>(Uri uri, TDescriptor descriptor = null)
@@ -36,27 +36,14 @@ namespace Bolt.Client
             where TContract : ContractProxy<TDescriptor>
             where TDescriptor : ContractDescriptor
         {
-            return
-                CreateProxy<TContract, TDescriptor>(
-                    new RecoverableStatefullChannel<TContract, TDescriptor>(
-                        descriptor ?? CreateDefaultDescriptor<TDescriptor>(),
-                        serverProvider,
-                        SessionHeader,
-                        RequestForwarder,
-                        EndpointProvider));
+            return CreateProxy<TContract, TDescriptor>(this.CreateStateFullRecoverable<TContract, TDescriptor>(serverProvider, descriptor));
         }
 
-        public TContract CreateStateLessProxy<TContract, TDescriptor>(IServerProvider serverProvider, TDescriptor descriptor = null)
+        public TContract CreateProxy<TContract, TDescriptor>(IServerProvider serverProvider, TDescriptor descriptor = null)
             where TContract : ContractProxy<TDescriptor>
             where TDescriptor : ContractDescriptor
         {
-            return
-                CreateProxy<TContract, TDescriptor>(
-                    new RecoverableChannel<TContract, TDescriptor>(
-                        descriptor ?? CreateDefaultDescriptor<TDescriptor>(),
-                        serverProvider,
-                        RequestForwarder,
-                        EndpointProvider));
+            return CreateProxy<TContract, TDescriptor>(this.CreateRecoverable<TContract, TDescriptor>(serverProvider, descriptor));
         }
 
         public TContract CreateProxy<TContract, TDescriptor>(IChannel channel)
@@ -64,12 +51,6 @@ namespace Bolt.Client
             where TDescriptor : ContractDescriptor
         {
             return (TContract)Activator.CreateInstance(typeof(TContract), channel);
-        }
-
-        public virtual TDescriptor CreateDefaultDescriptor<TDescriptor>()
-        {
-            FieldInfo defaultValue = typeof(TDescriptor).GetTypeInfo().DeclaredFields.First(m => m.IsStatic && m.Name == "Default");
-            return (TDescriptor)defaultValue.GetValue(null);
         }
     }
 }

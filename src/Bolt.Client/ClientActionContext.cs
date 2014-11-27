@@ -32,6 +32,8 @@ namespace Bolt.Client
 
         public HttpWebResponse Response { get; set; }
 
+        public TimeSpan ResponseTimeout { get; set; }
+
         public void Dispose()
         {
             if (Response != null)

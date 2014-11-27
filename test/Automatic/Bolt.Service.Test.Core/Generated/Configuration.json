@@ -3,15 +3,8 @@
         {
             "contract": "Bolt.Service.Test.Core.ITestContract",
             "assemblies": [ "Bolt.Service.Test.Core.dll" ],
-            "modifier": "public",
-            "client": {
-                "modifier": "public"
-            },
-            "server": {
-                "modifier": "public"
-
-
-            }
+            "client": { },
+            "server": { }
         }
     ]
 }

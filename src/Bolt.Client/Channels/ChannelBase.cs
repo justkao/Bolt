@@ -50,6 +50,8 @@ namespace Bolt.Client.Channels
 
         public bool IsOpened { get; protected set; }
 
+        public TimeSpan DefaultResponseTimeout { get; set; }
+
         public virtual CancellationToken GetCancellationToken(ActionDescriptor descriptor)
         {
             return CancellationToken.None;
@@ -120,7 +122,11 @@ namespace Bolt.Client.Channels
             CancellationToken cancellation,
             object parameters)
         {
-            return new ClientActionContext(actionDescriptor, CreateWebRequest(server, Descriptor, actionDescriptor), server, cancellation);
+            return new ClientActionContext(actionDescriptor, CreateWebRequest(server, Descriptor, actionDescriptor),
+                server, cancellation)
+            {
+                ResponseTimeout = DefaultResponseTimeout
+            };
         }
 
         public virtual T SendCore<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)

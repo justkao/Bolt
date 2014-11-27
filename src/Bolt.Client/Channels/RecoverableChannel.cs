@@ -46,7 +46,7 @@ namespace Bolt.Client.Channels
         {
             if (error is WebException)
             {
-                if (!(error as WebException).ResponseReceived())
+                if ((error as WebException).Response == null)
                 {
                     ServerProvider.OnServerUnavailable(context.Server);
                 }
@@ -100,7 +100,63 @@ namespace Bolt.Client.Channels
             ActionDescriptor descriptor,
             CancellationToken cancellation)
         {
-            return TaskExtensions.Execute(() => SendCoreAsync<T, TParameters>(parameters, descriptor, cancellation));
+            EnsureNotClosed();
+
+            int tries = 0;
+
+            while (true)
+            {
+                Exception error = null;
+                Uri connection = null;
+                try
+                {
+                    connection = GetRemoteConnection();
+                }
+                catch (Exception e)
+                {
+                    e.EnsureNotCancelled();
+
+                    if (!HandleOpenConnectionError(e))
+                    {
+                        throw;
+                    }
+
+                    error = e;
+                }
+
+                if (connection != null)
+                {
+                    using (ClientActionContext ctxt = CreateContext(connection, descriptor, cancellation, parameters))
+                    {
+                        try
+                        {
+                            BeforeSending(ctxt);
+                            ResponseDescriptor<T> result = RequestForwarder.GetResponse<T, TParameters>(ctxt, parameters);
+                            AfterReceived(ctxt);
+                            return result.GetResultOrThrow();
+                        }
+                        catch (Exception e)
+                        {
+                            e.EnsureNotCancelled();
+                            error = e;
+                        }
+
+                        if (!HandleError(ctxt, error))
+                        {
+                            throw error;
+                        }
+                    }
+                }
+
+                tries++;
+                if (tries > Retries)
+                {
+                    IsClosed = true;
+                    throw error;
+                }
+
+                TaskExtensions.Sleep(RetryDelay, cancellation);
+            }
         }
 
         public sealed override async Task<T> SendCoreAsync<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)

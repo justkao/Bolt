@@ -10,6 +10,12 @@ namespace Bolt
     {
         private readonly List<ActionDescriptor> _actions = new List<ActionDescriptor>();
 
+        public static TDescriptor GetDefaultValue<TDescriptor>() where TDescriptor : ContractDescriptor
+        {
+            FieldInfo defaultValue = typeof(TDescriptor).GetTypeInfo().DeclaredFields.First(m => m.IsStatic && m.Name == "Default");
+            return (TDescriptor)defaultValue.GetValue(null);
+        }
+
         protected ContractDescriptor(Type type, string name)
         {
             if (type == null)

@@ -7,9 +7,10 @@ namespace Bolt.Client
     public class RequestForwarder : IRequestForwarder
     {
         private readonly IClientDataHandler _dataHandler;
+        private readonly IWebRequestHandler _webRequestHandler;
         private readonly string _boltServerErrorsHeader;
 
-        public RequestForwarder(IClientDataHandler dataHandler, string boltServerErrorsHeader)
+        public RequestForwarder(IClientDataHandler dataHandler, IWebRequestHandler webRequestHandler, string boltServerErrorsHeader)
         {
             if (dataHandler == null)
             {
@@ -17,6 +18,7 @@ namespace Bolt.Client
             }
 
             _dataHandler = dataHandler;
+            _webRequestHandler = webRequestHandler ?? new DefaultWebRequestHandler();
             _boltServerErrorsHeader = boltServerErrorsHeader;
         }
 
@@ -49,7 +51,7 @@ namespace Bolt.Client
             {
                 try
                 {
-                    HttpWebResponse response = context.Request.GetResponse(context.Cancellation);
+                    HttpWebResponse response = _webRequestHandler.GetResponse(context.Request, context.ResponseTimeout, context.Cancellation);
                     context.Response = response;
                 }
                 catch (WebException e)
@@ -113,7 +115,7 @@ namespace Bolt.Client
             {
                 try
                 {
-                    HttpWebResponse response = await context.Request.GetResponseAsync(context.Cancellation);
+                    HttpWebResponse response = await _webRequestHandler.GetResponseAsync(context.Request, context.ResponseTimeout, context.Cancellation);
                     context.Response = response;
                 }
                 catch (WebException e)
