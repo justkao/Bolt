@@ -123,9 +123,7 @@ namespace Bolt.Client.Channels
         {
             return new ClientActionContext(actionDescriptor, CreateWebRequest(server, actionDescriptor), server, cancellation)
                        {
-                           ResponseTimeout
-                               =
-                               DefaultResponseTimeout
+                           ResponseTimeout = DefaultResponseTimeout
                        };
         }
 
@@ -180,11 +178,11 @@ namespace Bolt.Client.Channels
             return request;
         }
 
-        protected virtual void EnsureNotClosed()
+        protected void EnsureNotClosed()
         {
             if (IsClosed)
             {
-                throw new SessionClosedException("Proxy is already closed.");
+                throw new ChannelClosedException("Channel is already closed.");
             }
         }
 

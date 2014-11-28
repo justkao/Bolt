@@ -46,6 +46,7 @@ namespace Bolt.Server
                 return Task.FromResult(0);
             }
 
+            context.Context.Response.ContentLength = raw.Length;
             return context.Context.Response.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
         }
 
@@ -54,6 +55,7 @@ namespace Bolt.Server
             context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
 
             byte[] raw = _serializer.SerializeResponse(Create(exception, context.Action), context.Action);
+            context.Context.Response.ContentLength = raw.Length;
             return context.Context.Response.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
         }
 

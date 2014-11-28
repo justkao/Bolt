@@ -20,7 +20,7 @@ namespace TestService.Client
             Execute(c => c.DoNothing(), cnt, "DoNothing");
             Execute(c => c.GetSimpleType(new Random().Next()), cnt, "GetSimpleType");
             Execute(c => c.GetSinglePerson(Person.Create(10)), cnt, "GetSinglePerson");
-            Execute(c => c.GetManyPersons(Person.Create(10)), cnt, "GetManyPersons");
+            Execute(c => c.GetManyPersons(), cnt, "GetManyPersons");
             List<Person> input = Enumerable.Range(0, 100).Select(Person.Create).ToList();
             Execute(c => c.DoNothingWithComplexParameter(input), cnt, "DoNothingWithComplexParameter");
             Console.WriteLine("Test finished. Press any key to exit program ... ");

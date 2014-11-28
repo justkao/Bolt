@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading;
@@ -8,6 +9,7 @@ namespace Bolt
 {
     public class DefaultWebRequestHandler : IWebRequestHandler
     {
+        [DebuggerStepThrough]
         public virtual async Task<HttpWebResponse> GetResponseAsync(HttpWebRequest request, TimeSpan timeout, CancellationToken cancellation)
         {
             if (cancellation == CancellationToken.None)
@@ -49,6 +51,7 @@ namespace Bolt
             }
         }
 
+        [DebuggerStepThrough]
         public virtual HttpWebResponse GetResponse(HttpWebRequest request, TimeSpan timeout, CancellationToken cancellation)
         {
             if (cancellation == CancellationToken.None)
@@ -90,16 +93,19 @@ namespace Bolt
             }
         }
 
+        [DebuggerStepThrough]
         public virtual Stream GetRequestStream(HttpWebRequest response)
         {
             return TaskExtensions.Execute(response.GetRequestStreamAsync);
         }
 
+        [DebuggerStepThrough]
         protected virtual WebResponse GetResponseCore(HttpWebRequest webRequest, TimeSpan timeout)
         {
             return TaskExtensions.Execute(() => GetResponseAsyncCore(webRequest, timeout));
         }
 
+        [DebuggerStepThrough]
         protected virtual Task<WebResponse> GetResponseAsyncCore(HttpWebRequest webRequest, TimeSpan timeout)
         {
             return webRequest.GetResponseAsync();

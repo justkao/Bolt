@@ -74,7 +74,7 @@
     <Compile Include="NoServersAvailableException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Channels\ContractProxy.cs" />
-    <Compile Include="SessionClosedException.cs" />
+    <Compile Include="ChannelClosedException.cs" />
     <Compile Include="RequestForwarder.cs" />
     <Compile Include="ClientSerializerExtensions.cs" />
     <Compile Include="ResponseDescriptor.cs" />

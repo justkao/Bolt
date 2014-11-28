@@ -215,11 +215,10 @@ namespace TestService.Core
 
         protected virtual async Task PersonRepository_GetManyPersons(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<GetManyPersonsParameters>(context);
             var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
             try
             {
-                var result = instance.GetManyPersons(parameters.Person);
+                var result = instance.GetManyPersons();
                 await ResponseHandler.Handle(context, result);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }

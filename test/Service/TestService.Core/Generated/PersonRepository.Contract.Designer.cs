@@ -80,13 +80,6 @@ namespace TestService.Core.Parameters
     }
 
     [DataContract]
-    public partial class GetManyPersonsParameters
-    {
-        [DataMember(Order = 1)]
-        public Person Person { get; set; }
-    }
-
-    [DataContract]
     public partial class GetManyPersonsAsAsyncParameters
     {
         [DataMember(Order = 1)]
@@ -111,7 +104,7 @@ namespace TestService.Core
             GetSimpleTypeAsAsync = Add("GetSimpleTypeAsAsync", typeof(TestService.Core.Parameters.GetSimpleTypeAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetSimpleTypeAsAsync"));
             GetSinglePerson = Add("GetSinglePerson", typeof(TestService.Core.Parameters.GetSinglePersonParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetSinglePerson"));
             GetSinglePersonAsAsync = Add("GetSinglePersonAsAsync", typeof(TestService.Core.Parameters.GetSinglePersonAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetSinglePersonAsAsync"));
-            GetManyPersons = Add("GetManyPersons", typeof(TestService.Core.Parameters.GetManyPersonsParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetManyPersons"));
+            GetManyPersons = Add("GetManyPersons", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetManyPersons"));
             GetManyPersonsAsAsync = Add("GetManyPersonsAsAsync", typeof(TestService.Core.Parameters.GetManyPersonsAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetManyPersonsAsAsync"));
             InnerOperation = Add("InnerOperation", typeof(Bolt.Empty), typeof(IPersonRepositoryInner).GetTypeInfo().GetMethod("InnerOperation"));
             InnerOperationExAsync = Add("InnerOperationExAsync", typeof(Bolt.Empty), typeof(IPersonRepositoryInner).GetTypeInfo().GetMethod("InnerOperationExAsync"));

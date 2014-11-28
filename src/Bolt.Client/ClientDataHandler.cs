@@ -47,7 +47,6 @@ namespace Bolt.Client
             }
 
             byte[] raw = _serializer.SerializeParameters(parameters, context.Action);
-
             using (Stream stream = _requestHandler.GetRequestStream(context.Request))
             {
                 stream.Write(raw, 0, raw.Length);
@@ -68,7 +67,6 @@ namespace Bolt.Client
             context.Cancellation.ThrowIfCancellationRequested();
 
             byte[] raw = _serializer.SerializeParameters(parameters, context.Action);
-
             using (Stream stream = await context.Request.GetRequestStreamAsync())
             {
                 await stream.WriteAsync(raw, 0, raw.Length, context.Cancellation);

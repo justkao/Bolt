@@ -50,7 +50,7 @@ namespace TestService.Core
 
         Task<Person> GetSinglePersonAsync(Person person);
 
-        Task<List<Person>> GetManyPersonsAsync(Person person);
+        Task<List<Person>> GetManyPersonsAsync();
     }
 }
 
@@ -172,18 +172,14 @@ namespace TestService.Core
             return Channel.SendAsync<Person, GetSinglePersonAsAsyncParameters>(request, Descriptor.GetSinglePersonAsAsync, GetCancellationToken(Descriptor.GetSinglePersonAsAsync));
         }
 
-        public virtual List<Person> GetManyPersons(Person person)
+        public virtual List<Person> GetManyPersons()
         {
-            var request = new GetManyPersonsParameters();
-            request.Person = person;
-            return Channel.Send<List<Person>, GetManyPersonsParameters>(request, Descriptor.GetManyPersons, GetCancellationToken(Descriptor.GetManyPersons));
+            return Channel.Send<List<Person>, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.GetManyPersons, GetCancellationToken(Descriptor.GetManyPersons));
         }
 
-        public virtual Task<List<Person>> GetManyPersonsAsync(Person person)
+        public virtual Task<List<Person>> GetManyPersonsAsync()
         {
-            var request = new GetManyPersonsParameters();
-            request.Person = person;
-            return Channel.SendAsync<List<Person>, GetManyPersonsParameters>(request, Descriptor.GetManyPersons, GetCancellationToken(Descriptor.GetManyPersons));
+            return Channel.SendAsync<List<Person>, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.GetManyPersons, GetCancellationToken(Descriptor.GetManyPersons));
         }
 
         public virtual Task<List<Person>> GetManyPersonsAsAsync(Person person)

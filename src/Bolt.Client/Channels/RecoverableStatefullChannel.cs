@@ -52,44 +52,6 @@ namespace Bolt.Client.Channels
             get { return true; }
         }
 
-        protected override void BeforeSending(ClientActionContext context)
-        {
-            context.Request.Headers[_sessionHeaderName] = _sessionId;
-            base.BeforeSending(context);
-        }
-
-        protected override Uri GetRemoteConnection()
-        {
-            EnsureNotClosed();
-            Uri uri = EnsureConnection();
-            IsOpened = true;
-            return uri;
-        }
-
-        protected override async Task<Uri> GetRemoteConnectionAsync()
-        {
-            EnsureNotClosed();
-            Uri uri = await EnsureConnectionAsync();
-            IsOpened = true;
-            return uri;
-        }
-
-        protected abstract void OnProxyOpening(TContract contract);
-
-        protected abstract void OnProxyClosing(TContract contract);
-
-        protected virtual Task OnProxyClosingAsync(TContract contract)
-        {
-            OnProxyClosing(contract);
-            return Task.FromResult(0);
-        }
-
-        protected virtual Task OnProxyOpeningAsync(TContract contract)
-        {
-            OnProxyOpening(contract);
-            return Task.FromResult(0);
-        }
-
         public override void Open()
         {
             EnsureConnection();
@@ -164,6 +126,21 @@ namespace Bolt.Client.Channels
             }
         }
 
+        protected abstract void OnProxyOpening(TContract contract);
+
+        protected abstract void OnProxyClosing(TContract contract);
+
+        protected virtual Task OnProxyClosingAsync(TContract contract)
+        {
+            OnProxyClosing(contract);
+            return Task.FromResult(0);
+        }
+
+        protected virtual Task OnProxyOpeningAsync(TContract contract)
+        {
+            OnProxyOpening(contract);
+            return Task.FromResult(0);
+        }
 
         protected override bool HandleError(ClientActionContext context, Exception error)
         {
@@ -188,6 +165,33 @@ namespace Bolt.Client.Channels
                 _activeConnection = null;
                 _sessionId = null;
             }
+        }
+
+        protected override void BeforeSending(ClientActionContext context)
+        {
+            string sessionId = _sessionId;
+            if (!string.IsNullOrEmpty(sessionId))
+            {
+                context.Request.Headers[_sessionHeaderName] = sessionId;
+            }
+
+            base.BeforeSending(context);
+        }
+
+        protected override Uri GetRemoteConnection()
+        {
+            EnsureNotClosed();
+            Uri uri = EnsureConnection();
+            IsOpened = true;
+            return uri;
+        }
+
+        protected override async Task<Uri> GetRemoteConnectionAsync()
+        {
+            EnsureNotClosed();
+            Uri uri = await EnsureConnectionAsync();
+            IsOpened = true;
+            return uri;
         }
 
         private Uri EnsureConnection()

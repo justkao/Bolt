@@ -14,7 +14,10 @@ namespace Bolt.Server
 
             if (stream == null || stream.Length == 0)
             {
-                return default(TParameters);
+                throw new DeserializeParametersException(
+                    string.Format(
+                        "The data required to deserialize '{0}' parameters for action '{1}' are not available in request.",
+                        typeof(TParameters).Name, actionDescriptor));
             }
 
             try

@@ -71,7 +71,7 @@ namespace TestService.Core
             return Task.FromResult(Person.Create(0));
         }
 
-        public List<Person> GetManyPersons(Person person)
+        public List<Person> GetManyPersons()
         {
             return Enumerable.Range(0, 100).Select(Person.Create).ToList();
         }

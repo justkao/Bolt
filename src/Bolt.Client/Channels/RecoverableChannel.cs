@@ -22,8 +22,6 @@ namespace Bolt.Client.Channels
             ServerProvider = new UriServerProvider(server);
         }
 
-
-
         public RecoverableChannel(IServerProvider serverProvider, ClientConfiguration clientConfiguration)
             : base(clientConfiguration)
         {
@@ -41,64 +39,6 @@ namespace Bolt.Client.Channels
         public TimeSpan RetryDelay { get; set; }
 
         public IServerProvider ServerProvider { get; private set; }
-
-        protected virtual bool HandleOpenConnectionError(Exception error)
-        {
-            return HandleErrorCore(error);
-        }
-
-        protected virtual bool HandleError(ClientActionContext context, Exception error)
-        {
-            if (error is WebException)
-            {
-                if ((error as WebException).Response == null)
-                {
-                    ServerProvider.OnServerUnavailable(context.Server);
-                }
-            }
-
-            return HandleErrorCore(error);
-        }
-
-        private bool HandleErrorCore(Exception error)
-        {
-            if (error is NoServersAvailableException)
-            {
-                return true;
-            }
-
-            if (error is BoltSerializationException)
-            {
-                throw error;
-            }
-
-            if (error is BoltServerException)
-            {
-                switch (((BoltServerException)error).Error)
-                {
-                    case ServerErrorCode.ContractNotFound:
-                        IsClosed = true;
-                        throw error;
-                    default:
-                        throw error;
-                }
-            }
-
-            if (error is WebException)
-            {
-                if ((error as WebException).Response == null)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        protected virtual Task<bool> HandleErrorAsync(ClientActionContext context, Exception error)
-        {
-            return Task.FromResult(HandleError(context, error));
-        }
 
         public override sealed T SendCore<T, TParameters>(
             TParameters parameters,
@@ -225,13 +165,36 @@ namespace Bolt.Client.Channels
             }
         }
 
+        protected virtual bool HandleError(ClientActionContext context, Exception error)
+        {
+            if (error is WebException)
+            {
+                if ((error as WebException).Response == null)
+                {
+                    ServerProvider.OnServerUnavailable(context.Server);
+                }
+            }
+
+            return HandleErrorCore(error);
+        }
+
+        protected virtual Task<bool> HandleErrorAsync(ClientActionContext context, Exception error)
+        {
+            return Task.FromResult(HandleError(context, error));
+        }
+
+        protected virtual bool HandleOpenConnectionError(Exception error)
+        {
+            return HandleErrorCore(error);
+        }
+
         protected override Uri GetRemoteConnection()
         {
             Open();
             return ServerProvider.GetServer();
         }
 
-        protected virtual TContract CreateContract(IChannel channel)
+        protected TContract CreateContract(IChannel channel)
         {
             return (TContract)Activator.CreateInstance(typeof(TContract), channel);
         }
@@ -239,6 +202,41 @@ namespace Bolt.Client.Channels
         protected TContract CreateContract(Uri server)
         {
             return CreateContract(new DelegatedChannel(server, RequestForwarder, EndpointProvider, BeforeSending, AfterReceived));
+        }
+
+        private bool HandleErrorCore(Exception error)
+        {
+            if (error is NoServersAvailableException)
+            {
+                return true;
+            }
+
+            if (error is BoltSerializationException)
+            {
+                throw error;
+            }
+
+            if (error is BoltServerException)
+            {
+                switch (((BoltServerException)error).Error)
+                {
+                    case ServerErrorCode.ContractNotFound:
+                        IsClosed = true;
+                        throw error;
+                    default:
+                        throw error;
+                }
+            }
+
+            if (error is WebException)
+            {
+                if ((error as WebException).Response == null)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

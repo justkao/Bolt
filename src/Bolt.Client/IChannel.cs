@@ -1,22 +1,15 @@
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace Bolt.Client
 {
-    public interface IChannel : ICancellationTokenProvider, IDisposable
+    public interface IChannel : ICancellationTokenProvider, ICloseable
     {
         void Open();
 
         Task OpenAsync();
 
         bool IsOpened { get; }
-
-        void Close();
-
-        Task CloseAsync();
-
-        bool IsClosed { get; }
 
         Task SendAsync<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation);
 

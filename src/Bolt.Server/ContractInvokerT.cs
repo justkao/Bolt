@@ -10,16 +10,8 @@ namespace Bolt.Server
 
         public new T Descriptor
         {
-            get
-            {
-                return (T)base.Descriptor;
-            }
-
-            set
-            {
-                base.Descriptor = value;
-            }
+            get { return (T)base.Descriptor; }
+            set { base.Descriptor = value; }
         }
-
     }
 }

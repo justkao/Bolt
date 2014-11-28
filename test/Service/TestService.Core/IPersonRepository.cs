@@ -41,7 +41,7 @@ namespace TestService.Core
         Task<Person> GetSinglePersonAsAsync(Person person);
 
         [OperationContract]
-        List<Person> GetManyPersons(Person person);
+        List<Person> GetManyPersons();
 
         [OperationContract]
         Task<List<Person>> GetManyPersonsAsAsync(Person person);

@@ -88,8 +88,8 @@
     </Compile>
     <Compile Include="CustomException.cs" />
     <Compile Include="SerializerType.cs" />
-    <Compile Include="StateFullServiceTest.cs" />
-    <Compile Include="ServiceTest.cs" />
+    <Compile Include="StateFullTest.cs" />
+    <Compile Include="StateLessTest.cs" />
     <Compile Include="MockInstanceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestContractStateFullChannel.cs" />

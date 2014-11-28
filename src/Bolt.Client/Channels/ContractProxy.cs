@@ -64,17 +64,17 @@ namespace Bolt.Client.Channels
             get { return Channel.IsOpened; }
         }
 
-        void IChannel.Close()
+        void ICloseable.Close()
         {
             Channel.Close();
         }
 
-        Task IChannel.CloseAsync()
+        Task ICloseable.CloseAsync()
         {
             return Channel.CloseAsync();
         }
 
-        bool IChannel.IsClosed
+        bool ICloseable.IsClosed
         {
             get { return Channel.IsClosed; }
         }

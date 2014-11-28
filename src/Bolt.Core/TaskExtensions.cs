@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -6,6 +7,7 @@ namespace Bolt
 {
     public static class TaskExtensions
     {
+        [DebuggerStepThrough]
         public static void Sleep(TimeSpan time, CancellationToken cancellation)
         {
             Task.Delay(time, cancellation).Wait(cancellation);
