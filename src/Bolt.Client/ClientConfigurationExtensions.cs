@@ -1,5 +1,5 @@
-﻿using System;
-using Bolt.Client.Channels;
+﻿using Bolt.Client.Channels;
+using System;
 
 namespace Bolt.Client
 {
@@ -14,7 +14,7 @@ namespace Bolt.Client
         public static TContract CreateProxy<TContract>(this ClientConfiguration clientConfiguration, IServerProvider serverProvider)
             where TContract : ContractProxy
         {
-            return clientConfiguration.CreateProxy<TContract>(clientConfiguration.CreateRecoverable<TContract>(serverProvider));
+            return clientConfiguration.CreateProxy<TContract>(clientConfiguration.CreateRecoverable(serverProvider));
         }
 
         public static TContract CreateProxy<TContract>(this ClientConfiguration clientConfiguration, IChannel channel)

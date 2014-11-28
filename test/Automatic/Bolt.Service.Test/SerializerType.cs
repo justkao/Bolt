@@ -3,6 +3,7 @@
     public enum SerializerType
     {
         Proto,
-        Json
+        Json,
+        Xml
     }
 }

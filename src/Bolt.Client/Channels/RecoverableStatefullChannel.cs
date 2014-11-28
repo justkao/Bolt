@@ -1,11 +1,10 @@
 using Bolt.Client.Helpers;
 using System;
-using System.Diagnostics;
 using System.Threading.Tasks;
 
 namespace Bolt.Client.Channels
 {
-    public abstract class RecoverableStatefullChannel<TContract> : RecoverableChannel<TContract>
+    public abstract class RecoverableStatefullChannel<TContract> : RecoverableChannel
         where TContract : ContractProxy
     {
         private readonly string _sessionHeaderName;
@@ -287,42 +286,14 @@ namespace Bolt.Client.Channels
             }
         }
 
-        private static class ThreadHelper
+        protected TContract CreateContract(IChannel channel)
         {
-            /// <summary>
-            /// Ensure that <see cref="currentValue"/> is initialized in thread safe way.
-            /// </summary>
-            /// <typeparam name="T">Type of class.</typeparam>
-            /// <param name="currentValue">Reference to current value. If this value is null <paramref name="factory"/> is called and output value assigned to <paramref name="currentValue"/>.</param>
-            /// <param name="factory">Factory used to create <typeparamref name="T"/> if <paramref name="currentValue"/> is not initialized.</param>
-            /// <param name="syncRoot">Locking object used when <paramref name="currentValue"/> is not initialized.</param>
-            /// <returns>Initialized value of <typeparamref name="T"/>.</returns>
-            /// <remarks>
-            /// Double checked locking is used to avoid unnecessary locking.
-            /// </remarks>
-            public static T EnsureInitialized<T>(ref T currentValue, Func<T> factory, object syncRoot) where T : class
-            {
-                T tmp = currentValue;
+            return (TContract)Activator.CreateInstance(typeof(TContract), channel);
+        }
 
-                if (tmp == null)
-                {
-                    lock (syncRoot)
-                    {
-                        if (currentValue == null)
-                        {
-                            T value = factory();
-                            // not supported in PCL
-                            // Thread.MemoryBarrier();
-                            currentValue = value;
-                        }
-
-                        tmp = currentValue;
-                    }
-                }
-
-                Debug.Assert(tmp != null, string.Format("Lazy initialization of {0} returned null value.", typeof(T).Name));
-                return tmp;
-            }
+        protected TContract CreateContract(Uri server)
+        {
+            return CreateContract(new DelegatedChannel(server, RequestForwarder, EndpointProvider, BeforeSending, AfterReceived));
         }
     }
 }

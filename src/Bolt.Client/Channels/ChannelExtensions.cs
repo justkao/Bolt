@@ -12,16 +12,14 @@ namespace Bolt.Client.Channels
             };
         }
 
-        public static RecoverableChannel<TContract> CreateRecoverable<TContract>(this ClientConfiguration configuration, Uri server)
-            where TContract : ContractProxy
+        public static RecoverableChannel CreateRecoverable(this ClientConfiguration configuration, Uri server)
         {
-            return configuration.CreateRecoverable<TContract>(new UriServerProvider(server));
+            return configuration.CreateRecoverable(new UriServerProvider(server));
         }
 
-        public static RecoverableChannel<TContract> CreateRecoverable<TContract>(this ClientConfiguration configuration, IServerProvider serverProvider)
-            where TContract : ContractProxy
+        public static RecoverableChannel CreateRecoverable(this ClientConfiguration configuration, IServerProvider serverProvider)
         {
-            return new RecoverableChannel<TContract>(serverProvider, configuration);
+            return new RecoverableChannel(serverProvider, configuration);
         }
     }
 }

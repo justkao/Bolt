@@ -1,25 +1,19 @@
 ﻿using Bolt.Client;
-using Bolt.Core.Serialization;
 using Bolt.Server;
 using Bolt.Service.Test.Core;
-using Microsoft.Owin.Hosting;
 using NUnit.Framework;
-using System;
+using Owin;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Bolt.Service.Test
 {
-    [TestFixture(SerializerType.Json)]
-    [TestFixture(SerializerType.Proto)]
-    public class StateFullTest
+    public class StateFullTest : TestBase
     {
-        private readonly SerializerType _serializerType;
-
         public StateFullTest(SerializerType serializerType)
+            : base(serializerType)
         {
-            _serializerType = serializerType;
         }
 
         [Test]
@@ -244,14 +238,6 @@ namespace Bolt.Service.Test
             Assert.AreEqual(before, InstanceProvider.Count);
         }
 
-        private IDisposable _runningServer;
-
-        public Uri ServerUrl = new Uri("http://localhost:9999");
-
-        public ServerConfiguration ServerConfiguration { get; set; }
-
-        public ClientConfiguration ClientConfiguration { get; set; }
-
         public virtual TestContractStateFullProxy GetChannel()
         {
             return
@@ -261,42 +247,11 @@ namespace Bolt.Service.Test
 
         public IBoltExecutor BoltExecutor { get; set; }
 
-        [TestFixtureSetUp]
-        protected virtual void Init()
+        protected override void ConfigureDefaultServer(IAppBuilder appBuilder)
         {
-            ISerializer serializer = null;
-
-            switch (_serializerType)
-            {
-                case SerializerType.Proto:
-                    serializer = new ProtocolBufferSerializer();
-                    break;
-                case SerializerType.Json:
-                    serializer = new JsonSerializer();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            JsonExceptionSerializer jsonExceptionSerializer = new JsonExceptionSerializer();
-
-            ServerConfiguration = new ServerConfiguration(serializer, jsonExceptionSerializer);
-            ClientConfiguration = new ClientConfiguration(serializer, jsonExceptionSerializer, new DefaultWebRequestHandlerEx());
-
-            _runningServer = WebApp.Start(
-                ServerUrl.ToString(),
-                (appBuilder) =>
-                {
-                    appBuilder.UseBolt(ServerConfiguration);
-                    appBuilder.UseStateFullTestContractStateFull<TestContractStateFull>();
-                    BoltExecutor = appBuilder.GetBolt();
-                });
+            appBuilder.UseBolt(ServerConfiguration);
+            appBuilder.UseStateFullTestContractStateFull<TestContractStateFull>();
+            BoltExecutor = appBuilder.GetBolt();
         }
-
-        [TestFixtureTearDown]
-        protected virtual void Destroy()
-        {
-            _runningServer.Dispose();
-        }
-
     }
 }

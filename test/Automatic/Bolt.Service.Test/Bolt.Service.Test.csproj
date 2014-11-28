@@ -89,6 +89,7 @@
     <Compile Include="CustomException.cs" />
     <Compile Include="SerializerType.cs" />
     <Compile Include="StateFullTest.cs" />
+    <Compile Include="TestBase.cs" />
     <Compile Include="StateLessTest.cs" />
     <Compile Include="MockInstanceProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 
 namespace Bolt.Client.Channels
 {
-    public class RecoverableChannel<TContract> : ChannelBase
-        where TContract : ContractProxy
+    public class RecoverableChannel : ChannelBase
     {
-        public RecoverableChannel(RecoverableChannel<TContract> proxy)
+        public RecoverableChannel(RecoverableChannel proxy)
             : base(proxy)
         {
             Retries = proxy.Retries;
@@ -192,16 +191,6 @@ namespace Bolt.Client.Channels
         {
             Open();
             return ServerProvider.GetServer();
-        }
-
-        protected TContract CreateContract(IChannel channel)
-        {
-            return (TContract)Activator.CreateInstance(typeof(TContract), channel);
-        }
-
-        protected TContract CreateContract(Uri server)
-        {
-            return CreateContract(new DelegatedChannel(server, RequestForwarder, EndpointProvider, BeforeSending, AfterReceived));
         }
 
         private bool HandleErrorCore(Exception error)

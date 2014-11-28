@@ -1,11 +1,10 @@
 ﻿using Bolt.Client;
 using Bolt.Client.Channels;
-using Bolt.Core.Serialization;
 using Bolt.Server;
 using Bolt.Service.Test.Core;
-using Microsoft.Owin.Hosting;
 using Moq;
 using NUnit.Framework;
+using Owin;
 using System;
 using System.Diagnostics;
 using System.Threading;
@@ -13,15 +12,11 @@ using System.Threading.Tasks;
 
 namespace Bolt.Service.Test
 {
-    [TestFixture(SerializerType.Json)]
-    [TestFixture(SerializerType.Proto)]
-    public class StateLessTest
+    public class StateLessTest : TestBase
     {
-        private readonly SerializerType _serializerType;
-
         public StateLessTest(SerializerType serializerType)
+            : base(serializerType)
         {
-            _serializerType = serializerType;
         }
 
         [Test]
@@ -228,7 +223,7 @@ namespace Bolt.Service.Test
             {
                 using (
                     new TestContractProxy(
-                        new RecoverableChannel<TestContractProxy>(new UriServerProvider(ServerUrl), ClientConfiguration)))
+                        new RecoverableChannel(new UriServerProvider(ServerUrl), ClientConfiguration)))
                 {
                 }
             }
@@ -264,6 +259,14 @@ namespace Bolt.Service.Test
             }
         }
 
+        [Test]
+        public void Server_ReturnsNull_EnsureNullReceivedOnClient()
+        {
+            ITestContract client = CreateChannel();
+            Mock<ITestContract> server = Server();
+            server.Setup(v => v.ComplexFunction()).Returns<CompositeType>(null);
+            Assert.IsNull(client.ComplexFunction());
+        }
 
         [Test]
         public void Server_ThrowsWithInner_EnsureInnerwithCorrectMessageReceivedOnClient()
@@ -307,19 +310,11 @@ namespace Bolt.Service.Test
 
             Thread.Sleep(TimeSpan.FromSeconds(1));
 
-            IDisposable running = StartServer(server1);
+            IDisposable running = StartServer(server1, ConfigureDefaultServer);
 
             ongoing.GetAwaiter().GetResult();
             running.Dispose();
         }
-
-        private IDisposable _runningServer;
-
-        public Uri ServerUrl = new Uri("http://localhost:9999");
-
-        public ServerConfiguration ServerConfiguration { get; set; }
-
-        public ClientConfiguration ClientConfiguration { get; set; }
 
         public MockInstanceProvider InstanceProvider = new MockInstanceProvider();
 
@@ -338,51 +333,14 @@ namespace Bolt.Service.Test
         public virtual TestContractProxy CreateChannel(int retries, TimeSpan retryDelay, params Uri[] servers)
         {
             TestContractProxy proxy = ClientConfiguration.CreateProxy<TestContractProxy>(new MultipleServersProvider(servers));
-            ((RecoverableChannel<TestContractProxy>)proxy.Channel).Retries = retries;
-            ((RecoverableChannel<TestContractProxy>)proxy.Channel).RetryDelay = retryDelay;
+            proxy.WithRetries(retries, retryDelay);
             return proxy;
         }
 
-        [TestFixtureSetUp]
-        protected virtual void Init()
+        protected override void ConfigureDefaultServer(IAppBuilder appBuilder)
         {
-            ISerializer serializer = null;
-
-            switch (_serializerType)
-            {
-                case SerializerType.Proto:
-                    serializer = new ProtocolBufferSerializer();
-                    break;
-                case SerializerType.Json:
-                    serializer = new JsonSerializer();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
-            JsonExceptionSerializer jsonExceptionSerializer = new JsonExceptionSerializer();
-
-            ServerConfiguration = new ServerConfiguration(serializer, jsonExceptionSerializer);
-            ClientConfiguration = new ClientConfiguration(serializer, jsonExceptionSerializer, new DefaultWebRequestHandlerEx());
-
-            _runningServer = StartServer(ServerUrl);
+            appBuilder.UseBolt(ServerConfiguration);
+            appBuilder.UseTestContract(InstanceProvider);
         }
-
-        private IDisposable StartServer(Uri server)
-        {
-            return WebApp.Start(
-                server.ToString(),
-                (appBuilder) =>
-                {
-                    appBuilder.UseBolt(ServerConfiguration);
-                    appBuilder.UseTestContract(InstanceProvider);
-                });
-        }
-
-        [TestFixtureTearDown]
-        protected virtual void Destroy()
-        {
-            _runningServer.Dispose();
-        }
-
     }
 }
