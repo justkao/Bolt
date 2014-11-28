@@ -9,7 +9,7 @@ namespace Bolt.Server
             return (T)CreateInstance(typeof(T));
         }
 
-        public virtual void ReleaseInstance(ServerExecutionContext context, object obj)
+        public virtual void ReleaseInstance(ServerExecutionContext context, object obj, Exception error)
         {
             if (obj is IDisposable)
             {

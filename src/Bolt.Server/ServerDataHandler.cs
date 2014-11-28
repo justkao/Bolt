@@ -40,6 +40,12 @@ namespace Bolt.Server
         {
             context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
             byte[] raw = _serializer.SerializeResponse(data, context.ActionDescriptor);
+            if (raw == null || raw.Length == 0)
+            {
+                context.Context.Response.Body.Close();
+                return Task.FromResult(0);
+            }
+
             return context.Context.Response.Body.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
         }
 

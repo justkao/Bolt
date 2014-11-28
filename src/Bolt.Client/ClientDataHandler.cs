@@ -8,8 +8,9 @@ namespace Bolt.Client
     {
         private readonly ISerializer _serializer;
         private readonly IExceptionSerializer _exceptionSerializer;
+        private readonly IWebRequestHandler _requestHandler;
 
-        public ClientDataHandler(ISerializer serializer, IExceptionSerializer exceptionSerializer)
+        public ClientDataHandler(ISerializer serializer, IExceptionSerializer exceptionSerializer, IWebRequestHandler requestHandler)
         {
             if (serializer == null)
             {
@@ -19,9 +20,14 @@ namespace Bolt.Client
             {
                 throw new ArgumentNullException("exceptionSerializer");
             }
+            if (requestHandler == null)
+            {
+                throw new ArgumentNullException("requestHandler");
+            }
 
             _serializer = serializer;
             _exceptionSerializer = exceptionSerializer;
+            _requestHandler = requestHandler;
         }
 
         public virtual string ContentType
@@ -33,7 +39,7 @@ namespace Bolt.Client
         {
             if (typeof(T) == typeof(Empty))
             {
-                using (TaskExtensions.Execute(context.Request.GetRequestStreamAsync))
+                using (_requestHandler.GetRequestStream(context.Request))
                 {
                     // auto set content length to 0
                     return;
@@ -42,7 +48,7 @@ namespace Bolt.Client
 
             byte[] raw = _serializer.SerializeParameters(parameters, context.ActionDescriptor);
 
-            using (Stream stream = TaskExtensions.Execute(context.Request.GetRequestStreamAsync))
+            using (Stream stream = _requestHandler.GetRequestStream(context.Request))
             {
                 stream.Write(raw, 0, raw.Length);
             }
@@ -52,7 +58,7 @@ namespace Bolt.Client
         {
             if (typeof(T) == typeof(Empty))
             {
-                using (TaskExtensions.Execute(context.Request.GetRequestStreamAsync))
+                using (await context.Request.GetRequestStreamAsync())
                 {
                     // auto set content length to 0
                     return;

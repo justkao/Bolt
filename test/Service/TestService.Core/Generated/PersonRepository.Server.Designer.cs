@@ -53,10 +53,12 @@ namespace TestService.Core
             {
                 var result = instance.UpdatePerson(parameters.Person, context.CallCancelled);
                 await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -68,10 +70,12 @@ namespace TestService.Core
             {
                 var result = instance.UpdatePersonThatThrowsInvalidOperationException(parameters.Person);
                 await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -82,10 +86,12 @@ namespace TestService.Core
             {
                 await instance.DoNothingAsAsync();
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -96,10 +102,12 @@ namespace TestService.Core
             {
                 instance.DoNothing();
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -111,10 +119,12 @@ namespace TestService.Core
             {
                 await instance.DoNothingWithComplexParameterAsAsync(parameters.Person);
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -126,10 +136,12 @@ namespace TestService.Core
             {
                 instance.DoNothingWithComplexParameter(parameters.Person);
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -141,10 +153,12 @@ namespace TestService.Core
             {
                 var result = instance.GetSimpleType(parameters.Arg);
                 await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -156,10 +170,12 @@ namespace TestService.Core
             {
                 await instance.GetSimpleTypeAsAsync(parameters.Arg);
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -171,10 +187,12 @@ namespace TestService.Core
             {
                 var result = instance.GetSinglePerson(parameters.Person);
                 await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -186,10 +204,12 @@ namespace TestService.Core
             {
                 var result = await instance.GetSinglePersonAsAsync(parameters.Person);
                 await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -201,10 +221,12 @@ namespace TestService.Core
             {
                 var result = instance.GetManyPersons(parameters.Person);
                 await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -216,10 +238,12 @@ namespace TestService.Core
             {
                 var result = await instance.GetManyPersonsAsAsync(parameters.Person);
                 await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -230,10 +254,12 @@ namespace TestService.Core
             {
                 instance.InnerOperation();
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -244,10 +270,12 @@ namespace TestService.Core
             {
                 await instance.InnerOperationExAsync();
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -258,10 +286,12 @@ namespace TestService.Core
             {
                 instance.InnerOperation2();
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -272,10 +302,12 @@ namespace TestService.Core
             {
                 await instance.InnerOperationExAsync2();
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
     }

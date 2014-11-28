@@ -21,7 +21,7 @@ namespace Bolt.Server
             return (T)_instance;
         }
 
-        public void ReleaseInstance(ServerExecutionContext context, object obj)
+        public void ReleaseInstance(ServerExecutionContext context, object obj, Exception error)
         {
         }
     }

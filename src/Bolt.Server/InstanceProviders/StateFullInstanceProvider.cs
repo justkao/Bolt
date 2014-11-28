@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Timers;
 
 namespace Bolt.Server
@@ -49,33 +50,58 @@ namespace Bolt.Server
 
         public override TInstance GetInstance<TInstance>(ServerExecutionContext context)
         {
+            InstanceMetadata instance;
+
+            if (context.ActionDescriptor == _initInstanceAction)
+            {
+                instance = new InstanceMetadata(base.GetInstance<TInstance>(context));
+                string newSession = CreateNewSession();
+                _instances[newSession] = instance;
+                context.Context.Response.Headers[SessionHeader] = newSession;
+                OnInstanceCreated(context, newSession);
+                return (TInstance)instance.Instance;
+            }
+
             string sessionId = context.Context.Request.Headers[SessionHeader];
             if (string.IsNullOrEmpty(sessionId))
             {
                 throw new SessionHeaderNotFoundException();
             }
 
-            InstanceMetadata instance;
             if (_instances.TryGetValue(sessionId, out instance))
             {
                 instance.Timestamp = DateTime.UtcNow;
                 return (TInstance)instance.Instance;
             }
 
-            if (context.ActionDescriptor != _initInstanceAction)
-            {
-                throw new SessionNotFoundException(sessionId);
-            }
-
-            instance = new InstanceMetadata(base.GetInstance<TInstance>(context));
-            _instances[sessionId] = instance;
-            OnInstanceCreated(context, sessionId);
-            return (TInstance)instance.Instance;
+            throw new SessionNotFoundException(sessionId);
         }
 
-        public override void ReleaseInstance(ServerExecutionContext context, object obj)
+        public override void ReleaseInstance(ServerExecutionContext context, object obj, Exception error)
         {
-            if (context.ActionDescriptor == _releaseInstanceAction)
+            if (context.ActionDescriptor == _initInstanceAction)
+            {
+                if (error != null)
+                {
+                    // session initialization failed, cleanup the stack
+                    string session = context.Context.Response.Headers[SessionHeader];
+                    context.Context.Response.Headers.Remove(SessionHeader);
+                    if (ReleaseInstance(session))
+                    {
+                        try
+                        {
+                            OnInstanceReleased(context, session);
+                        }
+                        catch (Exception e)
+                        {
+                            Debug.Assert(false,
+                                "Instance release failed after the session initialization error. This exception will be supressed and the session initialization error will be propagated to client.",
+                                e.ToString());
+                        }
+                    }
+                }
+            }
+            else if (context.ActionDescriptor == _releaseInstanceAction)
             {
                 string sessionId = context.Context.Request.Headers[SessionHeader];
                 if (!string.IsNullOrEmpty(sessionId))
@@ -88,11 +114,13 @@ namespace Bolt.Server
             }
         }
 
-        public virtual bool ReleaseInstance(string key)
+        protected virtual bool ReleaseInstance(string key)
         {
             InstanceMetadata instance;
             if (_instances.TryRemove(key, out instance))
             {
+                Console.WriteLine("Session closed ... ");
+
                 if (instance.Instance is IDisposable)
                 {
                     (instance.Instance as IDisposable).Dispose();
@@ -132,6 +160,12 @@ namespace Bolt.Server
         protected virtual bool ShouldTimeoutInstance(object instance, DateTime timestamp)
         {
             return (DateTime.UtcNow - timestamp) > InstanceTimeout;
+        }
+
+        protected virtual string CreateNewSession()
+        {
+            Console.WriteLine("Session created ... ");
+            return Guid.NewGuid().ToString();
         }
 
         private void OnTimerElapsed(object sender, ElapsedEventArgs e)

@@ -1,43 +1,49 @@
 ﻿using System;
-using System.Threading;
 
 namespace Bolt.Client.Channels
 {
     public class DelegatedChannel : ChannelBase
     {
         private readonly Uri _server;
-        private readonly Action<ClientActionContext> _contextCreated;
+        private readonly Action<ClientActionContext> _beforeSending;
+        private readonly Action<ClientActionContext> _afterReceived;
 
         public DelegatedChannel(ChannelBase proxy)
             : base(proxy)
         {
         }
 
-        public DelegatedChannel(Uri server, ClientConfiguration configuration, Action<ClientActionContext> contextCreated = null)
-            : this(server, configuration.RequestForwarder, configuration.EndpointProvider, contextCreated)
+        public DelegatedChannel(Uri server, ClientConfiguration configuration, Action<ClientActionContext> beforeSending = null, Action<ClientActionContext> afterReceived = null)
+            : this(server, configuration.RequestForwarder, configuration.EndpointProvider, beforeSending, afterReceived)
         {
         }
 
-        public DelegatedChannel(
-            Uri server,
-            IRequestForwarder requestForwarder,
-            IEndpointProvider endpointProvider,
-            Action<ClientActionContext> contextCreated)
+        public DelegatedChannel(Uri server, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider, Action<ClientActionContext> beforeSending = null, Action<ClientActionContext> afterReceived = null)
             : base(requestForwarder, endpointProvider)
         {
             _server = server;
-            _contextCreated = contextCreated;
+            _beforeSending = beforeSending;
+            _afterReceived = afterReceived;
         }
 
-        protected override ClientActionContext CreateContext(Uri server, ActionDescriptor actionDescriptor, CancellationToken cancellation, object parameters)
+        protected override void BeforeSending(ClientActionContext context)
         {
-            ClientActionContext ctxt = base.CreateContext(server, actionDescriptor, cancellation, parameters);
-            if (_contextCreated != null)
+            if (_beforeSending != null)
             {
-                _contextCreated(ctxt);
+                _beforeSending(context);
             }
 
-            return ctxt;
+            base.BeforeSending(context);
+        }
+
+        protected override void AfterReceived(ClientActionContext context)
+        {
+            if (_afterReceived != null)
+            {
+                _afterReceived(context);
+            }
+
+            base.AfterReceived(context);
         }
 
         protected override Uri GetRemoteConnection()

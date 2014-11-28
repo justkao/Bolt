@@ -42,14 +42,6 @@ namespace Bolt.Client.Channels
 
         public IServerProvider ServerProvider { get; private set; }
 
-        protected virtual void BeforeSending(ClientActionContext context)
-        {
-        }
-
-        protected virtual void AfterReceived(ClientActionContext context)
-        {
-        }
-
         protected virtual bool HandleOpenConnectionError(Exception error)
         {
             return HandleErrorCore(error);
@@ -235,6 +227,7 @@ namespace Bolt.Client.Channels
 
         protected override Uri GetRemoteConnection()
         {
+            Open();
             return ServerProvider.GetServer();
         }
 
@@ -245,7 +238,7 @@ namespace Bolt.Client.Channels
 
         protected TContract CreateContract(Uri server)
         {
-            return CreateContract(new DelegatedChannel(server, RequestForwarder, EndpointProvider, BeforeSending));
+            return CreateContract(new DelegatedChannel(server, RequestForwarder, EndpointProvider, BeforeSending, AfterReceived));
         }
     }
 }

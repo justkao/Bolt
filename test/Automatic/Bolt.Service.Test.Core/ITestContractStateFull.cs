@@ -9,6 +9,7 @@ namespace Bolt.Service.Test.Core
 
         void SetState(string state);
 
+        [AsyncOperation]
         string GetState();
 
         [CloseSession]

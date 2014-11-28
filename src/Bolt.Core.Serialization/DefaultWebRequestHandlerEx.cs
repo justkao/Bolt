@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -6,6 +7,11 @@ namespace Bolt.Core.Serialization
 {
     public class DefaultWebRequestHandlerEx : DefaultWebRequestHandler
     {
+        public override Stream GetRequestStream(HttpWebRequest response)
+        {
+            return response.GetRequestStream();
+        }
+
         protected override WebResponse GetResponseCore(HttpWebRequest webRequest, TimeSpan timeout)
         {
             if (timeout != TimeSpan.Zero)

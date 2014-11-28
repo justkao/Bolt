@@ -1,3 +1,4 @@
+using System;
 using Bolt.Server;
 
 namespace Bolt.Service.Test
@@ -11,7 +12,7 @@ namespace Bolt.Service.Test
             return (T)CurrentInstance;
         }
 
-        public void ReleaseInstance(ServerExecutionContext context, object obj)
+        public void ReleaseInstance(ServerExecutionContext context, object obj, Exception error)
         {
         }
     }

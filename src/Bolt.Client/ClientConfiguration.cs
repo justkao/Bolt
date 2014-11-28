@@ -7,7 +7,7 @@ namespace Bolt.Client
         public ClientConfiguration(ISerializer serializer, IExceptionSerializer exceptionSerializer, IWebRequestHandler webRequestHandler = null)
             : base(serializer, exceptionSerializer)
         {
-            ClientDataHandler = new ClientDataHandler(serializer, ExceptionSerializer);
+            ClientDataHandler = new ClientDataHandler(serializer, ExceptionSerializer, webRequestHandler);
             RequestForwarder = new RequestForwarder(ClientDataHandler, webRequestHandler, ServerErrorCodesHeader);
         }
 

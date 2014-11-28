@@ -141,11 +141,13 @@ namespace Bolt.Generators
                 {
                     WriteLine("await ResponseHandler.Handle(context);");
                 }
+                WriteLine("InstanceProvider.ReleaseInstance(context, instance, null);", instanceType);
             }
-            WriteLine("finally");
+            WriteLine("catch (Exception e)");
             using (WithBlock())
             {
-                WriteLine("InstanceProvider.ReleaseInstance(context, instance);", instanceType);
+                WriteLine("InstanceProvider.ReleaseInstance(context, instance, e);", instanceType);
+                WriteLine("throw;");
             }
         }
 

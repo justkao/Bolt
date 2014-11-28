@@ -20,7 +20,15 @@ using Bolt.Service.Test.Core.Parameters;
 
 namespace Bolt.Service.Test.Core
 {
-    public partial class TestContractStateFullProxy : Bolt.Client.Channels.ContractProxy<Bolt.Service.Test.Core.TestContractStateFullDescriptor>, Bolt.Service.Test.Core.ITestContractStateFull
+    public partial interface ITestContractStateFullAsync : ITestContractStateFull
+    {
+        Task<string> GetStateAsync();
+    }
+}
+
+namespace Bolt.Service.Test.Core
+{
+    public partial class TestContractStateFullProxy : Bolt.Client.Channels.ContractProxy<Bolt.Service.Test.Core.TestContractStateFullDescriptor>, Bolt.Service.Test.Core.ITestContractStateFull, ITestContractStateFullAsync
     {
         public TestContractStateFullProxy(Bolt.Service.Test.Core.TestContractStateFullProxy proxy) : base(proxy)
         {
@@ -45,6 +53,11 @@ namespace Bolt.Service.Test.Core
         public virtual string GetState()
         {
             return Channel.Send<string, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.GetState, GetCancellationToken(Descriptor.GetState));
+        }
+
+        public virtual Task<string> GetStateAsync()
+        {
+            return Channel.SendAsync<string, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.GetState, GetCancellationToken(Descriptor.GetState));
         }
 
         public virtual void Destroy()

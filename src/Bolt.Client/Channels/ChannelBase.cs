@@ -138,7 +138,10 @@ namespace Bolt.Client.Channels
 
             using (ClientActionContext ctxt = CreateContext(server, descriptor, cancellation, parameters))
             {
-                return RequestForwarder.GetResponse<T, TParameters>(ctxt, parameters).GetResultOrThrow();
+                BeforeSending(ctxt);
+                ResponseDescriptor<T> result = RequestForwarder.GetResponse<T, TParameters>(ctxt, parameters);
+                AfterReceived(ctxt);
+                return result.GetResultOrThrow();
             }
         }
 
@@ -154,15 +157,25 @@ namespace Bolt.Client.Channels
 
             using (ClientActionContext ctxt = CreateContext(server, descriptor, cancellation, parameters))
             {
-                return (await RequestForwarder.GetResponseAsync<T, TParameters>(ctxt, parameters)).GetResultOrThrow();
+                BeforeSending(ctxt);
+                ResponseDescriptor<T> result = await RequestForwarder.GetResponseAsync<T, TParameters>(ctxt, parameters);
+                AfterReceived(ctxt);
+                return result.GetResultOrThrow();
             }
+        }
+
+        protected virtual void BeforeSending(ClientActionContext context)
+        {
+        }
+
+        protected virtual void AfterReceived(ClientActionContext context)
+        {
         }
 
         protected virtual HttpWebRequest CreateWebRequest(Uri server, ActionDescriptor descriptor)
         {
             Uri uri = EndpointProvider.GetEndpoint(server, descriptor);
             HttpWebRequest request = WebRequest.CreateHttp(uri);
-            request.Proxy = WebRequest.DefaultWebProxy;
             request.Method = "Post";
             return request;
         }
@@ -208,11 +221,6 @@ namespace Bolt.Client.Channels
             }
         }
 
-        protected virtual void DisposeManagedResources()
-        {
-            Close();
-        }
-
         public void Dispose()
         {
             Dispose(true);
@@ -228,7 +236,7 @@ namespace Bolt.Client.Channels
 
             if (disposeManagedResources)
             {
-                DisposeManagedResources();
+                Close();
             }
 
             IsClosed = true;

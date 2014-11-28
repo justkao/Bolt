@@ -10,5 +10,6 @@
         ActionNotImplemented = 5,
         NoSessionHeader = 6,
         SessionNotFound = 7,
+        SessionIdNotReceived = 8,
     }
 }

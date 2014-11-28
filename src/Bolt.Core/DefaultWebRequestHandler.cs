@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -87,6 +88,11 @@ namespace Bolt
 
                 throw;
             }
+        }
+
+        public virtual Stream GetRequestStream(HttpWebRequest response)
+        {
+            return TaskExtensions.Execute(response.GetRequestStreamAsync);
         }
 
         protected virtual WebResponse GetResponseCore(HttpWebRequest webRequest, TimeSpan timeout)

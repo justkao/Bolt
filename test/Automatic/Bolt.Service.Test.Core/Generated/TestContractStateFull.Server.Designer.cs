@@ -40,10 +40,12 @@ namespace Bolt.Service.Test.Core
             {
                 instance.Init();
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -55,10 +57,12 @@ namespace Bolt.Service.Test.Core
             {
                 instance.SetState(parameters.State);
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -69,10 +73,12 @@ namespace Bolt.Service.Test.Core
             {
                 var result = instance.GetState();
                 await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -83,10 +89,12 @@ namespace Bolt.Service.Test.Core
             {
                 instance.Destroy();
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
     }

@@ -21,7 +21,7 @@ namespace Bolt.Server
             return (T)(object)_factory(context);
         }
 
-        public void ReleaseInstance(ServerExecutionContext context, object obj)
+        public void ReleaseInstance(ServerExecutionContext context, object obj, Exception error)
         {
             if (obj is IDisposable)
             {

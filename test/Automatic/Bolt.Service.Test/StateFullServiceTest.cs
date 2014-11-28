@@ -1,10 +1,10 @@
-﻿using System;
-using Bolt.Client;
+﻿using Bolt.Client;
 using Bolt.Core.Serialization;
 using Bolt.Server;
 using Bolt.Service.Test.Core;
 using Microsoft.Owin.Hosting;
 using NUnit.Framework;
+using System;
 
 namespace Bolt.Service.Test
 {
@@ -25,8 +25,10 @@ namespace Bolt.Service.Test
             TestContractStateFullProxy client = GetChannel();
 
             client.SetState("test state");
-
+            client.GetState();
             Assert.AreEqual("test state", client.GetState());
+
+            client.Dispose();
         }
 
         [Test]

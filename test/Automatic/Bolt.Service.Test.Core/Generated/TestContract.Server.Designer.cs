@@ -47,10 +47,12 @@ namespace Bolt.Service.Test.Core
             {
                 instance.SimpleMethodWithSimpleArguments(parameters.Val);
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -61,10 +63,12 @@ namespace Bolt.Service.Test.Core
             {
                 instance.SimpleMethod();
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -75,10 +79,12 @@ namespace Bolt.Service.Test.Core
             {
                 await instance.SimpleMethodExAsync();
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -89,10 +95,12 @@ namespace Bolt.Service.Test.Core
             {
                 instance.SimpleMethodWithCancellation(context.CallCancelled);
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -103,10 +111,12 @@ namespace Bolt.Service.Test.Core
             {
                 var result = instance.ComplexFunction();
                 await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -118,10 +128,12 @@ namespace Bolt.Service.Test.Core
             {
                 instance.SimpleMethodWithComplexParameter(parameters.CompositeType);
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -132,10 +144,12 @@ namespace Bolt.Service.Test.Core
             {
                 var result = instance.SimpleFunction();
                 await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -146,10 +160,12 @@ namespace Bolt.Service.Test.Core
             {
                 var result = await instance.SimpleAsyncFunction();
                 await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -161,10 +177,12 @@ namespace Bolt.Service.Test.Core
             {
                 instance.MethodWithManyArguments(parameters.Arg1, parameters.Arg2, parameters.Time);
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
 
@@ -175,10 +193,12 @@ namespace Bolt.Service.Test.Core
             {
                 instance.ThisMethodShouldBeExcluded();
                 await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
             }
-            finally
+            catch (Exception e)
             {
-                InstanceProvider.ReleaseInstance(context, instance);
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
             }
         }
     }
