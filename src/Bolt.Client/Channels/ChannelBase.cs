@@ -184,7 +184,7 @@ namespace Bolt.Client.Channels
         {
             if (IsClosed)
             {
-                throw new ProxyClosedException("Proxy is already closed.");
+                throw new SessionClosedException("Proxy is already closed.");
             }
         }
 

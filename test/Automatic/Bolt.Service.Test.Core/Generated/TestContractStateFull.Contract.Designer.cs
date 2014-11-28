@@ -41,6 +41,7 @@ namespace Bolt.Service.Test.Core
             Init = Add("Init", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("Init"));
             SetState = Add("SetState", typeof(Bolt.Service.Test.Core.Parameters.SetStateParameters), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("SetState"));
             GetState = Add("GetState", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("GetState"));
+            NextCallWillFailProxy = Add("NextCallWillFailProxy", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("NextCallWillFailProxy"));
             Destroy = Add("Destroy", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("Destroy"));
         }
 
@@ -51,6 +52,8 @@ namespace Bolt.Service.Test.Core
         public  Bolt.ActionDescriptor SetState { get; private set; }
 
         public  Bolt.ActionDescriptor GetState { get; private set; }
+
+        public  Bolt.ActionDescriptor NextCallWillFailProxy { get; private set; }
 
         public  Bolt.ActionDescriptor Destroy { get; private set; }
     }

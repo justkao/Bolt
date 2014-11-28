@@ -62,7 +62,7 @@ namespace Bolt.Server
                 return (TInstance)instance.Instance;
             }
 
-            string sessionId = context.Context.Request.Headers[SessionHeader];
+            string sessionId = GetSession(context);
             if (string.IsNullOrEmpty(sessionId))
             {
                 throw new SessionHeaderNotFoundException();
@@ -84,7 +84,7 @@ namespace Bolt.Server
                 if (error != null)
                 {
                     // session initialization failed, cleanup the stack
-                    string session = context.Context.Response.Headers[SessionHeader];
+                    string session = GetSession(context);
                     context.Context.Response.Headers.Remove(SessionHeader);
                     if (ReleaseInstance(session))
                     {
@@ -103,7 +103,7 @@ namespace Bolt.Server
             }
             else if (context.ActionDescriptor == _releaseInstanceAction)
             {
-                string sessionId = context.Context.Request.Headers[SessionHeader];
+                string sessionId = GetSession(context);
                 if (!string.IsNullOrEmpty(sessionId))
                 {
                     if (ReleaseInstance(sessionId))
@@ -114,13 +114,11 @@ namespace Bolt.Server
             }
         }
 
-        protected virtual bool ReleaseInstance(string key)
+        public virtual bool ReleaseInstance(string key)
         {
             InstanceMetadata instance;
             if (_instances.TryRemove(key, out instance))
             {
-                Console.WriteLine("Session closed ... ");
-
                 if (instance.Instance is IDisposable)
                 {
                     (instance.Instance as IDisposable).Dispose();
@@ -151,10 +149,12 @@ namespace Bolt.Server
 
         protected virtual void OnInstanceCreated(ServerExecutionContext context, string sessionId)
         {
+            Console.WriteLine("New instance created for session '{0}' and contract '{1}'. Initiating action '{2}'", sessionId, context.ActionDescriptor.Contract, context.ActionDescriptor);
         }
 
         protected virtual void OnInstanceReleased(ServerExecutionContext context, string sessionId)
         {
+            Console.WriteLine("Instance released for session '{0}' and contract '{1}'. Destroy  action '{2}'", sessionId, context.ActionDescriptor.Contract, context.ActionDescriptor);
         }
 
         protected virtual bool ShouldTimeoutInstance(object instance, DateTime timestamp)
@@ -177,6 +177,11 @@ namespace Bolt.Server
                     ReleaseInstance(pair.Key);
                 }
             }
+        }
+
+        private string GetSession(ServerExecutionContext context)
+        {
+            return context.Context.Request.Headers[SessionHeader];
         }
 
         private class InstanceMetadata

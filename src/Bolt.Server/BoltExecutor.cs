@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Owin;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Owin;
 
 namespace Bolt.Server
 {
@@ -41,6 +41,11 @@ namespace Bolt.Server
             {
                 Console.WriteLine("     Action: {0}", descriptor.Name);
             }
+        }
+
+        public IContractInvoker Get(ContractDescriptor descriptor)
+        {
+            return _invokers.FirstOrDefault(i => i.Descriptor == descriptor);
         }
 
         public virtual Task Execute(IOwinContext context)

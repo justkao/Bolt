@@ -5,6 +5,9 @@ using Bolt.Service.Test.Core;
 using Microsoft.Owin.Hosting;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Bolt.Service.Test
 {
@@ -20,6 +23,67 @@ namespace Bolt.Service.Test
         }
 
         [Test]
+        public async Task Async_EnsureStatePersistedBetweenCalls()
+        {
+            TestContractStateFullProxy client = GetChannel();
+
+            await client.SetStateAsync("test state");
+            await client.GetStateAsync();
+            Assert.AreEqual("test state", await client.GetStateAsync());
+
+            await (client as IChannel).CloseAsync();
+        }
+
+        [Test]
+        public async Task Async_RecoverProxy_EnsureNewSession()
+        {
+            TestContractStateFullProxy client = GetChannel();
+            await client.GetStateAsync();
+            string sessionId1 = ((TestContractStateFullChannel)client.Channel).SessionId;
+            await client.NextCallWillFailProxyAsync();
+            await client.GetStateAsync();
+            string sessionId2 = ((TestContractStateFullChannel)client.Channel).SessionId;
+            Assert.AreNotEqual(sessionId1, sessionId2);
+        }
+
+        [Test]
+        public async Task Async_SessionNotFound_EnsureBoltServerExceptionIsThrown()
+        {
+            TestContractStateFullProxy client = GetChannel();
+            ((TestContractStateFullChannel)client.Channel).Retries = 0;
+
+            await client.GetStateAsync();
+            string sessionId1 = ((TestContractStateFullChannel)client.Channel).SessionId;
+
+            StateFullInstanceProvider instanceProvider = (StateFullInstanceProvider)((ContractInvoker)BoltExecutor.Get(TestContractStateFullDescriptor.Default)).InstanceProvider;
+            instanceProvider.ReleaseInstance(sessionId1);
+
+            try
+            {
+                await client.GetStateAsync();
+            }
+            catch (BoltServerException e)
+            {
+                Assert.AreEqual(e.Error, ServerErrorCode.SessionNotFound);
+            }
+        }
+
+        [Test]
+        public async Task Async_SessionNotFound_RetriesEnabled_EnsureNewSession()
+        {
+            TestContractStateFullProxy client = GetChannel();
+            ((TestContractStateFullChannel)client.Channel).Retries = 1;
+
+            await client.GetStateAsync();
+            string session = ((TestContractStateFullChannel)client.Channel).SessionId;
+
+            StateFullInstanceProvider instanceProvider = (StateFullInstanceProvider)((ContractInvoker)BoltExecutor.Get(TestContractStateFullDescriptor.Default)).InstanceProvider;
+            instanceProvider.ReleaseInstance(session);
+
+            await client.GetStateAsync();
+        }
+
+        [Test]
         public void EnsureStatePersistedBetweenCalls()
         {
             TestContractStateFullProxy client = GetChannel();
@@ -32,12 +96,122 @@ namespace Bolt.Service.Test
         }
 
         [Test]
-        public void CloseTest()
+        public void RecoverProxy_EnsureNewSession()
         {
             TestContractStateFullProxy client = GetChannel();
-            client.SetState("test state");
-            client.Dispose();
             client.GetState();
+            string sessionId1 = ((TestContractStateFullChannel)client.Channel).SessionId;
+            client.NextCallWillFailProxy();
+            client.GetState();
+            string sessionId2 = ((TestContractStateFullChannel)client.Channel).SessionId;
+            Assert.AreNotEqual(sessionId1, sessionId2);
+        }
+
+        [Test]
+        public void SessionNotFound_EnsureBoltServerExceptionIsThrown()
+        {
+            TestContractStateFullProxy client = GetChannel();
+            ((TestContractStateFullChannel)client.Channel).Retries = 0;
+
+            client.GetState();
+            string sessionId1 = ((TestContractStateFullChannel)client.Channel).SessionId;
+
+            StateFullInstanceProvider instanceProvider = (StateFullInstanceProvider)((ContractInvoker)BoltExecutor.Get(TestContractStateFullDescriptor.Default)).InstanceProvider;
+            instanceProvider.ReleaseInstance(sessionId1);
+
+            try
+            {
+                client.GetState();
+            }
+            catch (BoltServerException e)
+            {
+                Assert.AreEqual(e.Error, ServerErrorCode.SessionNotFound);
+            }
+        }
+
+        [Test]
+        public void SessionNotFound_RetriesEnabled_EnsureNewSession()
+        {
+            TestContractStateFullProxy client = GetChannel();
+            ((TestContractStateFullChannel)client.Channel).Retries = 1;
+
+            client.GetState();
+            string session = ((TestContractStateFullChannel)client.Channel).SessionId;
+
+            StateFullInstanceProvider instanceProvider = (StateFullInstanceProvider)((ContractInvoker)BoltExecutor.Get(TestContractStateFullDescriptor.Default)).InstanceProvider;
+            instanceProvider.ReleaseInstance(session);
+
+            client.GetState();
+        }
+
+        [Test]
+        public void CloseSession_EnsureInstanceReleasedOnServer()
+        {
+            TestContractStateFullProxy client = GetChannel();
+            ((TestContractStateFullChannel)client.Channel).Retries = 0;
+            client.GetState();
+            string session = ((TestContractStateFullChannel)client.Channel).SessionId;
+            client.Dispose();
+            StateFullInstanceProvider instanceProvider = (StateFullInstanceProvider)((ContractInvoker)BoltExecutor.Get(TestContractStateFullDescriptor.Default)).InstanceProvider;
+            Assert.IsFalse(instanceProvider.ReleaseInstance(session));
+        }
+
+        [Test]
+        public async Task Async_Request_EnsureInstanceReleasedOnServer()
+        {
+            TestContractStateFullProxy client = GetChannel();
+            ((TestContractStateFullChannel)client.Channel).Retries = 0;
+            await client.GetStateAsync();
+            string session = ((TestContractStateFullChannel)client.Channel).SessionId;
+            await (client as IChannel).CloseAsync();
+            StateFullInstanceProvider instanceProvider = (StateFullInstanceProvider)((ContractInvoker)BoltExecutor.Get(TestContractStateFullDescriptor.Default)).InstanceProvider;
+            Assert.IsFalse(instanceProvider.ReleaseInstance(session));
+        }
+
+        [Test]
+        public async Task Async_Request_ClosedProxy_EnsureSessionClosedException()
+        {
+            TestContractStateFullProxy client = GetChannel();
+            ((TestContractStateFullChannel)client.Channel).Retries = 0;
+            await client.GetStateAsync();
+            await (client as IChannel).CloseAsync();
+
+            Assert.Throws<SessionClosedException>(() => client.GetState());
+        }
+
+        [Test]
+        public void Request_ClosedProxy_EnsureSessionClosedException()
+        {
+            TestContractStateFullProxy client = GetChannel();
+            ((TestContractStateFullChannel)client.Channel).Retries = 0;
+            client.GetState();
+            (client as IChannel).Close();
+
+            Assert.Throws<SessionClosedException>(() => client.GetState());
+        }
+
+        [Test]
+        public void ManySessions_EnsureStateSaved()
+        {
+            List<TestContractStateFullProxy> proxies =
+                Enumerable.Repeat(100, 100).Select(c => GetChannel()).ToList();
+
+            for (int index = 0; index < proxies.Count; index++)
+            {
+                TestContractStateFullProxy proxy = proxies[index];
+                proxy.SetState(index.ToString());
+            }
+
+            for (int index = 0; index < proxies.Count; index++)
+            {
+                TestContractStateFullProxy proxy = proxies[index];
+                Assert.AreEqual(index.ToString(), proxy.GetState());
+            }
+
+            foreach (TestContractStateFullProxy proxy in proxies)
+            {
+                proxy.Dispose();
+            }
         }
 
         private IDisposable _runningServer;
@@ -54,6 +228,8 @@ namespace Bolt.Service.Test
                 ClientConfiguration.CreateProxy<TestContractStateFullProxy>(
                     new TestContractStateFullChannel(ServerUrl, ClientConfiguration));
         }
+
+        public IBoltExecutor BoltExecutor { get; set; }
 
         [TestFixtureSetUp]
         protected virtual void Init()
@@ -82,6 +258,7 @@ namespace Bolt.Service.Test
                 {
                     appBuilder.UseBolt(ServerConfiguration);
                     appBuilder.UseStateFullTestContractStateFull<TestContractStateFull>();
+                    BoltExecutor = appBuilder.GetBolt();
                 });
         }
 

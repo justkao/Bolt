@@ -22,7 +22,15 @@ namespace Bolt.Service.Test.Core
 {
     public partial interface ITestContractStateFullAsync : ITestContractStateFull
     {
+        Task InitAsync();
+
+        Task SetStateAsync(string state);
+
         Task<string> GetStateAsync();
+
+        Task NextCallWillFailProxyAsync();
+
+        Task DestroyAsync();
     }
 }
 
@@ -43,11 +51,23 @@ namespace Bolt.Service.Test.Core
             Channel.Send(Bolt.Empty.Instance, Descriptor.Init, GetCancellationToken(Descriptor.Init));
         }
 
+        public virtual Task InitAsync()
+        {
+            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.Init, GetCancellationToken(Descriptor.Init));
+        }
+
         public virtual void SetState(string state)
         {
             var request = new SetStateParameters();
             request.State = state;
             Channel.Send(request, Descriptor.SetState, GetCancellationToken(Descriptor.SetState));
+        }
+
+        public virtual Task SetStateAsync(string state)
+        {
+            var request = new SetStateParameters();
+            request.State = state;
+            return Channel.SendAsync(request, Descriptor.SetState, GetCancellationToken(Descriptor.SetState));
         }
 
         public virtual string GetState()
@@ -60,10 +80,26 @@ namespace Bolt.Service.Test.Core
             return Channel.SendAsync<string, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.GetState, GetCancellationToken(Descriptor.GetState));
         }
 
+        public virtual void NextCallWillFailProxy()
+        {
+            Channel.Send(Bolt.Empty.Instance, Descriptor.NextCallWillFailProxy, GetCancellationToken(Descriptor.NextCallWillFailProxy));
+        }
+
+        public virtual Task NextCallWillFailProxyAsync()
+        {
+            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.NextCallWillFailProxy, GetCancellationToken(Descriptor.NextCallWillFailProxy));
+        }
+
         public virtual void Destroy()
         {
             Channel.Send(Bolt.Empty.Instance, Descriptor.Destroy, GetCancellationToken(Descriptor.Destroy));
         }
+
+        public virtual Task DestroyAsync()
+        {
+            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.Destroy, GetCancellationToken(Descriptor.Destroy));
+        }
+
     }
 }
 

@@ -37,17 +37,6 @@ namespace Bolt.Client.Channels
 
         public IChannel Channel { get; private set; }
 
-        public virtual ContractProxy Clone(IChannel channel = null)
-        {
-            ContractProxy proxy = (ContractProxy)Activator.CreateInstance(GetType(), this);
-            if (channel != null)
-            {
-                proxy.Channel = channel;
-            }
-
-            return proxy;
-        }
-
         #region IChannel Implementation
 
         public virtual CancellationToken GetCancellationToken(ActionDescriptor descriptor)

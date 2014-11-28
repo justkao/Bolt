@@ -169,24 +169,25 @@ namespace Bolt.Client.Channels
         {
             if (error is BoltServerException && (error as BoltServerException).Error == ServerErrorCode.SessionNotFound)
             {
-                if (IsRecoverable)
+                if (!IsRecoverable)
                 {
                     return false;
                 }
 
-                using (_syncRoot.Enter())
-                {
-                    if (context.Request.Headers[_sessionHeaderName] == _sessionId)
-                    {
-                        _activeConnection = null;
-                        _sessionId = null;
-                    }
-                }
-
+                CloseConnection();
                 return true;
             }
 
             return base.HandleError(context, error);
+        }
+
+        protected void CloseConnection()
+        {
+            using (_syncRoot.Enter())
+            {
+                _activeConnection = null;
+                _sessionId = null;
+            }
         }
 
         private Uri EnsureConnection()

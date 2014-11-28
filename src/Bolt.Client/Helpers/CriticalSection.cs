@@ -67,24 +67,23 @@ namespace Bolt.Client.Helpers
 
         public Task<IDisposable> EnterAsync()
         {
+            Token token = new Token();
             lock (_syncRoot)
             {
-                Token token = new Token();
                 _tokens.Enqueue(token);
                 if (!_busy)
                 {
                     _busy = true;
                     _tokens.Dequeue().Signal(true);
                 }
-
-                return Task.Factory.FromAsync(token, result => _disposable);
             }
+
+            return Task.Factory.FromAsync(token, result => _disposable);
         }
 
         public IDisposable Enter()
         {
             Token token = new Token();
-
             lock (_syncRoot)
             {
                 _tokens.Enqueue(token);

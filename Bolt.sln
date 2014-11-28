@@ -46,6 +46,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{DC3200
 		.nuget\NuGet.targets = .nuget\NuGet.targets
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bolt.Core.Serialization.Test", "test\Automatic\Bolt.Core.Serialization.Test\Bolt.Core.Serialization.Test.csproj", "{BE41B91E-F1EF-44A6-90E6-002FCC6DD2FC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -112,6 +114,10 @@ Global
 		{7E15C5A0-A53E-4971-88A4-1884F095AD23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E15C5A0-A53E-4971-88A4-1884F095AD23}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7E15C5A0-A53E-4971-88A4-1884F095AD23}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE41B91E-F1EF-44A6-90E6-002FCC6DD2FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE41B91E-F1EF-44A6-90E6-002FCC6DD2FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE41B91E-F1EF-44A6-90E6-002FCC6DD2FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE41B91E-F1EF-44A6-90E6-002FCC6DD2FC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -128,5 +134,6 @@ Global
 		{6F98FB6A-AE1A-441C-9602-FEDFBD1700AE} = {B07FC614-1007-49C6-A695-3636E759C4E0}
 		{D2ABC4C7-5262-438B-ABFC-FA54556374B6} = {6F98FB6A-AE1A-441C-9602-FEDFBD1700AE}
 		{BEB79086-B231-479B-8E88-C5A6CF4802BB} = {6F98FB6A-AE1A-441C-9602-FEDFBD1700AE}
+		{BE41B91E-F1EF-44A6-90E6-002FCC6DD2FC} = {6F98FB6A-AE1A-441C-9602-FEDFBD1700AE}
 	EndGlobalSection
 EndGlobal

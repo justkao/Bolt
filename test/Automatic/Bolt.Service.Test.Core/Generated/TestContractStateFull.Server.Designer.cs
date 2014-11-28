@@ -29,6 +29,7 @@ namespace Bolt.Service.Test.Core
             AddAction(Descriptor.Init, TestContractStateFull_Init);
             AddAction(Descriptor.SetState, TestContractStateFull_SetState);
             AddAction(Descriptor.GetState, TestContractStateFull_GetState);
+            AddAction(Descriptor.NextCallWillFailProxy, TestContractStateFull_NextCallWillFailProxy);
             AddAction(Descriptor.Destroy, TestContractStateFull_Destroy);
 
             base.Init();
@@ -73,6 +74,22 @@ namespace Bolt.Service.Test.Core
             {
                 var result = instance.GetState();
                 await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
+            }
+            catch (Exception e)
+            {
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
+            }
+        }
+
+        protected virtual async Task TestContractStateFull_NextCallWillFailProxy(Bolt.Server.ServerExecutionContext context)
+        {
+            var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
+            try
+            {
+                instance.NextCallWillFailProxy();
+                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)

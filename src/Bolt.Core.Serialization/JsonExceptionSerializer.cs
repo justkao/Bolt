@@ -26,6 +26,11 @@ namespace Bolt.Core.Serialization
 
         public byte[] Serialize(Exception exception)
         {
+            if (exception == null)
+            {
+                throw new ArgumentNullException("exception");
+            }
+
             Newtonsoft.Json.JsonSerializer serializer = Newtonsoft.Json.JsonSerializer.CreateDefault(_exceptionSerializerSettings);
 
             using (MemoryStream stream = new MemoryStream())
@@ -44,6 +49,11 @@ namespace Bolt.Core.Serialization
 
         public Exception Deserialize(byte[] exception)
         {
+            if (exception == null)
+            {
+                throw new ArgumentNullException("exception");
+            }
+
             Newtonsoft.Json.JsonSerializer serializer = Newtonsoft.Json.JsonSerializer.CreateDefault(_exceptionSerializerSettings);
 
             using (MemoryStream stream = new MemoryStream(exception))

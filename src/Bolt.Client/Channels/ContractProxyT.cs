@@ -15,15 +15,8 @@
 
         public new TContractDescriptor Descriptor
         {
-            get
-            {
-                return (TContractDescriptor)base.Descriptor;
-            }
-
-            set
-            {
-                base.Descriptor = value;
-            }
+            get { return (TContractDescriptor)base.Descriptor; }
+            set { base.Descriptor = value; }
         }
     }
 }

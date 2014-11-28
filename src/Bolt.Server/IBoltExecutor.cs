@@ -1,5 +1,5 @@
-using System.Threading.Tasks;
 using Microsoft.Owin;
+using System.Threading.Tasks;
 
 namespace Bolt.Server
 {
@@ -8,6 +8,8 @@ namespace Bolt.Server
         ServerConfiguration Configuration { get; }
 
         void Add(IContractInvoker contractInvoker);
+
+        IContractInvoker Get(ContractDescriptor descriptor);
 
         Task Execute(IOwinContext context);
     }
