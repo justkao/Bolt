@@ -14,9 +14,18 @@ namespace Bolt.Console
 
         public string Modifier { get; set; }
 
+        public string StateFullBase { get; set; }
+
         protected override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
         {
-            ServerGenerator serverGenerator = new ServerGenerator { ContractDefinition = definition, Namespace = Namespace, Name = Name, Modifier = Modifier ?? "public" };
+            ServerGenerator serverGenerator = new ServerGenerator
+                                                  {
+                                                      ContractDefinition = definition,
+                                                      Namespace = Namespace,
+                                                      Name = Name,
+                                                      StateFullInstanceProviderBase = StateFullBase,
+                                                      Modifier = Modifier ?? "public"
+                                                  };
 
             if (!string.IsNullOrEmpty(Suffix))
             {

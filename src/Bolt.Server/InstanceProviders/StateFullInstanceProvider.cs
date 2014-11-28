@@ -69,6 +69,7 @@ namespace Bolt.Server
 
             instance = new InstanceMetadata(base.GetInstance<TInstance>(context));
             _instances[sessionId] = instance;
+            OnInstanceCreated(context, sessionId);
             return (TInstance)instance.Instance;
         }
 
@@ -79,12 +80,15 @@ namespace Bolt.Server
                 string sessionId = context.Context.Request.Headers[SessionHeader];
                 if (!string.IsNullOrEmpty(sessionId))
                 {
-                    ReleaseInstance(sessionId);
+                    if (ReleaseInstance(sessionId))
+                    {
+                        OnInstanceReleased(context, sessionId);
+                    }
                 }
             }
         }
 
-        public virtual void ReleaseInstance(string key)
+        public virtual bool ReleaseInstance(string key)
         {
             InstanceMetadata instance;
             if (_instances.TryRemove(key, out instance))
@@ -93,7 +97,11 @@ namespace Bolt.Server
                 {
                     (instance.Instance as IDisposable).Dispose();
                 }
+
+                return true;
             }
+
+            return false;
         }
 
         public virtual void KeepAlive(string key)
@@ -103,6 +111,22 @@ namespace Bolt.Server
             {
                 instance.Timestamp = DateTime.UtcNow;
             }
+        }
+
+        public virtual void Dispose()
+        {
+            if (_timer != null)
+            {
+                _timer.Dispose();
+            }
+        }
+
+        protected virtual void OnInstanceCreated(ServerExecutionContext context, string sessionId)
+        {
+        }
+
+        protected virtual void OnInstanceReleased(ServerExecutionContext context, string sessionId)
+        {
         }
 
         protected virtual bool ShouldTimeoutInstance(object instance, DateTime timestamp)
@@ -118,14 +142,6 @@ namespace Bolt.Server
                 {
                     ReleaseInstance(pair.Key);
                 }
-            }
-        }
-
-        public virtual void Dispose()
-        {
-            if (_timer != null)
-            {
-                _timer.Dispose();
             }
         }
 

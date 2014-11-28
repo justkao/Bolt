@@ -10,10 +10,10 @@ namespace Bolt.Generators
 {
     public class ServerGenerator : ContractGeneratorBase
     {
-        private string _baseClass;
         private const string InvokerName = "ContractInvoker";
         private const string ServerExecutionContext = "Bolt.Server.ServerExecutionContext";
         public const string BoltServerNamespace = "Bolt.Server";
+        private string _baseClass;
 
         public ServerGenerator()
             : this(new StringWriter(), new TypeFormatter(), new IntendProvider())
@@ -57,11 +57,12 @@ namespace Bolt.Generators
 
         public string Modifier { get; set; }
 
+        public string StateFullInstanceProviderBase { get; set; }
+
         public override void Generate()
         {
             AddUsings(BoltServerNamespace);
 
-            ClassDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
             ClassGenerator classGenerator = CreateClassGenerator(ContractDescriptor);
             classGenerator.Modifier = Modifier;
 
@@ -99,6 +100,10 @@ namespace Bolt.Generators
 
             ContractInvokerExtensionGenerator generator = CreateEx<ContractInvokerExtensionGenerator>();
             generator.Modifier = Modifier;
+            if (StateFullInstanceProviderBase != null)
+            {
+                generator.StateFullInstanceProviderBase = StateFullInstanceProviderBase;
+            }
             generator.ContractInvoker = classGenerator.Descriptor;
             generator.Generate();
         }
