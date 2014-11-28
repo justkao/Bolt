@@ -5,10 +5,10 @@ namespace Bolt.Server
 {
     public interface IResponseHandler
     {
-        Task Handle(ServerExecutionContext context);
+        Task Handle(ServerActionContext context);
 
-        Task Handle<TResult>(ServerExecutionContext context, TResult result);
+        Task Handle<TResult>(ServerActionContext context, TResult result);
 
-        Task HandleErrorResponse(ServerExecutionContext context, Exception error);
+        Task HandleErrorResponse(ServerActionContext context, Exception error);
     }
 }

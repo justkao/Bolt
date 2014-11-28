@@ -4,12 +4,12 @@ namespace Bolt.Server
 {
     public class InstanceProvider : IInstanceProvider
     {
-        public virtual T GetInstance<T>(ServerExecutionContext context)
+        public virtual T GetInstance<T>(ServerActionContext context)
         {
             return (T)CreateInstance(typeof(T));
         }
 
-        public virtual void ReleaseInstance(ServerExecutionContext context, object obj, Exception error)
+        public virtual void ReleaseInstance(ServerActionContext context, object obj, Exception error)
         {
             if (obj is IDisposable)
             {

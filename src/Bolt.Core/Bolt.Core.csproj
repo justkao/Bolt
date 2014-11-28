@@ -62,7 +62,7 @@
     <Compile Include="EndpointProvider.cs" />
     <Compile Include="ErrorResponse.cs" />
     <Compile Include="ExceptionExtensions.cs" />
-    <Compile Include="ExecutionContextBase.cs" />
+    <Compile Include="ActionContextBase.cs" />
     <Compile Include="IContractDescriptorProvider.cs" />
     <Compile Include="IEndpointProvider.cs" />
     <Compile Include="IExceptionSerializer.cs" />

@@ -16,12 +16,12 @@ namespace Bolt.Server
             _instance = instance;
         }
 
-        public T GetInstance<T>(ServerExecutionContext context)
+        public T GetInstance<T>(ServerActionContext context)
         {
             return (T)_instance;
         }
 
-        public void ReleaseInstance(ServerExecutionContext context, object obj, Exception error)
+        public void ReleaseInstance(ServerActionContext context, object obj, Exception error)
         {
         }
     }

@@ -7,16 +7,17 @@ namespace TestService.Client
 {
     public class ClientFactory
     {
+        public static readonly ClientConfiguration Config = new ClientConfiguration(new JsonSerializer(),
+            new JsonExceptionSerializer(), new DefaultWebRequestHandlerEx());
+
         public static IPersonRepository CreateIISBolt()
         {
-            return new ClientConfiguration(new ProtocolBufferSerializer(), new JsonExceptionSerializer())
-                .CreateProxy<PersonRepositoryProxy>(Servers.IISBoltServer);
+            return Config.CreateProxy<PersonRepositoryProxy>(Servers.IISBoltServer);
         }
 
         public static IPersonRepository CreateBolt()
         {
-            return new ClientConfiguration(new ProtocolBufferSerializer(), new JsonExceptionSerializer())
-                .CreateProxy<PersonRepositoryProxy>(Servers.BoltServer);
+            return Config.CreateProxy<PersonRepositoryProxy>(Servers.BoltServer);
         }
 
         public static IPersonRepository CreateWcf()

@@ -44,15 +44,20 @@ namespace Bolt.Server
             }
         }
 
+        public int Count
+        {
+            get { return _instances.Count; }
+        }
+
         public string SessionHeader { get; private set; }
 
         public TimeSpan InstanceTimeout { get; private set; }
 
-        public override TInstance GetInstance<TInstance>(ServerExecutionContext context)
+        public override TInstance GetInstance<TInstance>(ServerActionContext context)
         {
             InstanceMetadata instance;
 
-            if (context.ActionDescriptor == _initInstanceAction)
+            if (context.Action == _initInstanceAction)
             {
                 instance = new InstanceMetadata(base.GetInstance<TInstance>(context));
                 string newSession = CreateNewSession();
@@ -77,9 +82,9 @@ namespace Bolt.Server
             throw new SessionNotFoundException(sessionId);
         }
 
-        public override void ReleaseInstance(ServerExecutionContext context, object obj, Exception error)
+        public override void ReleaseInstance(ServerActionContext context, object obj, Exception error)
         {
-            if (context.ActionDescriptor == _initInstanceAction)
+            if (context.Action == _initInstanceAction)
             {
                 if (error != null)
                 {
@@ -101,7 +106,7 @@ namespace Bolt.Server
                     }
                 }
             }
-            else if (context.ActionDescriptor == _releaseInstanceAction)
+            else if (context.Action == _releaseInstanceAction)
             {
                 string sessionId = GetSession(context);
                 if (!string.IsNullOrEmpty(sessionId))
@@ -147,14 +152,14 @@ namespace Bolt.Server
             }
         }
 
-        protected virtual void OnInstanceCreated(ServerExecutionContext context, string sessionId)
+        protected virtual void OnInstanceCreated(ServerActionContext context, string sessionId)
         {
-            Console.WriteLine("New instance created for session '{0}' and contract '{1}'. Initiating action '{2}'", sessionId, context.ActionDescriptor.Contract, context.ActionDescriptor);
+            Console.WriteLine("New instance created for session '{0}' and contract '{1}'. Initiating action '{2}'", sessionId, context.Action.Contract, context.Action);
         }
 
-        protected virtual void OnInstanceReleased(ServerExecutionContext context, string sessionId)
+        protected virtual void OnInstanceReleased(ServerActionContext context, string sessionId)
         {
-            Console.WriteLine("Instance released for session '{0}' and contract '{1}'. Destroy  action '{2}'", sessionId, context.ActionDescriptor.Contract, context.ActionDescriptor);
+            Console.WriteLine("Instance released for session '{0}' and contract '{1}'. Destroy  action '{2}'", sessionId, context.Action.Contract, context.Action);
         }
 
         protected virtual bool ShouldTimeoutInstance(object instance, DateTime timestamp)
@@ -179,7 +184,7 @@ namespace Bolt.Server
             }
         }
 
-        private string GetSession(ServerExecutionContext context)
+        private string GetSession(ServerActionContext context)
         {
             return context.Context.Request.Headers[SessionHeader];
         }

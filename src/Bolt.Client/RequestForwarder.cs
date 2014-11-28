@@ -157,7 +157,7 @@ namespace Bolt.Client
             {
                 if (context.Response != null)
                 {
-                    Exception serverError = ReadBoltServerErrorIfAvailable(context.ActionDescriptor, context.Request, context.Response, _boltServerErrorsHeader);
+                    Exception serverError = ReadBoltServerErrorIfAvailable(context.Action, context.Request, context.Response, _boltServerErrorsHeader);
                     if (serverError != null)
                     {
                         return new ResponseDescriptor<T>(context.Response, context, serverError, ResponseErrorType.Server);
@@ -209,7 +209,7 @@ namespace Bolt.Client
             {
                 if (context.Response != null)
                 {
-                    Exception serverError = ReadBoltServerErrorIfAvailable(context.ActionDescriptor, context.Request, context.Response, _boltServerErrorsHeader);
+                    Exception serverError = ReadBoltServerErrorIfAvailable(context.Action, context.Request, context.Response, _boltServerErrorsHeader);
                     if (serverError != null)
                     {
                         return new ResponseDescriptor<T>(context.Response, context, serverError, ResponseErrorType.Server);

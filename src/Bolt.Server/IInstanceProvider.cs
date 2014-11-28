@@ -4,8 +4,8 @@ namespace Bolt.Server
 {
     public interface IInstanceProvider
     {
-        T GetInstance<T>(ServerExecutionContext context);
+        T GetInstance<T>(ServerActionContext context);
 
-        void ReleaseInstance(ServerExecutionContext context, object obj, Exception error);
+        void ReleaseInstance(ServerActionContext context, object obj, Exception error);
     }
 }

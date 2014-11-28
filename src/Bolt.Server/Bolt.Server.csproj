@@ -73,7 +73,7 @@
     <Compile Include="IResponseHandler.cs" />
     <Compile Include="BoltMiddleware.cs" />
     <Compile Include="IInstanceProvider.cs" />
-    <Compile Include="ServerExecutionContext.cs" />
+    <Compile Include="ServerActionContext.cs" />
     <Compile Include="BoltMiddlewareOptions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ResponseHandler.cs" />

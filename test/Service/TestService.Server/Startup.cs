@@ -11,7 +11,7 @@ namespace TestService.Server
     {
         public void Configuration(IAppBuilder app)
         {
-            app.UseBolt(new ServerConfiguration(new ProtocolBufferSerializer(), new JsonExceptionSerializer()));
+            app.UseBolt(new ServerConfiguration(new JsonSerializer(), new JsonExceptionSerializer()));
             app.UsePersonRepository<PersonRepository>();
         }
     }

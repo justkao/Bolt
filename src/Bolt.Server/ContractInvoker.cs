@@ -88,7 +88,7 @@ namespace Bolt.Server
         {
         }
 
-        protected virtual void AddAction(ActionDescriptor descriptor, Func<ServerExecutionContext, Task> action)
+        protected virtual void AddAction(ActionDescriptor descriptor, Func<ServerActionContext, Task> action)
         {
             _actions[descriptor] = new ActionMetadata()
                                            {
@@ -102,7 +102,7 @@ namespace Bolt.Server
             ActionMetadata metadata;
             if (_actions.TryGetValue(action, out metadata))
             {
-                ServerExecutionContext ctxt = new ServerExecutionContext(context, action);
+                ServerActionContext ctxt = new ServerActionContext(context, action);
 
                 Exception error = null;
                 try
@@ -127,7 +127,7 @@ namespace Bolt.Server
 
         private class ActionMetadata
         {
-            public Func<ServerExecutionContext, Task> Action { get; set; }
+            public Func<ServerActionContext, Task> Action { get; set; }
 
             public ActionDescriptor Descriptor { get; set; }
         }

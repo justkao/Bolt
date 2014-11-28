@@ -4,9 +4,9 @@ namespace Bolt.Server
 {
     public sealed class DelegatedInstanceProvider<TImplementation> : IInstanceProvider
     {
-        private readonly Func<ServerExecutionContext, TImplementation> _factory;
+        private readonly Func<ServerActionContext, TImplementation> _factory;
 
-        public DelegatedInstanceProvider(Func<ServerExecutionContext, TImplementation> factory)
+        public DelegatedInstanceProvider(Func<ServerActionContext, TImplementation> factory)
         {
             if (factory == null)
             {
@@ -16,12 +16,12 @@ namespace Bolt.Server
             _factory = factory;
         }
 
-        public T GetInstance<T>(ServerExecutionContext context)
+        public T GetInstance<T>(ServerActionContext context)
         {
             return (T)(object)_factory(context);
         }
 
-        public void ReleaseInstance(ServerExecutionContext context, object obj, Exception error)
+        public void ReleaseInstance(ServerActionContext context, object obj, Exception error)
         {
             if (obj is IDisposable)
             {

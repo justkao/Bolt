@@ -11,7 +11,7 @@ namespace Bolt.Generators
     public class ServerGenerator : ContractGeneratorBase
     {
         private const string InvokerName = "ContractInvoker";
-        private const string ServerExecutionContext = "Bolt.Server.ServerExecutionContext";
+        private const string ServerExecutionContext = "Bolt.Server.ServerActionContext";
         public const string BoltServerNamespace = "Bolt.Server";
         private string _baseClass;
 

@@ -30,31 +30,31 @@ namespace Bolt.Server
             get { return _serializer.ContentType; }
         }
 
-        public virtual async Task<T> ReadParametersAsync<T>(ServerExecutionContext context)
+        public virtual async Task<T> ReadParametersAsync<T>(ServerActionContext context)
         {
             context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
-            return _serializer.DeserializeParameters<T>(await context.Context.Request.Body.CopyAsync(context.CallCancelled), context.ActionDescriptor);
+            return _serializer.DeserializeParameters<T>(await context.Context.Request.Body.CopyAsync(context.CallCancelled), context.Action);
         }
 
-        public virtual Task WriteResponseAsync<T>(ServerExecutionContext context, T data)
+        public virtual Task WriteResponseAsync<T>(ServerActionContext context, T data)
         {
             context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
-            byte[] raw = _serializer.SerializeResponse(data, context.ActionDescriptor);
+            byte[] raw = _serializer.SerializeResponse(data, context.Action);
             if (raw == null || raw.Length == 0)
             {
                 context.Context.Response.Body.Close();
                 return Task.FromResult(0);
             }
 
-            return context.Context.Response.Body.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
+            return context.Context.Response.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
         }
 
-        public virtual Task WriteExceptionAsync(ServerExecutionContext context, Exception exception)
+        public virtual Task WriteExceptionAsync(ServerActionContext context, Exception exception)
         {
             context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
 
-            byte[] raw = _serializer.SerializeResponse(Create(exception, context.ActionDescriptor), context.ActionDescriptor);
-            return context.Context.Response.Body.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
+            byte[] raw = _serializer.SerializeResponse(Create(exception, context.Action), context.Action);
+            return context.Context.Response.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
         }
 
         protected virtual ErrorResponse Create(Exception e, ActionDescriptor actionDescriptor)

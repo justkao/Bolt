@@ -34,7 +34,7 @@ namespace Bolt.Service.Test.Core
 
             base.Init();
         }
-        protected virtual async Task TestContractStateFull_Init(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task TestContractStateFull_Init(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
             try
@@ -50,7 +50,7 @@ namespace Bolt.Service.Test.Core
             }
         }
 
-        protected virtual async Task TestContractStateFull_SetState(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task TestContractStateFull_SetState(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<SetStateParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
@@ -67,7 +67,7 @@ namespace Bolt.Service.Test.Core
             }
         }
 
-        protected virtual async Task TestContractStateFull_GetState(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task TestContractStateFull_GetState(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
             try
@@ -83,7 +83,7 @@ namespace Bolt.Service.Test.Core
             }
         }
 
-        protected virtual async Task TestContractStateFull_NextCallWillFailProxy(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task TestContractStateFull_NextCallWillFailProxy(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
             try
@@ -99,7 +99,7 @@ namespace Bolt.Service.Test.Core
             }
         }
 
-        protected virtual async Task TestContractStateFull_Destroy(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task TestContractStateFull_Destroy(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
             try

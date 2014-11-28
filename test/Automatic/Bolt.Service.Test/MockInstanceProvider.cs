@@ -7,12 +7,12 @@ namespace Bolt.Service.Test
     {
         public object CurrentInstance { get; set; }
 
-        public T GetInstance<T>(ServerExecutionContext context)
+        public T GetInstance<T>(ServerActionContext context)
         {
             return (T)CurrentInstance;
         }
 
-        public void ReleaseInstance(ServerExecutionContext context, object obj, Exception error)
+        public void ReleaseInstance(ServerActionContext context, object obj, Exception error)
         {
         }
     }

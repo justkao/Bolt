@@ -55,7 +55,7 @@ namespace Bolt.Service.Test
             await client.GetStateAsync();
             string sessionId1 = ((TestContractStateFullChannel)client.Channel).SessionId;
 
-            StateFullInstanceProvider instanceProvider = (StateFullInstanceProvider)((ContractInvoker)BoltExecutor.Get(TestContractStateFullDescriptor.Default)).InstanceProvider;
+            StateFullInstanceProvider instanceProvider = InstanceProvider;
             instanceProvider.ReleaseInstance(sessionId1);
 
             try
@@ -77,7 +77,7 @@ namespace Bolt.Service.Test
             await client.GetStateAsync();
             string session = ((TestContractStateFullChannel)client.Channel).SessionId;
 
-            StateFullInstanceProvider instanceProvider = (StateFullInstanceProvider)((ContractInvoker)BoltExecutor.Get(TestContractStateFullDescriptor.Default)).InstanceProvider;
+            StateFullInstanceProvider instanceProvider = InstanceProvider;
             instanceProvider.ReleaseInstance(session);
 
             await client.GetStateAsync();
@@ -116,7 +116,7 @@ namespace Bolt.Service.Test
             client.GetState();
             string sessionId1 = ((TestContractStateFullChannel)client.Channel).SessionId;
 
-            StateFullInstanceProvider instanceProvider = (StateFullInstanceProvider)((ContractInvoker)BoltExecutor.Get(TestContractStateFullDescriptor.Default)).InstanceProvider;
+            StateFullInstanceProvider instanceProvider = InstanceProvider;
             instanceProvider.ReleaseInstance(sessionId1);
 
             try
@@ -138,7 +138,7 @@ namespace Bolt.Service.Test
             client.GetState();
             string session = ((TestContractStateFullChannel)client.Channel).SessionId;
 
-            StateFullInstanceProvider instanceProvider = (StateFullInstanceProvider)((ContractInvoker)BoltExecutor.Get(TestContractStateFullDescriptor.Default)).InstanceProvider;
+            StateFullInstanceProvider instanceProvider = InstanceProvider;
             instanceProvider.ReleaseInstance(session);
 
             client.GetState();
@@ -152,7 +152,7 @@ namespace Bolt.Service.Test
             client.GetState();
             string session = ((TestContractStateFullChannel)client.Channel).SessionId;
             client.Dispose();
-            StateFullInstanceProvider instanceProvider = (StateFullInstanceProvider)((ContractInvoker)BoltExecutor.Get(TestContractStateFullDescriptor.Default)).InstanceProvider;
+            StateFullInstanceProvider instanceProvider = InstanceProvider;
             Assert.IsFalse(instanceProvider.ReleaseInstance(session));
         }
 
@@ -164,8 +164,16 @@ namespace Bolt.Service.Test
             await client.GetStateAsync();
             string session = ((TestContractStateFullChannel)client.Channel).SessionId;
             await (client as IChannel).CloseAsync();
-            StateFullInstanceProvider instanceProvider = (StateFullInstanceProvider)((ContractInvoker)BoltExecutor.Get(TestContractStateFullDescriptor.Default)).InstanceProvider;
+            StateFullInstanceProvider instanceProvider = InstanceProvider;
             Assert.IsFalse(instanceProvider.ReleaseInstance(session));
+        }
+
+        private StateFullInstanceProvider InstanceProvider
+        {
+            get
+            {
+                return (StateFullInstanceProvider)((ContractInvoker)BoltExecutor.Get(TestContractStateFullDescriptor.Default)).InstanceProvider;
+            }
         }
 
         [Test]
@@ -212,6 +220,28 @@ namespace Bolt.Service.Test
             {
                 proxy.Dispose();
             }
+        }
+
+        [Test]
+        public void ExecuteManyRequests_SingleChannel_EnsureOnlyOneSessionCreated()
+        {
+            TestContractStateFullProxy channel = GetChannel();
+            int before = InstanceProvider.Count;
+            Task.WaitAll(Enumerable.Repeat(0, 100).Select(_ => Task.Run(() => channel.GetState())).ToArray());
+            Assert.AreEqual(before + 1, InstanceProvider.Count);
+            channel.Dispose();
+            Assert.AreEqual(before, InstanceProvider.Count);
+        }
+
+        [Test]
+        public async Task Async_ExecuteManyRequests_SingleChannel_EnsureOnlyOneSessionCreated()
+        {
+            TestContractStateFullProxy channel = GetChannel();
+            int before = InstanceProvider.Count;
+            await Task.WhenAll(Enumerable.Repeat(0, 100).Select(_ => channel.GetStateAsync()));
+            Assert.AreEqual(before + 1, InstanceProvider.Count);
+            await (channel as IChannel).CloseAsync();
+            Assert.AreEqual(before, InstanceProvider.Count);
         }
 
         private IDisposable _runningServer;

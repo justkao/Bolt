@@ -46,7 +46,7 @@ namespace Bolt.Client
                 }
             }
 
-            byte[] raw = _serializer.SerializeParameters(parameters, context.ActionDescriptor);
+            byte[] raw = _serializer.SerializeParameters(parameters, context.Action);
 
             using (Stream stream = _requestHandler.GetRequestStream(context.Request))
             {
@@ -67,7 +67,7 @@ namespace Bolt.Client
 
             context.Cancellation.ThrowIfCancellationRequested();
 
-            byte[] raw = _serializer.SerializeParameters(parameters, context.ActionDescriptor);
+            byte[] raw = _serializer.SerializeParameters(parameters, context.Action);
 
             using (Stream stream = await context.Request.GetRequestStreamAsync())
             {
@@ -84,7 +84,7 @@ namespace Bolt.Client
 
             using (Stream stream = context.Response.GetResponseStream())
             {
-                return _serializer.DeserializeResponse<T>(await stream.CopyAsync(context.Cancellation), context.ActionDescriptor);
+                return _serializer.DeserializeResponse<T>(await stream.CopyAsync(context.Cancellation), context.Action);
             }
         }
 
@@ -97,7 +97,7 @@ namespace Bolt.Client
 
             using (Stream stream = context.Response.GetResponseStream())
             {
-                return _serializer.DeserializeResponse<T>(stream.Copy(), context.ActionDescriptor);
+                return _serializer.DeserializeResponse<T>(stream.Copy(), context.Action);
             }
         }
 
@@ -105,8 +105,8 @@ namespace Bolt.Client
         {
             using (Stream stream = context.Response.GetResponseStream())
             {
-                ErrorResponse data = _serializer.DeserializeResponse<ErrorResponse>(stream.Copy(), context.ActionDescriptor);
-                return ReadException(data, context.ActionDescriptor);
+                ErrorResponse data = _serializer.DeserializeResponse<ErrorResponse>(stream.Copy(), context.Action);
+                return ReadException(data, context.Action);
             }
         }
 
@@ -114,8 +114,8 @@ namespace Bolt.Client
         {
             using (Stream stream = context.Response.GetResponseStream())
             {
-                ErrorResponse data = _serializer.DeserializeResponse<ErrorResponse>(await stream.CopyAsync(context.Cancellation), context.ActionDescriptor);
-                return ReadException(data, context.ActionDescriptor);
+                ErrorResponse data = _serializer.DeserializeResponse<ErrorResponse>(await stream.CopyAsync(context.Cancellation), context.Action);
+                return ReadException(data, context.Action);
             }
         }
 

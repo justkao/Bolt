@@ -45,7 +45,7 @@ namespace TestService.Core
 
             base.Init();
         }
-        protected virtual async Task PersonRepository_UpdatePerson(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepository_UpdatePerson(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<UpdatePersonParameters>(context);
             var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
@@ -62,7 +62,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepository_UpdatePersonThatThrowsInvalidOperationException(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepository_UpdatePersonThatThrowsInvalidOperationException(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<UpdatePersonThatThrowsInvalidOperationExceptionParameters>(context);
             var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
@@ -79,7 +79,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepository_DoNothingAsAsync(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepository_DoNothingAsAsync(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
             try
@@ -95,7 +95,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepository_DoNothing(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepository_DoNothing(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
             try
@@ -111,7 +111,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepository_DoNothingWithComplexParameterAsAsync(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepository_DoNothingWithComplexParameterAsAsync(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<DoNothingWithComplexParameterAsAsyncParameters>(context);
             var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
@@ -128,7 +128,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepository_DoNothingWithComplexParameter(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepository_DoNothingWithComplexParameter(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<DoNothingWithComplexParameterParameters>(context);
             var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
@@ -145,7 +145,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepository_GetSimpleType(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepository_GetSimpleType(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<GetSimpleTypeParameters>(context);
             var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
@@ -162,7 +162,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepository_GetSimpleTypeAsAsync(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepository_GetSimpleTypeAsAsync(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<GetSimpleTypeAsAsyncParameters>(context);
             var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
@@ -179,7 +179,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepository_GetSinglePerson(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepository_GetSinglePerson(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<GetSinglePersonParameters>(context);
             var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
@@ -196,7 +196,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepository_GetSinglePersonAsAsync(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepository_GetSinglePersonAsAsync(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<GetSinglePersonAsAsyncParameters>(context);
             var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
@@ -213,7 +213,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepository_GetManyPersons(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepository_GetManyPersons(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<GetManyPersonsParameters>(context);
             var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
@@ -230,7 +230,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepository_GetManyPersonsAsAsync(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepository_GetManyPersonsAsAsync(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<GetManyPersonsAsAsyncParameters>(context);
             var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
@@ -247,7 +247,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepositoryInner_InnerOperation(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepositoryInner_InnerOperation(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<IPersonRepositoryInner>(context);
             try
@@ -263,7 +263,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepositoryInner_InnerOperationExAsync(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepositoryInner_InnerOperationExAsync(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<IPersonRepositoryInner>(context);
             try
@@ -279,7 +279,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepositoryInner2_InnerOperation2(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepositoryInner2_InnerOperation2(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<IPersonRepositoryInner2>(context);
             try
@@ -295,7 +295,7 @@ namespace TestService.Core
             }
         }
 
-        protected virtual async Task PersonRepositoryInner2_InnerOperationExAsync2(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task PersonRepositoryInner2_InnerOperationExAsync2(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<IPersonRepositoryInner2>(context);
             try

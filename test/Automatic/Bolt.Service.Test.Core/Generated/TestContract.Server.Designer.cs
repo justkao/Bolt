@@ -39,7 +39,7 @@ namespace Bolt.Service.Test.Core
 
             base.Init();
         }
-        protected virtual async Task TestContract_SimpleMethodWithSimpleArguments(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task TestContract_SimpleMethodWithSimpleArguments(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<SimpleMethodWithSimpleArgumentsParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
@@ -56,7 +56,7 @@ namespace Bolt.Service.Test.Core
             }
         }
 
-        protected virtual async Task TestContract_SimpleMethod(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task TestContract_SimpleMethod(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
@@ -72,7 +72,7 @@ namespace Bolt.Service.Test.Core
             }
         }
 
-        protected virtual async Task TestContract_SimpleMethodExAsync(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task TestContract_SimpleMethodExAsync(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
@@ -88,7 +88,7 @@ namespace Bolt.Service.Test.Core
             }
         }
 
-        protected virtual async Task TestContract_SimpleMethodWithCancellation(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task TestContract_SimpleMethodWithCancellation(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
@@ -104,7 +104,7 @@ namespace Bolt.Service.Test.Core
             }
         }
 
-        protected virtual async Task TestContract_ComplexFunction(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task TestContract_ComplexFunction(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
@@ -120,7 +120,7 @@ namespace Bolt.Service.Test.Core
             }
         }
 
-        protected virtual async Task TestContractInner_SimpleMethodWithComplexParameter(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task TestContractInner_SimpleMethodWithComplexParameter(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<SimpleMethodWithComplexParameterParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
@@ -137,7 +137,7 @@ namespace Bolt.Service.Test.Core
             }
         }
 
-        protected virtual async Task TestContractInner_SimpleFunction(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task TestContractInner_SimpleFunction(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
             try
@@ -153,7 +153,7 @@ namespace Bolt.Service.Test.Core
             }
         }
 
-        protected virtual async Task TestContractInner_SimpleAsyncFunction(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task TestContractInner_SimpleAsyncFunction(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
             try
@@ -169,7 +169,7 @@ namespace Bolt.Service.Test.Core
             }
         }
 
-        protected virtual async Task TestContractInner_MethodWithManyArguments(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task TestContractInner_MethodWithManyArguments(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<MethodWithManyArgumentsParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
@@ -186,7 +186,7 @@ namespace Bolt.Service.Test.Core
             }
         }
 
-        protected virtual async Task ExcludedContract_ThisMethodShouldBeExcluded(Bolt.Server.ServerExecutionContext context)
+        protected virtual async Task ExcludedContract_ThisMethodShouldBeExcluded(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<IExcludedContract>(context);
             try

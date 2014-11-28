@@ -216,7 +216,7 @@ namespace Bolt.Client.Channels
                         {
                             if (sessionId == null)
                             {
-                                action = ctxt.ActionDescriptor;
+                                action = ctxt.Action;
                                 if (ctxt.Response != null && ctxt.Response.Headers[_sessionHeaderName] != null)
                                 {
                                     sessionId = ctxt.Response.Headers[_sessionHeaderName];
@@ -262,7 +262,7 @@ namespace Bolt.Client.Channels
                         {
                             if (sessionId == null)
                             {
-                                action = ctxt.ActionDescriptor;
+                                action = ctxt.Action;
                                 if (ctxt.Response != null && ctxt.Response.Headers[_sessionHeaderName] != null)
                                 {
                                     sessionId = ctxt.Response.Headers[_sessionHeaderName];

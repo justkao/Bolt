@@ -4,10 +4,10 @@ using System.Threading;
 
 namespace Bolt.Client
 {
-    public class ClientActionContext : ExecutionContextBase, IDisposable
+    public class ClientActionContext : ActionContextBase, IDisposable
     {
-        public ClientActionContext(ActionDescriptor actionDescriptor, HttpWebRequest request, Uri server, CancellationToken cancellation)
-            : base(actionDescriptor)
+        public ClientActionContext(ActionDescriptor action, HttpWebRequest request, Uri server, CancellationToken cancellation)
+            : base(action)
         {
             if (request == null)
             {
