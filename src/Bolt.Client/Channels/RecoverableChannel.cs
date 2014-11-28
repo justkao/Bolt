@@ -5,11 +5,10 @@ using System.Threading.Tasks;
 
 namespace Bolt.Client.Channels
 {
-    public class RecoverableChannel<TContract, TContractDescriptor> : ChannelBase
-        where TContract : ContractProxy<TContractDescriptor>
-        where TContractDescriptor : ContractDescriptor
+    public class RecoverableChannel<TContract> : ChannelBase
+        where TContract : ContractProxy
     {
-        public RecoverableChannel(RecoverableChannel<TContract, TContractDescriptor> proxy)
+        public RecoverableChannel(RecoverableChannel<TContract> proxy)
             : base(proxy)
         {
             Retries = proxy.Retries;
@@ -18,37 +17,21 @@ namespace Bolt.Client.Channels
         }
 
         public RecoverableChannel(Uri server, ClientConfiguration clientConfiguration)
-            : base(ContractDescriptor.GetDefaultValue<TContractDescriptor>(), clientConfiguration)
+            : base(clientConfiguration)
         {
             ServerProvider = new UriServerProvider(server);
         }
 
-        public RecoverableChannel(TContractDescriptor descriptor, Uri server, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
-            : base(descriptor, requestForwarder, endpointProvider)
-        {
-            ServerProvider = new UriServerProvider(server);
-        }
+
 
         public RecoverableChannel(IServerProvider serverProvider, ClientConfiguration clientConfiguration)
-            : base(ContractDescriptor.GetDefaultValue<TContractDescriptor>(), clientConfiguration)
+            : base(clientConfiguration)
         {
             ServerProvider = serverProvider;
         }
 
         public RecoverableChannel(IServerProvider serverProvider, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
-            : base(ContractDescriptor.GetDefaultValue<TContractDescriptor>(), requestForwarder, endpointProvider)
-        {
-            ServerProvider = serverProvider;
-        }
-
-        public RecoverableChannel(TContractDescriptor descriptor, IServerProvider serverProvider, ClientConfiguration clientConfiguration)
-            : base(descriptor, clientConfiguration)
-        {
-            ServerProvider = serverProvider;
-        }
-
-        public RecoverableChannel(TContractDescriptor descriptor, IServerProvider serverProvider, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
-            : base(descriptor, requestForwarder, endpointProvider)
+            : base(requestForwarder, endpointProvider)
         {
             ServerProvider = serverProvider;
         }
@@ -85,7 +68,7 @@ namespace Bolt.Client.Channels
             return HandleErrorCore(error);
         }
 
-        protected virtual bool HandleErrorCore(Exception error)
+        private bool HandleErrorCore(Exception error)
         {
             if (error is NoServersAvailableException)
             {
@@ -262,7 +245,7 @@ namespace Bolt.Client.Channels
 
         protected TContract CreateContract(Uri server)
         {
-            return CreateContract(new DelegatedChannel(server, Descriptor, RequestForwarder, EndpointProvider, BeforeSending));
+            return CreateContract(new DelegatedChannel(server, RequestForwarder, EndpointProvider, BeforeSending));
         }
     }
 }

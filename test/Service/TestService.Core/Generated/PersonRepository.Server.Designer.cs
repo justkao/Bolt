@@ -26,11 +26,6 @@ namespace TestService.Core
     {
         public override void Init()
         {
-            if (Descriptor == null)
-            {
-                Descriptor = TestService.Core.PersonRepositoryDescriptor.Default;
-            }
-
             AddAction(Descriptor.UpdatePerson, PersonRepository_UpdatePerson);
             AddAction(Descriptor.UpdatePersonThatThrowsInvalidOperationException, PersonRepository_UpdatePersonThatThrowsInvalidOperationException);
             AddAction(Descriptor.DoNothingAsAsync, PersonRepository_DoNothingAsAsync);
@@ -50,9 +45,6 @@ namespace TestService.Core
 
             base.Init();
         }
-
-        public virtual TestService.Core.PersonRepositoryDescriptor ContractDescriptor { get; set; }
-
         protected virtual async Task PersonRepository_UpdatePerson(Bolt.Server.ServerExecutionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<UpdatePersonParameters>(context);
@@ -312,7 +304,6 @@ namespace Bolt.Server
         {
             var boltExecutor = app.GetBolt();
             var invoker = new TestService.Core.PersonRepositoryInvoker();
-            invoker.Descriptor = TestService.Core.PersonRepositoryDescriptor.Default;
             invoker.Init(boltExecutor.Configuration);
             invoker.InstanceProvider = instanceProvider;
             boltExecutor.Add(invoker);

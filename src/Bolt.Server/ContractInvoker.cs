@@ -1,14 +1,24 @@
-using Microsoft.Owin;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
+using Microsoft.Owin;
+
 namespace Bolt.Server
 {
-    public class ContractInvoker<T> : IContractInvoker<T>
-        where T : ContractDescriptor
+    public class ContractInvoker : IContractInvoker
     {
         private readonly IDictionary<ActionDescriptor, ActionMetadata> _actions = new Dictionary<ActionDescriptor, ActionMetadata>();
+
+        public ContractInvoker(ContractDescriptor descriptor)
+        {
+            if (descriptor == null)
+            {
+                throw new ArgumentNullException("descriptor");
+            }
+
+            Descriptor = descriptor;
+        }
 
         private IInstanceProvider _instanceProvider;
 
@@ -18,13 +28,7 @@ namespace Bolt.Server
 
         public string ErrorCodesHeader { get; set; }
 
-        public ContractDescriptor DescriptorCore
-        {
-            get { return Descriptor; }
-            set { Descriptor = (T)value; }
-        }
-
-        public virtual T Descriptor { get; set; }
+        public ContractDescriptor Descriptor { get; protected set; }
 
         public IInstanceProvider InstanceProvider
         {

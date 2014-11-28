@@ -4,10 +4,9 @@ using System.Threading.Tasks;
 
 namespace Bolt.Client.Channels
 {
-    public abstract class ContractProxy<TContractDescriptor> : IContractDescriptorProvider<TContractDescriptor>, IChannel
-        where TContractDescriptor : ContractDescriptor
+    public abstract class ContractProxy : IContractDescriptorProvider, IChannel
     {
-        protected ContractProxy(ContractProxy<TContractDescriptor> proxy)
+        protected ContractProxy(ContractProxy proxy)
         {
             if (proxy == null)
             {
@@ -18,7 +17,7 @@ namespace Bolt.Client.Channels
             Channel = proxy.Channel;
         }
 
-        protected ContractProxy(TContractDescriptor contractDescriptor, IChannel channel)
+        protected ContractProxy(ContractDescriptor contractDescriptor, IChannel channel)
         {
             if (contractDescriptor == null)
             {
@@ -34,13 +33,13 @@ namespace Bolt.Client.Channels
             Channel = channel;
         }
 
-        public TContractDescriptor Descriptor { get; private set; }
+        public ContractDescriptor Descriptor { get; protected set; }
 
         public IChannel Channel { get; private set; }
 
-        public virtual ContractProxy<TContractDescriptor> Clone(IChannel channel = null)
+        public virtual ContractProxy Clone(IChannel channel = null)
         {
-            ContractProxy<TContractDescriptor> proxy = (ContractProxy<TContractDescriptor>)Activator.CreateInstance(GetType(), this);
+            ContractProxy proxy = (ContractProxy)Activator.CreateInstance(GetType(), this);
             if (channel != null)
             {
                 proxy.Channel = channel;

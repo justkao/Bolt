@@ -71,13 +71,6 @@ namespace Bolt.Generators
                     g.WriteLine("public override void Init()");
                     using (WithBlock())
                     {
-                        WriteLine("if ({0} == null)", ContractDescriptorPropertyName);
-                        using (WithBlock())
-                        {
-                            WriteLine("{0} = {1}.Default;", ContractDescriptorPropertyName, contractDescriptor.FullName);
-                        }
-                        WriteLine();
-
                         foreach (MethodInfo method in ContractDefinition.GetEffectiveMethods())
                         {
                             WriteLine(
@@ -90,11 +83,6 @@ namespace Bolt.Generators
                         WriteLine();
                         WriteLine("base.Init();");
                     }
-
-
-                    WriteLine();
-                    g.WritePublicProperty(contractDescriptor.FullName, "ContractDescriptor");
-                    WriteLine();
 
                     IEnumerable<MethodInfo> methods = ContractDefinition.GetEffectiveMethods().ToList();
 

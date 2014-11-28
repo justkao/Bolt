@@ -10,13 +10,13 @@ namespace TestService.Client
         public static IPersonRepository CreateIISBolt()
         {
             return new ClientConfiguration(new ProtocolBufferSerializer(), new JsonExceptionSerializer())
-                .CreateProxy<PersonRepositoryProxy, PersonRepositoryDescriptor>(Servers.IISBoltServer);
+                .CreateProxy<PersonRepositoryProxy>(Servers.IISBoltServer);
         }
 
         public static IPersonRepository CreateBolt()
         {
             return new ClientConfiguration(new ProtocolBufferSerializer(), new JsonExceptionSerializer())
-                .CreateProxy<PersonRepositoryProxy, PersonRepositoryDescriptor>(Servers.BoltServer);
+                .CreateProxy<PersonRepositoryProxy>(Servers.BoltServer);
         }
 
         public static IPersonRepository CreateWcf()

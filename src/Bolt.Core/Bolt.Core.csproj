@@ -53,6 +53,7 @@
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="Configuration.cs" />
     <Compile Include="ContractDescriptor.cs" />
+    <Compile Include="ContractDescriptorT.cs" />
     <Compile Include="DefaultWebRequestHandler.cs" />
     <Compile Include="DeserializeParametersException.cs" />
     <Compile Include="DeserializeResponseException.cs" />

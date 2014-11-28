@@ -29,15 +29,15 @@ namespace Bolt.Server
                 throw new ArgumentNullException("invoker");
             }
 
-            if (_invokers.FirstOrDefault(i => i.DescriptorCore.Name == invoker.DescriptorCore.Name) != null)
+            if (_invokers.FirstOrDefault(i => i.Descriptor.Name == invoker.Descriptor.Name) != null)
             {
                 throw new InvalidOperationException(
-                    string.Format("Invoker for contract '{0}' already registered.", invoker.DescriptorCore.Name));
+                    string.Format("Invoker for contract '{0}' already registered.", invoker.Descriptor.Name));
             }
 
             _invokers.Add(invoker);
-            Console.WriteLine("Adding contract: {0}", invoker.DescriptorCore.Name);
-            foreach (ActionDescriptor descriptor in invoker.DescriptorCore)
+            Console.WriteLine("Adding contract: {0}", invoker.Descriptor.Name);
+            foreach (ActionDescriptor descriptor in invoker.Descriptor)
             {
                 Console.WriteLine("     Action: {0}", descriptor.Name);
             }
@@ -76,14 +76,14 @@ namespace Bolt.Server
             string name = parts[parts.Length - 2];
             string actionName = parts[parts.Length - 1];
 
-            IContractInvoker found = _invokers.FirstOrDefault(i => i.DescriptorCore.Name == name);
+            IContractInvoker found = _invokers.FirstOrDefault(i => i.Descriptor.Name == name);
             if (found == null)
             {
                 descriptor = null;
                 return null;
             }
 
-            descriptor = found.DescriptorCore.FirstOrDefault(a => a.Name == actionName);
+            descriptor = found.Descriptor.FirstOrDefault(a => a.Name == actionName);
             return found;
         }
     }

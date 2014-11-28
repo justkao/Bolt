@@ -64,7 +64,6 @@ namespace Bolt.Generators
                 {
                     WriteLine("var boltExecutor = app.GetBolt();");
                     WriteLine("var invoker = new {0}();", ContractInvoker.FullName);
-                    WriteLine("invoker.Descriptor = {0}.Default;", MetadataProvider.GetContractDescriptor(ContractDefinition).FullName);
                     WriteLine("invoker.Init(boltExecutor.Configuration);");
                     WriteLine("invoker.InstanceProvider = instanceProvider;");
                     WriteLine("boltExecutor.Add(invoker);");

@@ -63,13 +63,7 @@ namespace Bolt.Generators
                 {
                     g.GenerateConstructor(g.Descriptor.FullName + " proxy", "proxy");
 
-                    g.GenerateConstructor(
-                        string.Format("{0} descriptor, {1} channel", contractDescriptor.FullName, FormatType<IChannel>()),
-                        "descriptor, channel");
-
-                    g.GenerateConstructor(
-                        string.Format("{0} channel", FormatType<IChannel>()),
-                        string.Format("{0}.Default, channel", contractDescriptor.FullName));
+                    g.GenerateConstructor(string.Format("{0} channel", FormatType<IChannel>()), "channel");
 
                     List<Type> contracts = ContractDefinition.GetEffectiveContracts().ToList();
                     foreach (Type type in contracts)

@@ -62,11 +62,7 @@ namespace TestService.Core
         {
         }
 
-        public PersonRepositoryProxy(TestService.Core.PersonRepositoryDescriptor descriptor, Bolt.Client.IChannel channel) : base(descriptor, channel)
-        {
-        }
-
-        public PersonRepositoryProxy(Bolt.Client.IChannel channel) : base(TestService.Core.PersonRepositoryDescriptor.Default, channel)
+        public PersonRepositoryProxy(Bolt.Client.IChannel channel) : base(channel)
         {
         }
 

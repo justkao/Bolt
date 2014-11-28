@@ -13,18 +13,17 @@ namespace Bolt.Client.Channels
         {
         }
 
-        public DelegatedChannel(Uri server, ContractDescriptor descriptor, ClientConfiguration configuration, Action<ClientActionContext> contextCreated = null)
-            : this(server, descriptor, configuration.RequestForwarder, configuration.EndpointProvider, contextCreated)
+        public DelegatedChannel(Uri server, ClientConfiguration configuration, Action<ClientActionContext> contextCreated = null)
+            : this(server, configuration.RequestForwarder, configuration.EndpointProvider, contextCreated)
         {
         }
 
         public DelegatedChannel(
             Uri server,
-            ContractDescriptor descriptor,
             IRequestForwarder requestForwarder,
             IEndpointProvider endpointProvider,
             Action<ClientActionContext> contextCreated)
-            : base(descriptor, requestForwarder, endpointProvider)
+            : base(requestForwarder, endpointProvider)
         {
             _server = server;
             _contextCreated = contextCreated;

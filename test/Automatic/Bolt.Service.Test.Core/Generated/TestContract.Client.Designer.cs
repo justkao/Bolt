@@ -42,11 +42,7 @@ namespace Bolt.Service.Test.Core
         {
         }
 
-        public TestContractProxy(Bolt.Service.Test.Core.TestContractDescriptor descriptor, Bolt.Client.IChannel channel) : base(descriptor, channel)
-        {
-        }
-
-        public TestContractProxy(Bolt.Client.IChannel channel) : base(Bolt.Service.Test.Core.TestContractDescriptor.Default, channel)
+        public TestContractProxy(Bolt.Client.IChannel channel) : base(channel)
         {
         }
 

@@ -4,63 +4,24 @@ namespace Bolt.Client.Channels
 {
     public static class ChannelExtensions
     {
-        public static DelegatedChannel CreateDelegated(this ClientConfiguration configuration, Uri server, ContractDescriptor descriptor)
+        public static DelegatedChannel CreateDelegated(this ClientConfiguration configuration, Uri server)
         {
-            return new DelegatedChannel(server, descriptor, configuration.RequestForwarder, configuration.EndpointProvider, null)
+            return new DelegatedChannel(server, configuration)
             {
                 DefaultResponseTimeout = configuration.DefaultResponseTimeout
             };
         }
 
-        public static DelegatedChannel CreateDelegated<TContractDescriptor>(this ClientConfiguration configuration, Uri server, TContractDescriptor descriptor = null) where TContractDescriptor : ContractDescriptor
+        public static RecoverableChannel<TContract> CreateRecoverable<TContract>(this ClientConfiguration configuration, Uri server)
+            where TContract : ContractProxy
         {
-            return new DelegatedChannel(server, descriptor ?? ContractDescriptor.GetDefaultValue<TContractDescriptor>(), configuration.RequestForwarder, configuration.EndpointProvider, null)
-            {
-                DefaultResponseTimeout = configuration.DefaultResponseTimeout
-            };
+            return configuration.CreateRecoverable<TContract>(new UriServerProvider(server));
         }
 
-        public static RecoverableStatefullChannel<TContract, TContractDescriptor> CreateStateFullRecoverable<TContract, TContractDescriptor>(this ClientConfiguration configuration, Uri server, TContractDescriptor descriptor = null)
-            where TContract : ContractProxy<TContractDescriptor>
-            where TContractDescriptor : ContractDescriptor
+        public static RecoverableChannel<TContract> CreateRecoverable<TContract>(this ClientConfiguration configuration, IServerProvider serverProvider)
+            where TContract : ContractProxy
         {
-            return configuration.CreateStateFullRecoverable<TContract, TContractDescriptor>(new UriServerProvider(server), descriptor);
-
-        }
-
-        public static RecoverableStatefullChannel<TContract, TContractDescriptor> CreateStateFullRecoverable<TContract, TContractDescriptor>(this ClientConfiguration configuration, IServerProvider serverProvider, TContractDescriptor descriptor = null)
-            where TContract : ContractProxy<TContractDescriptor>
-            where TContractDescriptor : ContractDescriptor
-        {
-            return
-                new RecoverableStatefullChannel<TContract, TContractDescriptor>(
-                    descriptor ?? ContractDescriptor.GetDefaultValue<TContractDescriptor>(), serverProvider,
-                    configuration.SessionHeader, configuration.RequestForwarder, configuration.EndpointProvider)
-                {
-                    DefaultResponseTimeout = configuration.DefaultResponseTimeout
-                };
-        }
-
-
-        public static RecoverableChannel<TContract, TContractDescriptor> CreateRecoverable<TContract, TContractDescriptor>(this ClientConfiguration configuration, Uri server, TContractDescriptor descriptor = null)
-            where TContract : ContractProxy<TContractDescriptor>
-            where TContractDescriptor : ContractDescriptor
-        {
-            return configuration.CreateRecoverable<TContract, TContractDescriptor>(new UriServerProvider(server), descriptor);
-
-        }
-
-        public static RecoverableChannel<TContract, TContractDescriptor> CreateRecoverable<TContract, TContractDescriptor>(this ClientConfiguration configuration, IServerProvider serverProvider, TContractDescriptor descriptor = null)
-            where TContract : ContractProxy<TContractDescriptor>
-            where TContractDescriptor : ContractDescriptor
-        {
-            return
-                new RecoverableChannel<TContract, TContractDescriptor>(
-                    descriptor ?? ContractDescriptor.GetDefaultValue<TContractDescriptor>(), serverProvider,
-                    configuration.RequestForwarder, configuration.EndpointProvider)
-                {
-                    DefaultResponseTimeout = configuration.DefaultResponseTimeout
-                };
+            return new RecoverableChannel<TContract>(serverProvider, configuration);
         }
     }
 }

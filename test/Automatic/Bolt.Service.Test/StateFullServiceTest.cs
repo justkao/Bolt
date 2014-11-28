@@ -1,10 +1,10 @@
-﻿using Bolt.Client;
+﻿using System;
+using Bolt.Client;
 using Bolt.Core.Serialization;
 using Bolt.Server;
 using Bolt.Service.Test.Core;
 using Microsoft.Owin.Hosting;
 using NUnit.Framework;
-using System;
 
 namespace Bolt.Service.Test
 {
@@ -49,7 +49,7 @@ namespace Bolt.Service.Test
         public virtual TestContractStateFullProxy GetChannel()
         {
             return
-                ClientConfiguration.CreateProxy<TestContractStateFullProxy, TestContractStateFullDescriptor>(
+                ClientConfiguration.CreateProxy<TestContractStateFullProxy>(
                     new TestContractStateFullChannel(ServerUrl, ClientConfiguration));
         }
 

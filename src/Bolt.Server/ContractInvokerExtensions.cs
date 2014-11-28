@@ -4,46 +4,41 @@ namespace Bolt.Server
 {
     public static class ContractInvokerExtensions
     {
-        public static IAppBuilder UseStateLessContractInvoker<TInvoker, TContractImplementation, TContractDescriptor>(
+        public static IAppBuilder UseStateLessContractInvoker<TInvoker, TContractImplementation>(
             this IAppBuilder builder,
-            ServerConfiguration configuration,
-            TContractDescriptor descriptor)
-            where TInvoker : IContractInvoker<TContractDescriptor>, new()
+            ServerConfiguration configuration)
+            where TInvoker : ContractInvoker, new()
             where TContractImplementation : new()
-            where TContractDescriptor : ContractDescriptor
         {
-            return builder.UseContractInvoker<TInvoker, TContractDescriptor>(configuration, descriptor, new InstanceProvider<TContractImplementation>());
+            return builder.UseContractInvoker<TInvoker>(configuration, new InstanceProvider<TContractImplementation>());
         }
 
-        public static IAppBuilder UseStateFullContractInvoker<TInvoker, TContractImplementation, TContractDescriptor>(
+        public static IAppBuilder UseStateFullContractInvoker<TInvoker, TContractImplementation>(
             this IAppBuilder builder,
             ServerConfiguration configuration,
-            TContractDescriptor descriptor, ActionDescriptor initInstanceAction,
+            ActionDescriptor initInstanceAction,
             ActionDescriptor releaseInstanceAction)
-            where TInvoker : IContractInvoker<TContractDescriptor>, new()
+            where TInvoker : ContractInvoker, new()
             where TContractImplementation : new()
-            where TContractDescriptor : ContractDescriptor
         {
-            return builder.UseContractInvoker<TInvoker, TContractDescriptor>(
+            return builder.UseContractInvoker<TInvoker>(
                 configuration,
-                descriptor,
-                new StateFullInstanceProvider<TContractImplementation>(initInstanceAction, releaseInstanceAction, configuration.SessionHeader, configuration.StateFullInstanceLifetime));
+                new StateFullInstanceProvider<TContractImplementation>(
+                    initInstanceAction,
+                    releaseInstanceAction,
+                    configuration.SessionHeader,
+                    configuration.StateFullInstanceLifetime));
         }
 
-        public static IAppBuilder UseContractInvoker<TInvoker, TDescriptor>(
+        public static IAppBuilder UseContractInvoker<TInvoker>(
             this IAppBuilder builder,
             ServerConfiguration configuration,
-            TDescriptor descriptor,
             IInstanceProvider instanceProvider)
-            where TInvoker : IContractInvoker<TDescriptor>, new()
-            where TDescriptor : ContractDescriptor
+            where TInvoker : ContractInvoker, new()
         {
-
-            ContractInvoker<TDescriptor> contractInvoker = (ContractInvoker<TDescriptor>)((object)new TInvoker());
+            TInvoker contractInvoker = new TInvoker();
             contractInvoker.Init(configuration);
-            contractInvoker.Descriptor = descriptor;
             contractInvoker.InstanceProvider = instanceProvider;
-
             builder.GetBolt().Add(contractInvoker);
             return builder;
         }

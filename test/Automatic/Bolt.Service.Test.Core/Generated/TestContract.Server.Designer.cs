@@ -26,11 +26,6 @@ namespace Bolt.Service.Test.Core
     {
         public override void Init()
         {
-            if (Descriptor == null)
-            {
-                Descriptor = Bolt.Service.Test.Core.TestContractDescriptor.Default;
-            }
-
             AddAction(Descriptor.SimpleMethodWithSimpleArguments, TestContract_SimpleMethodWithSimpleArguments);
             AddAction(Descriptor.SimpleMethod, TestContract_SimpleMethod);
             AddAction(Descriptor.SimpleMethodExAsync, TestContract_SimpleMethodExAsync);
@@ -44,9 +39,6 @@ namespace Bolt.Service.Test.Core
 
             base.Init();
         }
-
-        public virtual Bolt.Service.Test.Core.TestContractDescriptor ContractDescriptor { get; set; }
-
         protected virtual async Task TestContract_SimpleMethodWithSimpleArguments(Bolt.Server.ServerExecutionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<SimpleMethodWithSimpleArgumentsParameters>(context);
@@ -215,7 +207,6 @@ namespace Bolt.Server
         {
             var boltExecutor = app.GetBolt();
             var invoker = new Bolt.Service.Test.Core.TestContractInvoker();
-            invoker.Descriptor = Bolt.Service.Test.Core.TestContractDescriptor.Default;
             invoker.Init(boltExecutor.Configuration);
             invoker.InstanceProvider = instanceProvider;
             boltExecutor.Add(invoker);

@@ -26,11 +26,7 @@ namespace Bolt.Service.Test.Core
         {
         }
 
-        public TestContractStateFullProxy(Bolt.Service.Test.Core.TestContractStateFullDescriptor descriptor, Bolt.Client.IChannel channel) : base(descriptor, channel)
-        {
-        }
-
-        public TestContractStateFullProxy(Bolt.Client.IChannel channel) : base(Bolt.Service.Test.Core.TestContractStateFullDescriptor.Default, channel)
+        public TestContractStateFullProxy(Bolt.Client.IChannel channel) : base(channel)
         {
         }
 

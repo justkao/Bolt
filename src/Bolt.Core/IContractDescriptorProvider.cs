@@ -1,8 +1,8 @@
 ﻿
 namespace Bolt
 {
-    public interface IContractDescriptorProvider<T> where T : ContractDescriptor
+    public interface IContractDescriptorProvider
     {
-        T Descriptor { get; }
+        ContractDescriptor Descriptor { get; }
     }
 }

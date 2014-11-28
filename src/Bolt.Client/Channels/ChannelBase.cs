@@ -19,17 +19,14 @@ namespace Bolt.Client.Channels
             IsClosed = proxy.IsClosed;
         }
 
-        protected ChannelBase(ContractDescriptor descriptor, ClientConfiguration configuration)
-            : this(descriptor, configuration.RequestForwarder, configuration.EndpointProvider)
+        protected ChannelBase(ClientConfiguration configuration)
+            : this(configuration.RequestForwarder, configuration.EndpointProvider)
         {
+            DefaultResponseTimeout = configuration.DefaultResponseTimeout;
         }
 
-        protected ChannelBase(ContractDescriptor descriptor, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+        protected ChannelBase(IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
         {
-            if (descriptor == null)
-            {
-                throw new ArgumentNullException("descriptor");
-            }
             if (requestForwarder == null)
             {
                 throw new ArgumentNullException("requestForwarder");
@@ -40,12 +37,9 @@ namespace Bolt.Client.Channels
                 throw new ArgumentNullException("endpointProvider");
             }
 
-            Descriptor = descriptor;
             RequestForwarder = requestForwarder;
             EndpointProvider = endpointProvider;
         }
-
-        public ContractDescriptor Descriptor { get; private set; }
 
         public IRequestForwarder RequestForwarder { get; private set; }
 
@@ -127,11 +121,12 @@ namespace Bolt.Client.Channels
             CancellationToken cancellation,
             object parameters)
         {
-            return new ClientActionContext(actionDescriptor, CreateWebRequest(server, Descriptor, actionDescriptor),
-                server, cancellation)
-            {
-                ResponseTimeout = DefaultResponseTimeout
-            };
+            return new ClientActionContext(actionDescriptor, CreateWebRequest(server, actionDescriptor), server, cancellation)
+                       {
+                           ResponseTimeout
+                               =
+                               DefaultResponseTimeout
+                       };
         }
 
         public virtual T SendCore<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
@@ -163,9 +158,9 @@ namespace Bolt.Client.Channels
             }
         }
 
-        protected virtual HttpWebRequest CreateWebRequest(Uri server, ContractDescriptor contract, ActionDescriptor descriptor)
+        protected virtual HttpWebRequest CreateWebRequest(Uri server, ActionDescriptor descriptor)
         {
-            Uri uri = EndpointProvider.GetEndpoint(server, contract, descriptor);
+            Uri uri = EndpointProvider.GetEndpoint(server, descriptor);
             HttpWebRequest request = WebRequest.CreateHttp(uri);
             request.Proxy = WebRequest.DefaultWebProxy;
             request.Method = "Post";

@@ -5,7 +5,7 @@ namespace Bolt
 {
     public class EndpointProvider : IEndpointProvider
     {
-        public Uri GetEndpoint(Uri server, ContractDescriptor contractDescriptor, ActionDescriptor actionDescriptor)
+        public Uri GetEndpoint(Uri server, ActionDescriptor actionDescriptor)
         {
             StringBuilder sb = new StringBuilder();
             if (server != null)
@@ -13,25 +13,17 @@ namespace Bolt
                 sb.Append(server);
             }
 
-            if (contractDescriptor != null)
+            if (actionDescriptor != null)
             {
                 if (sb.Length > 0 && sb[sb.Length - 1] == '/')
                 {
-                    sb.Append(contractDescriptor.Name);
+                    sb.Append(actionDescriptor.Contract.Name);
                 }
                 else
                 {
-                    sb.Append("/" + contractDescriptor.Name);
+                    sb.Append("/" + actionDescriptor.Contract.Name);
                 }
 
-                if (actionDescriptor != null)
-                {
-                    sb.Append("/" + GetActionEndpoint(actionDescriptor));
-                }
-            }
-            else if (actionDescriptor != null)
-            {
-                sb.Append("/" + actionDescriptor.Contract.Name);
                 sb.Append("/" + GetActionEndpoint(actionDescriptor));
             }
 

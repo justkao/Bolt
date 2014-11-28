@@ -1,4 +1,8 @@
-﻿using Bolt.Client;
+﻿using System;
+using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
+using Bolt.Client;
 using Bolt.Client.Channels;
 using Bolt.Core.Serialization;
 using Bolt.Server;
@@ -6,10 +10,6 @@ using Bolt.Service.Test.Core;
 using Microsoft.Owin.Hosting;
 using Moq;
 using NUnit.Framework;
-using System;
-using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace Bolt.Service.Test
 {
@@ -215,7 +215,7 @@ namespace Bolt.Service.Test
 
             for (int i = 0; i < 10000; i++)
             {
-                using (ClientConfiguration.CreateProxy<TestContractProxy, TestContractDescriptor>(ServerUrl))
+                using (ClientConfiguration.CreateProxy<TestContractProxy>(ServerUrl))
                 {
                 }
             }
@@ -227,9 +227,7 @@ namespace Bolt.Service.Test
             {
                 using (
                     new TestContractProxy(
-                        new RecoverableChannel<TestContractProxy, TestContractDescriptor>(
-                            TestContractDescriptor.Default, new UriServerProvider(ServerUrl),
-                            ClientConfiguration.RequestForwarder, ClientConfiguration.EndpointProvider)))
+                        new RecoverableChannel<TestContractProxy>(new UriServerProvider(ServerUrl), ClientConfiguration)))
                 {
                 }
             }
@@ -239,7 +237,7 @@ namespace Bolt.Service.Test
             watch.Restart();
             for (int i = 0; i < 10000; i++)
             {
-                using (ClientConfiguration.CreateProxy<TestContractProxy, TestContractDescriptor>(ServerUrl, TestContractDescriptor.Default))
+                using (ClientConfiguration.CreateProxy<TestContractProxy>(ServerUrl))
                 {
                 }
             }
@@ -316,12 +314,7 @@ namespace Bolt.Service.Test
 
         public virtual TestContractProxy GetChannel()
         {
-            return ClientConfiguration.CreateProxy<TestContractProxy, TestContractDescriptor>(ServerUrl, TestContractDescriptor.Default);
-        }
-
-        public virtual TestContractProxy GetStateFullChannel()
-        {
-            return ClientConfiguration.CreateStateFullProxy<TestContractProxy, TestContractDescriptor>(ServerUrl);
+            return ClientConfiguration.CreateProxy<TestContractProxy>(ServerUrl);
         }
 
         [TestFixtureSetUp]

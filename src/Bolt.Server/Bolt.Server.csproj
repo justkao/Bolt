@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="BoltExecutor.cs" />
     <Compile Include="BoltMiddlewareExtensions.cs" />
+    <Compile Include="ContractInvokerT.cs" />
     <Compile Include="IBoltExecutor.cs" />
     <Compile Include="InstanceProviders\InstanceProviderT.cs" />
     <Compile Include="InstanceProviders\StateFullInstanceProviderT.cs" />

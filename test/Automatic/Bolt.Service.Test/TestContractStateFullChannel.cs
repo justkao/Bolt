@@ -1,14 +1,14 @@
-﻿using Bolt.Client;
+﻿using System;
+using Bolt.Client;
 using Bolt.Client.Channels;
 using Bolt.Service.Test.Core;
-using System;
 
 namespace Bolt.Service.Test
 {
-    public class TestContractStateFullChannel : RecoverableStatefullChannel<TestContractStateFullProxy, TestContractStateFullDescriptor>
+    public class TestContractStateFullChannel : RecoverableStatefullChannel<TestContractStateFullProxy>
     {
         public TestContractStateFullChannel(Uri server, ClientConfiguration clientConfiguration)
-            : base(TestContractStateFullDescriptor.Default, server, clientConfiguration)
+            : base(server, clientConfiguration)
         {
         }
 

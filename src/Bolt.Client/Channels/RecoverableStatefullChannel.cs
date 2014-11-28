@@ -3,9 +3,8 @@ using System.Diagnostics;
 
 namespace Bolt.Client.Channels
 {
-    public class RecoverableStatefullChannel<TContract, TContractDescriptor> : RecoverableChannel<TContract, TContractDescriptor>
-        where TContract : ContractProxy<TContractDescriptor>
-        where TContractDescriptor : ContractDescriptor
+    public abstract class RecoverableStatefullChannel<TContract> : RecoverableChannel<TContract>
+        where TContract : ContractProxy
     {
         private readonly string _sessionHeaderName;
         private readonly object _syncRoot = new object();
@@ -13,45 +12,48 @@ namespace Bolt.Client.Channels
         private Uri _activeConnection;
         private string _sessionId;
 
-        public RecoverableStatefullChannel(Uri server, ClientConfiguration clientConfiguration)
-            : base(ContractDescriptor.GetDefaultValue<TContractDescriptor>(), new UriServerProvider(server), clientConfiguration)
+        protected RecoverableStatefullChannel(Uri server, ClientConfiguration clientConfiguration)
+            : base(new UriServerProvider(server), clientConfiguration)
         {
             _sessionHeaderName = clientConfiguration.SessionHeader;
         }
 
-        public RecoverableStatefullChannel(TContractDescriptor descriptor, Uri server, ClientConfiguration clientConfiguration)
-            : base(descriptor, new UriServerProvider(server), clientConfiguration)
+        protected RecoverableStatefullChannel(IServerProvider serverProvider, ClientConfiguration clientConfiguration)
+            : base(serverProvider, clientConfiguration)
         {
             _sessionHeaderName = clientConfiguration.SessionHeader;
         }
 
-        public RecoverableStatefullChannel(IServerProvider serverProvider, ClientConfiguration clientConfiguration)
-            : base(ContractDescriptor.GetDefaultValue<TContractDescriptor>(), serverProvider, clientConfiguration)
-        {
-            _sessionHeaderName = clientConfiguration.SessionHeader;
-        }
-
-        public RecoverableStatefullChannel(TContractDescriptor descriptor, IServerProvider serverProvider, ClientConfiguration clientConfiguration)
-            : base(descriptor, serverProvider, clientConfiguration)
-        {
-            _sessionHeaderName = clientConfiguration.SessionHeader;
-        }
-
-        public RecoverableStatefullChannel(RecoverableStatefullChannel<TContract, TContractDescriptor> proxy)
+        protected RecoverableStatefullChannel(RecoverableStatefullChannel<TContract> proxy)
             : base(proxy)
         {
             _sessionHeaderName = proxy._sessionHeaderName;
         }
 
-        public RecoverableStatefullChannel(
-            TContractDescriptor descriptor,
+        protected RecoverableStatefullChannel(
             IServerProvider serverProvider,
             string sessionHeaderName,
             IRequestForwarder requestForwarder,
             IEndpointProvider endpointProvider)
-            : base(descriptor, serverProvider, requestForwarder, endpointProvider)
+            : base(serverProvider, requestForwarder, endpointProvider)
         {
             _sessionHeaderName = sessionHeaderName;
+        }
+
+        public string SessionId
+        {
+            get
+            {
+                return _sessionId;
+            }
+        }
+
+        public virtual bool IsRecoverable
+        {
+            get
+            {
+                return true;
+            }
         }
 
         protected override void BeforeSending(ClientActionContext context)
@@ -65,13 +67,9 @@ namespace Bolt.Client.Channels
             return EnsureConnection();
         }
 
-        protected virtual void OnProxyOpening(TContract contract)
-        {
-        }
+        protected abstract void OnProxyOpening(TContract contract);
 
-        protected virtual void OnProxyClosing(TContract contract)
-        {
-        }
+        protected abstract void OnProxyClosing(TContract contract);
 
         public override void Open()
         {
@@ -104,6 +102,30 @@ namespace Bolt.Client.Channels
                     base.Close();
                 }
             }
+        }
+
+        protected override bool HandleError(ClientActionContext context, Exception error)
+        {
+            if (error is BoltServerException && (error as BoltServerException).Error == ServerErrorCode.SessionNotFound)
+            {
+                if (IsRecoverable)
+                {
+                    return false;
+                }
+
+                lock (_syncRoot)
+                {
+                    if (context.Request.Headers[_sessionHeaderName] == _sessionId)
+                    {
+                        _activeConnection = null;
+                        _sessionId = null;
+                    }
+                }
+
+                return true;
+            }
+
+            return base.HandleError(context, error);
         }
 
         protected virtual string CreateSessionId()

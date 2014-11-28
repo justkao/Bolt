@@ -4,15 +4,8 @@ using Microsoft.Owin;
 
 namespace Bolt.Server
 {
-    public interface IContractInvoker
+    public interface IContractInvoker : IContractDescriptorProvider
     {
-        ContractDescriptor DescriptorCore { get; set; }
-
         Task Execute(IOwinContext context, ActionDescriptor action);
-    }
-
-    public interface IContractInvoker<T> : IContractInvoker, IContractDescriptorProvider<T>
-        where T : ContractDescriptor
-    {
     }
 }

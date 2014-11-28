@@ -26,11 +26,6 @@ namespace Bolt.Service.Test.Core
     {
         public override void Init()
         {
-            if (Descriptor == null)
-            {
-                Descriptor = Bolt.Service.Test.Core.TestContractStateFullDescriptor.Default;
-            }
-
             AddAction(Descriptor.Init, TestContractStateFull_Init);
             AddAction(Descriptor.SetState, TestContractStateFull_SetState);
             AddAction(Descriptor.GetState, TestContractStateFull_GetState);
@@ -38,9 +33,6 @@ namespace Bolt.Service.Test.Core
 
             base.Init();
         }
-
-        public virtual Bolt.Service.Test.Core.TestContractStateFullDescriptor ContractDescriptor { get; set; }
-
         protected virtual async Task TestContractStateFull_Init(Bolt.Server.ServerExecutionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
@@ -130,7 +122,6 @@ namespace Bolt.Server
         {
             var boltExecutor = app.GetBolt();
             var invoker = new Bolt.Service.Test.Core.TestContractStateFullInvoker();
-            invoker.Descriptor = Bolt.Service.Test.Core.TestContractStateFullDescriptor.Default;
             invoker.Init(boltExecutor.Configuration);
             invoker.InstanceProvider = instanceProvider;
             boltExecutor.Add(invoker);
