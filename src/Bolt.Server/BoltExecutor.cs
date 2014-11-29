@@ -1,12 +1,13 @@
 ﻿using Microsoft.Owin;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Bolt.Server
 {
-    public class BoltExecutor : IBoltExecutor
+    public class BoltExecutor : IBoltExecutor, IEnumerable<IContractInvoker>
     {
         private readonly List<IContractInvoker> _invokers = new List<IContractInvoker>();
 
@@ -90,6 +91,16 @@ namespace Bolt.Server
 
             descriptor = found.Descriptor.FirstOrDefault(a => a.Name == actionName);
             return found;
+        }
+
+        public IEnumerator<IContractInvoker> GetEnumerator()
+        {
+            return _invokers.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

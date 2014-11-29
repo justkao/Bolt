@@ -106,6 +106,8 @@ namespace TestService.Core
             GetSinglePersonAsAsync = Add("GetSinglePersonAsAsync", typeof(TestService.Core.Parameters.GetSinglePersonAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetSinglePersonAsAsync"));
             GetManyPersons = Add("GetManyPersons", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetManyPersons"));
             GetManyPersonsAsAsync = Add("GetManyPersonsAsAsync", typeof(TestService.Core.Parameters.GetManyPersonsAsAsyncParameters), typeof(IPersonRepository).GetTypeInfo().GetMethod("GetManyPersonsAsAsync"));
+            Throws = Add("Throws", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("Throws"));
+            ThrowsCustom = Add("ThrowsCustom", typeof(Bolt.Empty), typeof(IPersonRepository).GetTypeInfo().GetMethod("ThrowsCustom"));
             InnerOperation = Add("InnerOperation", typeof(Bolt.Empty), typeof(IPersonRepositoryInner).GetTypeInfo().GetMethod("InnerOperation"));
             InnerOperationExAsync = Add("InnerOperationExAsync", typeof(Bolt.Empty), typeof(IPersonRepositoryInner).GetTypeInfo().GetMethod("InnerOperationExAsync"));
             InnerOperation2 = Add("InnerOperation2", typeof(Bolt.Empty), typeof(IPersonRepositoryInner2).GetTypeInfo().GetMethod("InnerOperation2"));
@@ -137,6 +139,10 @@ namespace TestService.Core
         public  Bolt.ActionDescriptor GetManyPersons { get; private set; }
 
         public  Bolt.ActionDescriptor GetManyPersonsAsAsync { get; private set; }
+
+        public  Bolt.ActionDescriptor Throws { get; private set; }
+
+        public  Bolt.ActionDescriptor ThrowsCustom { get; private set; }
 
         public  Bolt.ActionDescriptor InnerOperation { get; private set; }
 

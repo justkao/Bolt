@@ -161,8 +161,14 @@ namespace Bolt.Client.Channels
         {
             using (_syncRoot.Enter())
             {
+                bool exist = _activeConnection != null;
                 _activeConnection = null;
                 _sessionId = null;
+
+                if (exist)
+                {
+                    OnConnectionClosed();
+                }
             }
         }
 
@@ -191,6 +197,14 @@ namespace Bolt.Client.Channels
             Uri uri = await EnsureConnectionAsync();
             IsOpened = true;
             return uri;
+        }
+
+        protected virtual void OnConnectionOpened(Uri activeConnection, string sessionId)
+        {
+        }
+
+        protected virtual void OnConnectionClosed()
+        {
         }
 
         private Uri EnsureConnection()
@@ -234,6 +248,8 @@ namespace Bolt.Client.Channels
                     throw new BoltServerException(ServerErrorCode.SessionIdNotReceived, action, connection.ToString());
                 }
 
+                OnConnectionOpened(_activeConnection, _sessionId);
+
                 _activeConnection = connection;
                 _sessionId = sessionId;
                 return connection;
@@ -249,7 +265,7 @@ namespace Bolt.Client.Channels
                 return _activeConnection;
             }
 
-            using (_syncRoot.Enter())
+            using (await _syncRoot.EnterAsync())
             {
                 if (_activeConnection != null)
                 {
@@ -279,6 +295,8 @@ namespace Bolt.Client.Channels
                 {
                     throw new BoltServerException(ServerErrorCode.SessionIdNotReceived, action, connection.ToString());
                 }
+
+                OnConnectionOpened(_activeConnection, _sessionId);
 
                 _activeConnection = connection;
                 _sessionId = sessionId;

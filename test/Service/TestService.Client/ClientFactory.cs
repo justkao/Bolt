@@ -8,7 +8,7 @@ namespace TestService.Client
     public class ClientFactory
     {
         public static readonly ClientConfiguration Config = new ClientConfiguration(new JsonSerializer(),
-            new JsonExceptionSerializer(), new DefaultWebRequestHandlerEx());
+            new JsonExceptionSerializer(new JsonSerializer()), new DefaultWebRequestHandlerEx());
 
         public static IPersonRepository CreateIISBolt()
         {

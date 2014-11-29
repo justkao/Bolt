@@ -46,7 +46,8 @@ namespace Bolt.Service.Test
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-            JsonExceptionSerializer jsonExceptionSerializer = new JsonExceptionSerializer();
+
+            JsonExceptionSerializer jsonExceptionSerializer = new JsonExceptionSerializer(serializer);
 
             ServerConfiguration = new ServerConfiguration(serializer, jsonExceptionSerializer);
             ClientConfiguration = new ClientConfiguration(serializer, jsonExceptionSerializer, new DefaultWebRequestHandlerEx());

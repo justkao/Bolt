@@ -17,6 +17,8 @@ namespace TestService.Client
 
             int cnt = 10000;
 
+            ClientFactory.CreateBolt().ThrowsCustom();
+
             Execute(c => c.DoNothing(), cnt, "DoNothing");
             Execute(c => c.GetSimpleType(new Random().Next()), cnt, "GetSimpleType");
             Execute(c => c.GetSinglePerson(Person.Create(10)), cnt, "GetSinglePerson");

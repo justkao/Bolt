@@ -38,6 +38,8 @@ namespace TestService.Core
             AddAction(Descriptor.GetSinglePersonAsAsync, PersonRepository_GetSinglePersonAsAsync);
             AddAction(Descriptor.GetManyPersons, PersonRepository_GetManyPersons);
             AddAction(Descriptor.GetManyPersonsAsAsync, PersonRepository_GetManyPersonsAsAsync);
+            AddAction(Descriptor.Throws, PersonRepository_Throws);
+            AddAction(Descriptor.ThrowsCustom, PersonRepository_ThrowsCustom);
             AddAction(Descriptor.InnerOperation, PersonRepositoryInner_InnerOperation);
             AddAction(Descriptor.InnerOperationExAsync, PersonRepositoryInner_InnerOperationExAsync);
             AddAction(Descriptor.InnerOperation2, PersonRepositoryInner2_InnerOperation2);
@@ -237,6 +239,38 @@ namespace TestService.Core
             {
                 var result = await instance.GetManyPersonsAsAsync(parameters.Person);
                 await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
+            }
+            catch (Exception e)
+            {
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
+            }
+        }
+
+        protected virtual async Task PersonRepository_Throws(Bolt.Server.ServerActionContext context)
+        {
+            var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
+            try
+            {
+                instance.Throws();
+                await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
+            }
+            catch (Exception e)
+            {
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
+            }
+        }
+
+        protected virtual async Task PersonRepository_ThrowsCustom(Bolt.Server.ServerActionContext context)
+        {
+            var instance = InstanceProvider.GetInstance<IPersonRepository>(context);
+            try
+            {
+                instance.ThrowsCustom();
+                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)

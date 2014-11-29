@@ -51,6 +51,10 @@ namespace TestService.Core
         Task<Person> GetSinglePersonAsync(Person person);
 
         Task<List<Person>> GetManyPersonsAsync();
+
+        Task ThrowsAsync();
+
+        Task ThrowsCustomAsync();
     }
 }
 
@@ -188,6 +192,27 @@ namespace TestService.Core
             request.Person = person;
             return Channel.SendAsync<List<Person>, GetManyPersonsAsAsyncParameters>(request, Descriptor.GetManyPersonsAsAsync, GetCancellationToken(Descriptor.GetManyPersonsAsAsync));
         }
+
+        public virtual void Throws()
+        {
+            Channel.Send(Bolt.Empty.Instance, Descriptor.Throws, GetCancellationToken(Descriptor.Throws));
+        }
+
+        public virtual Task ThrowsAsync()
+        {
+            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.Throws, GetCancellationToken(Descriptor.Throws));
+        }
+
+        public virtual void ThrowsCustom()
+        {
+            Channel.Send(Bolt.Empty.Instance, Descriptor.ThrowsCustom, GetCancellationToken(Descriptor.ThrowsCustom));
+        }
+
+        public virtual Task ThrowsCustomAsync()
+        {
+            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.ThrowsCustom, GetCancellationToken(Descriptor.ThrowsCustom));
+        }
+
         public virtual void InnerOperation()
         {
             Channel.Send(Bolt.Empty.Instance, Descriptor.InnerOperation, GetCancellationToken(Descriptor.InnerOperation));

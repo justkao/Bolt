@@ -83,6 +83,7 @@
     <Compile Include="..\TestService.Core\Generated\PersonRepository.Server.Designer.cs">
       <Link>PersonRepository.Server.Designer.cs</Link>
     </Compile>
+    <Compile Include="CustomException.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />

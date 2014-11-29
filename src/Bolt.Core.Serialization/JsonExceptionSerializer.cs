@@ -1,13 +1,22 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
-using Newtonsoft.Json;
 
 namespace Bolt.Core.Serialization
 {
     public class JsonExceptionSerializer : IExceptionSerializer
     {
+        private readonly ISerializer _serializer;
+
+        [DataContract]
+        private class ExceptionWrapper
+        {
+            [DataMember(Order = 1)]
+            public string RawException { get; set; }
+        }
+
         private readonly JsonSerializerSettings _exceptionSerializerSettings = new JsonSerializerSettings()
         {
             TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
@@ -16,56 +25,54 @@ namespace Bolt.Core.Serialization
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
         };
 
-        public JsonExceptionSerializer(SerializationBinder binder = null)
+        public JsonExceptionSerializer(ISerializer serializer, SerializationBinder binder = null)
         {
+            if (serializer == null)
+            {
+                throw new ArgumentNullException("serializer");
+            }
+
             if (binder != null)
             {
                 _exceptionSerializerSettings.Binder = binder;
             }
+            _serializer = serializer;
         }
 
-        public byte[] Serialize(Exception exception)
+        public string ContentType
         {
+            get { return _serializer.ContentType; }
+        }
+
+        public void Serialize(Stream stream, Exception exception)
+        {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
             if (exception == null)
             {
                 throw new ArgumentNullException("exception");
             }
 
-            Newtonsoft.Json.JsonSerializer serializer = Newtonsoft.Json.JsonSerializer.CreateDefault(_exceptionSerializerSettings);
-
-            using (MemoryStream stream = new MemoryStream())
-            {
-                using (StreamWriter streamWriter = new StreamWriter(stream))
-                {
-                    using (JsonWriter writer = new JsonTextWriter(streamWriter))
-                    {
-                        serializer.Serialize(writer, exception);
-                    }
-                }
-
-                return stream.ToArray();
-            }
+            string rawException = JsonConvert.SerializeObject(exception, _exceptionSerializerSettings);
+            _serializer.Write(stream, new ExceptionWrapper() { RawException = rawException });
         }
 
-        public Exception Deserialize(byte[] exception)
+        public Exception Deserialize(Stream stream)
         {
-            if (exception == null)
+            if (stream == null)
             {
-                throw new ArgumentNullException("exception");
+                throw new ArgumentNullException("stream");
             }
 
-            Newtonsoft.Json.JsonSerializer serializer = Newtonsoft.Json.JsonSerializer.CreateDefault(_exceptionSerializerSettings);
-
-            using (MemoryStream stream = new MemoryStream(exception))
+            ExceptionWrapper obj = _serializer.Read<ExceptionWrapper>(stream);
+            if (obj == null || obj.RawException == null)
             {
-                using (StreamReader streamReader = new StreamReader(stream))
-                {
-                    using (JsonTextReader reader = new JsonTextReader(streamReader))
-                    {
-                        return serializer.Deserialize<Exception>(reader);
-                    }
-                }
+                return null;
             }
+
+            return JsonConvert.DeserializeObject<Exception>(obj.RawException, _exceptionSerializerSettings);
         }
     }
 }

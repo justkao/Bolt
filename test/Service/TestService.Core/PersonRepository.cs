@@ -81,6 +81,25 @@ namespace TestService.Core
             return Task.FromResult(Enumerable.Range(0, 100).Select(Person.Create).ToList());
         }
 
+        public virtual void ThrowsCustom()
+        {
+        }
+
+        public void Throws()
+        {
+            Exception inner;
+            try
+            {
+                throw new NotSupportedException("Another message");
+            }
+            catch (Exception e)
+            {
+                inner = e;
+            }
+
+            throw new InvalidOperationException("This is forced error message.", inner);
+        }
+
         public void InnerOperation()
         {
         }

@@ -67,7 +67,7 @@ namespace Bolt.Client
             }
         }
 
-        public static Exception DeserializeExceptionResponse(this IExceptionSerializer serializer, byte[] rawException, ActionDescriptor actionDescriptor)
+        public static Exception DeserializeExceptionResponse(this IExceptionSerializer serializer, Stream rawException, ActionDescriptor actionDescriptor)
         {
             if (rawException == null)
             {

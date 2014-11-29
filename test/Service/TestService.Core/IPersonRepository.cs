@@ -45,5 +45,11 @@ namespace TestService.Core
 
         [OperationContract]
         Task<List<Person>> GetManyPersonsAsAsync(Person person);
+
+        [OperationContract]
+        void Throws();
+
+        [OperationContract]
+        void ThrowsCustom();
     }
 }

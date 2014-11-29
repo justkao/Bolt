@@ -79,7 +79,9 @@ namespace Bolt.Server
 
             try
             {
-                return serializer.Serialize(exception);
+                MemoryStream stream = new MemoryStream();
+                serializer.Serialize(stream, exception);
+                return stream.ToArray();
             }
             catch (OperationCanceledException)
             {

@@ -103,8 +103,7 @@ namespace Bolt.Client
         {
             using (Stream stream = context.Response.GetResponseStream())
             {
-                ErrorResponse data = _serializer.DeserializeResponse<ErrorResponse>(stream.Copy(), context.Action);
-                return ReadException(data, context.Action);
+                return _exceptionSerializer.DeserializeExceptionResponse(stream.Copy(), context.Action);
             }
         }
 
@@ -112,19 +111,8 @@ namespace Bolt.Client
         {
             using (Stream stream = context.Response.GetResponseStream())
             {
-                ErrorResponse data = _serializer.DeserializeResponse<ErrorResponse>(await stream.CopyAsync(context.Cancellation), context.Action);
-                return ReadException(data, context.Action);
+                return _exceptionSerializer.DeserializeExceptionResponse(await stream.CopyAsync(context.Cancellation), context.Action);
             }
-        }
-
-        protected virtual Exception ReadException(ErrorResponse response, ActionDescriptor descriptor)
-        {
-            if (response == null || response.RawException == null || response.RawException.Length == 0)
-            {
-                return null;
-            }
-
-            return _exceptionSerializer.DeserializeExceptionResponse(response.RawException, descriptor);
         }
     }
 }

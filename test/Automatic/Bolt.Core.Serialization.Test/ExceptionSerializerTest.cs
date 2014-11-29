@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System;
+using System.IO;
 
 namespace Bolt.Core.Serialization.Test
 {
@@ -9,7 +10,7 @@ namespace Bolt.Core.Serialization.Test
         [Test]
         public void Serialize_NullArgument_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => _serializer.Serialize(null));
+            Assert.Throws<ArgumentNullException>(() => _serializer.Serialize(null, null));
         }
 
         [Test]
@@ -21,8 +22,9 @@ namespace Bolt.Core.Serialization.Test
         [Test]
         public void DeserializeException_EnsureStackTracePreserved()
         {
-            byte[] raw = _serializer.Serialize(Exception(new CustomException("custom message")));
-            Exception deserialized = _serializer.Deserialize(raw);
+            MemoryStream raw = new MemoryStream();
+            _serializer.Serialize(raw, Exception(new CustomException("custom message")));
+            Exception deserialized = _serializer.Deserialize(new MemoryStream(raw.ToArray()));
 
             Assert.IsNotNullOrEmpty(deserialized.StackTrace);
         }
@@ -30,8 +32,9 @@ namespace Bolt.Core.Serialization.Test
         [Test]
         public void DeserializeException_EnsureMessagePreserved()
         {
-            byte[] raw = _serializer.Serialize(Exception(new CustomException("custom message")));
-            Exception deserialized = _serializer.Deserialize(raw);
+            MemoryStream raw = new MemoryStream();
+            _serializer.Serialize(raw, Exception(new CustomException("custom message")));
+            Exception deserialized = _serializer.Deserialize(new MemoryStream(raw.ToArray()));
 
             Assert.AreEqual("custom message", deserialized.Message);
         }
@@ -39,8 +42,9 @@ namespace Bolt.Core.Serialization.Test
         [Test]
         public void DeserializeException_EnsureTypePreserved()
         {
-            byte[] raw = _serializer.Serialize(Exception(new CustomException("custom message")));
-            Exception deserialized = _serializer.Deserialize(raw);
+            MemoryStream raw = new MemoryStream();
+            _serializer.Serialize(raw, Exception(new CustomException("custom message")));
+            Exception deserialized = _serializer.Deserialize(new MemoryStream(raw.ToArray()));
 
             Assert.IsInstanceOf<CustomException>(deserialized);
         }
@@ -48,8 +52,9 @@ namespace Bolt.Core.Serialization.Test
         [Test]
         public void DeserializeException_EnsureCustomDataPreserved()
         {
-            byte[] raw = _serializer.Serialize(Exception(new CustomException(10)));
-            CustomException deserialized = _serializer.Deserialize(raw) as CustomException;
+            MemoryStream raw = new MemoryStream();
+            _serializer.Serialize(raw, Exception(new CustomException(10)));
+            CustomException deserialized = _serializer.Deserialize(new MemoryStream(raw.ToArray())) as CustomException;
 
             Assert.AreEqual(10, deserialized.CustomData);
         }
@@ -58,8 +63,9 @@ namespace Bolt.Core.Serialization.Test
         [Test]
         public void DeserializeException_EnsureInnerExceptionTypePreserverd()
         {
-            byte[] raw = _serializer.Serialize(Exception(new CustomException("test", Exception(new CustomException()))));
-            CustomException deserialized = _serializer.Deserialize(raw) as CustomException;
+            MemoryStream raw = new MemoryStream();
+            _serializer.Serialize(raw, Exception(new CustomException("test", Exception(new CustomException()))));
+            CustomException deserialized = _serializer.Deserialize(new MemoryStream(raw.ToArray())) as CustomException;
 
             Assert.IsInstanceOf<CustomException>(deserialized.InnerException);
         }
@@ -67,8 +73,9 @@ namespace Bolt.Core.Serialization.Test
         [Test]
         public void DeserializeException_EnsureInnerExceptionMessagePreserverd()
         {
-            byte[] raw = _serializer.Serialize(Exception(new CustomException("test", Exception(new CustomException("test2")))));
-            CustomException deserialized = _serializer.Deserialize(raw) as CustomException;
+            MemoryStream raw = new MemoryStream();
+            _serializer.Serialize(raw, Exception(new CustomException("test", Exception(new CustomException("test2")))));
+            CustomException deserialized = _serializer.Deserialize(new MemoryStream(raw.ToArray())) as CustomException;
 
             Assert.AreEqual("test2", deserialized.InnerException.Message);
         }
@@ -85,6 +92,6 @@ namespace Bolt.Core.Serialization.Test
             }
         }
 
-        private IExceptionSerializer _serializer = new JsonExceptionSerializer();
+        private IExceptionSerializer _serializer = new JsonExceptionSerializer(new JsonSerializer());
     }
 }

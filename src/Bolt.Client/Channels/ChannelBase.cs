@@ -99,7 +99,13 @@ namespace Bolt.Client.Channels
 
         public virtual void Close()
         {
+            if (IsClosed)
+            {
+                return;
+            }
+
             IsClosed = true;
+            OnClosed();
         }
 
         public virtual Task CloseAsync()
@@ -176,6 +182,10 @@ namespace Bolt.Client.Channels
             HttpWebRequest request = WebRequest.CreateHttp(uri);
             request.Method = "Post";
             return request;
+        }
+
+        protected virtual void OnClosed()
+        {
         }
 
         protected void EnsureNotClosed()

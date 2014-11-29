@@ -52,19 +52,11 @@ namespace Bolt.Server
 
         public virtual Task WriteExceptionAsync(ServerActionContext context, Exception exception)
         {
+            context.Context.Response.ContentType = _exceptionSerializer.ContentType;
             context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
-
-            byte[] raw = _serializer.SerializeResponse(Create(exception, context.Action), context.Action);
+            byte[] raw = _exceptionSerializer.SerializeExceptionResponse(exception, context.Action);
             context.Context.Response.ContentLength = raw.Length;
             return context.Context.Response.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
-        }
-
-        protected virtual ErrorResponse Create(Exception e, ActionDescriptor actionDescriptor)
-        {
-            return new ErrorResponse
-            {
-                RawException = _exceptionSerializer.SerializeExceptionResponse(e, actionDescriptor)
-            };
         }
     }
 }

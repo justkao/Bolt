@@ -1,11 +1,14 @@
 ﻿using System;
+using System.IO;
 
 namespace Bolt
 {
     public interface IExceptionSerializer
     {
-        byte[] Serialize(Exception exception);
+        string ContentType { get; }
 
-        Exception Deserialize(byte[] exception);
+        void Serialize(Stream stream, Exception exception);
+
+        Exception Deserialize(Stream stream);
     }
 }
