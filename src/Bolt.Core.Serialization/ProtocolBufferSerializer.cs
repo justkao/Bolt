@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Bolt.Core.Serialization
 {
@@ -6,12 +7,27 @@ namespace Bolt.Core.Serialization
     {
         public virtual void Write<T>(Stream stream, T data)
         {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+
             ProtoBuf.Serializer.Serialize(stream, data);
         }
 
-        public virtual T Read<T>(Stream data)
+        public virtual T Read<T>(Stream stream)
         {
-            return ProtoBuf.Serializer.Deserialize<T>(data);
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+
+            if (stream.CanSeek && stream.Length == 0)
+            {
+                return default(T);
+            }
+
+            return ProtoBuf.Serializer.Deserialize<T>(stream);
         }
 
         public virtual string ContentType

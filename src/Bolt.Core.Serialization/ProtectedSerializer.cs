@@ -38,24 +38,27 @@ namespace Bolt.Core.Serialization
 
         public void Write<T>(Stream stream, T data)
         {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+
             using (CryptoStream cryptoStream = new CryptoStream(stream, _transform, CryptoStreamMode.Write))
             {
-                MemoryStream memoryStream = new MemoryStream();
-                _inner.Write(memoryStream, data);
-                byte[] raw = memoryStream.ToArray();
-                cryptoStream.Write(raw, 0, raw.Length);
+                _inner.Write(cryptoStream, data);
             }
         }
 
-        public T Read<T>(Stream data)
+        public T Read<T>(Stream stream)
         {
-            using (CryptoStream cryptoStream = new CryptoStream(data, _transform, CryptoStreamMode.Read))
+            if (stream == null)
             {
-                MemoryStream memoryStream = new MemoryStream();
-                cryptoStream.CopyTo(memoryStream);
-                memoryStream.Seek(0, SeekOrigin.Begin);
+                throw new ArgumentNullException("stream");
+            }
 
-                return _inner.Read<T>(memoryStream);
+            using (CryptoStream cryptoStream = new CryptoStream(stream, _transform, CryptoStreamMode.Read))
+            {
+                return _inner.Read<T>(cryptoStream);
             }
         }
 

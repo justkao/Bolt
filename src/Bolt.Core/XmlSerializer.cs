@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Runtime.Serialization;
 
 namespace Bolt
@@ -7,12 +8,22 @@ namespace Bolt
     {
         public void Write<T>(Stream stream, T data)
         {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+
             GetSerializer<T>().WriteObject(stream, data);
         }
 
-        public T Read<T>(Stream data)
+        public T Read<T>(Stream stream)
         {
-            return (T)GetSerializer<T>().ReadObject(data);
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+
+            return (T)GetSerializer<T>().ReadObject(stream);
         }
 
         public string ContentType

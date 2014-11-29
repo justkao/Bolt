@@ -37,6 +37,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -44,12 +45,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Bolt.Service.Test.Core\CompositeType.cs">
+      <Link>CompositeType.cs</Link>
+    </Compile>
     <Compile Include="..\Bolt.Service.Test\SerializerTestBase.cs">
       <Link>SerializerTestBase.cs</Link>
     </Compile>
     <Compile Include="..\Bolt.Service.Test\SerializerType.cs">
       <Link>SerializerType.cs</Link>
     </Compile>
+    <Compile Include="DataSerializerTest.cs" />
     <Compile Include="ExceptionSerializerTest.cs" />
     <Compile Include="CustomException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

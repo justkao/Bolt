@@ -1,5 +1,6 @@
 ﻿
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,6 +17,8 @@ namespace Bolt.Service.Test.Core
         void SimpleMethodWithComplexParameter(CompositeType compositeType);
 
         int SimpleFunction();
+
+        List<CompositeType> FunctionReturningHugeData();
 
         [AsyncOperation]
         void MethodWithNotSerializableType(NotSerializableType arg);

@@ -6,7 +6,7 @@ namespace Bolt
     {
         void Write<T>(Stream stream, T data);
 
-        T Read<T>(Stream data);
+        T Read<T>(Stream stream);
 
         string ContentType { get; }
     }

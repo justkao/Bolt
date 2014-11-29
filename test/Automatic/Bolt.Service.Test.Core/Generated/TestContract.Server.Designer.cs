@@ -33,6 +33,7 @@ namespace Bolt.Service.Test.Core
             AddAction(Descriptor.ComplexFunction, TestContract_ComplexFunction);
             AddAction(Descriptor.SimpleMethodWithComplexParameter, TestContractInner_SimpleMethodWithComplexParameter);
             AddAction(Descriptor.SimpleFunction, TestContractInner_SimpleFunction);
+            AddAction(Descriptor.FunctionReturningHugeData, TestContractInner_FunctionReturningHugeData);
             AddAction(Descriptor.MethodWithNotSerializableType, TestContractInner_MethodWithNotSerializableType);
             AddAction(Descriptor.FunctionWithNotSerializableType, TestContractInner_FunctionWithNotSerializableType);
             AddAction(Descriptor.SimpleAsyncFunction, TestContractInner_SimpleAsyncFunction);
@@ -145,6 +146,22 @@ namespace Bolt.Service.Test.Core
             try
             {
                 var result = instance.SimpleFunction();
+                await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
+            }
+            catch (Exception e)
+            {
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
+            }
+        }
+
+        protected virtual async Task TestContractInner_FunctionReturningHugeData(Bolt.Server.ServerActionContext context)
+        {
+            var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
+            try
+            {
+                var result = instance.FunctionReturningHugeData();
                 await ResponseHandler.Handle(context, result);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }

@@ -6,7 +6,9 @@ using Moq;
 using NUnit.Framework;
 using Owin;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -387,6 +389,20 @@ namespace Bolt.Service.Test
 
             ongoing.GetAwaiter().GetResult();
             running.Dispose();
+        }
+
+
+        [Test]
+        public void ServerReturnsBigData_EnsureReceivedOnClient()
+        {
+            TestContractProxy channel = CreateChannel();
+            Server()
+                .Setup(v => v.FunctionReturningHugeData())
+                .Returns(() => Enumerable.Repeat(0, 1000).Select(_ => CompositeType.CreateRandom()).ToList());
+
+            List<CompositeType> result = channel.FunctionReturningHugeData();
+            Assert.AreEqual(1000, result.Count);
+
         }
 
         public MockInstanceProvider InstanceProvider = new MockInstanceProvider();
