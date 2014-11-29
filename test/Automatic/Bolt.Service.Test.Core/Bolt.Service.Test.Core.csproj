@@ -43,6 +43,7 @@
     <Compile Include="CompositeType.cs" />
     <Compile Include="ITestContractStateFull.cs" />
     <Compile Include="ITestContract.cs" />
+    <Compile Include="NotSerializableType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

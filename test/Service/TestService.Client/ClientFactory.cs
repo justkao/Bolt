@@ -1,5 +1,7 @@
 ﻿using Bolt.Client;
 using Bolt.Core.Serialization;
+using System;
+using System.Runtime.Serialization;
 using System.ServiceModel;
 using TestService.Core;
 
@@ -7,8 +9,16 @@ namespace TestService.Client
 {
     public class ClientFactory
     {
+        private class CustomSerializationBinder : SerializationBinder
+        {
+            public override Type BindToType(string assemblyName, string typeName)
+            {
+                return typeof(InvalidOperationException);
+            }
+        }
+
         public static readonly ClientConfiguration Config = new ClientConfiguration(new JsonSerializer(),
-            new JsonExceptionSerializer(new JsonSerializer()), new DefaultWebRequestHandlerEx());
+            new JsonExceptionSerializer(new JsonSerializer(), new CustomSerializationBinder()), new DefaultWebRequestHandlerEx());
 
         public static IPersonRepository CreateIISBolt()
         {

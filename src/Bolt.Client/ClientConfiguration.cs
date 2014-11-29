@@ -12,13 +12,13 @@ namespace Bolt.Client
                 webRequestHandler = new DefaultWebRequestHandler();
             }
 
-            ClientDataHandler = new ClientDataHandler(serializer, ExceptionSerializer, webRequestHandler);
-            RequestForwarder = new RequestForwarder(ClientDataHandler, webRequestHandler, ServerErrorCodesHeader);
+            DataHandler = new DataHandler(serializer, ExceptionSerializer, webRequestHandler);
+            RequestForwarder = new RequestForwarder(DataHandler, webRequestHandler, new ServerErrorProvider(ServerErrorCodesHeader));
         }
 
         public IRequestForwarder RequestForwarder { get; set; }
 
-        public IClientDataHandler ClientDataHandler { get; set; }
+        public IDataHandler DataHandler { get; set; }
 
         public TimeSpan DefaultResponseTimeout { get; set; }
     }

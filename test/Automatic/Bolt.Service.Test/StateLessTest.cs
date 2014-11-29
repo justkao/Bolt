@@ -186,6 +186,89 @@ namespace Bolt.Service.Test
             Assert.Throws<CustomException>(client.SimpleMethod);
         }
 
+
+        [Test]
+        public void Client_NotSerializableReturnValue_EnsureBoltServerException()
+        {
+            var client = CreateChannel();
+            Mock<ITestContract> server = Server();
+            var arg = new NotSerializableType(10);
+
+            server.Setup(v => v.FunctionWithNotSerializableType()).Returns(arg);
+
+            try
+            {
+                client.FunctionWithNotSerializableType();
+            }
+            catch (BoltServerException e)
+            {
+                if (e.Error != ServerErrorCode.Serialization)
+                {
+                    throw;
+                }
+            }
+        }
+
+        [Test]
+        public async Task Async_Client_NotSerializableReturnValue_EnsureBoltServerException()
+        {
+            var client = CreateChannel();
+            Mock<ITestContract> server = Server();
+            var arg = new NotSerializableType(10);
+
+            server.Setup(v => v.FunctionWithNotSerializableType()).Returns(arg);
+
+            try
+            {
+                await client.FunctionWithNotSerializableTypeAsync();
+            }
+            catch (BoltServerException e)
+            {
+                if (e.Error != ServerErrorCode.Serialization)
+                {
+                    throw;
+                }
+            }
+        }
+
+        [Test]
+        public void Client_NotSerializableParameters_EnsureBoltSerializationException()
+        {
+            var client = CreateChannel();
+            Mock<ITestContract> server = Server();
+            var arg = new NotSerializableType(10);
+
+            server.Setup(v => v.MethodWithNotSerializableType(It.IsAny<NotSerializableType>()));
+
+            try
+            {
+                client.MethodWithNotSerializableType(arg);
+            }
+            catch (SerializeParametersException)
+            {
+                // ok
+            }
+        }
+
+        [Test]
+        public async Task Async_Client_NotSerializableParameters_EnsureBoltSerializationException()
+        {
+            var client = CreateChannel();
+            Mock<ITestContract> server = Server();
+            var arg = new NotSerializableType(10);
+
+            server.Setup(v => v.MethodWithNotSerializableType(It.IsAny<NotSerializableType>()));
+
+            try
+            {
+                await client.MethodWithNotSerializableTypeAsync(arg);
+            }
+            catch (SerializeParametersException)
+            {
+                // ok
+            }
+        }
+
         [Test]
         public void Server_Throws_EnsureCorrectMessageOnClient()
         {
@@ -207,9 +290,11 @@ namespace Bolt.Service.Test
         [Test]
         public void CreateProxyPerformance()
         {
+            int cnt = 10000;
+
             Stopwatch watch = Stopwatch.StartNew();
 
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < cnt; i++)
             {
                 using (ClientConfiguration.CreateProxy<TestContractProxy>(ServerUrl))
                 {
@@ -219,26 +304,14 @@ namespace Bolt.Service.Test
             Console.WriteLine("Creating {0} proxies by helpers has taken {1}ms", 10000, watch.ElapsedMilliseconds);
 
             watch.Restart();
-            for (int i = 0; i < 10000; i++)
+            for (int i = 0; i < cnt; i++)
             {
-                using (
-                    new TestContractProxy(
-                        new RecoverableChannel(new UriServerProvider(ServerUrl), ClientConfiguration)))
+                using (new TestContractProxy(new RecoverableChannel(new UriServerProvider(ServerUrl), ClientConfiguration)))
                 {
                 }
             }
 
             Console.WriteLine("Creating {0} proxies manually has taken {1}ms", 10000, watch.ElapsedMilliseconds);
-
-            watch.Restart();
-            for (int i = 0; i < 10000; i++)
-            {
-                using (ClientConfiguration.CreateProxy<TestContractProxy>(ServerUrl))
-                {
-                }
-            }
-
-            Console.WriteLine("Creating {0} proxies by helpers with descriptor provided has taken {1}ms", 10000, watch.ElapsedMilliseconds);
         }
 
         [Test]
@@ -291,11 +364,11 @@ namespace Bolt.Service.Test
         public void LongOperation_TimeoutSet_EnsureCallTimeouted()
         {
             TestContractProxy client = CreateChannel();
-            ((ChannelBase)client.Channel).DefaultResponseTimeout = TimeSpan.FromSeconds(1);
+            ((ChannelBase)client.Channel).DefaultResponseTimeout = TimeSpan.FromSeconds(0.1);
             CompositeType arg = CompositeType.CreateRandom();
 
             Mock<ITestContract> server = Server();
-            server.Setup(v => v.SimpleMethodWithComplexParameter(arg)).Callback(() => Thread.Sleep(TimeSpan.FromSeconds(10)));
+            server.Setup(v => v.SimpleMethodWithComplexParameter(arg)).Callback(() => Thread.Sleep(TimeSpan.FromSeconds(1)));
             Assert.Throws<TimeoutException>(() => client.SimpleMethodWithComplexParameter(arg));
         }
 
@@ -305,10 +378,10 @@ namespace Bolt.Service.Test
             Uri server1 = new Uri("http://localhost:1111");
             Mock<ITestContract> server = Server();
             server.Setup(m => m.SimpleMethod());
-            TestContractProxy channel = CreateChannel(10, TimeSpan.FromSeconds(1), server1);
+            TestContractProxy channel = CreateChannel(10, TimeSpan.FromSeconds(0.2), server1);
             Task ongoing = channel.SimpleMethodAsync();
 
-            Thread.Sleep(TimeSpan.FromSeconds(1));
+            Thread.Sleep(TimeSpan.FromSeconds(0.5));
 
             IDisposable running = StartServer(server1, ConfigureDefaultServer);
 

@@ -38,6 +38,13 @@ namespace Bolt.Service.Test.Core.Parameters
     }
 
     [DataContract]
+    public partial class MethodWithNotSerializableTypeParameters
+    {
+        [DataMember(Order = 1)]
+        public NotSerializableType Arg { get; set; }
+    }
+
+    [DataContract]
     public partial class MethodWithManyArgumentsParameters
     {
         [DataMember(Order = 1)]
@@ -65,6 +72,8 @@ namespace Bolt.Service.Test.Core
             ComplexFunction = Add("ComplexFunction", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("ComplexFunction"));
             SimpleMethodWithComplexParameter = Add("SimpleMethodWithComplexParameter", typeof(Bolt.Service.Test.Core.Parameters.SimpleMethodWithComplexParameterParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleMethodWithComplexParameter"));
             SimpleFunction = Add("SimpleFunction", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleFunction"));
+            MethodWithNotSerializableType = Add("MethodWithNotSerializableType", typeof(Bolt.Service.Test.Core.Parameters.MethodWithNotSerializableTypeParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("MethodWithNotSerializableType"));
+            FunctionWithNotSerializableType = Add("FunctionWithNotSerializableType", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("FunctionWithNotSerializableType"));
             SimpleAsyncFunction = Add("SimpleAsyncFunction", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleAsyncFunction"));
             MethodWithManyArguments = Add("MethodWithManyArguments", typeof(Bolt.Service.Test.Core.Parameters.MethodWithManyArgumentsParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("MethodWithManyArguments"));
             ThisMethodShouldBeExcluded = Add("ThisMethodShouldBeExcluded", typeof(Bolt.Empty), typeof(IExcludedContract).GetTypeInfo().GetMethod("ThisMethodShouldBeExcluded"));
@@ -85,6 +94,10 @@ namespace Bolt.Service.Test.Core
         public  Bolt.ActionDescriptor SimpleMethodWithComplexParameter { get; private set; }
 
         public  Bolt.ActionDescriptor SimpleFunction { get; private set; }
+
+        public  Bolt.ActionDescriptor MethodWithNotSerializableType { get; private set; }
+
+        public  Bolt.ActionDescriptor FunctionWithNotSerializableType { get; private set; }
 
         public  Bolt.ActionDescriptor SimpleAsyncFunction { get; private set; }
 

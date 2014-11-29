@@ -1,8 +1,7 @@
+using Microsoft.Owin;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
-using Microsoft.Owin;
 
 namespace Bolt.Server
 {
@@ -24,9 +23,9 @@ namespace Bolt.Server
 
         private IResponseHandler _responseHandler;
 
-        private IServerDataHandler _dataHandler;
+        private IDataHandler _dataHandler;
 
-        public string ErrorCodesHeader { get; set; }
+        public IErrorHandler ErrorHandler { get; set; }
 
         public ContractDescriptor Descriptor { get; protected set; }
 
@@ -45,7 +44,7 @@ namespace Bolt.Server
             set { _instanceProvider = value; }
         }
 
-        public IServerDataHandler DataHandler
+        public IDataHandler DataHandler
         {
             get
             {
@@ -77,9 +76,9 @@ namespace Bolt.Server
 
         public void Init(ServerConfiguration configuration)
         {
-            DataHandler = configuration.ServerDataHandler;
+            DataHandler = configuration.DataHandler;
             ResponseHandler = configuration.ResponseHandler;
-            ErrorCodesHeader = configuration.ServerErrorCodesHeader;
+            ErrorHandler = configuration.ErrorHandler;
 
             Init();
         }
@@ -116,13 +115,18 @@ namespace Bolt.Server
 
                 if (error != null)
                 {
-                    await ResponseHandler.HandleErrorResponse(ctxt, error);
+                    await ErrorHandler.HandleError(ctxt, error);
                 }
             }
             else
             {
-                context.CloseWithError(ErrorCodesHeader, ServerErrorCode.ActionNotImplemented);
+                HandleActionNotImplemented(context);
             }
+        }
+
+        protected virtual void HandleActionNotImplemented(IOwinContext context)
+        {
+            ErrorHandler.HandleBoltError(context, ServerErrorCode.ActionNotImplemented);
         }
 
         private class ActionMetadata

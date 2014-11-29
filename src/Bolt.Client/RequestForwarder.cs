@@ -6,20 +6,24 @@ namespace Bolt.Client
 {
     public class RequestForwarder : IRequestForwarder
     {
-        private readonly IClientDataHandler _dataHandler;
+        private readonly IDataHandler _dataHandler;
+        private readonly IServerErrorProvider _serverErrorProvider;
         private readonly IWebRequestHandler _webRequestHandler;
-        private readonly string _boltServerErrorsHeader;
 
-        public RequestForwarder(IClientDataHandler dataHandler, IWebRequestHandler webRequestHandler, string boltServerErrorsHeader)
+        public RequestForwarder(IDataHandler dataHandler, IWebRequestHandler webRequestHandler, IServerErrorProvider serverErrorProvider)
         {
             if (dataHandler == null)
             {
                 throw new ArgumentNullException("dataHandler");
             }
+            if (serverErrorProvider == null)
+            {
+                throw new ArgumentNullException("serverErrorProvider");
+            }
 
             _dataHandler = dataHandler;
+            _serverErrorProvider = serverErrorProvider;
             _webRequestHandler = webRequestHandler ?? new DefaultWebRequestHandler();
-            _boltServerErrorsHeader = boltServerErrorsHeader;
         }
 
         public virtual ResponseDescriptor<T> GetResponse<T, TParameters>(ClientActionContext context, TParameters parameters)
@@ -157,7 +161,7 @@ namespace Bolt.Client
             {
                 if (context.Response != null)
                 {
-                    Exception serverError = ReadBoltServerErrorIfAvailable(context.Action, context.Request, context.Response, _boltServerErrorsHeader);
+                    Exception serverError = ReadBoltServerErrorIfAvailable(context);
                     if (serverError != null)
                     {
                         return new ResponseDescriptor<T>(context.Response, context, serverError, ResponseErrorType.Server);
@@ -209,7 +213,7 @@ namespace Bolt.Client
             {
                 if (context.Response != null)
                 {
-                    Exception serverError = ReadBoltServerErrorIfAvailable(context.Action, context.Request, context.Response, _boltServerErrorsHeader);
+                    Exception serverError = ReadBoltServerErrorIfAvailable(context);
                     if (serverError != null)
                     {
                         return new ResponseDescriptor<T>(context.Response, context, serverError, ResponseErrorType.Server);
@@ -255,18 +259,18 @@ namespace Bolt.Client
             }
         }
 
-        protected virtual Exception ReadBoltServerErrorIfAvailable(ActionDescriptor action, HttpWebRequest request, HttpWebResponse response, string header)
+        protected virtual Exception ReadBoltServerErrorIfAvailable(ClientActionContext context)
         {
-            string value = response.Headers[header];
-            if (string.IsNullOrEmpty(value))
+            ServerErrorCode? result = _serverErrorProvider.TryRead(context);
+            if (result != null)
             {
-                return null;
+                return new BoltServerException(result.Value, context.Action, context.Request.RequestUri.ToString());
             }
 
-            ServerErrorCode code;
-            if (Enum.TryParse(value, true, out code))
+            int? code = _serverErrorProvider.TryReadErrorCode(context);
+            if (code != null)
             {
-                return new BoltServerException(code, action, request.RequestUri.ToString());
+                return new BoltServerException(code.Value, context.Action, context.Request.RequestUri.ToString());
             }
 
             return null;

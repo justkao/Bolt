@@ -51,29 +51,39 @@ namespace Bolt.Server
 
         public virtual Task Execute(IOwinContext context)
         {
-            ActionDescriptor descriptor;
+            ActionDescriptor actionDescriptor;
 
-            IContractInvoker found = ChooseInvoker(context, out descriptor);
+            IContractInvoker found = ChooseInvoker(context, out actionDescriptor);
             if (found == null)
             {
-                context.CloseWithError(Configuration.ServerErrorCodesHeader, ServerErrorCode.ContractNotFound);
-                return Task.FromResult(0);
+                return HandleContractNotFound(context);
             }
 
-            if (descriptor == null)
+            if (actionDescriptor == null)
             {
-                context.CloseWithError(Configuration.ServerErrorCodesHeader, ServerErrorCode.ActionNotFound);
-                return Task.FromResult(0);
+                return HandleActionNotFound(context, found.Descriptor);
             }
 
             try
             {
-                return found.Execute(context, descriptor);
+                return found.Execute(context, actionDescriptor);
             }
             finally
             {
                 context.Response.Body.Close();
             }
+        }
+
+        protected virtual Task HandleActionNotFound(IOwinContext context, ContractDescriptor descriptor)
+        {
+            Configuration.ErrorHandler.HandleBoltError(context, ServerErrorCode.ActionNotFound);
+            return Task.FromResult(0);
+        }
+
+        protected virtual Task HandleContractNotFound(IOwinContext context)
+        {
+            Configuration.ErrorHandler.HandleBoltError(context, ServerErrorCode.ContractNotFound);
+            return Task.FromResult(0);
         }
 
         protected virtual IContractInvoker ChooseInvoker(IOwinContext context, out ActionDescriptor descriptor)

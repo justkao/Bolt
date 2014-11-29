@@ -1,5 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Bolt.Server
 {
@@ -8,7 +7,5 @@ namespace Bolt.Server
         Task Handle(ServerActionContext context);
 
         Task Handle<TResult>(ServerActionContext context, TResult result);
-
-        Task HandleErrorResponse(ServerActionContext context, Exception error);
     }
 }

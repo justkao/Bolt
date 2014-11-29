@@ -8,18 +8,16 @@ using System;
 
 namespace Bolt.Service.Test
 {
-    [TestFixture(SerializerType.Json)]
-    [TestFixture(SerializerType.Proto)]
-    [TestFixture(SerializerType.Xml)]
-    public abstract class TestBase
+
+    public abstract class TestBase : SerializerTestBase
     {
-        private readonly SerializerType _serializerType;
         private IDisposable _runningServer;
 
         protected TestBase(SerializerType serializerType)
+            : base(serializerType)
         {
-            _serializerType = serializerType;
         }
+
 
         public Uri ServerUrl = new Uri("http://localhost:9999");
 
@@ -28,29 +26,14 @@ namespace Bolt.Service.Test
         public ClientConfiguration ClientConfiguration { get; set; }
 
         [TestFixtureSetUp]
-        protected virtual void Init()
+        protected override void Init()
         {
-            ISerializer serializer;
+            base.Init();
 
-            switch (_serializerType)
-            {
-                case SerializerType.Proto:
-                    serializer = new ProtocolBufferSerializer();
-                    break;
-                case SerializerType.Json:
-                    serializer = new JsonSerializer();
-                    break;
-                case SerializerType.Xml:
-                    serializer = new XmlSerializer();
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            JsonExceptionSerializer jsonExceptionSerializer = new JsonExceptionSerializer(Serializer);
 
-            JsonExceptionSerializer jsonExceptionSerializer = new JsonExceptionSerializer(serializer);
-
-            ServerConfiguration = new ServerConfiguration(serializer, jsonExceptionSerializer);
-            ClientConfiguration = new ClientConfiguration(serializer, jsonExceptionSerializer, new DefaultWebRequestHandlerEx());
+            ServerConfiguration = new ServerConfiguration(Serializer, jsonExceptionSerializer);
+            ClientConfiguration = new ClientConfiguration(Serializer, jsonExceptionSerializer, new DefaultWebRequestHandlerEx());
 
             _runningServer = StartServer(ServerUrl, ConfigureDefaultServer);
         }

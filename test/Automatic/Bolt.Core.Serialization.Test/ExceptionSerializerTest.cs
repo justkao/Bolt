@@ -1,12 +1,19 @@
-﻿using NUnit.Framework;
+﻿using Bolt.Service.Test;
+using NUnit.Framework;
 using System;
 using System.IO;
 
 namespace Bolt.Core.Serialization.Test
 {
-    [TestFixture]
-    public class ExceptionSerializerTest
+    public class ExceptionSerializerTest : SerializerTestBase
     {
+        private IExceptionSerializer _serializer;
+
+        public ExceptionSerializerTest(SerializerType serializerType)
+            : base(serializerType)
+        {
+        }
+
         [Test]
         public void Serialize_NullArgument_ThrowsArgumentNullException()
         {
@@ -92,6 +99,11 @@ namespace Bolt.Core.Serialization.Test
             }
         }
 
-        private IExceptionSerializer _serializer = new JsonExceptionSerializer(new JsonSerializer());
+        protected override void Init()
+        {
+            base.Init();
+            _serializer = new JsonExceptionSerializer(Serializer);
+        }
+
     }
 }

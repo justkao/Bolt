@@ -4,6 +4,7 @@
     {
         Proto,
         Json,
-        Xml
+        Xml,
+        Protected
     }
 }

@@ -61,15 +61,16 @@
     <Compile Include="Channels\RecoverableChannel.cs" />
     <Compile Include="ClientConfiguration.cs" />
     <Compile Include="ClientConfigurationExtensions.cs" />
-    <Compile Include="ClientDataHandler.cs" />
+    <Compile Include="DataHandler.cs" />
     <Compile Include="ClientActionContext.cs" />
     <Compile Include="Channels\DelegatedChannel.cs" />
     <Compile Include="Helpers\CriticalSection.cs" />
     <Compile Include="ICancellationTokenProvider.cs" />
     <Compile Include="IChannel.cs" />
-    <Compile Include="IClientDataHandler.cs" />
+    <Compile Include="IDataHandler.cs" />
     <Compile Include="ICloseable.cs" />
     <Compile Include="IRequestForwarder.cs" />
+    <Compile Include="IServerErrorProvider.cs" />
     <Compile Include="IServerProvider.cs" />
     <Compile Include="MultipleServersProvider.cs" />
     <Compile Include="NoServersAvailableException.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="ResponseDescriptor.cs" />
     <Compile Include="ResponseErrorType.cs" />
     <Compile Include="Channels\RecoverableStatefullChannel.cs" />
+    <Compile Include="ServerErrorProvider.cs" />
     <Compile Include="UriServerProvider.cs" />
   </ItemGroup>
   <ItemGroup>

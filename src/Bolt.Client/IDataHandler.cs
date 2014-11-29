@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Bolt.Client
 {
-    public interface IClientDataHandler
+    public interface IDataHandler
     {
         string ContentType { get; }
 

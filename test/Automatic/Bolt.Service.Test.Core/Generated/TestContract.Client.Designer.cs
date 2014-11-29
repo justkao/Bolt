@@ -23,6 +23,10 @@ namespace Bolt.Service.Test.Core
     public partial interface ITestContractInnerAsync : ITestContractInner
     {
         Task SimpleMethodWithComplexParameterAsync(CompositeType compositeType);
+
+        Task MethodWithNotSerializableTypeAsync(NotSerializableType arg);
+
+        Task<NotSerializableType> FunctionWithNotSerializableTypeAsync();
     }
 }
 
@@ -94,6 +98,30 @@ namespace Bolt.Service.Test.Core
         public virtual int SimpleFunction()
         {
             return Channel.Send<int, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.SimpleFunction, GetCancellationToken(Descriptor.SimpleFunction));
+        }
+
+        public virtual void MethodWithNotSerializableType(NotSerializableType arg)
+        {
+            var request = new MethodWithNotSerializableTypeParameters();
+            request.Arg = arg;
+            Channel.Send(request, Descriptor.MethodWithNotSerializableType, GetCancellationToken(Descriptor.MethodWithNotSerializableType));
+        }
+
+        public virtual Task MethodWithNotSerializableTypeAsync(NotSerializableType arg)
+        {
+            var request = new MethodWithNotSerializableTypeParameters();
+            request.Arg = arg;
+            return Channel.SendAsync(request, Descriptor.MethodWithNotSerializableType, GetCancellationToken(Descriptor.MethodWithNotSerializableType));
+        }
+
+        public virtual NotSerializableType FunctionWithNotSerializableType()
+        {
+            return Channel.Send<NotSerializableType, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.FunctionWithNotSerializableType, GetCancellationToken(Descriptor.FunctionWithNotSerializableType));
+        }
+
+        public virtual Task<NotSerializableType> FunctionWithNotSerializableTypeAsync()
+        {
+            return Channel.SendAsync<NotSerializableType, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.FunctionWithNotSerializableType, GetCancellationToken(Descriptor.FunctionWithNotSerializableType));
         }
 
         public virtual Task<int> SimpleAsyncFunction()

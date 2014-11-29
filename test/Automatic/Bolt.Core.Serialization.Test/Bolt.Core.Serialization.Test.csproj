@@ -44,6 +44,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Bolt.Service.Test\SerializerTestBase.cs">
+      <Link>SerializerTestBase.cs</Link>
+    </Compile>
+    <Compile Include="..\Bolt.Service.Test\SerializerType.cs">
+      <Link>SerializerType.cs</Link>
+    </Compile>
     <Compile Include="ExceptionSerializerTest.cs" />
     <Compile Include="CustomException.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

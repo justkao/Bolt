@@ -87,6 +87,7 @@
       <Link>TestContractStateFull.Server.Designer.cs</Link>
     </Compile>
     <Compile Include="CustomException.cs" />
+    <Compile Include="SerializerTestBase.cs" />
     <Compile Include="SerializerType.cs" />
     <Compile Include="StateFullTest.cs" />
     <Compile Include="TestBase.cs" />

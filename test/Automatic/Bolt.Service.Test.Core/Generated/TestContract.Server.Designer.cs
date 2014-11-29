@@ -33,6 +33,8 @@ namespace Bolt.Service.Test.Core
             AddAction(Descriptor.ComplexFunction, TestContract_ComplexFunction);
             AddAction(Descriptor.SimpleMethodWithComplexParameter, TestContractInner_SimpleMethodWithComplexParameter);
             AddAction(Descriptor.SimpleFunction, TestContractInner_SimpleFunction);
+            AddAction(Descriptor.MethodWithNotSerializableType, TestContractInner_MethodWithNotSerializableType);
+            AddAction(Descriptor.FunctionWithNotSerializableType, TestContractInner_FunctionWithNotSerializableType);
             AddAction(Descriptor.SimpleAsyncFunction, TestContractInner_SimpleAsyncFunction);
             AddAction(Descriptor.MethodWithManyArguments, TestContractInner_MethodWithManyArguments);
             AddAction(Descriptor.ThisMethodShouldBeExcluded, ExcludedContract_ThisMethodShouldBeExcluded);
@@ -143,6 +145,39 @@ namespace Bolt.Service.Test.Core
             try
             {
                 var result = instance.SimpleFunction();
+                await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
+            }
+            catch (Exception e)
+            {
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
+            }
+        }
+
+        protected virtual async Task TestContractInner_MethodWithNotSerializableType(Bolt.Server.ServerActionContext context)
+        {
+            var parameters = await DataHandler.ReadParametersAsync<MethodWithNotSerializableTypeParameters>(context);
+            var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
+            try
+            {
+                instance.MethodWithNotSerializableType(parameters.Arg);
+                await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
+            }
+            catch (Exception e)
+            {
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
+            }
+        }
+
+        protected virtual async Task TestContractInner_FunctionWithNotSerializableType(Bolt.Server.ServerActionContext context)
+        {
+            var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
+            try
+            {
+                var result = instance.FunctionWithNotSerializableType();
                 await ResponseHandler.Handle(context, result);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }

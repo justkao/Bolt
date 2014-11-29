@@ -189,7 +189,7 @@ namespace Bolt.Client.Channels
 
         protected override Uri GetRemoteConnection()
         {
-            Open();
+            Open(); 
             return ServerProvider.GetServer();
         }
 

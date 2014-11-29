@@ -17,6 +17,12 @@ namespace Bolt.Service.Test.Core
 
         int SimpleFunction();
 
+        [AsyncOperation]
+        void MethodWithNotSerializableType(NotSerializableType arg);
+
+        [AsyncOperation]
+        NotSerializableType FunctionWithNotSerializableType();
+
         Task<int> SimpleAsyncFunction();
 
         void MethodWithManyArguments(CompositeType arg1, CompositeType arg2, DateTime time);
