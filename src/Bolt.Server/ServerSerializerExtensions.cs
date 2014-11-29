@@ -65,8 +65,7 @@ namespace Bolt.Server
             {
                 e.EnsureNotCancelled();
 
-                throw new SerializeResponseException(
-                    string.Format("Failed to serialize response data for action '{0}'.", actionDescriptor), e);
+                throw new SerializeResponseException(string.Format("Failed to serialize response data for action '{0}'.", actionDescriptor), e);
             }
         }
 
@@ -95,8 +94,7 @@ namespace Bolt.Server
             {
                 e.EnsureNotCancelled();
 
-                throw new SerializeResponseException(
-                    string.Format("Failed to serialize exception response for action '{0}'.", actionDescriptor), e);
+                throw new SerializeResponseException(string.Format("Failed to serialize exception response for action '{0}'.", actionDescriptor), e);
             }
         }
     }

@@ -76,6 +76,7 @@ namespace Bolt.Server
             if (_instances.TryGetValue(sessionId, out instance))
             {
                 instance.Timestamp = DateTime.UtcNow;
+                BeforeSessionInstanceRetrieved(context, instance.Instance);
                 return (TInstance)instance.Instance;
             }
 
@@ -150,6 +151,10 @@ namespace Bolt.Server
             {
                 _timer.Dispose();
             }
+        }
+
+        protected virtual void BeforeSessionInstanceRetrieved(ServerActionContext context, object instance)
+        {
         }
 
         protected virtual void OnInstanceCreated(ServerActionContext context, string sessionId)

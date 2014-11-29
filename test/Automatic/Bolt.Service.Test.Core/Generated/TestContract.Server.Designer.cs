@@ -34,6 +34,7 @@ namespace Bolt.Service.Test.Core
             AddAction(Descriptor.SimpleMethodWithComplexParameter, TestContractInner_SimpleMethodWithComplexParameter);
             AddAction(Descriptor.SimpleFunction, TestContractInner_SimpleFunction);
             AddAction(Descriptor.FunctionReturningHugeData, TestContractInner_FunctionReturningHugeData);
+            AddAction(Descriptor.MethodTakingHugeData, TestContractInner_MethodTakingHugeData);
             AddAction(Descriptor.MethodWithNotSerializableType, TestContractInner_MethodWithNotSerializableType);
             AddAction(Descriptor.FunctionWithNotSerializableType, TestContractInner_FunctionWithNotSerializableType);
             AddAction(Descriptor.SimpleAsyncFunction, TestContractInner_SimpleAsyncFunction);
@@ -163,6 +164,23 @@ namespace Bolt.Service.Test.Core
             {
                 var result = instance.FunctionReturningHugeData();
                 await ResponseHandler.Handle(context, result);
+                InstanceProvider.ReleaseInstance(context, instance, null);
+            }
+            catch (Exception e)
+            {
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
+            }
+        }
+
+        protected virtual async Task TestContractInner_MethodTakingHugeData(Bolt.Server.ServerActionContext context)
+        {
+            var parameters = await DataHandler.ReadParametersAsync<MethodTakingHugeDataParameters>(context);
+            var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
+            try
+            {
+                instance.MethodTakingHugeData(parameters.Arg);
+                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)

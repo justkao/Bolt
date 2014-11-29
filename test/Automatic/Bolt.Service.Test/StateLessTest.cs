@@ -405,6 +405,21 @@ namespace Bolt.Service.Test
 
         }
 
+        [Test]
+        public void ClientSendsBigData_EnsureReceivedOnServer()
+        {
+            TestContractProxy channel = CreateChannel();
+            var data = Enumerable.Repeat(0, 1000).Select(_ => CompositeType.CreateRandom()).ToList();
+
+            Mock<ITestContract> server = Server();
+            server.Setup(v => v.MethodTakingHugeData(It.IsAny<List<CompositeType>>())).Callback<List<CompositeType>>(
+                v => Assert.AreEqual(1000, v.Count));
+
+            channel.MethodTakingHugeData(data);
+
+            server.Verify(v => v.MethodTakingHugeData(It.IsAny<List<CompositeType>>()));
+        }
+
         public MockInstanceProvider InstanceProvider = new MockInstanceProvider();
 
         public Mock<ITestContract> Server()

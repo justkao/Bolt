@@ -38,6 +38,13 @@ namespace Bolt.Service.Test.Core.Parameters
     }
 
     [DataContract]
+    public partial class MethodTakingHugeDataParameters
+    {
+        [DataMember(Order = 1)]
+        public List<CompositeType> Arg { get; set; }
+    }
+
+    [DataContract]
     public partial class MethodWithNotSerializableTypeParameters
     {
         [DataMember(Order = 1)]
@@ -73,6 +80,7 @@ namespace Bolt.Service.Test.Core
             SimpleMethodWithComplexParameter = Add("SimpleMethodWithComplexParameter", typeof(Bolt.Service.Test.Core.Parameters.SimpleMethodWithComplexParameterParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleMethodWithComplexParameter"));
             SimpleFunction = Add("SimpleFunction", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleFunction"));
             FunctionReturningHugeData = Add("FunctionReturningHugeData", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("FunctionReturningHugeData"));
+            MethodTakingHugeData = Add("MethodTakingHugeData", typeof(Bolt.Service.Test.Core.Parameters.MethodTakingHugeDataParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("MethodTakingHugeData"));
             MethodWithNotSerializableType = Add("MethodWithNotSerializableType", typeof(Bolt.Service.Test.Core.Parameters.MethodWithNotSerializableTypeParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("MethodWithNotSerializableType"));
             FunctionWithNotSerializableType = Add("FunctionWithNotSerializableType", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("FunctionWithNotSerializableType"));
             SimpleAsyncFunction = Add("SimpleAsyncFunction", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleAsyncFunction"));
@@ -97,6 +105,8 @@ namespace Bolt.Service.Test.Core
         public  Bolt.ActionDescriptor SimpleFunction { get; private set; }
 
         public  Bolt.ActionDescriptor FunctionReturningHugeData { get; private set; }
+
+        public  Bolt.ActionDescriptor MethodTakingHugeData { get; private set; }
 
         public  Bolt.ActionDescriptor MethodWithNotSerializableType { get; private set; }
 

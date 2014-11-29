@@ -105,6 +105,13 @@ namespace Bolt.Service.Test.Core
             return Channel.Send<List<CompositeType>, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.FunctionReturningHugeData, GetCancellationToken(Descriptor.FunctionReturningHugeData));
         }
 
+        public virtual void MethodTakingHugeData(List<CompositeType> arg)
+        {
+            var request = new MethodTakingHugeDataParameters();
+            request.Arg = arg;
+            Channel.Send(request, Descriptor.MethodTakingHugeData, GetCancellationToken(Descriptor.MethodTakingHugeData));
+        }
+
         public virtual void MethodWithNotSerializableType(NotSerializableType arg)
         {
             var request = new MethodWithNotSerializableTypeParameters();

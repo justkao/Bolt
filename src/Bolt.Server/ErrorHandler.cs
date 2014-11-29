@@ -1,8 +1,8 @@
+using Microsoft.Owin;
 using System;
 using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.Owin;
 
 namespace Bolt.Server
 {
@@ -13,6 +13,16 @@ namespace Bolt.Server
 
         public ErrorHandler(IDataHandler dataHandler, string errorCodesHeader)
         {
+            if (dataHandler == null)
+            {
+                throw new ArgumentNullException("dataHandler");
+            }
+
+            if (string.IsNullOrEmpty(errorCodesHeader))
+            {
+                throw new ArgumentNullException("errorCodesHeader");
+            }
+
             _dataHandler = dataHandler;
             _errorCodesHeader = errorCodesHeader;
         }

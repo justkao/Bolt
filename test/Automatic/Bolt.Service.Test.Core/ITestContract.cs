@@ -20,6 +20,8 @@ namespace Bolt.Service.Test.Core
 
         List<CompositeType> FunctionReturningHugeData();
 
+        void MethodTakingHugeData(List<CompositeType> arg);
+
         [AsyncOperation]
         void MethodWithNotSerializableType(NotSerializableType arg);
 

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Owin;
+using System;
 using System.Threading;
 
 namespace Bolt.Server
@@ -8,6 +9,11 @@ namespace Bolt.Server
         public ServerActionContext(IOwinContext context, ActionDescriptor descriptor)
             : base(descriptor)
         {
+            if (context == null)
+            {
+                throw new ArgumentNullException("context");
+            }
+
             Context = context;
         }
 
