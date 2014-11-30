@@ -14,7 +14,7 @@ namespace Bolt
         {
             if (cancellation == CancellationToken.None)
             {
-                return (HttpWebResponse)await GetResponseAsyncCore(request, timeout);
+                return (HttpWebResponse)await GetResponseCoreAsync(request, timeout);
             }
 
             try
@@ -32,7 +32,7 @@ namespace Bolt
                     },
                     false))
                 {
-                    WebResponse response = await GetResponseAsyncCore(request, timeout);
+                    WebResponse response = await GetResponseCoreAsync(request, timeout);
                     cancellation.ThrowIfCancellationRequested();
                     return (HttpWebResponse)response;
                 }
@@ -102,11 +102,11 @@ namespace Bolt
         [DebuggerStepThrough]
         protected virtual WebResponse GetResponseCore(HttpWebRequest webRequest, TimeSpan timeout)
         {
-            return TaskExtensions.Execute(() => GetResponseAsyncCore(webRequest, timeout));
+            return TaskExtensions.Execute(() => GetResponseCoreAsync(webRequest, timeout));
         }
 
         [DebuggerStepThrough]
-        protected virtual Task<WebResponse> GetResponseAsyncCore(HttpWebRequest webRequest, TimeSpan timeout)
+        protected virtual Task<WebResponse> GetResponseCoreAsync(HttpWebRequest webRequest, TimeSpan timeout)
         {
             return webRequest.GetResponseAsync();
         }

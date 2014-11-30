@@ -38,7 +38,7 @@ namespace Bolt.Core.Serialization
         }
 
         [DebuggerStepThrough]
-        protected override async Task<WebResponse> GetResponseAsyncCore(HttpWebRequest webRequest, TimeSpan timeout)
+        protected override async Task<WebResponse> GetResponseCoreAsync(HttpWebRequest webRequest, TimeSpan timeout)
         {
             if (timeout != TimeSpan.Zero)
             {
