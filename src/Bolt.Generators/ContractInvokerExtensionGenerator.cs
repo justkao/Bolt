@@ -73,9 +73,6 @@ namespace Bolt.Generators
                     WriteLine();
                     WriteLine("return app;");
                 }
-
-                WriteLine();
-
             });
 
             base.Generate();

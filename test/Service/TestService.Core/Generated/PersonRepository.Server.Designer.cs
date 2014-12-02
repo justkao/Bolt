@@ -47,6 +47,7 @@ namespace TestService.Core
 
             base.Init();
         }
+
         protected virtual async Task PersonRepository_UpdatePerson(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<UpdatePersonParameters>(context);
@@ -375,7 +376,6 @@ namespace Bolt.Server
 
             return app;
         }
-
     }
 }
 

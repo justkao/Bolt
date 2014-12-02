@@ -153,7 +153,6 @@ namespace Bolt.Server
 
             return app;
         }
-
     }
 }
 

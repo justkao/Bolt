@@ -84,6 +84,7 @@ namespace Bolt.Generators
                         WriteLine();
                         WriteLine("base.Init();");
                     }
+                    WriteLine();
 
                     IEnumerable<MethodInfo> methods = ContractDefinition.GetEffectiveMethods().ToList();
 
