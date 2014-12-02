@@ -43,6 +43,7 @@ namespace Bolt.Service.Test.Core
 
             base.Init();
         }
+
         protected virtual async Task TestContract_SimpleMethodWithSimpleArguments(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<SimpleMethodWithSimpleArgumentsParameters>(context);

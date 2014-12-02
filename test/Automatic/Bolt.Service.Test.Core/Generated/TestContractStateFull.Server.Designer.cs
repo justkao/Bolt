@@ -34,6 +34,7 @@ namespace Bolt.Service.Test.Core
 
             base.Init();
         }
+
         protected virtual async Task TestContractStateFull_Init(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);

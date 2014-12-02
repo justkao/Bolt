@@ -29,7 +29,7 @@ namespace TestService.Client
             Console.ReadLine();
         }
 
-        private static void Execute(Action<IPersonRepository> action, int count, string actionName)
+        private static void Execute(Action<ITestContract> action, int count, string actionName)
         {
             Console.WriteLine("Executing '{0}', Repeats = '{1}' ", actionName, count);
             Console.WriteLine();
@@ -42,7 +42,7 @@ namespace TestService.Client
             Console.WriteLine();
         }
 
-        private static void Execute(Action<IPersonRepository> action, int count, IPersonRepository channel, string type, string actionName)
+        private static void Execute(Action<ITestContract> action, int count, ITestContract channel, string type, string actionName)
         {
             // warmup
             for (int i = 0; i < 10; i++)

@@ -12,7 +12,7 @@ namespace TestService.IIS.Bolt
         public void Configuration(IAppBuilder app)
         {
             app.UseBolt(new ServerConfiguration(new ProtocolBufferSerializer(), new JsonExceptionSerializer(new ProtocolBufferSerializer())));
-            app.UsePersonRepository<PersonRepository>();
+            app.UseTestContract<TestContractImplementation>();
         }
     }
 }

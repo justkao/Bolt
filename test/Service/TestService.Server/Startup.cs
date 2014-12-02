@@ -7,7 +7,7 @@ using TestService.Core;
 
 namespace TestService.Server
 {
-    public class Rep : PersonRepository
+    public class Rep : TestContractImplementation
     {
         public override void ThrowsCustom()
         {
@@ -20,7 +20,7 @@ namespace TestService.Server
         public void Configuration(IAppBuilder app)
         {
             app.UseBolt(new ServerConfiguration(new JsonSerializer(), new JsonExceptionSerializer(new JsonSerializer())));
-            app.UsePersonRepository(new Rep());
+            app.UseTestContract<TestContractImplementation>();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace TestService.Server.Wcf
     {
         public static void Main(string[] args)
         {
-            ServiceHost host = new ServiceHost(typeof(PersonRepository), Servers.WcfServer);
+            ServiceHost host = new ServiceHost(typeof(TestContractImplementation), Servers.WcfServer);
             host.Open();
 
             Console.WriteLine("Host running ... ");

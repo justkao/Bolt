@@ -49,11 +49,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\TestService.Core\Generated\PersonRepository.Client.Designer.cs">
-      <Link>PersonRepository.Client.Designer.cs</Link>
+    <Compile Include="..\TestService.Core\Generated\TestContract.Client.Designer.cs">
+      <Link>TestContract.Client.Designer.cs</Link>
     </Compile>
-    <Compile Include="..\TestService.Core\Generated\PersonRepository.Contract.Designer.cs">
-      <Link>PersonRepository.Contract.Designer.cs</Link>
+    <Compile Include="..\TestService.Core\Generated\TestContract.Contract.Designer.cs">
+      <Link>TestContract.Contract.Designer.cs</Link>
     </Compile>
     <Compile Include="ClientFactory.cs" />
     <Compile Include="Program.cs" />

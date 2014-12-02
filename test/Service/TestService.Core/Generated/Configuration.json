@@ -1,7 +1,7 @@
 ﻿{
     "contracts": [
         {
-            "contract": "TestService.Core.IPersonRepository",
+            "contract": "TestService.Core.ITestContract",
             "assemblies": [ "TestService.Core.dll" ],
                 "parametersBase": "TestService.Core.ParametersBase",
 

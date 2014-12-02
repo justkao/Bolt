@@ -20,27 +20,27 @@ namespace TestService.Client
         public static readonly ClientConfiguration Config = new ClientConfiguration(new JsonSerializer(),
             new JsonExceptionSerializer(new JsonSerializer(), new CustomSerializationBinder()), new DefaultWebRequestHandlerEx());
 
-        public static IPersonRepository CreateIISBolt()
+        public static ITestContract CreateIISBolt()
         {
-            return Config.CreateProxy<PersonRepositoryProxy>(Servers.IISBoltServer);
+            return Config.CreateProxy<TestContractProxy>(Servers.IISBoltServer);
         }
 
-        public static IPersonRepository CreateBolt()
+        public static ITestContract CreateBolt()
         {
-            return Config.CreateProxy<PersonRepositoryProxy>(Servers.BoltServer);
+            return Config.CreateProxy<TestContractProxy>(Servers.BoltServer);
         }
 
-        public static IPersonRepository CreateWcf()
+        public static ITestContract CreateWcf()
         {
-            System.ServiceModel.ChannelFactory<IPersonRepository> respository = new System.ServiceModel.ChannelFactory<IPersonRepository>(new BasicHttpBinding());
-            IPersonRepository channel = respository.CreateChannel(new EndpointAddress(Servers.WcfServer));
+            System.ServiceModel.ChannelFactory<ITestContract> respository = new System.ServiceModel.ChannelFactory<ITestContract>(new BasicHttpBinding());
+            ITestContract channel = respository.CreateChannel(new EndpointAddress(Servers.WcfServer));
             return channel;
         }
 
-        public static IPersonRepository CreateIISWcf()
+        public static ITestContract CreateIISWcf()
         {
-            System.ServiceModel.ChannelFactory<IPersonRepository> respository = new System.ServiceModel.ChannelFactory<IPersonRepository>(new BasicHttpBinding());
-            IPersonRepository channel = respository.CreateChannel(new EndpointAddress(Servers.IISWcfServer));
+            System.ServiceModel.ChannelFactory<ITestContract> respository = new System.ServiceModel.ChannelFactory<ITestContract>(new BasicHttpBinding());
+            ITestContract channel = respository.CreateChannel(new EndpointAddress(Servers.IISWcfServer));
             return channel;
         }
     }
