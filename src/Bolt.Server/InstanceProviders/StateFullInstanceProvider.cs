@@ -59,6 +59,14 @@ namespace Bolt.Server
 
             if (context.Action == _initInstanceAction)
             {
+                string existingSession = GetSession(context);
+                if (existingSession != null && _instances.TryGetValue(existingSession, out instance))
+                {
+                    instance.Timestamp = DateTime.UtcNow;
+                    BeforeInstanceReturned(context, instance.Instance);
+                    return (TInstance) instance.Instance;
+                }
+
                 instance = new InstanceMetadata(base.GetInstance<TInstance>(context));
                 string newSession = CreateNewSession();
                 _instances[newSession] = instance;
@@ -76,7 +84,7 @@ namespace Bolt.Server
             if (_instances.TryGetValue(sessionId, out instance))
             {
                 instance.Timestamp = DateTime.UtcNow;
-                BeforeSessionInstanceRetrieved(context, instance.Instance);
+                BeforeInstanceReturned(context, instance.Instance);
                 return (TInstance)instance.Instance;
             }
 
@@ -153,7 +161,7 @@ namespace Bolt.Server
             }
         }
 
-        protected virtual void BeforeSessionInstanceRetrieved(ServerActionContext context, object instance)
+        protected virtual void BeforeInstanceReturned(ServerActionContext context, object instance)
         {
         }
 

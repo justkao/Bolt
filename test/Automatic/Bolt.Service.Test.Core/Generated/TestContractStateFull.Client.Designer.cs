@@ -58,16 +58,16 @@ namespace Bolt.Service.Test.Core
 
         public virtual void SetState(string state)
         {
-            var request = new SetStateParameters();
-            request.State = state;
-            Channel.Send(request, Descriptor.SetState, GetCancellationToken(Descriptor.SetState));
+            var bolt_Params = new SetStateParameters();
+            bolt_Params.State = state;
+            Channel.Send(bolt_Params, Descriptor.SetState, GetCancellationToken(Descriptor.SetState));
         }
 
         public virtual Task SetStateAsync(string state)
         {
-            var request = new SetStateParameters();
-            request.State = state;
-            return Channel.SendAsync(request, Descriptor.SetState, GetCancellationToken(Descriptor.SetState));
+            var bolt_Params = new SetStateParameters();
+            bolt_Params.State = state;
+            return Channel.SendAsync(bolt_Params, Descriptor.SetState, GetCancellationToken(Descriptor.SetState));
         }
 
         public virtual string GetState()

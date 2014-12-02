@@ -1,8 +1,10 @@
 ﻿using Bolt.Client;
+using Bolt.Client.Channels;
 using Bolt.Server;
 using Bolt.Service.Test.Core;
 using NUnit.Framework;
 using Owin;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -237,6 +239,84 @@ namespace Bolt.Service.Test
             await (channel as IChannel).CloseAsync();
             Assert.AreEqual(before, InstanceProvider.Count);
         }
+
+
+        [Test]
+        public void CloseSession_EnsureNextRequestFails()
+        {
+            TestContractStateFullProxy channel = GetChannel();
+            channel.WithRetries(0, TimeSpan.FromMilliseconds(1));
+            channel.GetState();
+            channel.Destroy();
+
+            try
+            {
+                channel.GetState();
+                Assert.Fail("BoltServerException was not thrown.");
+            }
+            catch (BoltServerException e)
+            {
+                Assert.AreEqual(ServerErrorCode.SessionNotFound, e.Error.Value);
+            }
+        }
+
+        [Test]
+        public async Task Async_CloseSession_EnsureNextRequestFails()
+        {
+            TestContractStateFullProxy channel = GetChannel();
+            channel.WithRetries(0, TimeSpan.FromMilliseconds(1));
+            await channel.GetStateAsync();
+            await channel.DestroyAsync();
+
+            try
+            {
+                await channel.GetStateAsync();
+                Assert.Fail("BoltServerException was not thrown.");
+            }
+            catch (BoltServerException e)
+            {
+                Assert.AreEqual(ServerErrorCode.SessionNotFound, e.Error.Value);
+            }
+        }
+
+        [Test]
+        public void InitSession_Explicitely_EnsureInitialized()
+        {
+            TestContractStateFullProxy channel = GetChannel();
+            channel.Init();
+            channel.GetState();
+            channel.Dispose();
+        }
+
+        [Test]
+        public async Task Async_InitSession_Explicitely_EnsureInitialized()
+        {
+            TestContractStateFullProxy channel = GetChannel();
+            await channel.InitAsync();
+            await channel.GetStateAsync();
+            await (channel as IChannel).CloseAsync();
+        }
+
+        [Test]
+        public void CloseSession_EnsureSessionIdNull()
+        {
+            TestContractStateFullProxy channel = GetChannel();
+            channel.GetState();
+            channel.Dispose();
+
+            Assert.IsNull(((RecoverableStatefullChannel<TestContractStateFullProxy>)channel.Channel).SessionId);
+        }
+
+        [Test]
+        public async Task Async_CloseSession_EnsureSessionIdNull()
+        {
+            TestContractStateFullProxy channel = GetChannel();
+            await channel.GetStateAsync();
+            await (channel as ICloseable).CloseAsync();
+
+            Assert.IsNull(((RecoverableStatefullChannel<TestContractStateFullProxy>)channel.Channel).SessionId);
+        }
+
 
         public virtual TestContractStateFullProxy GetChannel()
         {

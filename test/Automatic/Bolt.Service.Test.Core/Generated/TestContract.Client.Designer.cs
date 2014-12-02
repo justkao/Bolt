@@ -52,9 +52,9 @@ namespace Bolt.Service.Test.Core
 
         public virtual void SimpleMethodWithSimpleArguments(int val)
         {
-            var request = new SimpleMethodWithSimpleArgumentsParameters();
-            request.Val = val;
-            Channel.Send(request, Descriptor.SimpleMethodWithSimpleArguments, GetCancellationToken(Descriptor.SimpleMethodWithSimpleArguments));
+            var bolt_Params = new SimpleMethodWithSimpleArgumentsParameters();
+            bolt_Params.Val = val;
+            Channel.Send(bolt_Params, Descriptor.SimpleMethodWithSimpleArguments, GetCancellationToken(Descriptor.SimpleMethodWithSimpleArguments));
         }
 
         public virtual void SimpleMethod()
@@ -83,16 +83,16 @@ namespace Bolt.Service.Test.Core
         }
         public virtual void SimpleMethodWithComplexParameter(CompositeType compositeType)
         {
-            var request = new SimpleMethodWithComplexParameterParameters();
-            request.CompositeType = compositeType;
-            Channel.Send(request, Descriptor.SimpleMethodWithComplexParameter, GetCancellationToken(Descriptor.SimpleMethodWithComplexParameter));
+            var bolt_Params = new SimpleMethodWithComplexParameterParameters();
+            bolt_Params.CompositeType = compositeType;
+            Channel.Send(bolt_Params, Descriptor.SimpleMethodWithComplexParameter, GetCancellationToken(Descriptor.SimpleMethodWithComplexParameter));
         }
 
         public virtual Task SimpleMethodWithComplexParameterAsync(CompositeType compositeType)
         {
-            var request = new SimpleMethodWithComplexParameterParameters();
-            request.CompositeType = compositeType;
-            return Channel.SendAsync(request, Descriptor.SimpleMethodWithComplexParameter, GetCancellationToken(Descriptor.SimpleMethodWithComplexParameter));
+            var bolt_Params = new SimpleMethodWithComplexParameterParameters();
+            bolt_Params.CompositeType = compositeType;
+            return Channel.SendAsync(bolt_Params, Descriptor.SimpleMethodWithComplexParameter, GetCancellationToken(Descriptor.SimpleMethodWithComplexParameter));
         }
 
         public virtual int SimpleFunction()
@@ -107,23 +107,23 @@ namespace Bolt.Service.Test.Core
 
         public virtual void MethodTakingHugeData(List<CompositeType> arg)
         {
-            var request = new MethodTakingHugeDataParameters();
-            request.Arg = arg;
-            Channel.Send(request, Descriptor.MethodTakingHugeData, GetCancellationToken(Descriptor.MethodTakingHugeData));
+            var bolt_Params = new MethodTakingHugeDataParameters();
+            bolt_Params.Arg = arg;
+            Channel.Send(bolt_Params, Descriptor.MethodTakingHugeData, GetCancellationToken(Descriptor.MethodTakingHugeData));
         }
 
         public virtual void MethodWithNotSerializableType(NotSerializableType arg)
         {
-            var request = new MethodWithNotSerializableTypeParameters();
-            request.Arg = arg;
-            Channel.Send(request, Descriptor.MethodWithNotSerializableType, GetCancellationToken(Descriptor.MethodWithNotSerializableType));
+            var bolt_Params = new MethodWithNotSerializableTypeParameters();
+            bolt_Params.Arg = arg;
+            Channel.Send(bolt_Params, Descriptor.MethodWithNotSerializableType, GetCancellationToken(Descriptor.MethodWithNotSerializableType));
         }
 
         public virtual Task MethodWithNotSerializableTypeAsync(NotSerializableType arg)
         {
-            var request = new MethodWithNotSerializableTypeParameters();
-            request.Arg = arg;
-            return Channel.SendAsync(request, Descriptor.MethodWithNotSerializableType, GetCancellationToken(Descriptor.MethodWithNotSerializableType));
+            var bolt_Params = new MethodWithNotSerializableTypeParameters();
+            bolt_Params.Arg = arg;
+            return Channel.SendAsync(bolt_Params, Descriptor.MethodWithNotSerializableType, GetCancellationToken(Descriptor.MethodWithNotSerializableType));
         }
 
         public virtual NotSerializableType FunctionWithNotSerializableType()
@@ -143,11 +143,11 @@ namespace Bolt.Service.Test.Core
 
         public virtual void MethodWithManyArguments(CompositeType arg1, CompositeType arg2, DateTime time)
         {
-            var request = new MethodWithManyArgumentsParameters();
-            request.Arg1 = arg1;
-            request.Arg2 = arg2;
-            request.Time = time;
-            Channel.Send(request, Descriptor.MethodWithManyArguments, GetCancellationToken(Descriptor.MethodWithManyArguments));
+            var bolt_Params = new MethodWithManyArgumentsParameters();
+            bolt_Params.Arg1 = arg1;
+            bolt_Params.Arg2 = arg2;
+            bolt_Params.Time = time;
+            Channel.Send(bolt_Params, Descriptor.MethodWithManyArguments, GetCancellationToken(Descriptor.MethodWithManyArguments));
         }
         public virtual void ThisMethodShouldBeExcluded()
         {

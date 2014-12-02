@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Bolt.Client;
+using Bolt.Client.Channels;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Bolt.Client;
-using Bolt.Client.Channels;
 
 namespace Bolt.Generators
 {
@@ -180,16 +180,16 @@ namespace Bolt.Generators
             }
 
             AddUsings(methodDescriptor.Parameters.Namespace);
-            WriteLine("var request = new {0}();", methodDescriptor.Parameters.Name);
+            WriteLine("var bolt_Params = new {0}();", methodDescriptor.Parameters.Name);
 
             foreach (ParameterInfo info in methodDescriptor.GetParameters())
             {
-                WriteLine("request.{0} = {1};", info.Name.CapitalizeFirstLetter(), variables[info]);
+                WriteLine("bolt_Params.{0} = {1};", info.Name.CapitalizeFirstLetter(), variables[info]);
             }
 
             return new GenerateRequestCodeResult()
             {
-                VariableName = "request",
+                VariableName = "bolt_Params",
                 TypeName = methodDescriptor.Parameters.Name
             };
         }
