@@ -16,7 +16,24 @@ namespace Bolt.Client
             _errorCodeHeader = errorCodeHeader;
         }
 
-        public ServerErrorCode? TryRead(ClientActionContext context)
+        public virtual Exception TryReadServerError(ClientActionContext context)
+        {
+            ServerErrorCode? result = TryReadBoltError(context);
+            if (result != null)
+            {
+                return new BoltServerException(result.Value, context.Action, context.Request.RequestUri.ToString());
+            }
+
+            int? code = TryReadErrorCode(context);
+            if (code != null)
+            {
+                return new BoltServerException(code.Value, context.Action, context.Request.RequestUri.ToString());
+            }
+
+            return null;
+        }
+
+        protected virtual ServerErrorCode? TryReadBoltError(ClientActionContext context)
         {
             string value = context.Response.Headers[_errorCodeHeader];
             if (string.IsNullOrEmpty(value))
@@ -33,7 +50,7 @@ namespace Bolt.Client
             return null;
         }
 
-        public int? TryReadErrorCode(ClientActionContext context)
+        protected virtual int? TryReadErrorCode(ClientActionContext context)
         {
             string value = context.Response.Headers[_errorCodeHeader];
             if (string.IsNullOrEmpty(value))

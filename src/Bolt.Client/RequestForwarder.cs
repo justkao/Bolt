@@ -261,19 +261,7 @@ namespace Bolt.Client
 
         protected virtual Exception ReadBoltServerErrorIfAvailable(ClientActionContext context)
         {
-            ServerErrorCode? result = _serverErrorProvider.TryRead(context);
-            if (result != null)
-            {
-                return new BoltServerException(result.Value, context.Action, context.Request.RequestUri.ToString());
-            }
-
-            int? code = _serverErrorProvider.TryReadErrorCode(context);
-            if (code != null)
-            {
-                return new BoltServerException(code.Value, context.Action, context.Request.RequestUri.ToString());
-            }
-
-            return null;
+            return _serverErrorProvider.TryReadServerError(context);
         }
 
         protected virtual bool IsCommunicationException(WebException e)
