@@ -1,9 +1,9 @@
-﻿namespace Bolt.Client
+﻿using System;
+
+namespace Bolt.Client
 {
     public interface IServerErrorProvider
     {
-        ServerErrorCode? TryRead(ClientActionContext context);
-
-        int? TryReadErrorCode(ClientActionContext context);
+        Exception TryReadServerError(ClientActionContext context);
     }
 }
