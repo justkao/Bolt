@@ -60,10 +60,10 @@
     <Compile Include="AssemblyCache.cs" />
     <Compile Include="ClientConfig.cs" />
     <Compile Include="GeneratorConfig.cs" />
+    <Compile Include="Options.cs" />
     <Compile Include="PathHelpers.cs" />
     <Compile Include="RootConfig.cs" />
     <Compile Include="ServerConfig.cs" />
-    <Compile Include="TypeHelper.cs" />
     <Compile Include="ContractExecution.cs" />
     <Compile Include="ConfigBase.cs" />
     <Compile Include="ContractConfig.cs" />

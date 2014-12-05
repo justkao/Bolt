@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+
+using NDesk.Options;
 
 namespace Bolt.Console
 {
@@ -7,34 +10,82 @@ namespace Bolt.Console
     {
         public static void Main(string[] args)
         {
-            if (args.Length == 0)
-            {
-                System.Console.WriteLine("Tool used to generate Bolt client and server classes.");
-                System.Console.WriteLine();
-                System.Console.WriteLine("Usage:");
-                System.Console.WriteLine("      Bolt -example <output>   : Generates configuration example at defined path.");
-                System.Console.WriteLine("      Bolt <config>            : Generate Bolt classes based on provided configuration file.");
+            bool showHelp = false;
+            bool showExample = false;
+            string examplePath = null;
+            string workingDirectory = null;
+            string config = null;
 
+            OptionSet set = new OptionSet()
+                                {
+                                    {
+                                        "h|help", "Shows help for bolt tool.", 
+                                        v => showHelp = v != null
+                                    },
+                                    {
+                                        "r=|root=", "The working directory for assembly loading.",
+                                        v => workingDirectory = v
+                                    },
+                                    {
+                                        "e|example:", "Shows or generates configuration example.", v =>
+                                            {
+                                                showExample = true;
+                                                examplePath = v;
+                                            }
+                                    },
+                                    {
+                                        "c=|config=", "The path to configuration file.",
+                                        v => config = v
+                                    }
+                                };
+
+            try
+            {
+                set.Parse(args);
+            }
+            catch (OptionException e)
+            {
+                System.Console.WriteLine(e.Message);
+                System.Console.WriteLine("Try 'Bolt --help' for more information.");
                 return;
             }
 
-            if (args[0] == "-example")
+            if (showHelp)
+            {
+                ShowHelp(set);
+                return;
+            }
+
+            if (showExample)
             {
                 string result = CreateSampleConfiguration().Serialize();
-                string output = "Bolt.Example.json";
-
-                if (args.Length > 1)
-                {
-                    output = args[1];
-                }
-
-                File.WriteAllText(output, result);
+                File.WriteAllText(examplePath ?? "Bolt.Example.json", result);
                 return;
             }
 
-            RootConfig config = RootConfig.Load(args[0]);
-            config.OutputDirectory = Path.GetDirectoryName(args[0]);
-            config.Generate();
+            if (string.IsNullOrEmpty(config))
+            {
+                System.Console.Error.WriteLine("The configuration path must be specified.");
+                set.WriteOptionDescriptions(System.Console.Error);
+                Environment.Exit(-1);
+            }
+
+            if (!string.IsNullOrEmpty(workingDirectory))
+            {
+                Directory.SetCurrentDirectory(workingDirectory);
+            }
+
+            RootConfig rootConfig = RootConfig.Load(config);
+            rootConfig.OutputDirectory = Path.GetDirectoryName(config);
+            rootConfig.Generate();
+        }
+
+        private static void ShowHelp(OptionSet p)
+        {
+            System.Console.WriteLine("Usage: Bolt [OPTIONS]");
+            System.Console.WriteLine();
+            System.Console.WriteLine("Options:");
+            p.WriteOptionDescriptions(System.Console.Out);
         }
 
         private static RootConfig CreateSampleConfiguration()

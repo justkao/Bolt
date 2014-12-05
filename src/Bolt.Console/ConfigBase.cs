@@ -28,11 +28,12 @@ namespace Bolt.Console
 
         private ContractDefinition CoerceDescriptor(ContractDefinition definition)
         {
-            return new ContractDefinition(definition.Root,
+            return new ContractDefinition(
+                definition.Root,
                 definition.ExcludedContracts.Concat(GetExcludedTypes()).Distinct().ToArray())
-            {
-                ParametersBase = definition.ParametersBase
-            };
+                       {
+                           ParametersBase = definition.ParametersBase
+                       };
         }
 
         private IEnumerable<Type> GetExcludedTypes()
@@ -42,7 +43,7 @@ namespace Bolt.Console
                 return Enumerable.Empty<Type>();
             }
 
-            return Excluded.Select(TypeHelper.GetTypeOrThrow);
+            return Excluded.Select(Parent.Parent.AssemblyCache.GetType);
         }
     }
 }

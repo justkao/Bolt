@@ -73,7 +73,12 @@ namespace Bolt.Console
 
         public void Generate()
         {
-            List<string> directories = Assemblies.Select(Path.GetDirectoryName).Distinct().ToList();
+            List<string> directories =
+                Assemblies.Select(Path.GetDirectoryName)
+                    .Concat(new[] { Directory.GetCurrentDirectory() })
+                    .Distinct()
+                    .ToList();
+
             AssemblyResolver resolver = new AssemblyResolver(directories.ToArray());
             AppDomain.CurrentDomain.AssemblyResolve += resolver.Resolve;
 
@@ -84,6 +89,10 @@ namespace Bolt.Console
 
             try
             {
+                System.Console.WriteLine();
+                System.Console.WriteLine("Generating files ... ");
+                System.Console.WriteLine();
+
                 foreach (ContractConfig contract in Contracts)
                 {
                     contract.Generate();
@@ -98,11 +107,17 @@ namespace Bolt.Console
                         if (prev != result)
                         {
                             File.WriteAllText(documentGenerator.Key, result);
+                            System.Console.WriteLine("Generated File: '{0}'", documentGenerator.Key);
+                        }
+                        else
+                        {
+                            System.Console.WriteLine("No changes detected for file: '{0}'", Path.GetFileName(documentGenerator.Key));
                         }
                     }
                     else
                     {
                         File.WriteAllText(documentGenerator.Key, result);
+                        System.Console.WriteLine("Generated File: '{0}'", documentGenerator.Key);
                     }
                 }
             }

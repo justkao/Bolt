@@ -22,10 +22,18 @@ namespace Bolt.Console
             _assemblyPath.Add(assemblyPath);
         }
 
-
         public Type GetType(string fullName)
         {
-            return TypeHelper.GetTypeOrThrow(fullName);
+            foreach (Assembly assembly in _assemblies)
+            {
+                Type type = assembly.GetType(fullName);
+                if (type != null)
+                {
+                    return type;
+                }
+            }
+
+            throw new InvalidOperationException(string.Format("Type '{0}' could not be loaded.", fullName));
         }
 
         public IEnumerator<Assembly> GetEnumerator()
