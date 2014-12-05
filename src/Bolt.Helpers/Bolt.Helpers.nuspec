@@ -11,5 +11,6 @@
     <description>$description$</description>
     <releaseNotes>The initial release of Bolt library.</releaseNotes>
     <copyright>Copyright 2014</copyright>
+    <tags>bolt wcf communication owin http alternative Serialization helpers</tags>
   </metadata>
 </package>
