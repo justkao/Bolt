@@ -59,9 +59,11 @@ namespace Bolt.Generators
 
         public string StateFullInstanceProviderBase { get; set; }
 
-        public IUserGenerator InvocatorUserGenerator { get; set; }
+        public IUserCodeGenerator InvocatorUserCodeGenerator { get; set; }
 
-        public IUserGenerator ExtensionUserGenerator { get; set; }
+        public IUserCodeGenerator ExtensionUserCodeGenerator { get; set; }
+
+        public object Context { get; set; }
 
         public override void Generate()
         {
@@ -73,9 +75,9 @@ namespace Bolt.Generators
             classGenerator.GenerateClass(
                 g =>
                 {
-                    if (InvocatorUserGenerator != null)
+                    if (InvocatorUserCodeGenerator != null)
                     {
-                        InvocatorUserGenerator.Generate(g);
+                        InvocatorUserCodeGenerator.Generate(g, Context);
                     }
 
                     g.WriteLine("public override void Init()");
@@ -109,9 +111,10 @@ namespace Bolt.Generators
                 });
 
             ContractInvokerExtensionGenerator generator = CreateEx<ContractInvokerExtensionGenerator>();
-            if (ExtensionUserGenerator != null)
+            if (ExtensionUserCodeGenerator != null)
             {
-                generator.UserGenerator = ExtensionUserGenerator;
+                generator.Context = Context;
+                generator.UserCodeGenerator = ExtensionUserCodeGenerator;
             }
 
             generator.Modifier = Modifier;

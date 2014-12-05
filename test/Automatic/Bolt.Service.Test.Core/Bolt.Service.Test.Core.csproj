@@ -41,7 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompositeType.cs" />
-    <Compile Include="CustomUserGenerator.cs" />
+    <Compile Include="UserCodeGenerator.cs" />
     <Compile Include="ITestContractStateFull.cs" />
     <Compile Include="ITestContract.cs" />
     <Compile Include="NotSerializableType.cs" />

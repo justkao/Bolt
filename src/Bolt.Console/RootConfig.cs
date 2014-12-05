@@ -238,7 +238,7 @@ namespace Bolt.Console
 
         }
 
-        public IUserGenerator GetGenerator(string generatorName)
+        public IUserCodeGenerator GetGenerator(string generatorName)
         {
             GeneratorConfig found =
                 Generators.EmptyIfNull().FirstOrDefault(

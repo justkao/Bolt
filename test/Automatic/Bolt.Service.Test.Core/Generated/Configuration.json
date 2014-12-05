@@ -3,14 +3,20 @@
     "generators": [
         {
             "Name": "CustomUserGenerator",
-            "Type": "Bolt.Service.Test.Core.CustomUserGenerator"
+            "Type": "Bolt.Service.Test.Core.UserCodeGenerator"
         }
     ],
     "contracts": [
         {
             "contract": "Bolt.Service.Test.Core.ITestContract",
-            "client": { "Generator": "CustomUserGenerator" },
-            "server": { "Generator": "CustomUserGenerator" }
+            "client": {
+                "Generator": "CustomUserGenerator",
+                "context": "generatorContext"
+            },
+            "server": {
+                "Generator": "CustomUserGenerator",
+                "context": "generatorContext2"
+            }
         },
         {
             "contract": "Bolt.Service.Test.Core.ITestContractStateFull",

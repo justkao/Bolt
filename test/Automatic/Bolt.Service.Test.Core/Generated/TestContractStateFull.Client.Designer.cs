@@ -38,7 +38,7 @@ namespace Bolt.Service.Test.Core
 {
     public partial class TestContractStateFullProxy : Bolt.Client.Channels.ContractProxy<Bolt.Service.Test.Core.TestContractStateFullDescriptor>, Bolt.Service.Test.Core.ITestContractStateFull, ITestContractStateFullAsync
     {
-        // useless comment added by user generator - 'Bolt.Service.Test.Core.CustomUserGenerator'
+        // useless comment added by user generator - 'Bolt.Service.Test.Core.UserCodeGenerator', Context - ''
 
         public TestContractStateFullProxy(Bolt.Service.Test.Core.TestContractStateFullProxy proxy) : base(proxy)
         {

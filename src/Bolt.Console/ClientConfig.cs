@@ -22,6 +22,8 @@ namespace Bolt.Console
 
         public string Generator { get; set; }
 
+        public string Context { get; set; }
+
         protected override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
         {
             ClientGenerator clientGenerator = new ClientGenerator()
@@ -29,12 +31,13 @@ namespace Bolt.Console
                 ForceAsync = ForceAsync,
                 ContractDefinition = definition,
                 Namespace = Namespace,
-                Name = Name
+                Name = Name,
+                Context = Context
             };
 
             if (!string.IsNullOrEmpty(Generator))
             {
-                clientGenerator.UserGenerator = Parent.Parent.GetGenerator(Generator);
+                clientGenerator.UserCodeGenerator = Parent.Parent.GetGenerator(Generator);
             }
 
             if (!string.IsNullOrEmpty(Modifier))

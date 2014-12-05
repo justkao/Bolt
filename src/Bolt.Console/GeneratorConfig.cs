@@ -17,9 +17,9 @@ namespace Bolt.Console
         [JsonIgnore]
         public RootConfig Parent { get; set; }
 
-        public IUserGenerator GetGenerator()
+        public IUserCodeGenerator GetGenerator()
         {
-            return (IUserGenerator)Activator.CreateInstance(Parent.AssemblyCache.GetType(Type));
+            return (IUserCodeGenerator)Activator.CreateInstance(Parent.AssemblyCache.GetType(Type));
         }
     }
 }

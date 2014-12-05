@@ -52,7 +52,9 @@ namespace Bolt.Generators
 
         public IEnumerable<string> BaseInterfaces { get; set; }
 
-        public IUserGenerator UserGenerator { get; set; }
+        public IUserCodeGenerator UserCodeGenerator { get; set; }
+
+        public object Context { get; set; }
 
         public override void Generate()
         {
@@ -62,9 +64,9 @@ namespace Bolt.Generators
             generator.GenerateClass(
                 g =>
                 {
-                    if (UserGenerator != null)
+                    if (UserCodeGenerator != null)
                     {
-                        UserGenerator.Generate(g);
+                        UserCodeGenerator.Generate(g, Context);
                     }
 
                     g.GenerateConstructor(g.Descriptor.FullName + " proxy", "proxy");

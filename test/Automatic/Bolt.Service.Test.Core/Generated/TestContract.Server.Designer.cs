@@ -24,7 +24,7 @@ namespace Bolt.Service.Test.Core
 {
     public partial class TestContractInvoker : Bolt.Server.ContractInvoker<Bolt.Service.Test.Core.TestContractDescriptor>
     {
-        // useless comment added by user generator - 'Bolt.Service.Test.Core.CustomUserGenerator'
+        // useless comment added by user generator - 'Bolt.Service.Test.Core.UserCodeGenerator', Context - 'generatorContext2'
 
         public override void Init()
         {
