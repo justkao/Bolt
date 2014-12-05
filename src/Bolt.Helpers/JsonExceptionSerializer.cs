@@ -1,10 +1,11 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters;
 
-namespace Bolt.Core.Serialization
+using Newtonsoft.Json;
+
+namespace Bolt.Helpers
 {
     public class JsonExceptionSerializer : IExceptionSerializer
     {

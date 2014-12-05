@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
 using System.Text;
 
-namespace Bolt.Core.Serialization
+using Newtonsoft.Json;
+
+namespace Bolt.Helpers
 {
     public class JsonSerializer : ISerializer
     {

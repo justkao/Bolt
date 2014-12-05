@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Bolt.Core.Serialization
+namespace Bolt.Helpers
 {
     public class ProtocolBufferSerializer : ISerializer
     {

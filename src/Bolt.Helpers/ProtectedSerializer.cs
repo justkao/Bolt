@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Bolt.Core.Serialization
+namespace Bolt.Helpers
 {
     public class ProtectedSerializer : ISerializer
     {

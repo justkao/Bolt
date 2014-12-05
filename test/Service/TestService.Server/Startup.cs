@@ -1,4 +1,4 @@
-﻿using Bolt.Core.Serialization;
+﻿using Bolt.Helpers;
 using Bolt.Server;
 
 using Owin;

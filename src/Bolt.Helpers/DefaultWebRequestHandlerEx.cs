@@ -4,7 +4,7 @@ using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Bolt.Core.Serialization
+namespace Bolt.Helpers
 {
     public class DefaultWebRequestHandlerEx : DefaultWebRequestHandler
     {

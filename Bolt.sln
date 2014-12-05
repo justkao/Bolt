@@ -35,8 +35,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bolt.Service.Test", "test\A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bolt.Service.Test.Core", "test\Automatic\Bolt.Service.Test.Core\Bolt.Service.Test.Core.csproj", "{BEB79086-B231-479B-8E88-C5A6CF4802BB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bolt.Core.Serialization", "src\Bolt.Core.Serialization\Bolt.Core.Serialization.csproj", "{B0B083FD-A0A9-4709-8E14-5892B6F41846}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bolt.Console", "src\Bolt.Console\Bolt.Console.csproj", "{7E15C5A0-A53E-4971-88A4-1884F095AD23}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{DC32003E-A4BF-4D02-B13A-A327656D3AB5}"
@@ -47,6 +45,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{DC3200
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bolt.Core.Serialization.Test", "test\Automatic\Bolt.Core.Serialization.Test\Bolt.Core.Serialization.Test.csproj", "{BE41B91E-F1EF-44A6-90E6-002FCC6DD2FC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bolt.Helpers", "src\Bolt.Helpers\Bolt.Helpers.csproj", "{B0B083FD-A0A9-4709-8E14-5892B6F41846}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -106,10 +106,6 @@ Global
 		{BEB79086-B231-479B-8E88-C5A6CF4802BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BEB79086-B231-479B-8E88-C5A6CF4802BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BEB79086-B231-479B-8E88-C5A6CF4802BB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B0B083FD-A0A9-4709-8E14-5892B6F41846}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B0B083FD-A0A9-4709-8E14-5892B6F41846}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B0B083FD-A0A9-4709-8E14-5892B6F41846}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B0B083FD-A0A9-4709-8E14-5892B6F41846}.Release|Any CPU.Build.0 = Release|Any CPU
 		{7E15C5A0-A53E-4971-88A4-1884F095AD23}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{7E15C5A0-A53E-4971-88A4-1884F095AD23}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7E15C5A0-A53E-4971-88A4-1884F095AD23}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -118,6 +114,10 @@ Global
 		{BE41B91E-F1EF-44A6-90E6-002FCC6DD2FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BE41B91E-F1EF-44A6-90E6-002FCC6DD2FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BE41B91E-F1EF-44A6-90E6-002FCC6DD2FC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0B083FD-A0A9-4709-8E14-5892B6F41846}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0B083FD-A0A9-4709-8E14-5892B6F41846}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0B083FD-A0A9-4709-8E14-5892B6F41846}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0B083FD-A0A9-4709-8E14-5892B6F41846}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

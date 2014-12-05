@@ -1,4 +1,5 @@
-﻿using Bolt.Core.Serialization;
+﻿using Bolt.Helpers;
+
 using NUnit.Framework;
 using System;
 

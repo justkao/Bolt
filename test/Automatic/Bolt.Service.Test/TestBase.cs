@@ -1,5 +1,5 @@
 ﻿using Bolt.Client;
-using Bolt.Core.Serialization;
+using Bolt.Helpers;
 using Bolt.Server;
 using Microsoft.Owin.Hosting;
 using NUnit.Framework;

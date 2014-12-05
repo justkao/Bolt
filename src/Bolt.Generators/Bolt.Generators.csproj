@@ -44,6 +44,9 @@
     <Reference Include="System.Runtime.Serialization" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Bolt.Core\Properties\SharedAssemblyInfo.cs">
+      <Link>SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="ClassDescriptor.cs" />
     <Compile Include="ClassGenerator.cs" />
     <Compile Include="ContractDefinition.cs" />

@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Bolt</RootNamespace>
     <AssemblyName>Bolt.Core</AssemblyName>
-    <TargetFrameworkProfile>Profile7</TargetFrameworkProfile>
+    <TargetFrameworkProfile>Profile111</TargetFrameworkProfile>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
@@ -77,6 +77,7 @@
     <Compile Include="ServerErrorCode.cs" />
     <Compile Include="StreamExtensions.cs" />
     <Compile Include="TaskExtensions.cs" />
+    <Compile Include="Properties\SharedAssemblyInfo.cs" />
     <Compile Include="XmlSerializer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />

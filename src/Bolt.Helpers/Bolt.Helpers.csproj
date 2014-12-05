@@ -7,8 +7,8 @@
     <ProjectGuid>{B0B083FD-A0A9-4709-8E14-5892B6F41846}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Bolt.Core.Serialization</RootNamespace>
-    <AssemblyName>Bolt.Core.Serialization</AssemblyName>
+    <RootNamespace>Bolt.Helpers</RootNamespace>
+    <AssemblyName>Bolt.Helpers</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <MinimumVisualStudioVersion>11.0</MinimumVisualStudioVersion>
@@ -54,6 +54,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Bolt.Core\Properties\SharedAssemblyInfo.cs">
+      <Link>SharedAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="ProtectedSerializer.cs" />
     <Compile Include="JsonExceptionSerializer.cs" />
     <Compile Include="JsonSerializer.cs" />

@@ -1,4 +1,5 @@
-﻿using Bolt.Service.Test;
+﻿using Bolt.Helpers;
+using Bolt.Service.Test;
 using NUnit.Framework;
 using System;
 using System.IO;

@@ -1,8 +1,11 @@
 ﻿using Bolt.Client;
-using Bolt.Core.Serialization;
+
 using System;
 using System.Runtime.Serialization;
 using System.ServiceModel;
+
+using Bolt.Helpers;
+
 using TestService.Core;
 
 namespace TestService.Client

@@ -95,9 +95,9 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Bolt.Core.Serialization\Bolt.Core.Serialization.csproj">
-      <Project>{B0B083FD-A0A9-4709-8E14-5892B6F41846}</Project>
-      <Name>Bolt.Core.Serialization</Name>
+    <ProjectReference Include="..\..\..\src\Bolt.Helpers\Bolt.Helpers.csproj">
+      <Project>{b0b083fd-a0a9-4709-8e14-5892b6f41846}</Project>
+      <Name>Bolt.Helpers</Name>
     </ProjectReference>
     <ProjectReference Include="..\..\..\src\Bolt.Server\Bolt.Server.csproj">
       <Project>{C8D9762E-4B32-4711-BF3C-EB4EA485743F}</Project>
