@@ -1,9 +1,4 @@
 ﻿using System.Reflection;
-using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Bolt")]
+[assembly: AssemblyTitle("Bolt.Core")]
 [assembly: AssemblyDescription("Bolt core library")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]

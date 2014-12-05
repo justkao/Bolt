@@ -23,7 +23,7 @@ namespace Bolt.Console
                                         v => showHelp = v != null
                                     },
                                     {
-                                        "r=|root=", "The working directory for assembly loading.",
+                                        "r:|root:", "The working directory for assembly loading.",
                                         v => workingDirectory = v
                                     },
                                     {
