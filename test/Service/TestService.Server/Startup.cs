@@ -19,7 +19,7 @@ namespace TestService.Server
     {
         public void Configuration(IAppBuilder app)
         {
-            app.UseBolt(new ServerConfiguration(new JsonSerializer(), new JsonExceptionSerializer(new JsonSerializer())));
+            app.UseBolt(new ServerConfiguration(new ProtocolBufferSerializer(), new JsonExceptionSerializer(new JsonSerializer())));
             app.UseTestContract<TestContractImplementation>();
         }
     }

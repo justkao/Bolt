@@ -1,16 +1,21 @@
 ﻿{
+    "assemblies": [ "Bolt.Service.Test.Core.dll" ],
+    "generators": [
+        {
+            "Name": "CustomUserGenerator",
+            "Type": "Bolt.Service.Test.Core.CustomUserGenerator"
+        }
+    ],
     "contracts": [
         {
             "contract": "Bolt.Service.Test.Core.ITestContract",
-            "assemblies": [ "Bolt.Service.Test.Core.dll" ],
-            "client": { },
-            "server": { }
+            "client": { "Generator": "CustomUserGenerator" },
+            "server": { "Generator": "CustomUserGenerator" }
         },
-                {
+        {
             "contract": "Bolt.Service.Test.Core.ITestContractStateFull",
-            "assemblies": [ "Bolt.Service.Test.Core.dll" ],
-            "client": { },
-            "server": { }
+            "client": { "Generator": "CustomUserGenerator" },
+            "server": { "Generator": "CustomUserGenerator" }
         }
     ]
 }

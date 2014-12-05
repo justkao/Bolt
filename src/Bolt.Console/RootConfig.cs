@@ -18,6 +18,7 @@ namespace Bolt.Console
         public RootConfig()
         {
             Contracts = new List<ContractConfig>();
+            AssemblyCache = new AssemblyCache();
         }
 
         public static RootConfig Load(string file)
@@ -38,8 +39,24 @@ namespace Bolt.Console
                 contract.Parent = config;
             }
 
+            if (config.Generators != null)
+            {
+                foreach (GeneratorConfig generator in config.Generators)
+                {
+                    generator.Parent = config;
+                }
+            }
+
             return config;
         }
+
+        [JsonIgnore]
+        public AssemblyCache AssemblyCache { get; set; }
+
+        [JsonProperty(Required = Required.Always)]
+        public List<string> Assemblies { get; set; }
+
+        public List<GeneratorConfig> Generators { get; set; }
 
         [JsonProperty(Required = Required.Always)]
         public List<ContractConfig> Contracts { get; set; }
@@ -56,9 +73,14 @@ namespace Bolt.Console
 
         public void Generate()
         {
-            List<string> directories = Contracts.SelectMany(c => c.Assemblies.Select(Path.GetDirectoryName)).Distinct().ToList();
+            List<string> directories = Assemblies.Select(Path.GetDirectoryName).Distinct().ToList();
             AssemblyResolver resolver = new AssemblyResolver(directories.ToArray());
             AppDomain.CurrentDomain.AssemblyResolve += resolver.Resolve;
+
+            foreach (string assembly in Assemblies)
+            {
+                AssemblyCache.Add(assembly);
+            }
 
             try
             {
@@ -199,6 +221,20 @@ namespace Bolt.Console
                 }
             }
 
+        }
+
+        public IUserGenerator GetGenerator(string generatorName)
+        {
+            GeneratorConfig found =
+                Generators.EmptyIfNull().FirstOrDefault(
+                    g => string.Equals(g.Name, generatorName, StringComparison.InvariantCultureIgnoreCase));
+
+            if (found == null)
+            {
+                throw new InvalidOperationException(string.Format("GeneratorEx '{0}' is not registered.", generatorName));
+            }
+
+            return found.GetGenerator();
         }
     }
 }

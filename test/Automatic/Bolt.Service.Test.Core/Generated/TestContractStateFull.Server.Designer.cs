@@ -24,6 +24,8 @@ namespace Bolt.Service.Test.Core
 {
     public partial class TestContractStateFullInvoker : Bolt.Server.ContractInvoker<Bolt.Service.Test.Core.TestContractStateFullDescriptor>
     {
+        // useless comment added by user generator - 'Bolt.Service.Test.Core.CustomUserGenerator'
+
         public override void Init()
         {
             AddAction(Descriptor.Init, TestContractStateFull_Init);

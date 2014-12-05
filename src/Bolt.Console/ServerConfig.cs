@@ -1,3 +1,5 @@
+using System;
+
 using Bolt.Generators;
 
 namespace Bolt.Console
@@ -16,6 +18,10 @@ namespace Bolt.Console
 
         public string StateFullBase { get; set; }
 
+        public string Generator { get; set; }
+
+        public string GeneratorEx { get; set; }
+
         protected override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
         {
             ServerGenerator serverGenerator = new ServerGenerator
@@ -30,6 +36,16 @@ namespace Bolt.Console
             if (!string.IsNullOrEmpty(Suffix))
             {
                 serverGenerator.Suffix = Suffix;
+            }
+
+            if (!string.IsNullOrEmpty(Generator))
+            {
+                serverGenerator.InvocatorUserGenerator = Parent.Parent.GetGenerator(Generator);
+            }
+
+            if (!string.IsNullOrEmpty(GeneratorEx))
+            {
+                serverGenerator.ExtensionUserGenerator = Parent.Parent.GetGenerator(GeneratorEx);
             }
 
             generator.Add(serverGenerator);

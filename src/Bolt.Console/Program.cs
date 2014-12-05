@@ -40,10 +40,19 @@ namespace Bolt.Console
         private static RootConfig CreateSampleConfiguration()
         {
             RootConfig rootConfig = new RootConfig();
+            rootConfig.Assemblies = new List<string>() { "<AssemblyPath>", "<AssemblyPath>", "<AssemblyPath>" };
+            rootConfig.Generators = new List<GeneratorConfig>()
+                                        {
+                                            new GeneratorConfig()
+                                                {
+                                                    Name = "<GeneratorName>",
+                                                    Type = "<FullTypeName>"
+                                                }
+                                        };
+
             rootConfig.Contracts = new List<ContractConfig>();
             rootConfig.Contracts.Add(new ContractConfig()
             {
-                Assemblies = new List<string>() { "<AssemblyPath>" },
                 Contract = "<Type>",
                 Modifier = "public",
                 Output = "<Directory or File Path>",
@@ -51,6 +60,7 @@ namespace Bolt.Console
                 Client = new ClientConfig()
                 {
                     ForceAsync = true,
+                    Generator = "<GeneratorName>",
                     Output = "<Directory or File Path>",
                     Excluded = new List<string>() { "<Additional Excluded Type >" },
                     Suffix = "<Generated Client Classes Suffix>",
@@ -67,7 +77,10 @@ namespace Bolt.Console
                     Suffix = "<Generated Server Classes Suffix>",
                     Modifier = "public",
                     Namespace = "Server.Invoker.Namespace",
-                    Name = "ServerInvokerName"
+                    Name = "ServerInvokerName",
+                    Generator = "<GeneratorName>",
+                    GeneratorEx = "<GeneratorName>",
+                    StateFullBase = "<base class for statefull instance provider>"
                 }
             });
 

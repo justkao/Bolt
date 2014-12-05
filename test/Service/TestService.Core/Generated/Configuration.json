@@ -1,9 +1,9 @@
 ﻿{
+    "assemblies": ["TestService.Core.dll" ],
     "contracts": [
         {
             "contract": "TestService.Core.ITestContract",
-            "assemblies": [ "TestService.Core.dll" ],
-                "parametersBase": "TestService.Core.ParametersBase",
+            "parametersBase": "TestService.Core.ParametersBase",
 
             "client": {
                 "forceAsync": "true"

@@ -17,6 +17,8 @@ namespace Bolt.Generators
 
         public string StateFullInstanceProviderBase { get; set; }
 
+        public IUserGenerator UserGenerator { get; set; }
+
         public override void Generate()
         {
             AddUsings(ServerGenerator.BoltServerNamespace, "Owin");
@@ -26,6 +28,11 @@ namespace Bolt.Generators
 
             generator.GenerateClass((v) =>
             {
+                if (UserGenerator != null)
+                {
+                    UserGenerator.Generate(v);
+                }
+
                 WriteLine("public static IAppBuilder Use{0}(this IAppBuilder app, {1} instance)", ContractDefinition.Name, ContractDefinition.Root.FullName);
                 using (WithBlock())
                 {

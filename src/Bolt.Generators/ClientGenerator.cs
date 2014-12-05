@@ -52,15 +52,21 @@ namespace Bolt.Generators
 
         public IEnumerable<string> BaseInterfaces { get; set; }
 
+        public IUserGenerator UserGenerator { get; set; }
+
         public override void Generate()
         {
-            ClassDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
             generator.Modifier = Modifier;
 
             generator.GenerateClass(
                 g =>
                 {
+                    if (UserGenerator != null)
+                    {
+                        UserGenerator.Generate(g);
+                    }
+
                     g.GenerateConstructor(g.Descriptor.FullName + " proxy", "proxy");
 
                     g.GenerateConstructor(string.Format("{0} channel", FormatType<IChannel>()), "channel");

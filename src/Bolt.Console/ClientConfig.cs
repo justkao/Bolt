@@ -1,4 +1,6 @@
-﻿using Bolt.Generators;
+﻿using System;
+
+using Bolt.Generators;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,6 +20,8 @@ namespace Bolt.Console
 
         public string Modifier { get; set; }
 
+        public string Generator { get; set; }
+
         protected override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
         {
             ClientGenerator clientGenerator = new ClientGenerator()
@@ -27,6 +31,11 @@ namespace Bolt.Console
                 Namespace = Namespace,
                 Name = Name
             };
+
+            if (!string.IsNullOrEmpty(Generator))
+            {
+                clientGenerator.UserGenerator = Parent.Parent.GetGenerator(Generator);
+            }
 
             if (!string.IsNullOrEmpty(Modifier))
             {

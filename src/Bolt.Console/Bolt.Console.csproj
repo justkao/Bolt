@@ -54,7 +54,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyCache.cs" />
     <Compile Include="ClientConfig.cs" />
+    <Compile Include="GeneratorConfig.cs" />
     <Compile Include="PathHelpers.cs" />
     <Compile Include="RootConfig.cs" />
     <Compile Include="ServerConfig.cs" />

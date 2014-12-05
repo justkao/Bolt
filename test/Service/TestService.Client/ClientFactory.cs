@@ -17,7 +17,7 @@ namespace TestService.Client
             }
         }
 
-        public static readonly ClientConfiguration Config = new ClientConfiguration(new JsonSerializer(),
+        public static readonly ClientConfiguration Config = new ClientConfiguration(new ProtocolBufferSerializer(), 
             new JsonExceptionSerializer(new JsonSerializer(), new CustomSerializationBinder()), new DefaultWebRequestHandlerEx());
 
         public static ITestContract CreateIISBolt()
