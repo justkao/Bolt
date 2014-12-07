@@ -159,7 +159,6 @@ namespace Bolt.Console
                 },
                 Server = new ServerConfig()
                 {
-                    ForceAsync = true,
                     Output = "<Path>",
                     Excluded = new List<string>() { "<FullTypeName>" },
                     Suffix = "<Suffix> // suffix for generated server invokers, defaults to 'Invoker'",

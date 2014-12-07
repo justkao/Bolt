@@ -4,8 +4,6 @@ namespace Bolt.Console
 {
     public class ServerConfig : ConfigBase
     {
-        public bool ForceAsync { get; set; }
-
         public string Namespace { get; set; }
 
         public string Suffix { get; set; }
