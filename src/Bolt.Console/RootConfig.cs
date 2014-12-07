@@ -27,6 +27,36 @@ namespace Bolt.Console
             return Load(Path.GetDirectoryName(file), content);
         }
 
+        public static RootConfig Create(string assembly)
+        {
+            RootConfig root = new RootConfig();
+            root.Assemblies = new List<string>() {assembly};
+            root.Contracts = new List<ContractConfig>();
+            
+            foreach (Type type in Assembly.LoadFrom(assembly).GetTypes())
+            {
+                if (!type.IsInterface)
+                {
+                    continue;
+                }
+
+                ContractConfig c = new ContractConfig();
+                c.Contract = type.FullName;
+                c.Client = new ClientConfig()
+                {
+                    ForceAsync = true,
+                };
+
+                c.Server = new ServerConfig()
+                {
+                };
+
+                root.Contracts.Add(c);
+            }
+
+            return root;
+        }
+
         public static RootConfig Load(string outputDirectory, string content)
         {
             RootConfig config = JsonConvert.DeserializeObject<RootConfig>(

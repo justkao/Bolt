@@ -14,6 +14,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Bolt.Client;
+using Bolt.Client.Channels;
 using Bolt.Service.Test.Core;
 using Bolt.Service.Test.Core.Parameters;
 
@@ -40,7 +42,7 @@ namespace Bolt.Service.Test.Core
 
 namespace Bolt.Service.Test.Core
 {
-    public partial class TestContractProxy : Bolt.Client.Channels.ContractProxy<Bolt.Service.Test.Core.TestContractDescriptor>, Bolt.Service.Test.Core.ITestContract, ITestContractInnerAsync, ITestContractAsync
+    public partial class TestContractProxy : ContractProxy<Bolt.Service.Test.Core.TestContractDescriptor>, Bolt.Service.Test.Core.ITestContract, ITestContractInnerAsync, ITestContractAsync
     {
         // useless comment added by user generator - 'Bolt.Service.Test.Core.UserCodeGenerator', Context - ''
 
@@ -48,7 +50,7 @@ namespace Bolt.Service.Test.Core
         {
         }
 
-        public TestContractProxy(Bolt.Client.IChannel channel) : base(channel)
+        public TestContractProxy(IChannel channel) : base(channel)
         {
         }
 

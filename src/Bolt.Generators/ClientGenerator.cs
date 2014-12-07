@@ -1,6 +1,4 @@
-﻿using Bolt.Client;
-using Bolt.Client.Channels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -10,6 +8,10 @@ namespace Bolt.Generators
 {
     public class ClientGenerator : ContractGeneratorBase
     {
+        private const string BoltClientNamespace = "Bolt.Client";
+        private const string BoltChannelsNamespace = "Bolt.Client.Channels";
+        private const string BoltChannelInterface = "IChannel";
+
         private string _contractDescriptorProperty;
 
         public ClientGenerator()
@@ -56,6 +58,8 @@ namespace Bolt.Generators
 
         public override void Generate(object context)
         {
+            AddUsings(BoltClientNamespace, BoltChannelsNamespace);
+
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
             generator.Modifier = Modifier;
             generator.UserGenerator = UserGenerator;
@@ -64,7 +68,7 @@ namespace Bolt.Generators
                 {
                     g.GenerateConstructor(g.Descriptor.FullName + " proxy", "proxy");
 
-                    g.GenerateConstructor(string.Format("{0} channel", FormatType<IChannel>()), "channel");
+                    g.GenerateConstructor(string.Format("{0} channel", BoltChannelInterface), "channel");
 
                     List<Type> contracts = ContractDefinition.GetEffectiveContracts().ToList();
                     foreach (Type type in contracts)
@@ -219,7 +223,7 @@ namespace Bolt.Generators
         {
             ClassDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
             List<string> baseClasses = new List<string>();
-            string baseClass = string.Format("{0}.ContractProxy<{1}>", typeof(ChannelBase).Namespace, contractDescriptor.FullName);
+            string baseClass = string.Format("ContractProxy<{0}>", contractDescriptor.FullName);
             baseClasses.Add(baseClass);
             baseClasses.Add(ContractDefinition.Root.FullName);
 

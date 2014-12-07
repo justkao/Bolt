@@ -7,36 +7,62 @@ namespace Bolt.Console
 {
     public class Program
     {
+        private enum BoltAction
+        {
+            GenerateCode,
+            Help,
+            GenerateConfig,
+            GenerateExample
+        }
+
         public static void Main(string[] args)
         {
-            bool showHelp = false;
-            bool showExample = false;
-            string examplePath = null;
+            BoltAction action = BoltAction.Help;
             string workingDirectory = null;
-            string config = null;
+            string inputPath = null;
+            string outputPath = null;
 
             OptionSet set = new OptionSet()
-                                {
-                                    {
-                                        "h|help", "Shows help for bolt tool.", 
-                                        v => showHelp = v != null
-                                    },
-                                    {
-                                        "r:|root:", "The working directory for assembly loading.",
-                                        v => workingDirectory = v
-                                    },
-                                    {
-                                        "e|example:", "Shows or generates configuration example.", v =>
-                                            {
-                                                showExample = true;
-                                                examplePath = v;
-                                            }
-                                    },
-                                    {
-                                        "c=|config=", "The path to configuration file.",
-                                        v => config = v
-                                    }
-                                };
+            {
+                {
+                    "h|help", "Shows help for bolt tool.",
+                    (v) => { action = BoltAction.Help; }
+                },
+                {
+                    "r:|root:", "The working directory for assembly loading.",
+                    v => workingDirectory = v
+                },
+                {
+                    "e|example", "Shows or generates configuration example.", v =>
+                    {
+                        action = BoltAction.GenerateExample;
+                    }
+                },
+                {
+                    "c=|config=", "The path to configuration file.",
+                    v =>
+                    {
+                        inputPath = v;
+                        action = BoltAction.GenerateCode;
+                    }
+                },
+                {
+                    "g=|generate=", "Generates Configuration.json file for all interfaces in defined assembly.",
+                    v =>
+                    {
+                        inputPath = v;
+                        action = BoltAction.GenerateConfig;
+                    }
+                },
+                {
+                    "o=|output=", "Defines output file or directory.",
+                    v =>
+                    {
+                        outputPath = v;
+                        action = BoltAction.GenerateConfig;
+                    }
+                },
+            };
 
             try
             {
@@ -49,34 +75,45 @@ namespace Bolt.Console
                 return;
             }
 
-            if (showHelp)
+            switch (action)
             {
-                ShowHelp(set);
-                return;
+                case BoltAction.GenerateCode:
+                    if (string.IsNullOrEmpty(inputPath))
+                    {
+                        System.Console.Error.WriteLine("The configuration path must be specified.");
+                        set.WriteOptionDescriptions(System.Console.Error);
+                        Environment.Exit(-1);
+                    }
+
+                    if (!string.IsNullOrEmpty(workingDirectory))
+                    {
+                        Directory.SetCurrentDirectory(workingDirectory);
+                    }
+
+                    RootConfig rootConfig = RootConfig.Load(inputPath);
+                    rootConfig.OutputDirectory = Path.GetDirectoryName(inputPath);
+                    if (!string.IsNullOrEmpty(outputPath))
+                    {
+                        rootConfig.OutputDirectory = Path.GetDirectoryName(outputPath);
+                    }
+                    rootConfig.Generate();
+                    break;
+                case BoltAction.Help:
+                    ShowHelp(set);
+                    break;
+                case BoltAction.GenerateConfig:
+                    string json = RootConfig.Create(inputPath).Serialize();
+                    File.WriteAllText(outputPath ?? Path.Combine(Path.GetDirectoryName(inputPath), "Configuration.json"), json);
+                    break;
+                case BoltAction.GenerateExample:
+                    string result = CreateSampleConfiguration().Serialize();
+                    File.WriteAllText(outputPath ?? "Bolt.Example.json", result);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
-            if (showExample)
-            {
-                string result = CreateSampleConfiguration().Serialize();
-                File.WriteAllText(examplePath ?? "Bolt.Example.json", result);
-                return;
-            }
-
-            if (string.IsNullOrEmpty(config))
-            {
-                System.Console.Error.WriteLine("The configuration path must be specified.");
-                set.WriteOptionDescriptions(System.Console.Error);
-                Environment.Exit(-1);
-            }
-
-            if (!string.IsNullOrEmpty(workingDirectory))
-            {
-                Directory.SetCurrentDirectory(workingDirectory);
-            }
-
-            RootConfig rootConfig = RootConfig.Load(config);
-            rootConfig.OutputDirectory = Path.GetDirectoryName(config);
-            rootConfig.Generate();
+            Environment.Exit(0);
         }
 
         private static void ShowHelp(OptionSet p)
@@ -104,33 +141,34 @@ namespace Bolt.Console
             rootConfig.Contracts.Add(new ContractConfig()
             {
                 Contract = "<Type>",
-                Modifier = "public",
-                Output = "<Directory or File Path>",
-                Excluded = new List<string> { "<ExcludedType1>", "<ExcludedType2>" },
+                Modifier = "<public|internal>",
+                Output = "<Path>",
+                Context = "<Context> // passed to user code generators",
+                Excluded = new List<string> { "<FullTypeName>", "<FullTypeName>" },
                 Client = new ClientConfig()
                 {
                     ForceAsync = true,
                     Generator = "<GeneratorName>",
-                    Output = "<Directory or File Path>",
-                    Excluded = new List<string>() { "<Additional Excluded Type >" },
-                    Suffix = "<Generated Client Classes Suffix>",
-                    Modifier = "public",
-                    Namespace = "Client.Proxy.Namespace",
-                    Name = "ProxyName",
-                    ExcludedInterfaces = new List<string>() { "<Interface that will be excluded from Async proxy generation>" },
+                    Output = "<Path>",
+                    Excluded = new List<string>() { "<FullTypeName>", "<FullTypeName>" },
+                    Suffix = "<Suffix> // suffix for generated client proxy, defaults to 'Proxy'",
+                    Modifier = "<public|internal>",
+                    Namespace = "<Namespace> // namespace of generated proxy, defaults to contract namespace if null",
+                    Name = "<ProxyName> // name of generated proxy, defaults to 'ContractName + Suffix' if null",
+                    ExcludedInterfaces = new List<string>() { "<FullTypeName>", "<FullTypeName>" }
                 },
                 Server = new ServerConfig()
                 {
                     ForceAsync = true,
-                    Output = "<Directory or File Path>",
-                    Excluded = new List<string>() { "<Additional Excluded Type >" },
-                    Suffix = "<Generated Server Classes Suffix>",
-                    Modifier = "public",
-                    Namespace = "Server.Invoker.Namespace",
-                    Name = "ServerInvokerName",
-                    Generator = "<GeneratorName>",
-                    GeneratorEx = "<GeneratorName>",
-                    StateFullBase = "<base class for statefull instance provider>"
+                    Output = "<Path>",
+                    Excluded = new List<string>() { "<FullTypeName>" },
+                    Suffix = "<Suffix> // suffix for generated server invokers, defaults to 'Invoker'",
+                    Modifier = "<public|internal>",
+                    Namespace = "<Namespace> // namespace of generated server invoker, defaults to contract namespace if null",
+                    Name = "<ProxyName> // name of generated server invoker, defaults to 'ContractName + Suffix' if null",
+                    Generator = "<GeneratorName> // user defined generator for server invokers",
+                    GeneratorEx = "<GeneratorName> // user defined generator for invoker extensions",
+                    StateFullBase = "<FullTypeName> // base class used for statefull invokers"
                 }
             });
 

@@ -14,6 +14,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using Bolt.Client;
+using Bolt.Client.Channels;
 using TestService.Core;
 using TestService.Core.Parameters;
 
@@ -60,13 +62,13 @@ namespace TestService.Core
 
 namespace TestService.Core
 {
-    public partial class TestContractProxy : Bolt.Client.Channels.ContractProxy<TestService.Core.TestContractDescriptor>, TestService.Core.ITestContract, IInnerTestContractAsync, IInnerTestContract2Async, ITestContractAsync
+    public partial class TestContractProxy : ContractProxy<TestService.Core.TestContractDescriptor>, TestService.Core.ITestContract, IInnerTestContractAsync, IInnerTestContract2Async, ITestContractAsync
     {
         public TestContractProxy(TestService.Core.TestContractProxy proxy) : base(proxy)
         {
         }
 
-        public TestContractProxy(Bolt.Client.IChannel channel) : base(channel)
+        public TestContractProxy(IChannel channel) : base(channel)
         {
         }
 
