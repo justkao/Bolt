@@ -19,5 +19,6 @@
         <file src="tools\Bolt.Generators.dll" target="tools\Bolt.Generators.dll" />
         <file src="tools\Newtonsoft.Json.dll" target="tools\Newtonsoft.Json.dll" />
         <file src="tools\Newtonsoft.Json.xml" target="tools\Newtonsoft.Json.xml" />
+        <file src="Readme.txt" target="" />
     </files>
 </package>
