@@ -10,6 +10,7 @@ namespace Bolt.Console
         private enum BoltAction
         {
             GenerateCode,
+            GenerateCodeFromAssembly,
             Help,
             GenerateConfig,
             GenerateExample
@@ -29,17 +30,17 @@ namespace Bolt.Console
                     (v) => { action = BoltAction.Help; }
                 },
                 {
-                    "r:|root:", "The working directory for assembly loading.",
+                    "root=", "The working directory for assembly loading.",
                     v => workingDirectory = v
                 },
                 {
-                    "e|example", "Shows or generates configuration example.", v =>
+                    "example", "Generates configuration example.", v =>
                     {
                         action = BoltAction.GenerateExample;
                     }
                 },
                 {
-                    "c=|config=", "The path to configuration file.",
+                    "fromConfig=", "The path to configuration file.",
                     v =>
                     {
                         inputPath = v;
@@ -47,7 +48,7 @@ namespace Bolt.Console
                     }
                 },
                 {
-                    "g=|generate=", "Generates Configuration.json file for all interfaces in defined assembly.",
+                    "createConfig=", "Generates Configuration.json file for all interfaces in defined assembly.",
                     v =>
                     {
                         inputPath = v;
@@ -55,11 +56,18 @@ namespace Bolt.Console
                     }
                 },
                 {
-                    "o=|output=", "Defines output file or directory.",
+                    "fromAssembly=", "Generates Bolt code from interfaces defined in assembly.",
+                    v =>
+                    {
+                        inputPath = v;
+                        action = BoltAction.GenerateCodeFromAssembly;
+                    }
+                },
+                {
+                    "output=", "Defines output file or directory.",
                     v =>
                     {
                         outputPath = v;
-                        action = BoltAction.GenerateConfig;
                     }
                 },
             };
@@ -75,33 +83,30 @@ namespace Bolt.Console
                 return;
             }
 
+            if (!string.IsNullOrEmpty(workingDirectory))
+            {
+                Directory.SetCurrentDirectory(workingDirectory);
+            }
+
             switch (action)
             {
                 case BoltAction.GenerateCode:
-                    if (string.IsNullOrEmpty(inputPath))
-                    {
-                        System.Console.Error.WriteLine("The configuration path must be specified.");
-                        set.WriteOptionDescriptions(System.Console.Error);
-                        Environment.Exit(-1);
-                    }
-
-                    if (!string.IsNullOrEmpty(workingDirectory))
-                    {
-                        Directory.SetCurrentDirectory(workingDirectory);
-                    }
-
+                    EnsureInput(inputPath, set);
                     RootConfig rootConfig = RootConfig.Load(inputPath);
-                    rootConfig.OutputDirectory = Path.GetDirectoryName(inputPath);
-                    if (!string.IsNullOrEmpty(outputPath))
-                    {
-                        rootConfig.OutputDirectory = Path.GetDirectoryName(outputPath);
-                    }
+                    rootConfig.OutputDirectory = outputPath ??Path.GetDirectoryName(inputPath);
                     rootConfig.Generate();
                     break;
                 case BoltAction.Help:
                     ShowHelp(set);
                     break;
+                case BoltAction.GenerateCodeFromAssembly:
+                    EnsureInput(inputPath, set);
+                    RootConfig config = RootConfig.Create(inputPath);
+                    config.OutputDirectory = outputPath ?? Path.GetDirectoryName(inputPath);
+                    config.Generate();
+                    break;
                 case BoltAction.GenerateConfig:
+                    EnsureInput(inputPath, set);
                     string json = RootConfig.Create(inputPath).Serialize();
                     File.WriteAllText(outputPath ?? Path.Combine(Path.GetDirectoryName(inputPath), "Configuration.json"), json);
                     break;
@@ -114,6 +119,23 @@ namespace Bolt.Console
             }
 
             Environment.Exit(0);
+        }
+
+        private static void EnsureInput(string inputPath, OptionSet set)
+        {
+            if (string.IsNullOrEmpty(inputPath))
+            {
+                System.Console.Error.WriteLine("The input must be specified.");
+                set.WriteOptionDescriptions(System.Console.Error);
+                Environment.Exit(-1);
+            }
+
+            if (!File.Exists(inputPath))
+            {
+                System.Console.Error.WriteLine("The file '{0}' does not exist.", inputPath);
+                set.WriteOptionDescriptions(System.Console.Error);
+                Environment.Exit(-1);
+            }
         }
 
         private static void ShowHelp(OptionSet p)

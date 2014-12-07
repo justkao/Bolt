@@ -23,6 +23,7 @@ namespace Bolt.Console
 
         public static RootConfig Load(string file)
         {
+            file = Path.GetFullPath(file);
             string content = File.ReadAllText(file);
             return Load(Path.GetDirectoryName(file), content);
         }
@@ -41,6 +42,7 @@ namespace Bolt.Console
                 }
 
                 ContractConfig c = new ContractConfig();
+                c.Parent = root;
                 c.Contract = type.FullName;
                 c.Client = new ClientConfig()
                 {
@@ -141,7 +143,7 @@ namespace Bolt.Console
                         }
                         else
                         {
-                            System.Console.WriteLine("No changes detected for file: '{0}'", Path.GetFileName(documentGenerator.Key));
+                            System.Console.WriteLine("No changes detected for file: '{0}'", documentGenerator.Key);
                         }
                     }
                     else

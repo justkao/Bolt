@@ -78,6 +78,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>$(TargetDir)Bolt.exe -c="$(ProjectDir)Generated\Configuration.json"</PostBuildEvent>
+    <PostBuildEvent>$(TargetDir)Bolt.exe -fromConfig=$(ProjectDir)\Generated\Configuration.json</PostBuildEvent>
   </PropertyGroup>
 </Project>
