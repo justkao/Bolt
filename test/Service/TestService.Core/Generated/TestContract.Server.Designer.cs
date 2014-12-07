@@ -378,4 +378,3 @@ namespace Bolt.Server
         }
     }
 }
-

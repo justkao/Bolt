@@ -3,8 +3,12 @@
 //
 // Authors:
 //  Jonathan Pryor <jpryor@novell.com>
+//  Federico Di Gregorio <fog@initd.org>
+//  Rolf Bjarne Kvinge <rolf@xamarin.com>
 //
 // Copyright (C) 2008 Novell (http://www.novell.com)
+// Copyright (C) 2009 Federico Di Gregorio.
+// Copyright (C) 2012 Xamarin Inc (http://www.xamarin.com)
 //
 // Permission is hereby granted, free of charge, to any person obtaining
 // a copy of this software and associated documentation files (the
@@ -143,7 +147,93 @@ using System.Linq;
 using NDesk.Options;
 #endif
 
-namespace NDesk.Options {
+#if NDESK_OPTIONS
+namespace NDesk.Options
+#else
+namespace Mono.Options
+#endif
+{
+	static class StringCoda {
+
+		public static IEnumerable<string> WrappedLines (string self, params int[] widths)
+		{
+			IEnumerable<int> w = widths;
+			return WrappedLines (self, w);
+		}
+
+		public static IEnumerable<string> WrappedLines (string self, IEnumerable<int> widths)
+		{
+			if (widths == null)
+				throw new ArgumentNullException ("widths");
+			return CreateWrappedLinesIterator (self, widths);
+		}
+
+		private static IEnumerable<string> CreateWrappedLinesIterator (string self, IEnumerable<int> widths)
+		{
+			if (string.IsNullOrEmpty (self)) {
+				yield return string.Empty;
+				yield break;
+			}
+			using (IEnumerator<int> ewidths = widths.GetEnumerator ()) {
+				bool? hw = null;
+				int width = GetNextWidth (ewidths, int.MaxValue, ref hw);
+				int start = 0, end;
+				do {
+					end = GetLineEnd (start, width, self);
+					char c = self [end-1];
+					if (char.IsWhiteSpace (c))
+						--end;
+					bool needContinuation = end != self.Length && !IsEolChar (c);
+					string continuation = "";
+					if (needContinuation) {
+						--end;
+						continuation = "-";
+					}
+					string line = self.Substring (start, end - start) + continuation;
+					yield return line;
+					start = end;
+					if (char.IsWhiteSpace (c))
+						++start;
+					width = GetNextWidth (ewidths, width, ref hw);
+				} while (start < self.Length);
+			}
+		}
+
+		private static int GetNextWidth (IEnumerator<int> ewidths, int curWidth, ref bool? eValid)
+		{
+			if (!eValid.HasValue || (eValid.HasValue && eValid.Value)) {
+				curWidth = (eValid = ewidths.MoveNext ()).Value ? ewidths.Current : curWidth;
+				// '.' is any character, - is for a continuation
+				const string minWidth = ".-";
+				if (curWidth < minWidth.Length)
+					throw new ArgumentOutOfRangeException ("widths",
+							string.Format ("Element must be >= {0}, was {1}.", minWidth.Length, curWidth));
+				return curWidth;
+			}
+			// no more elements, use the last element.
+			return curWidth;
+		}
+
+		private static bool IsEolChar (char c)
+		{
+			return !char.IsLetterOrDigit (c);
+		}
+
+		private static int GetLineEnd (int start, int length, string description)
+		{
+			int end = System.Math.Min (start + length, description.Length);
+			int sep = -1;
+			for (int i = start; i < end; ++i) {
+				if (description [i] == '\n')
+					return i+1;
+				if (IsEolChar (description [i]))
+					sep = i+1;
+			}
+			if (sep == -1 || end == description.Length)
+				return end;
+			return sep;
+		}
+	}
 
 	public class OptionValueCollection : IList, IList<string> {
 
@@ -284,13 +374,19 @@ namespace NDesk.Options {
 		OptionValueType type;
 		int count;
 		string[] separators;
+		bool hidden;
 
 		protected Option (string prototype, string description)
-			: this (prototype, description, 1)
+			: this (prototype, description, 1, false)
 		{
 		}
 
 		protected Option (string prototype, string description, int maxValueCount)
+			: this (prototype, description, maxValueCount, false)
+		{
+		}
+
+		protected Option (string prototype, string description, int maxValueCount, bool hidden)
 		{
 			if (prototype == null)
 				throw new ArgumentNullException ("prototype");
@@ -300,10 +396,19 @@ namespace NDesk.Options {
 				throw new ArgumentOutOfRangeException ("maxValueCount");
 
 			this.prototype   = prototype;
-			this.names       = prototype.Split ('|');
 			this.description = description;
 			this.count       = maxValueCount;
+			this.names       = (this is OptionSet.Category)
+				// append GetHashCode() so that "duplicate" categories have distinct
+				// names, e.g. adding multiple "" categories should be valid.
+				? new[]{prototype + this.GetHashCode ()}
+				: prototype.Split ('|');
+
+			if (this is OptionSet.Category)
+				return;
+
 			this.type        = ParsePrototype ();
+			this.hidden      = hidden;
 
 			if (this.count == 0 && type != OptionValueType.None)
 				throw new ArgumentException (
@@ -326,6 +431,7 @@ namespace NDesk.Options {
 		public string           Description     {get {return description;}}
 		public OptionValueType  OptionValueType {get {return type;}}
 		public int              MaxValueCount   {get {return count;}}
+		public bool             Hidden          {get {return hidden;}}
 
 		public string[] GetNames ()
 		{
@@ -341,7 +447,12 @@ namespace NDesk.Options {
 
 		protected static T Parse<T> (string value, OptionContext c)
 		{
-			TypeConverter conv = TypeDescriptor.GetConverter (typeof (T));
+			Type tt = typeof (T);
+			bool nullable = tt.IsValueType && tt.IsGenericType && 
+				!tt.IsGenericTypeDefinition && 
+				tt.GetGenericTypeDefinition () == typeof (Nullable<>);
+			Type targetType = nullable ? tt.GetGenericArguments () [0] : typeof (T);
+			TypeConverter conv = TypeDescriptor.GetConverter (targetType);
 			T t = default (T);
 			try {
 				if (value != null)
@@ -351,7 +462,7 @@ namespace NDesk.Options {
 				throw new OptionException (
 						string.Format (
 							c.OptionSet.MessageLocalizer ("Could not convert string `{0}' to type {1} for option `{2}'."),
-							value, typeof (T).Name, c.OptionName),
+							value, targetType.Name, c.OptionName),
 						c.OptionName, e);
 			}
 			return t;
@@ -451,6 +562,92 @@ namespace NDesk.Options {
 		}
 	}
 
+	public abstract class ArgumentSource {
+
+		protected ArgumentSource ()
+		{
+		}
+
+		public abstract string[] GetNames ();
+		public abstract string Description { get; }
+		public abstract bool GetArguments (string value, out IEnumerable<string> replacement);
+
+		public static IEnumerable<string> GetArgumentsFromFile (string file)
+		{
+			return GetArguments (File.OpenText (file), true);
+		}
+
+		public static IEnumerable<string> GetArguments (TextReader reader)
+		{
+			return GetArguments (reader, false);
+		}
+
+		// Cribbed from mcs/driver.cs:LoadArgs(string)
+		static IEnumerable<string> GetArguments (TextReader reader, bool close)
+		{
+			try {
+				StringBuilder arg = new StringBuilder ();
+
+				string line;
+				while ((line = reader.ReadLine ()) != null) {
+					int t = line.Length;
+
+					for (int i = 0; i < t; i++) {
+						char c = line [i];
+						
+						if (c == '"' || c == '\'') {
+							char end = c;
+							
+							for (i++; i < t; i++){
+								c = line [i];
+
+								if (c == end)
+									break;
+								arg.Append (c);
+							}
+						} else if (c == ' ') {
+							if (arg.Length > 0) {
+								yield return arg.ToString ();
+								arg.Length = 0;
+							}
+						} else
+							arg.Append (c);
+					}
+					if (arg.Length > 0) {
+						yield return arg.ToString ();
+						arg.Length = 0;
+					}
+				}
+			}
+			finally {
+				if (close)
+					reader.Close ();
+			}
+		}
+	}
+
+	public class ResponseFileSource : ArgumentSource {
+
+		public override string[] GetNames ()
+		{
+			return new string[]{"@file"};
+		}
+
+		public override string Description {
+			get {return "Read response file for more options.";}
+		}
+
+		public override bool GetArguments (string value, out IEnumerable<string> replacement)
+		{
+			if (string.IsNullOrEmpty (value) || !value.StartsWith ("@")) {
+				replacement = null;
+				return false;
+			}
+			replacement = ArgumentSource.GetArgumentsFromFile (value.Substring (1));
+			return true;
+		}
+	}
+
 	[Serializable]
 	public class OptionException : Exception {
 		private string option;
@@ -501,6 +698,7 @@ namespace NDesk.Options {
 		public OptionSet (Converter<string, string> localizer)
 		{
 			this.localizer = localizer;
+			this.roSources = new ReadOnlyCollection<ArgumentSource>(sources);
 		}
 
 		Converter<string, string> localizer;
@@ -508,6 +706,14 @@ namespace NDesk.Options {
 		public Converter<string, string> MessageLocalizer {
 			get {return localizer;}
 		}
+
+		List<ArgumentSource> sources = new List<ArgumentSource> ();
+		ReadOnlyCollection<ArgumentSource> roSources;
+
+		public ReadOnlyCollection<ArgumentSource> ArgumentSources {
+			get {return roSources;}
+		}
+
 
 		protected override string GetKeyForItem (Option item)
 		{
@@ -541,8 +747,8 @@ namespace NDesk.Options {
 
 		protected override void RemoveItem (int index)
 		{
-			base.RemoveItem (index);
 			Option p = Items [index];
+			base.RemoveItem (index);
 			// KeyedCollection.RemoveItem() handles the 0th item
 			for (int i = 1; i < p.Names.Length; ++i) {
 				Dictionary.Remove (p.Names [i]);
@@ -552,7 +758,6 @@ namespace NDesk.Options {
 		protected override void SetItem (int index, Option item)
 		{
 			base.SetItem (index, item);
-			RemoveItem (index);
 			AddImpl (item);
 		}
 
@@ -575,6 +780,31 @@ namespace NDesk.Options {
 			}
 		}
 
+		public OptionSet Add (string header)
+		{
+			if (header == null)
+				throw new ArgumentNullException ("header");
+			Add (new Category (header));
+			return this;
+		}
+
+		internal sealed class Category : Option {
+
+			// Prototype starts with '=' because this is an invalid prototype
+			// (see Option.ParsePrototype(), and thus it'll prevent Category
+			// instances from being accidentally used as normal options.
+			public Category (string description)
+				: base ("=:Category:= " + description, description)
+			{
+			}
+
+			protected override void OnParseComplete (OptionContext c)
+			{
+				throw new NotSupportedException ("Category.OnParseComplete should not be invoked.");
+			}
+		}
+
+
 		public new OptionSet Add (Option option)
 		{
 			base.Add (option);
@@ -585,7 +815,12 @@ namespace NDesk.Options {
 			Action<OptionValueCollection> action;
 
 			public ActionOption (string prototype, string description, int count, Action<OptionValueCollection> action)
-				: base (prototype, description, count)
+				: this (prototype, description, count, action, false)
+			{
+			}
+
+			public ActionOption (string prototype, string description, int count, Action<OptionValueCollection> action, bool hidden)
+				: base (prototype, description, count, hidden)
 			{
 				if (action == null)
 					throw new ArgumentNullException ("action");
@@ -605,10 +840,15 @@ namespace NDesk.Options {
 
 		public OptionSet Add (string prototype, string description, Action<string> action)
 		{
+			return Add (prototype, description, action, false);
+		}
+
+		public OptionSet Add (string prototype, string description, Action<string> action, bool hidden)
+		{
 			if (action == null)
 				throw new ArgumentNullException ("action");
 			Option p = new ActionOption (prototype, description, 1, 
-					delegate (OptionValueCollection v) { action (v [0]); });
+					delegate (OptionValueCollection v) { action (v [0]); }, hidden);
 			base.Add (p);
 			return this;
 		}
@@ -620,10 +860,14 @@ namespace NDesk.Options {
 
 		public OptionSet Add (string prototype, string description, OptionAction<string, string> action)
 		{
+			return Add (prototype, description, action, false);
+		}
+
+		public OptionSet Add (string prototype, string description, OptionAction<string, string> action, bool hidden)	{
 			if (action == null)
 				throw new ArgumentNullException ("action");
 			Option p = new ActionOption (prototype, description, 2, 
-					delegate (OptionValueCollection v) {action (v [0], v [1]);});
+					delegate (OptionValueCollection v) {action (v [0], v [1]);}, hidden);
 			base.Add (p);
 			return this;
 		}
@@ -684,48 +928,30 @@ namespace NDesk.Options {
 			return Add (new ActionOption<TKey, TValue> (prototype, description, action));
 		}
 
+		public OptionSet Add (ArgumentSource source)
+		{
+			if (source == null)
+				throw new ArgumentNullException ("source");
+			sources.Add (source);
+			return this;
+		}
+
 		protected virtual OptionContext CreateOptionContext ()
 		{
 			return new OptionContext (this);
 		}
 
-#if LINQ
 		public List<string> Parse (IEnumerable<string> arguments)
 		{
-			bool process = true;
-			OptionContext c = CreateOptionContext ();
-			c.OptionIndex = -1;
-			var def = GetOptionForName ("<>");
-			var unprocessed = 
-				from argument in arguments
-				where ++c.OptionIndex >= 0 && (process || def != null)
-					? process
-						? argument == "--" 
-							? (process = false)
-							: !Parse (argument, c)
-								? def != null 
-									? Unprocessed (null, def, c, argument) 
-									: true
-								: false
-						: def != null 
-							? Unprocessed (null, def, c, argument)
-							: true
-					: true
-				select argument;
-			List<string> r = unprocessed.ToList ();
-			if (c.Option != null)
-				c.Option.Invoke (c);
-			return r;
-		}
-#else
-		public List<string> Parse (IEnumerable<string> arguments)
-		{
+			if (arguments == null)
+				throw new ArgumentNullException ("arguments");
 			OptionContext c = CreateOptionContext ();
 			c.OptionIndex = -1;
 			bool process = true;
 			List<string> unprocessed = new List<string> ();
 			Option def = Contains ("<>") ? this ["<>"] : null;
-			foreach (string argument in arguments) {
+			ArgumentEnumerator ae = new ArgumentEnumerator (arguments);
+			foreach (string argument in ae) {
 				++c.OptionIndex;
 				if (argument == "--") {
 					process = false;
@@ -735,6 +961,8 @@ namespace NDesk.Options {
 					Unprocessed (unprocessed, def, c, argument);
 					continue;
 				}
+				if (AddSource (ae, argument))
+					continue;
 				if (!Parse (argument, c))
 					Unprocessed (unprocessed, def, c, argument);
 			}
@@ -742,7 +970,50 @@ namespace NDesk.Options {
 				c.Option.Invoke (c);
 			return unprocessed;
 		}
-#endif
+
+		class ArgumentEnumerator : IEnumerable<string> {
+			List<IEnumerator<string>> sources = new List<IEnumerator<string>> ();
+
+			public ArgumentEnumerator (IEnumerable<string> arguments)
+			{
+				sources.Add (arguments.GetEnumerator ());
+			}
+
+			public void Add (IEnumerable<string> arguments)
+			{
+				sources.Add (arguments.GetEnumerator ());
+			}
+
+			public IEnumerator<string> GetEnumerator ()
+			{
+				do {
+					IEnumerator<string> c = sources [sources.Count-1];
+					if (c.MoveNext ())
+						yield return c.Current;
+					else {
+						c.Dispose ();
+						sources.RemoveAt (sources.Count-1);
+					}
+				} while (sources.Count > 0);
+			}
+
+			IEnumerator IEnumerable.GetEnumerator ()
+			{
+				return GetEnumerator ();
+			}
+		}
+
+		bool AddSource (ArgumentEnumerator ae, string argument)
+		{
+			foreach (ArgumentSource source in sources) {
+				IEnumerable<string> replacement;
+				if (!source.GetArguments (argument, out replacement))
+					continue;
+				ae.Add (replacement);
+				return true;
+			}
+			return false;
+		}
 
 		private static bool Unprocessed (ICollection<string> extra, Option def, OptionContext c, string argument)
 		{
@@ -820,7 +1091,7 @@ namespace NDesk.Options {
 		{
 			if (option != null)
 				foreach (string o in c.Option.ValueSeparators != null 
-						? option.Split (c.Option.ValueSeparators, StringSplitOptions.None)
+						? option.Split (c.Option.ValueSeparators, c.Option.MaxValueCount - c.OptionValues.Count, StringSplitOptions.None)
 						: new string[]{option}) {
 					c.OptionValues.Add (o);
 				}
@@ -895,11 +1166,23 @@ namespace NDesk.Options {
 		}
 
 		private const int OptionWidth = 29;
+		private const int Description_FirstWidth  = 80 - OptionWidth;
+		private const int Description_RemWidth    = 80 - OptionWidth - 2;
 
 		public void WriteOptionDescriptions (TextWriter o)
 		{
 			foreach (Option p in this) {
 				int written = 0;
+
+				if (p.Hidden)
+					continue;
+
+				Category c = p as Category;
+				if (c != null) {
+					WriteDescription (o, p.Description, "", 80, 80);
+					continue;
+				}
+
 				if (!WriteOptionPrototype (o, p, ref written))
 					continue;
 
@@ -910,13 +1193,44 @@ namespace NDesk.Options {
 					o.Write (new string (' ', OptionWidth));
 				}
 
-				List<string> lines = GetLines (localizer (GetDescription (p.Description)));
-				o.WriteLine (lines [0]);
-				string prefix = new string (' ', OptionWidth+2);
-				for (int i = 1; i < lines.Count; ++i) {
-					o.Write (prefix);
-					o.WriteLine (lines [i]);
+				WriteDescription (o, p.Description, new string (' ', OptionWidth+2),
+						Description_FirstWidth, Description_RemWidth);
+			}
+
+			foreach (ArgumentSource s in sources) {
+				string[] names = s.GetNames ();
+				if (names == null || names.Length == 0)
+					continue;
+
+				int written = 0;
+
+				Write (o, ref written, "  ");
+				Write (o, ref written, names [0]);
+				for (int i = 1; i < names.Length; ++i) {
+					Write (o, ref written, ", ");
+					Write (o, ref written, names [i]);
 				}
+
+				if (written < OptionWidth)
+					o.Write (new string (' ', OptionWidth - written));
+				else {
+					o.WriteLine ();
+					o.Write (new string (' ', OptionWidth));
+				}
+
+				WriteDescription (o, s.Description, new string (' ', OptionWidth+2),
+						Description_FirstWidth, Description_RemWidth);
+			}
+		}
+
+		void WriteDescription (TextWriter o, string value, string prefix, int firstWidth, int remWidth)
+		{
+			bool indent = false;
+			foreach (string line in GetLines (localizer (GetDescription (value)), firstWidth, remWidth)) {
+				if (indent)
+					o.Write (prefix);
+				o.WriteLine (line);
+				indent = true;
 			}
 		}
 
@@ -1043,60 +1357,9 @@ namespace NDesk.Options {
 			return sb.ToString ();
 		}
 
-		private static List<string> GetLines (string description)
+		private static IEnumerable<string> GetLines (string description, int firstWidth, int remWidth)
 		{
-			List<string> lines = new List<string> ();
-			if (string.IsNullOrEmpty (description)) {
-				lines.Add (string.Empty);
-				return lines;
-			}
-			int length = 80 - OptionWidth - 2;
-			int start = 0, end;
-			do {
-				end = GetLineEnd (start, length, description);
-				bool cont = false;
-				if (end < description.Length) {
-					char c = description [end];
-					if (c == '-' || (char.IsWhiteSpace (c) && c != '\n'))
-						++end;
-					else if (c != '\n') {
-						cont = true;
-						--end;
-					}
-				}
-				lines.Add (description.Substring (start, end - start));
-				if (cont) {
-					lines [lines.Count-1] += "-";
-				}
-				start = end;
-				if (start < description.Length && description [start] == '\n')
-					++start;
-			} while (end < description.Length);
-			return lines;
-		}
-
-		private static int GetLineEnd (int start, int length, string description)
-		{
-			int end = Math.Min (start + length, description.Length);
-			int sep = -1;
-			for (int i = start; i < end; ++i) {
-				switch (description [i]) {
-					case ' ':
-					case '\t':
-					case '\v':
-					case '-':
-					case ',':
-					case '.':
-					case ';':
-						sep = i;
-						break;
-					case '\n':
-						return i;
-				}
-			}
-			if (sep == -1 || end == description.Length)
-				return end;
-			return sep;
+			return StringCoda.WrappedLines (description, firstWidth, remWidth);
 		}
 	}
 }

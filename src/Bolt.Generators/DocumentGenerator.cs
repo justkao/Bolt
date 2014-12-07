@@ -37,13 +37,15 @@ namespace Bolt.Generators
             };
         }
 
-        public string GetResult()
+        public object Context { get; set; }
+
+        public string GetResult(object context = null)
         {
-            Generate();
-            return Output.GetStringBuilder().ToString();
+            Generate(context ?? Context);
+            return Output.GetStringBuilder().ToString().Trim();
         }
 
-        public override void Generate()
+        public override void Generate(object context)
         {
             WriteLine();
 
@@ -51,7 +53,7 @@ namespace Bolt.Generators
             {
                 try
                 {
-                    generator.Generate();
+                    generator.Generate(context);
                 }
                 catch (Exception e)
                 {

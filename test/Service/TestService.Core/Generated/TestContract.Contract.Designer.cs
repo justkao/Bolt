@@ -153,4 +153,3 @@ namespace TestService.Core
         public  Bolt.ActionDescriptor InnerOperationExAsync2 { get; private set; }
     }
 }
-

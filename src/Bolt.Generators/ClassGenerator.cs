@@ -14,11 +14,20 @@ namespace Bolt.Generators
         {
             Descriptor = descriptor;
             Modifier = "public";
+            AddNamespace = true;
         }
 
         public ClassDescriptor Descriptor { get; private set; }
 
         public string Modifier { get; set; }
+
+        public IUserCodeGenerator UserGenerator { get; set; }
+
+        public Action<ClassGenerator> GenerateBodyAction { get; set; }
+
+        public Action<ClassGenerator> AnnotateClassAction { get; set; }
+
+        public bool AddNamespace { get; set; }
 
         public virtual void WritePublicProperty(string type, string name)
         {
@@ -59,15 +68,15 @@ namespace Bolt.Generators
             WriteMethod(FormatMethodDeclaration(method, forceAsync), bodyGenerator, modifier, returnValue);
         }
 
-        public virtual void GenerateClass(Action<ClassGenerator> bodyGenerator, Action<ClassGenerator> annotateClassAction = null, bool addNamespace = true, Action<ClassGenerator> introduceFields = null)
+        public override void Generate(object context)
         {
             AddUsings(Descriptor.Namespace);
 
-            using (addNamespace ? WithNamespace(Descriptor.Namespace) : new EasyDispose(() => { }))
+            using (AddNamespace ? WithNamespace(Descriptor.Namespace) : new EasyDispose(() => { }))
             {
-                if (annotateClassAction != null)
+                if (AnnotateClassAction != null)
                 {
-                    annotateClassAction(this);
+                    AnnotateClassAction(this);
                 }
 
                 string type = Descriptor.IsInterface ? "interface" : "class";
@@ -94,10 +103,9 @@ namespace Bolt.Generators
 
                 using (WithBlock())
                 {
-                    if (introduceFields != null)
+                    if (UserGenerator != null)
                     {
-                        introduceFields(this);
-                        WriteLine();
+                        UserGenerator.Generate(this, context);
                     }
 
                     if (!Descriptor.IsInterface)
@@ -105,7 +113,10 @@ namespace Bolt.Generators
                         GenerateConstructors();
                     }
 
-                    bodyGenerator(this);
+                    if (GenerateBodyAction != null)
+                    {
+                        GenerateBodyAction(this);
+                    }
                 }
             }
 

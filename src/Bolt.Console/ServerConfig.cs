@@ -1,5 +1,3 @@
-using System;
-
 using Bolt.Generators;
 
 namespace Bolt.Console
@@ -22,8 +20,6 @@ namespace Bolt.Console
 
         public string GeneratorEx { get; set; }
 
-        public string Context { get; set; }
-
         protected override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
         {
             ServerGenerator serverGenerator = new ServerGenerator
@@ -32,8 +28,7 @@ namespace Bolt.Console
                                                       Namespace = Namespace,
                                                       Name = Name,
                                                       StateFullInstanceProviderBase = StateFullBase,
-                                                      Modifier = Modifier ?? "public",
-                                                      Context = Context
+                                                      Modifier = Modifier ?? "public"
                                                   };
 
             if (!string.IsNullOrEmpty(Suffix))
@@ -43,12 +38,12 @@ namespace Bolt.Console
 
             if (!string.IsNullOrEmpty(Generator))
             {
-                serverGenerator.InvocatorUserCodeGenerator = Parent.Parent.GetGenerator(Generator);
+                serverGenerator.InvocatorUserGenerator = Parent.Parent.GetGenerator(Generator);
             }
 
             if (!string.IsNullOrEmpty(GeneratorEx))
             {
-                serverGenerator.ExtensionUserCodeGenerator = Parent.Parent.GetGenerator(GeneratorEx);
+                serverGenerator.ExtensionCodeGenerator = Parent.Parent.GetGenerator(GeneratorEx);
             }
 
             generator.Add(serverGenerator);

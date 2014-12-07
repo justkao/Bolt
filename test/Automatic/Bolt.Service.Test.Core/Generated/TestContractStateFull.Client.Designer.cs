@@ -104,5 +104,3 @@ namespace Bolt.Service.Test.Core
 
     }
 }
-
-

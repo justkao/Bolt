@@ -17,74 +17,86 @@ namespace Bolt.Generators
 
         public string StateFullInstanceProviderBase { get; set; }
 
-        public IUserCodeGenerator UserCodeGenerator { get; set; }
+        public IUserCodeGenerator UserGenerator { get; set; }
 
-        public object Context { get; set; }
-
-        public override void Generate()
+        public override void Generate(object context)
         {
             AddUsings(ServerGenerator.BoltServerNamespace, "Owin");
 
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
             generator.Modifier = Modifier + " static";
+            generator.GenerateBodyAction = GenerateBody;
+            generator.UserGenerator = UserGenerator;
+            generator.Generate(context);
 
-            generator.GenerateClass((v) =>
+            base.Generate(context);
+        }
+
+        private void GenerateBody(ClassGenerator g)
+        {
+            WriteLine("public static IAppBuilder Use{0}(this IAppBuilder app, {1} instance)", ContractDefinition.Name,
+                ContractDefinition.Root.FullName);
+            using (WithBlock())
             {
-                if (UserCodeGenerator != null)
-                {
-                    UserCodeGenerator.Generate(v, Context);
-                }
+                WriteLine("return app.Use{0}(new StaticInstanceProvider(instance));", ContractDefinition.Name);
+            }
+            WriteLine();
 
-                WriteLine("public static IAppBuilder Use{0}(this IAppBuilder app, {1} instance)", ContractDefinition.Name, ContractDefinition.Root.FullName);
+            WriteLine(
+                "public static IAppBuilder Use{0}<TImplementation>(this IAppBuilder app) where TImplementation: {1}, new()",
+                ContractDefinition.Name, ContractDefinition.Root.FullName);
+            using (WithBlock())
+            {
+                WriteLine("return app.Use{0}(new InstanceProvider<TImplementation>());", ContractDefinition.Name);
+            }
+            WriteLine();
+
+            MethodInfo initSession = ContractDefinition.GetInitSessionMethod();
+            MethodInfo closeSession = ContractDefinition.GetCloseSessionMethod();
+            if (initSession != null && closeSession != null)
+            {
+                WriteLine(
+                    "public static IAppBuilder UseStateFull{0}<TImplementation>(this IAppBuilder app, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: {1}, new()",
+                    ContractDefinition.Name, ContractDefinition.Root.FullName);
                 using (WithBlock())
                 {
-                    WriteLine("return app.Use{0}(new StaticInstanceProvider(instance));", ContractDefinition.Name);
+                    WriteLine("var initSessionAction = {0}.Default.{1};",
+                        MetadataProvider.GetContractDescriptor(ContractDefinition).Name,
+                        MetadataProvider.GetMethodDescriptor(ContractDefinition, initSession).Name);
+                    WriteLine("var closeSessionAction = {0}.Default.{1};",
+                        MetadataProvider.GetContractDescriptor(ContractDefinition).Name,
+                        MetadataProvider.GetMethodDescriptor(ContractDefinition, closeSession).Name);
+                    WriteLine(
+                        "return app.Use{0}(new {1}<TImplementation>(initSessionAction, closeSessionAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));",
+                        ContractDefinition.Name, StateFullInstanceProviderBase);
                 }
                 WriteLine();
+            }
 
-                WriteLine("public static IAppBuilder Use{0}<TImplementation>(this IAppBuilder app) where TImplementation: {1}, new()", ContractDefinition.Name, ContractDefinition.Root.FullName);
-                using (WithBlock())
-                {
-                    WriteLine("return app.Use{0}(new InstanceProvider<TImplementation>());", ContractDefinition.Name);
-                }
+            WriteLine(
+                "public static IAppBuilder UseStateFull{0}<TImplementation>(this IAppBuilder app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: {1}, new()",
+                ContractDefinition.Name, ContractDefinition.Root.FullName);
+            using (WithBlock())
+            {
+                WriteLine(
+                    "return app.Use{0}(new {1}<TImplementation>(initInstanceAction, releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));",
+                    ContractDefinition.Name, StateFullInstanceProviderBase);
+            }
+
+            WriteLine();
+
+            WriteLine("public static IAppBuilder Use{0}(this IAppBuilder app, IInstanceProvider instanceProvider)",
+                ContractDefinition.Name);
+            using (WithBlock())
+            {
+                WriteLine("var boltExecutor = app.GetBolt();");
+                WriteLine("var invoker = new {0}();", ContractInvoker.FullName);
+                WriteLine("invoker.Init(boltExecutor.Configuration);");
+                WriteLine("invoker.InstanceProvider = instanceProvider;");
+                WriteLine("boltExecutor.Add(invoker);");
                 WriteLine();
-
-                MethodInfo initSession = ContractDefinition.GetInitSessionMethod();
-                MethodInfo closeSession = ContractDefinition.GetCloseSessionMethod();
-                if (initSession != null && closeSession != null)
-                {
-                    WriteLine("public static IAppBuilder UseStateFull{0}<TImplementation>(this IAppBuilder app, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: {1}, new()", ContractDefinition.Name, ContractDefinition.Root.FullName);
-                    using (WithBlock())
-                    {
-                        WriteLine("var initSessionAction = {0}.Default.{1};", MetadataProvider.GetContractDescriptor(ContractDefinition).Name, MetadataProvider.GetMethodDescriptor(ContractDefinition, initSession).Name);
-                        WriteLine("var closeSessionAction = {0}.Default.{1};", MetadataProvider.GetContractDescriptor(ContractDefinition).Name, MetadataProvider.GetMethodDescriptor(ContractDefinition, closeSession).Name);
-                        WriteLine("return app.Use{0}(new {1}<TImplementation>(initSessionAction, closeSessionAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));", ContractDefinition.Name, StateFullInstanceProviderBase);
-                    }
-                    WriteLine();
-                }
-
-                WriteLine("public static IAppBuilder UseStateFull{0}<TImplementation>(this IAppBuilder app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: {1}, new()", ContractDefinition.Name, ContractDefinition.Root.FullName);
-                using (WithBlock())
-                {
-                    WriteLine("return app.Use{0}(new {1}<TImplementation>(initInstanceAction, releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));", ContractDefinition.Name, StateFullInstanceProviderBase);
-                }
-
-                WriteLine();
-
-                WriteLine("public static IAppBuilder Use{0}(this IAppBuilder app, IInstanceProvider instanceProvider)", ContractDefinition.Name);
-                using (WithBlock())
-                {
-                    WriteLine("var boltExecutor = app.GetBolt();");
-                    WriteLine("var invoker = new {0}();", ContractInvoker.FullName);
-                    WriteLine("invoker.Init(boltExecutor.Configuration);");
-                    WriteLine("invoker.InstanceProvider = instanceProvider;");
-                    WriteLine("boltExecutor.Add(invoker);");
-                    WriteLine();
-                    WriteLine("return app;");
-                }
-            });
-
-            base.Generate();
+                WriteLine("return app;");
+            }
         }
 
         protected override ClassDescriptor CreateDefaultDescriptor()

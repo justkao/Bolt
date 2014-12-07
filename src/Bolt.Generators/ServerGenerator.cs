@@ -59,71 +59,29 @@ namespace Bolt.Generators
 
         public string StateFullInstanceProviderBase { get; set; }
 
-        public IUserCodeGenerator InvocatorUserCodeGenerator { get; set; }
+        public IUserCodeGenerator InvocatorUserGenerator { get; set; }
 
-        public IUserCodeGenerator ExtensionUserCodeGenerator { get; set; }
+        public IUserCodeGenerator ExtensionCodeGenerator { get; set; }
 
-        public object Context { get; set; }
-
-        public override void Generate()
+        public override void Generate(object context)
         {
             AddUsings(BoltServerNamespace);
 
             ClassGenerator classGenerator = CreateClassGenerator(ContractDescriptor);
             classGenerator.Modifier = Modifier;
-
-            classGenerator.GenerateClass(
-                g =>
-                {
-                    if (InvocatorUserCodeGenerator != null)
-                    {
-                        InvocatorUserCodeGenerator.Generate(g, Context);
-                    }
-
-                    g.WriteLine("public override void Init()");
-                    using (WithBlock())
-                    {
-                        foreach (MethodInfo method in ContractDefinition.GetEffectiveMethods())
-                        {
-                            WriteLine(
-                                "AddAction({0}.{1}, {2});",
-                                ContractDescriptorPropertyName,
-                                MetadataProvider.GetMethodDescriptor(ContractDefinition, method).Name,
-                                FormatMethodName(method));
-                        }
-
-                        WriteLine();
-                        WriteLine("base.Init();");
-                    }
-                    WriteLine();
-
-                    IEnumerable<MethodInfo> methods = ContractDefinition.GetEffectiveMethods().ToList();
-
-                    foreach (MethodInfo method in methods)
-                    {
-                        WriteInvocationMethod(MetadataProvider.GetMethodDescriptor(ContractDefinition, method), g);
-
-                        if (!Equals(method, methods.Last()))
-                        {
-                            WriteLine();
-                        }
-                    }
-                });
+            classGenerator.GenerateBodyAction = GenerateInvocatorBody;
+            classGenerator.UserGenerator = InvocatorUserGenerator;
+            classGenerator.Generate(context);
 
             ContractInvokerExtensionGenerator generator = CreateEx<ContractInvokerExtensionGenerator>();
-            if (ExtensionUserCodeGenerator != null)
-            {
-                generator.Context = Context;
-                generator.UserCodeGenerator = ExtensionUserCodeGenerator;
-            }
-
+            generator.UserGenerator = ExtensionCodeGenerator;
             generator.Modifier = Modifier;
             if (StateFullInstanceProviderBase != null)
             {
                 generator.StateFullInstanceProviderBase = StateFullInstanceProviderBase;
             }
             generator.ContractInvoker = classGenerator.Descriptor;
-            generator.Generate();
+            generator.Generate(context);
         }
 
         protected override ClassDescriptor CreateDefaultDescriptor()
@@ -135,6 +93,38 @@ namespace Bolt.Generators
         {
             string declaration = string.Format("{2} {0}({1} context)", FormatMethodName(methodDescriptor.Method), ServerExecutionContext, FormatType<Task>());
             classGenerator.WriteMethod(declaration, g => WriteInvocationMethodBody(methodDescriptor), "protected virtual async");
+        }
+
+        private void GenerateInvocatorBody(ClassGenerator g)
+        {
+            g.WriteLine("public override void Init()");
+            using (WithBlock())
+            {
+                foreach (MethodInfo method in ContractDefinition.GetEffectiveMethods())
+                {
+                    WriteLine(
+                        "AddAction({0}.{1}, {2});",
+                        ContractDescriptorPropertyName,
+                        MetadataProvider.GetMethodDescriptor(ContractDefinition, method).Name,
+                        FormatMethodName(method));
+                }
+
+                WriteLine();
+                WriteLine("base.Init();");
+            }
+            WriteLine();
+
+            IEnumerable<MethodInfo> methods = ContractDefinition.GetEffectiveMethods().ToList();
+
+            foreach (MethodInfo method in methods)
+            {
+                WriteInvocationMethod(MetadataProvider.GetMethodDescriptor(ContractDefinition, method), g);
+
+                if (!Equals(method, methods.Last()))
+                {
+                    WriteLine();
+                }
+            }
         }
 
         private void WriteInvocationMethodBody(MethodDescriptor methodDescriptor)

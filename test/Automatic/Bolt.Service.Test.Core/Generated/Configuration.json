@@ -9,13 +9,12 @@
     "contracts": [
         {
             "contract": "Bolt.Service.Test.Core.ITestContract",
+            "context": "generatorContext2",
             "client": {
                 "Generator": "CustomUserGenerator",
-                "context": "generatorContext"
             },
             "server": {
                 "Generator": "CustomUserGenerator",
-                "context": "generatorContext2"
             }
         },
         {

@@ -58,4 +58,3 @@ namespace Bolt.Service.Test.Core
         public  Bolt.ActionDescriptor Destroy { get; private set; }
     }
 }
-

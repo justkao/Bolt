@@ -119,4 +119,3 @@ namespace Bolt.Service.Test.Core
         public  Bolt.ActionDescriptor ThisMethodShouldBeExcluded { get; private set; }
     }
 }
-

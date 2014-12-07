@@ -52,23 +52,16 @@ namespace Bolt.Generators
 
         public IEnumerable<string> BaseInterfaces { get; set; }
 
-        public IUserCodeGenerator UserCodeGenerator { get; set; }
+        public IUserCodeGenerator UserGenerator { get; set; }
 
-        public object Context { get; set; }
-
-        public override void Generate()
+        public override void Generate(object context)
         {
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
             generator.Modifier = Modifier;
-
-            generator.GenerateClass(
+            generator.UserGenerator = UserGenerator;
+            generator.GenerateBodyAction = (
                 g =>
                 {
-                    if (UserCodeGenerator != null)
-                    {
-                        UserCodeGenerator.Generate(g, Context);
-                    }
-
                     g.GenerateConstructor(g.Descriptor.FullName + " proxy", "proxy");
 
                     g.GenerateConstructor(string.Format("{0} channel", FormatType<IChannel>()), "channel");
@@ -79,6 +72,7 @@ namespace Bolt.Generators
                         GenerateMethods(g, type);
                     }
                 });
+            generator.Generate(context);
 
             WriteLine();
         }

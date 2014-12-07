@@ -25,6 +25,8 @@ namespace Bolt.Console
 
         public string Modifier { get; set; }
 
+        public string Context { get; set; }
+
         [JsonIgnore]
         public RootConfig Parent { get; set; }
 
@@ -58,12 +60,12 @@ namespace Bolt.Console
             string output = PathHelpers.GetOutput(Parent.OutputDirectory, Output, ContractDefinition.Name + ".Contract.Designer.cs");
             DocumentGenerator document = Parent.GetDocument(output);
             document.Formatter.Assemblies = Parent.AssemblyCache.ToList();
+            document.Context = Context;
 
             document.Add(new ContractGenerator()
                              {
                                  ContractDefinition = definition,
                                  Modifier = Modifier ?? "public"
-
                              });
 
             document.Add(new ContractDescriptorGenerator()

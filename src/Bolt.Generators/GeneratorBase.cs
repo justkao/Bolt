@@ -41,7 +41,7 @@ namespace Bolt.Generators
             return res;
         }
 
-        public virtual void Generate()
+        public virtual void Generate(object context)
         {
         }
 

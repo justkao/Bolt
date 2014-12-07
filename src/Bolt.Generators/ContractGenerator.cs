@@ -19,7 +19,7 @@ namespace Bolt.Generators
 
         public string Modifier { get; set; }
 
-        public override void Generate()
+        public override void Generate(object context)
         {
             List<MethodDescriptor> methods =
                 ContractDefinition.GetEffectiveMethods()
@@ -35,7 +35,7 @@ namespace Bolt.Generators
                     {
                         ParametersGenerator parametersGenerator = new ParametersGenerator(method, Output, Formatter, IntendProvider)
                         {
-                            IncludeNamespace = false,
+                            AddNamespace = false,
                         };
 
                         parametersGenerator.Modifier = Modifier;
@@ -44,7 +44,7 @@ namespace Bolt.Generators
                             continue;
                         }
 
-                        parametersGenerator.Generate();
+                        parametersGenerator.Generate(context);
                     }
                 }
 
