@@ -14,8 +14,6 @@
     <files>
         <file src="tools\Bolt.Client.dll" target="tools\Bolt.Client.dll" />
         <file src="tools\Bolt.Core.dll" target="tools\Bolt.Core.dll" />
-        <file src="tools\Bolt.exe" target="tools\Bolt.exe" />
-        <file src="tools\Bolt.exe.config" target="tools\Bolt.exe.config" />
         <file src="tools\Bolt.Generators.dll" target="tools\Bolt.Generators.dll" />
         <file src="tools\Newtonsoft.Json.dll" target="tools\Newtonsoft.Json.dll" />
         <file src="tools\Newtonsoft.Json.xml" target="tools\Newtonsoft.Json.xml" />
