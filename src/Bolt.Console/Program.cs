@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Mono.Options;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using Mono.Options;
 
 namespace Bolt.Console
 {
@@ -87,13 +87,14 @@ namespace Bolt.Console
             {
                 Directory.SetCurrentDirectory(workingDirectory);
             }
+            string outputFile = null;
 
             switch (action)
             {
                 case BoltAction.GenerateCode:
                     EnsureInput(inputPath, set);
                     RootConfig rootConfig = RootConfig.Load(inputPath);
-                    rootConfig.OutputDirectory = outputPath ??Path.GetDirectoryName(inputPath);
+                    rootConfig.OutputDirectory = outputPath ?? Path.GetDirectoryName(inputPath);
                     rootConfig.Generate();
                     break;
                 case BoltAction.Help:
@@ -108,11 +109,13 @@ namespace Bolt.Console
                 case BoltAction.GenerateConfig:
                     EnsureInput(inputPath, set);
                     string json = RootConfig.Create(inputPath).Serialize();
-                    File.WriteAllText(outputPath ?? Path.Combine(Path.GetDirectoryName(inputPath), "Configuration.json"), json);
+                    outputFile = PathHelpers.GetOutput(Path.GetDirectoryName(inputPath), outputPath, "Configuration.json");
+                    File.WriteAllText(outputFile, json);
                     break;
                 case BoltAction.GenerateExample:
                     string result = CreateSampleConfiguration().Serialize();
-                    File.WriteAllText(outputPath ?? "Bolt.Example.json", result);
+                    outputFile = PathHelpers.GetOutput(Environment.CurrentDirectory, outputPath, "Bolt.Example.json");
+                    File.WriteAllText(outputFile, result);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

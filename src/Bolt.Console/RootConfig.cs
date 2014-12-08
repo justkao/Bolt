@@ -31,9 +31,9 @@ namespace Bolt.Console
         public static RootConfig Create(string assembly)
         {
             RootConfig root = new RootConfig();
-            root.Assemblies = new List<string>() {assembly};
+            root.Assemblies = new List<string>() { Path.GetFullPath(assembly) };
             root.Contracts = new List<ContractConfig>();
-            
+
             foreach (Type type in Assembly.LoadFrom(assembly).GetTypes())
             {
                 if (!type.IsInterface)
@@ -47,10 +47,16 @@ namespace Bolt.Console
                 c.Client = new ClientConfig()
                 {
                     ForceAsync = true,
+                    Modifier = "public",
+                    Suffix = "Proxy",
+                    Namespace = type.Namespace
                 };
 
                 c.Server = new ServerConfig()
                 {
+                    Modifier = "public",
+                    Suffix = "Invoker",
+                    Namespace = type.Namespace
                 };
 
                 root.Contracts.Add(c);
