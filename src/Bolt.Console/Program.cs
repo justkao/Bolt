@@ -16,7 +16,7 @@ namespace Bolt.Console
             GenerateExample
         }
 
-        public static void Main(string[] args)
+        public static int Main(string[] args)
         {
             BoltAction action = BoltAction.Help;
             string workingDirectory = null;
@@ -80,7 +80,7 @@ namespace Bolt.Console
             {
                 System.Console.WriteLine(e.Message);
                 System.Console.WriteLine("Try 'Bolt --help' for more information.");
-                return;
+                return 0;
             }
 
             if (!string.IsNullOrEmpty(workingDirectory))
@@ -89,39 +89,54 @@ namespace Bolt.Console
             }
             string outputFile = null;
 
-            switch (action)
+            try
             {
-                case BoltAction.GenerateCode:
-                    EnsureInput(inputPath, set);
-                    RootConfig rootConfig = RootConfig.Load(inputPath);
-                    rootConfig.OutputDirectory = outputPath ?? Path.GetDirectoryName(inputPath);
-                    rootConfig.Generate();
-                    break;
-                case BoltAction.Help:
-                    ShowHelp(set);
-                    break;
-                case BoltAction.GenerateCodeFromAssembly:
-                    EnsureInput(inputPath, set);
-                    RootConfig config = RootConfig.Create(inputPath);
-                    config.OutputDirectory = outputPath ?? Path.GetDirectoryName(inputPath);
-                    config.Generate();
-                    break;
-                case BoltAction.GenerateConfig:
-                    EnsureInput(inputPath, set);
-                    string json = RootConfig.Create(inputPath).Serialize();
-                    outputFile = PathHelpers.GetOutput(Path.GetDirectoryName(inputPath), outputPath, "Configuration.json");
-                    File.WriteAllText(outputFile, json);
-                    break;
-                case BoltAction.GenerateExample:
-                    string result = CreateSampleConfiguration().Serialize();
-                    outputFile = PathHelpers.GetOutput(Environment.CurrentDirectory, outputPath, "Bolt.Example.json");
-                    File.WriteAllText(outputFile, result);
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                switch (action)
+                {
+                    case BoltAction.GenerateCode:
+                        EnsureInput(inputPath, set);
+                        RootConfig rootConfig = RootConfig.Load(inputPath);
+                        rootConfig.OutputDirectory = outputPath ?? Path.GetDirectoryName(inputPath);
+                        rootConfig.Generate();
+                        break;
+                    case BoltAction.Help:
+                        ShowHelp(set);
+                        break;
+                    case BoltAction.GenerateCodeFromAssembly:
+                        EnsureInput(inputPath, set);
+                        RootConfig config = RootConfig.Create(inputPath);
+                        config.OutputDirectory = outputPath ?? Path.GetDirectoryName(inputPath);
+                        config.Generate();
+                        break;
+                    case BoltAction.GenerateConfig:
+                        EnsureInput(inputPath, set);
+                        string json = RootConfig.Create(inputPath).Serialize();
+                        outputFile = PathHelpers.GetOutput(Path.GetDirectoryName(inputPath), outputPath, "Configuration.json");
+                        File.WriteAllText(outputFile, json);
+                        break;
+                    case BoltAction.GenerateExample:
+                        string result = CreateSampleConfiguration().Serialize();
+                        outputFile = PathHelpers.GetOutput(Environment.CurrentDirectory, outputPath, "Bolt.Example.json");
+                        File.WriteAllText(outputFile, result);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
+                }
+            }
+            catch (Exception e)
+            {
+                ConsoleColor prev = System.Console.ForegroundColor;
+                System.Console.ForegroundColor = ConsoleColor.Red;
+                System.Console.WriteLine("Failed to execute '{0}' action.", action);
+                System.Console.WriteLine("Error: '{0}'", e.Message);
+                System.Console.ForegroundColor = ConsoleColor.Gray;
+                System.Console.WriteLine(e.ToString());
+                System.Console.WriteLine(e.ToString());
+                System.Console.ForegroundColor = prev;
+                return 1;
             }
 
-            Environment.Exit(0);
+            return 0;
         }
 
         private static void EnsureInput(string inputPath, OptionSet set)
