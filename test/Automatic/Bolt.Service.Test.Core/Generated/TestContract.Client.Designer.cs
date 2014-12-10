@@ -56,7 +56,7 @@ namespace Bolt.Service.Test.Core
 
         public virtual void SimpleMethodWithSimpleArguments(int val)
         {
-            var bolt_Params = new SimpleMethodWithSimpleArgumentsParameters();
+            var bolt_Params = new Bolt.Service.Test.Core.Parameters.SimpleMethodWithSimpleArgumentsParameters();
             bolt_Params.Val = val;
             Channel.Send(bolt_Params, Descriptor.SimpleMethodWithSimpleArguments, GetCancellationToken(Descriptor.SimpleMethodWithSimpleArguments));
         }
@@ -87,14 +87,14 @@ namespace Bolt.Service.Test.Core
         }
         public virtual void SimpleMethodWithComplexParameter(CompositeType compositeType)
         {
-            var bolt_Params = new SimpleMethodWithComplexParameterParameters();
+            var bolt_Params = new Bolt.Service.Test.Core.Parameters.SimpleMethodWithComplexParameterParameters();
             bolt_Params.CompositeType = compositeType;
             Channel.Send(bolt_Params, Descriptor.SimpleMethodWithComplexParameter, GetCancellationToken(Descriptor.SimpleMethodWithComplexParameter));
         }
 
         public virtual Task SimpleMethodWithComplexParameterAsync(CompositeType compositeType)
         {
-            var bolt_Params = new SimpleMethodWithComplexParameterParameters();
+            var bolt_Params = new Bolt.Service.Test.Core.Parameters.SimpleMethodWithComplexParameterParameters();
             bolt_Params.CompositeType = compositeType;
             return Channel.SendAsync(bolt_Params, Descriptor.SimpleMethodWithComplexParameter, GetCancellationToken(Descriptor.SimpleMethodWithComplexParameter));
         }
@@ -111,21 +111,21 @@ namespace Bolt.Service.Test.Core
 
         public virtual void MethodTakingHugeData(List<CompositeType> arg)
         {
-            var bolt_Params = new MethodTakingHugeDataParameters();
+            var bolt_Params = new Bolt.Service.Test.Core.Parameters.MethodTakingHugeDataParameters();
             bolt_Params.Arg = arg;
             Channel.Send(bolt_Params, Descriptor.MethodTakingHugeData, GetCancellationToken(Descriptor.MethodTakingHugeData));
         }
 
         public virtual void MethodWithNotSerializableType(NotSerializableType arg)
         {
-            var bolt_Params = new MethodWithNotSerializableTypeParameters();
+            var bolt_Params = new Bolt.Service.Test.Core.Parameters.MethodWithNotSerializableTypeParameters();
             bolt_Params.Arg = arg;
             Channel.Send(bolt_Params, Descriptor.MethodWithNotSerializableType, GetCancellationToken(Descriptor.MethodWithNotSerializableType));
         }
 
         public virtual Task MethodWithNotSerializableTypeAsync(NotSerializableType arg)
         {
-            var bolt_Params = new MethodWithNotSerializableTypeParameters();
+            var bolt_Params = new Bolt.Service.Test.Core.Parameters.MethodWithNotSerializableTypeParameters();
             bolt_Params.Arg = arg;
             return Channel.SendAsync(bolt_Params, Descriptor.MethodWithNotSerializableType, GetCancellationToken(Descriptor.MethodWithNotSerializableType));
         }
@@ -147,7 +147,7 @@ namespace Bolt.Service.Test.Core
 
         public virtual void MethodWithManyArguments(CompositeType arg1, CompositeType arg2, DateTime time)
         {
-            var bolt_Params = new MethodWithManyArgumentsParameters();
+            var bolt_Params = new Bolt.Service.Test.Core.Parameters.MethodWithManyArgumentsParameters();
             bolt_Params.Arg1 = arg1;
             bolt_Params.Arg2 = arg2;
             bolt_Params.Time = time;

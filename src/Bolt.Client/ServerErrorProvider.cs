@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 
 namespace Bolt.Client
 {
@@ -28,6 +29,17 @@ namespace Bolt.Client
             if (code != null)
             {
                 return new BoltServerException(code.Value, context.Action, context.Request.RequestUri.ToString());
+            }
+
+            if (context.Response != null)
+            {
+                if (context.Response.StatusCode == HttpStatusCode.NotFound)
+                {
+                    return new BoltServerException(
+                        ServerErrorCode.BoltUnavailable,
+                        context.Action,
+                        context.Request.RequestUri.ToString());
+                }
             }
 
             return null;

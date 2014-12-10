@@ -55,7 +55,7 @@ namespace Bolt.Service.Test.Core
 
         protected virtual async Task TestContractStateFull_SetState(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<SetStateParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<Bolt.Service.Test.Core.Parameters.SetStateParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
             try
             {

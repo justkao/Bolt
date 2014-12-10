@@ -33,7 +33,7 @@ namespace Bolt.Generators
             ClassGenerator classGenerator = CreateClassGenerator(descriptor);
             classGenerator.Modifier = Modifier;
             classGenerator.GenerateBodyAction = GenerateBody;
-            
+
             classGenerator.Generate(context);
         }
 
@@ -41,8 +41,12 @@ namespace Bolt.Generators
         {
             List<MethodInfo> methods = ContractDefinition.GetEffectiveMethods().ToList();
 
-            WriteLine("public {0}() : base(typeof({1}), \"{2}\")", g.Descriptor.Name, ContractDefinition.Root.FullName,
+            WriteLine(
+                "public {0}() : base(typeof({1}), \"{2}\")",
+                g.Descriptor.Name,
+                ContractDefinition.Root.FullName,
                 ContractDefinition.Name);
+
             using (WithBlock())
             {
                 foreach (MethodInfo method in methods)

@@ -50,7 +50,7 @@ namespace TestService.Core
 
         protected virtual async Task TestContract_UpdatePerson(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<UpdatePersonParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.UpdatePersonParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
             {
@@ -67,7 +67,7 @@ namespace TestService.Core
 
         protected virtual async Task TestContract_UpdatePersonThatThrowsInvalidOperationException(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<UpdatePersonThatThrowsInvalidOperationExceptionParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
             {
@@ -116,7 +116,7 @@ namespace TestService.Core
 
         protected virtual async Task TestContract_DoNothingWithComplexParameterAsAsync(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<DoNothingWithComplexParameterAsAsyncParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.DoNothingWithComplexParameterAsAsyncParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
             {
@@ -133,7 +133,7 @@ namespace TestService.Core
 
         protected virtual async Task TestContract_DoNothingWithComplexParameter(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<DoNothingWithComplexParameterParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.DoNothingWithComplexParameterParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
             {
@@ -150,7 +150,7 @@ namespace TestService.Core
 
         protected virtual async Task TestContract_GetSimpleType(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<GetSimpleTypeParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetSimpleTypeParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
             {
@@ -167,7 +167,7 @@ namespace TestService.Core
 
         protected virtual async Task TestContract_GetSimpleTypeAsAsync(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<GetSimpleTypeAsAsyncParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetSimpleTypeAsAsyncParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
             {
@@ -184,7 +184,7 @@ namespace TestService.Core
 
         protected virtual async Task TestContract_GetSinglePerson(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<GetSinglePersonParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetSinglePersonParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
             {
@@ -201,7 +201,7 @@ namespace TestService.Core
 
         protected virtual async Task TestContract_GetSinglePersonAsAsync(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<GetSinglePersonAsAsyncParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetSinglePersonAsAsyncParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
             {
@@ -234,7 +234,7 @@ namespace TestService.Core
 
         protected virtual async Task TestContract_GetManyPersonsAsAsync(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<GetManyPersonsAsAsyncParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetManyPersonsAsAsyncParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
             {

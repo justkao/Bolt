@@ -48,7 +48,7 @@ namespace Bolt.Service.Test.Core
 
         protected virtual async Task TestContract_SimpleMethodWithSimpleArguments(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<SimpleMethodWithSimpleArgumentsParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<Bolt.Service.Test.Core.Parameters.SimpleMethodWithSimpleArgumentsParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
             {
@@ -129,7 +129,7 @@ namespace Bolt.Service.Test.Core
 
         protected virtual async Task TestContractInner_SimpleMethodWithComplexParameter(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<SimpleMethodWithComplexParameterParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<Bolt.Service.Test.Core.Parameters.SimpleMethodWithComplexParameterParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
             try
             {
@@ -178,7 +178,7 @@ namespace Bolt.Service.Test.Core
 
         protected virtual async Task TestContractInner_MethodTakingHugeData(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<MethodTakingHugeDataParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<Bolt.Service.Test.Core.Parameters.MethodTakingHugeDataParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
             try
             {
@@ -195,7 +195,7 @@ namespace Bolt.Service.Test.Core
 
         protected virtual async Task TestContractInner_MethodWithNotSerializableType(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<MethodWithNotSerializableTypeParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<Bolt.Service.Test.Core.Parameters.MethodWithNotSerializableTypeParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
             try
             {
@@ -244,7 +244,7 @@ namespace Bolt.Service.Test.Core
 
         protected virtual async Task TestContractInner_MethodWithManyArguments(Bolt.Server.ServerActionContext context)
         {
-            var parameters = await DataHandler.ReadParametersAsync<MethodWithManyArgumentsParameters>(context);
+            var parameters = await DataHandler.ReadParametersAsync<Bolt.Service.Test.Core.Parameters.MethodWithManyArgumentsParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
             try
             {
