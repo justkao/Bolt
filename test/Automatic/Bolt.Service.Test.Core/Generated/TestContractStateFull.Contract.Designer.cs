@@ -24,6 +24,13 @@ using Bolt.Service.Test.Core.Parameters;
 namespace Bolt.Service.Test.Core.Parameters
 {
     [DataContract]
+    public partial class InitExParameters
+    {
+        [DataMember(Order = 1)]
+        public bool Fail { get; set; }
+    }
+
+    [DataContract]
     public partial class SetStateParameters
     {
         [DataMember(Order = 1)]
@@ -39,6 +46,7 @@ namespace Bolt.Service.Test.Core
         public TestContractStateFullDescriptor() : base(typeof(Bolt.Service.Test.Core.ITestContractStateFull), "TestContractStateFull")
         {
             Init = Add("Init", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("Init"));
+            InitEx = Add("InitEx", typeof(Bolt.Service.Test.Core.Parameters.InitExParameters), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("InitEx"));
             SetState = Add("SetState", typeof(Bolt.Service.Test.Core.Parameters.SetStateParameters), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("SetState"));
             GetState = Add("GetState", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("GetState"));
             NextCallWillFailProxy = Add("NextCallWillFailProxy", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("NextCallWillFailProxy"));
@@ -48,6 +56,8 @@ namespace Bolt.Service.Test.Core
         public static readonly TestContractStateFullDescriptor Default = new TestContractStateFullDescriptor();
 
         public  Bolt.ActionDescriptor Init { get; private set; }
+
+        public  Bolt.ActionDescriptor InitEx { get; private set; }
 
         public  Bolt.ActionDescriptor SetState { get; private set; }
 

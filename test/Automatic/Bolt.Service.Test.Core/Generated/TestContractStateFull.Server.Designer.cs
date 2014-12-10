@@ -29,6 +29,7 @@ namespace Bolt.Service.Test.Core
         public override void Init()
         {
             AddAction(Descriptor.Init, TestContractStateFull_Init);
+            AddAction(Descriptor.InitEx, TestContractStateFull_InitEx);
             AddAction(Descriptor.SetState, TestContractStateFull_SetState);
             AddAction(Descriptor.GetState, TestContractStateFull_GetState);
             AddAction(Descriptor.NextCallWillFailProxy, TestContractStateFull_NextCallWillFailProxy);
@@ -43,6 +44,23 @@ namespace Bolt.Service.Test.Core
             try
             {
                 instance.Init();
+                await ResponseHandler.Handle(context);
+                InstanceProvider.ReleaseInstance(context, instance, null);
+            }
+            catch (Exception e)
+            {
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
+            }
+        }
+
+        protected virtual async Task TestContractStateFull_InitEx(Bolt.Server.ServerActionContext context)
+        {
+            var parameters = await DataHandler.ReadParametersAsync<Bolt.Service.Test.Core.Parameters.InitExParameters>(context);
+            var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
+            try
+            {
+                instance.InitEx(parameters.Fail);
                 await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }

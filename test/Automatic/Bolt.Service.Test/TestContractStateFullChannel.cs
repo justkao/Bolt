@@ -14,6 +14,10 @@ namespace Bolt.Service.Test
             Retries = 1;
         }
 
+        public bool ExtendedInitialization { get; set; }
+
+        public bool FailExtendedInitialization { get; set; }
+
         public override bool IsRecoverable
         {
             get { return true; }
@@ -35,14 +39,22 @@ namespace Bolt.Service.Test
             return contract.DestroyAsync();
         }
 
-        protected override Task OnProxyOpeningAsync(TestContractStateFullProxy contract)
+        protected override async Task OnProxyOpeningAsync(TestContractStateFullProxy contract)
         {
-            return contract.InitAsync();
+            await contract.InitAsync();
+            if (ExtendedInitialization)
+            {
+                await contract.InitExAsync(FailExtendedInitialization);
+            }
         }
 
         protected override void OnProxyOpening(TestContractStateFullProxy contract)
         {
             contract.Init();
+            if (ExtendedInitialization)
+            {
+                contract.InitEx(FailExtendedInitialization);
+            }
         }
 
         protected override void OnProxyClosing(TestContractStateFullProxy contract)

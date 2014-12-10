@@ -289,6 +289,42 @@ namespace Bolt.Service.Test
         }
 
         [Test]
+        public void InitSessionEx_EnsureInitialized()
+        {
+            TestContractStateFullProxy channel = GetChannel();
+            TestContractStateFullChannel statefull = channel.Channel as TestContractStateFullChannel;
+            statefull.ExtendedInitialization = true;
+
+            int before = InstanceProvider.Count;
+
+            channel.GetState();
+            channel.Dispose();
+
+            Assert.AreEqual(before, InstanceProvider.Count);
+        }
+
+        [Test]
+        public void InitSessionEx_Fails_EnsureSessionDestroyed()
+        {
+            TestContractStateFullProxy channel = GetChannel();
+            TestContractStateFullChannel statefull = channel.Channel as TestContractStateFullChannel;
+            statefull.ExtendedInitialization = true;
+            statefull.FailExtendedInitialization = true;
+
+            int before = InstanceProvider.Count;
+
+            try
+            {
+                channel.GetState();
+            }
+            catch (Exception e)
+            {
+            }
+
+            Assert.AreEqual(before, InstanceProvider.Count);
+        }
+
+        [Test]
         public async Task Async_InitSession_Explicitely_EnsureInitialized()
         {
             TestContractStateFullProxy channel = GetChannel();
@@ -296,6 +332,8 @@ namespace Bolt.Service.Test
             await channel.GetStateAsync();
             await (channel as IChannel).CloseAsync();
         }
+
+
 
         [Test]
         public void CloseSession_EnsureSessionIdNull()

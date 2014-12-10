@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 using Bolt.Client.Helpers;
 using System;
 using System.Threading.Tasks;
@@ -81,7 +83,20 @@ namespace Bolt.Client.Channels
                 {
                     if (_activeConnection != null)
                     {
-                        TContract contract = CreateContract(_activeConnection);
+                        string sessionId = _sessionId;
+
+                        DelegatedChannel channel = new DelegatedChannel(
+                            _activeConnection,
+                            RequestForwarder,
+                            EndpointProvider,
+                            (c) =>
+                            {
+                                BeforeSending(c);
+                                WriteSessionHeader(c, sessionId);
+                            },
+                            AfterReceived);
+
+                        TContract contract = CreateContract(channel);
                         OnProxyClosing(contract);
                     }
                 }
@@ -112,7 +127,20 @@ namespace Bolt.Client.Channels
                 {
                     if (_activeConnection != null)
                     {
-                        TContract contract = CreateContract(_activeConnection);
+                        string sessionId = _sessionId;
+
+                        DelegatedChannel channel = new DelegatedChannel(
+                            _activeConnection,
+                            RequestForwarder,
+                            EndpointProvider,
+                            (c) =>
+                            {
+                                BeforeSending(c);
+                                WriteSessionHeader(c, sessionId);
+                            },
+                            AfterReceived);
+
+                        TContract contract = CreateContract(channel);
                         await OnProxyClosingAsync(contract);
                     }
                 }
@@ -174,12 +202,7 @@ namespace Bolt.Client.Channels
 
         protected override void BeforeSending(ClientActionContext context)
         {
-            string sessionId = _sessionId;
-            if (!string.IsNullOrEmpty(sessionId))
-            {
-                context.Request.Headers[_sessionHeaderName] = sessionId;
-            }
-
+            WriteSessionHeader(context, _sessionId);
             base.BeforeSending(context);
         }
 
@@ -207,6 +230,16 @@ namespace Bolt.Client.Channels
         {
         }
 
+        protected TContract CreateContract(IChannel channel)
+        {
+            return (TContract)Activator.CreateInstance(typeof(TContract), channel);
+        }
+
+        protected TContract CreateContract(Uri server)
+        {
+            return CreateContract(new DelegatedChannel(server, RequestForwarder, EndpointProvider, BeforeSending, AfterReceived));
+        }
+
         private Uri EnsureConnection()
         {
             EnsureNotClosed();
@@ -228,20 +261,48 @@ namespace Bolt.Client.Channels
                 ActionDescriptor action = null;
 
                 TContract contract =
-                    CreateContract(new DelegatedChannel(connection, RequestForwarder, EndpointProvider, BeforeSending,
-                        (ctxt) =>
-                        {
-                            if (sessionId == null)
+                    CreateContract(
+                        new DelegatedChannel(
+                            connection,
+                            RequestForwarder,
+                            EndpointProvider,
+                            (c) =>
                             {
-                                action = ctxt.Action;
-                                if (ctxt.Response != null && ctxt.Response.Headers[_sessionHeaderName] != null)
+                                WriteSessionHeader(c, sessionId);
+                                BeforeSending(c);
+                            },
+                            (ctxt) =>
+                            {
+                                if (sessionId == null)
                                 {
-                                    sessionId = ctxt.Response.Headers[_sessionHeaderName];
+                                    action = ctxt.Action;
+                                    if (ctxt.Response != null && ctxt.Response.Headers[_sessionHeaderName] != null)
+                                    {
+                                        sessionId = ctxt.Response.Headers[_sessionHeaderName];
+                                    }
                                 }
-                            }
-                        }));
+                            }));
 
-                OnProxyOpening(contract);
+                try
+                {
+                    OnProxyOpening(contract);
+                }
+                catch (Exception)
+                {
+                    if (sessionId != null)
+                    {
+                        try
+                        {
+                            OnProxyClosing(contract);
+                        }
+                        catch (Exception)
+                        {
+                            // OK, we tried to close pending proxy
+                        }
+                    }
+
+                    throw;
+                }
 
                 if (sessionId == null)
                 {
@@ -276,20 +337,56 @@ namespace Bolt.Client.Channels
                 ActionDescriptor action = null;
 
                 TContract contract =
-                    CreateContract(new DelegatedChannel(connection, RequestForwarder, EndpointProvider, BeforeSending,
-                        (ctxt) =>
-                        {
-                            if (sessionId == null)
+                    CreateContract(
+                        new DelegatedChannel(
+                            connection,
+                            RequestForwarder,
+                            EndpointProvider,
+                            (c) =>
                             {
-                                action = ctxt.Action;
-                                if (ctxt.Response != null && ctxt.Response.Headers[_sessionHeaderName] != null)
+                                WriteSessionHeader(c, sessionId);
+                                BeforeSending(c);
+                            },
+                            (ctxt) =>
+                            {
+                                if (sessionId == null)
                                 {
-                                    sessionId = ctxt.Response.Headers[_sessionHeaderName];
+                                    action = ctxt.Action;
+                                    if (ctxt.Response != null && ctxt.Response.Headers[_sessionHeaderName] != null)
+                                    {
+                                        sessionId = ctxt.Response.Headers[_sessionHeaderName];
+                                    }
                                 }
-                            }
-                        }));
+                            }));
 
-                await OnProxyOpeningAsync(contract);
+                Exception error = null;
+
+                try
+                {
+                    await OnProxyOpeningAsync(contract);
+                }
+                catch (Exception e)
+                {
+                    error = e;
+                    if (sessionId == null)
+                    {
+                        throw;
+                    }
+                }
+
+                if (error != null)
+                {
+                    try
+                    {
+                        await OnProxyClosingAsync(contract);
+                    }
+                    catch (Exception)
+                    {
+                        // OK, we tried to close pending proxy
+                    }
+
+                    throw error;
+                }
 
                 if (sessionId == null)
                 {
@@ -304,14 +401,12 @@ namespace Bolt.Client.Channels
             }
         }
 
-        protected TContract CreateContract(IChannel channel)
+        private void WriteSessionHeader(ClientActionContext context, string sessionId)
         {
-            return (TContract)Activator.CreateInstance(typeof(TContract), channel);
-        }
-
-        protected TContract CreateContract(Uri server)
-        {
-            return CreateContract(new DelegatedChannel(server, RequestForwarder, EndpointProvider, BeforeSending, AfterReceived));
+            if (!string.IsNullOrEmpty(sessionId))
+            {
+                context.Request.Headers[_sessionHeaderName] = sessionId;
+            }
         }
     }
 }
