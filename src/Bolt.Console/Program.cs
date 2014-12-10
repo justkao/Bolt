@@ -173,7 +173,11 @@ namespace Bolt.Console
                                             new GeneratorConfig()
                                                 {
                                                     Name = "<GeneratorName>",
-                                                    Type = "<FullTypeName>"
+                                                    Type = "<FullTypeName>",
+                                                    Properties = new Dictionary<string, string>()
+                                                                     {
+                                                                         { "<Name>", "<Value>" }
+                                                                     }
                                                 }
                                         };
 

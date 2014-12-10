@@ -19,6 +19,8 @@ namespace Bolt.Console
         {
             string output = PathHelpers.GetOutput(execution.OutputDirectory, Output, GetFileName(execution.Definition));
             DocumentGenerator document = Parent.Parent.GetDocument(output);
+            document.Context = Parent.Context;
+            document.Formatter.Assemblies.AddRange(Parent.Parent.AssemblyCache);
             DoExecute(document, CoerceDescriptor(execution.Definition));
         }
 

@@ -13,10 +13,7 @@ namespace Bolt.Generators
         {
             MethodDescriptor = methodDescriptor;
             GenerateBodyAction = GenerateBody;
-            AnnotateClassAction = (g) =>
-            {
-                g.WriteAttribute<DataContractAttribute>();
-            };
+            AnnotateClassAction = (g) => g.WriteAttribute<DataContractAttribute>();
         }
 
         public MethodDescriptor MethodDescriptor { get; set; }
