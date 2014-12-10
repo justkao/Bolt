@@ -27,6 +27,21 @@ namespace Bolt.Console
 
         public string Context { get; set; }
 
+        public string GetModifier()
+        {
+            if (!string.IsNullOrEmpty(Modifier))
+            {
+                return Modifier;
+            }
+
+            if (!string.IsNullOrEmpty(Parent.Modifier))
+            {
+                return Parent.Modifier;
+            }
+
+            return "public";
+        }
+
         [JsonIgnore]
         public RootConfig Parent { get; set; }
 
@@ -65,13 +80,13 @@ namespace Bolt.Console
             document.Add(new ContractGenerator()
                              {
                                  ContractDefinition = definition,
-                                 Modifier = Modifier ?? "public"
+                                 Modifier = GetModifier()
                              });
 
             document.Add(new ContractDescriptorGenerator()
                              {
                                  ContractDefinition = definition,
-                                 Modifier = Modifier ?? "public"
+                                 Modifier = GetModifier()
                              });
 
             ContractExecution execution = new ContractExecution(definition, Path.GetDirectoryName(output));

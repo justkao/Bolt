@@ -167,6 +167,7 @@ namespace Bolt.Console
         private static RootConfig CreateSampleConfiguration()
         {
             RootConfig rootConfig = new RootConfig();
+            rootConfig.Modifier = "<public|internal>";
             rootConfig.Assemblies = new List<string>() { "<AssemblyPath>", "<AssemblyPath>", "<AssemblyPath>" };
             rootConfig.Generators = new List<GeneratorConfig>()
                                         {

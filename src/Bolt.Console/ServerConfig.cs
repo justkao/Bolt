@@ -10,8 +10,6 @@ namespace Bolt.Console
 
         public string Name { get; set; }
 
-        public string Modifier { get; set; }
-
         public string StateFullBase { get; set; }
 
         public string Generator { get; set; }
@@ -26,7 +24,7 @@ namespace Bolt.Console
                                                       Namespace = Namespace,
                                                       Name = Name,
                                                       StateFullInstanceProviderBase = StateFullBase,
-                                                      Modifier = Modifier ?? "public"
+                                                      Modifier = GetModifier()
                                                   };
 
             if (!string.IsNullOrEmpty(Suffix))

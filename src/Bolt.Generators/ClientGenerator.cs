@@ -63,11 +63,9 @@ namespace Bolt.Generators
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
             generator.Modifier = Modifier;
             generator.UserGenerator = UserGenerator;
-            generator.GenerateBodyAction = (
-                g =>
+            generator.GenerateBodyAction = g =>
                 {
                     g.GenerateConstructor(g.Descriptor.FullName + " proxy", "proxy");
-
                     g.GenerateConstructor(string.Format("{0} channel", BoltChannelInterface), "channel");
 
                     List<Type> contracts = ContractDefinition.GetEffectiveContracts().ToList();
@@ -75,7 +73,7 @@ namespace Bolt.Generators
                     {
                         GenerateMethods(g, type);
                     }
-                });
+                };
             generator.Generate(context);
 
             WriteLine();

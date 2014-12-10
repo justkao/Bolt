@@ -99,6 +99,8 @@ namespace Bolt.Console
         [JsonProperty(Required = Required.Always)]
         public List<ContractConfig> Contracts { get; set; }
 
+        public string Modifier { get; set; }
+
         [JsonIgnore]
         public string OutputDirectory { get; set; }
 

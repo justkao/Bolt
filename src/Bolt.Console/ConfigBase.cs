@@ -15,6 +15,28 @@ namespace Bolt.Console
 
         public List<string> Excluded { get; set; }
 
+        public string Modifier { get; set; }
+
+        public string GetModifier()
+        {
+            if (!string.IsNullOrEmpty(Modifier))
+            {
+                return Modifier;
+            }
+
+            if (!string.IsNullOrEmpty(Parent.Modifier))
+            {
+                return Parent.Modifier;
+            }
+
+            if (!string.IsNullOrEmpty(Parent.Parent.Modifier))
+            {
+                return Parent.Parent.Modifier;
+            }
+
+            return "public";
+        }
+
         public void Execute(ContractExecution execution)
         {
             string output = PathHelpers.GetOutput(execution.OutputDirectory, Output, GetFileName(execution.Definition));

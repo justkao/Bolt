@@ -16,28 +16,22 @@ namespace Bolt.Console
 
         public List<string> ExcludedInterfaces { get; set; }
 
-        public string Modifier { get; set; }
-
         public string Generator { get; set; }
 
         protected override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
         {
-            ClientGenerator clientGenerator = new ClientGenerator()
+            ClientGenerator clientGenerator = new ClientGenerator
             {
                 ForceAsync = ForceAsync,
                 ContractDefinition = definition,
                 Namespace = Namespace,
-                Name = Name
+                Name = Name,
+                Modifier = GetModifier()
             };
 
             if (!string.IsNullOrEmpty(Generator))
             {
                 clientGenerator.UserGenerator = Parent.Parent.GetGenerator(Generator);
-            }
-
-            if (!string.IsNullOrEmpty(Modifier))
-            {
-                clientGenerator.Modifier = Modifier;
             }
 
             InterfaceGenerator interfaceGenerator = new InterfaceGenerator()
