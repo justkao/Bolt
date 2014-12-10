@@ -8,15 +8,7 @@ namespace Bolt.Console
     {
         public bool ForceAsync { get; set; }
 
-        public string Namespace { get; set; }
-
-        public string Name { get; set; }
-
-        public string Suffix { get; set; }
-
         public List<string> ExcludedInterfaces { get; set; }
-
-        public string Generator { get; set; }
 
         protected override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
         {

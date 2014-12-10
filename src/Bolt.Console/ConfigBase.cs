@@ -17,6 +17,14 @@ namespace Bolt.Console
 
         public string Modifier { get; set; }
 
+        public string Namespace { get; set; }
+
+        public string Suffix { get; set; }
+
+        public string Name { get; set; }
+
+        public string Generator { get; set; }
+
         public string GetModifier()
         {
             if (!string.IsNullOrEmpty(Modifier))

@@ -4,15 +4,7 @@ namespace Bolt.Console
 {
     public class ServerConfig : ConfigBase
     {
-        public string Namespace { get; set; }
-
-        public string Suffix { get; set; }
-
-        public string Name { get; set; }
-
         public string StateFullBase { get; set; }
-
-        public string Generator { get; set; }
 
         public string GeneratorEx { get; set; }
 
