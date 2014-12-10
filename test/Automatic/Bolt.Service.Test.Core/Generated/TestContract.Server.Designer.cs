@@ -24,7 +24,7 @@ namespace Bolt.Service.Test.Core
 {
     public partial class TestContractInvoker : Bolt.Server.ContractInvoker<Bolt.Service.Test.Core.TestContractDescriptor>
     {
-        // useless comment added by user generator - 'Bolt.Service.Test.Core.UserCodeGenerator', Context - ''
+        // useless comment added by user generator - 'Bolt.Service.Test.Core.UserCodeGenerator', Context - 'generatorContext2'
 
         public override void Init()
         {
@@ -281,26 +281,26 @@ namespace Bolt.Server
 {
     public static partial class TestContractInvokerExtensions
     {
-        public static IAppBuilder UseTestContract(this IAppBuilder app, Bolt.Service.Test.Core.ITestContract instance)
+        public static IAppBuilder UseTestContract(this IAppBuilder app, Bolt.Service.Test.Core.ITestContract instance, ServerConfiguration configuration = null)
         {
-            return app.UseTestContract(new StaticInstanceProvider(instance));
+            return app.UseTestContract(new StaticInstanceProvider(instance), configuration);
         }
 
-        public static IAppBuilder UseTestContract<TImplementation>(this IAppBuilder app) where TImplementation: Bolt.Service.Test.Core.ITestContract, new()
+        public static IAppBuilder UseTestContract<TImplementation>(this IAppBuilder app, ServerConfiguration configuration = null) where TImplementation: Bolt.Service.Test.Core.ITestContract, new()
         {
-            return app.UseTestContract(new InstanceProvider<TImplementation>());
+            return app.UseTestContract(new InstanceProvider<TImplementation>(), configuration);
         }
 
-        public static IAppBuilder UseStateFullTestContract<TImplementation>(this IAppBuilder app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: Bolt.Service.Test.Core.ITestContract, new()
+        public static IAppBuilder UseStateFullTestContract<TImplementation>(this IAppBuilder app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: Bolt.Service.Test.Core.ITestContract, new()
         {
-            return app.UseTestContract(new StateFullInstanceProvider<TImplementation>(initInstanceAction, releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));
+            return app.UseTestContract(new StateFullInstanceProvider<TImplementation>(initInstanceAction, releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime), configuration);
         }
 
-        public static IAppBuilder UseTestContract(this IAppBuilder app, IInstanceProvider instanceProvider)
+        public static IAppBuilder UseTestContract(this IAppBuilder app, IInstanceProvider instanceProvider, ServerConfiguration configuration = null)
         {
             var boltExecutor = app.GetBolt();
             var invoker = new Bolt.Service.Test.Core.TestContractInvoker();
-            invoker.Init(boltExecutor.Configuration);
+            invoker.Init(configuration ?? boltExecutor.Configuration);
             invoker.InstanceProvider = instanceProvider;
             boltExecutor.Add(invoker);
 

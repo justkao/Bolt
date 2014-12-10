@@ -124,33 +124,33 @@ namespace Bolt.Server
 {
     public static partial class TestContractStateFullInvokerExtensions
     {
-        public static IAppBuilder UseTestContractStateFull(this IAppBuilder app, Bolt.Service.Test.Core.ITestContractStateFull instance)
+        public static IAppBuilder UseTestContractStateFull(this IAppBuilder app, Bolt.Service.Test.Core.ITestContractStateFull instance, ServerConfiguration configuration = null)
         {
-            return app.UseTestContractStateFull(new StaticInstanceProvider(instance));
+            return app.UseTestContractStateFull(new StaticInstanceProvider(instance), configuration);
         }
 
-        public static IAppBuilder UseTestContractStateFull<TImplementation>(this IAppBuilder app) where TImplementation: Bolt.Service.Test.Core.ITestContractStateFull, new()
+        public static IAppBuilder UseTestContractStateFull<TImplementation>(this IAppBuilder app, ServerConfiguration configuration = null) where TImplementation: Bolt.Service.Test.Core.ITestContractStateFull, new()
         {
-            return app.UseTestContractStateFull(new InstanceProvider<TImplementation>());
+            return app.UseTestContractStateFull(new InstanceProvider<TImplementation>(), configuration);
         }
 
-        public static IAppBuilder UseStateFullTestContractStateFull<TImplementation>(this IAppBuilder app, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: Bolt.Service.Test.Core.ITestContractStateFull, new()
+        public static IAppBuilder UseStateFullTestContractStateFull<TImplementation>(this IAppBuilder app, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: Bolt.Service.Test.Core.ITestContractStateFull, new()
         {
             var initSessionAction = TestContractStateFullDescriptor.Default.Init;
             var closeSessionAction = TestContractStateFullDescriptor.Default.Destroy;
-            return app.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(initSessionAction, closeSessionAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));
+            return app.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(initSessionAction, closeSessionAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime), configuration);
         }
 
-        public static IAppBuilder UseStateFullTestContractStateFull<TImplementation>(this IAppBuilder app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null) where TImplementation: Bolt.Service.Test.Core.ITestContractStateFull, new()
+        public static IAppBuilder UseStateFullTestContractStateFull<TImplementation>(this IAppBuilder app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: Bolt.Service.Test.Core.ITestContractStateFull, new()
         {
-            return app.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(initInstanceAction, releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime));
+            return app.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(initInstanceAction, releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime), configuration);
         }
 
-        public static IAppBuilder UseTestContractStateFull(this IAppBuilder app, IInstanceProvider instanceProvider)
+        public static IAppBuilder UseTestContractStateFull(this IAppBuilder app, IInstanceProvider instanceProvider, ServerConfiguration configuration = null)
         {
             var boltExecutor = app.GetBolt();
             var invoker = new Bolt.Service.Test.Core.TestContractStateFullInvoker();
-            invoker.Init(boltExecutor.Configuration);
+            invoker.Init(configuration ?? boltExecutor.Configuration);
             invoker.InstanceProvider = instanceProvider;
             boltExecutor.Add(invoker);
 

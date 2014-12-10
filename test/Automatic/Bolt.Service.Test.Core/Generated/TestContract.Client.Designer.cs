@@ -44,7 +44,7 @@ namespace Bolt.Service.Test.Core
 {
     public partial class TestContractProxy : ContractProxy<Bolt.Service.Test.Core.TestContractDescriptor>, Bolt.Service.Test.Core.ITestContract, ITestContractInnerAsync, ITestContractAsync
     {
-        // useless comment added by user generator - 'Bolt.Service.Test.Core.UserCodeGenerator', Context - ''
+        // useless comment added by user generator - 'Bolt.Service.Test.Core.UserCodeGenerator', Context - 'generatorContext2'
 
         public TestContractProxy(Bolt.Service.Test.Core.TestContractProxy proxy) : base(proxy)
         {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Bolt.Generators
 {
@@ -27,12 +28,15 @@ namespace Bolt.Generators
                                                                      { typeof(short), "short" },
                                                                      { typeof(long), "long" },
                                                                      { typeof(double), "double" },
+                                                                     { typeof(Task), "Task" },
                                                                  };
 
         public TypeFormatter()
         {
             Assemblies = new List<Assembly>();
         }
+
+        public bool ForceFullTypeNames { get; set; }
 
         public virtual string FormatType(Type type)
         {
@@ -80,7 +84,7 @@ namespace Bolt.Generators
             {
                 string name = type.Name.Substring(0, type.Name.IndexOf('`'));
 
-                if (!_namespaces.Contains(type.Namespace))
+                if (!_namespaces.Contains(type.Namespace) && !ForceFullTypeNames)
                 {
                     name = type.Namespace + "." + name;
                 }
@@ -103,14 +107,17 @@ namespace Bolt.Generators
                 return _aliases[type];
             }
 
-            if (_namespaces.Contains(type.Namespace))
+            if (!ForceFullTypeNames)
             {
-                if (typeof(Attribute).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
+                if (_namespaces.Contains(type.Namespace))
                 {
-                    return type.Name.Substring(0, type.Name.IndexOf("Attribute", StringComparison.Ordinal));
-                }
+                    if (typeof(Attribute).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))
+                    {
+                        return type.Name.Substring(0, type.Name.IndexOf("Attribute", StringComparison.Ordinal));
+                    }
 
-                return type.Name;
+                    return type.Name;
+                }
             }
 
             if (typeof(Attribute).GetTypeInfo().IsAssignableFrom(type.GetTypeInfo()))

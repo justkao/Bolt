@@ -101,6 +101,8 @@ namespace Bolt.Console
 
         public string Modifier { get; set; }
 
+        public bool FullTypeNames { get; set; }
+
         [JsonIgnore]
         public string OutputDirectory { get; set; }
 
@@ -126,6 +128,8 @@ namespace Bolt.Console
             {
                 AssemblyCache.Add(assembly);
             }
+
+            Stopwatch watch = Stopwatch.StartNew();
 
             try
             {
@@ -163,6 +167,9 @@ namespace Bolt.Console
             }
             finally
             {
+                System.Console.WriteLine();
+                System.Console.WriteLine("Generation of {0} files has taken {1}ms", _documents.Count, watch.ElapsedMilliseconds);
+                System.Console.WriteLine();
                 AppDomain.CurrentDomain.AssemblyResolve -= resolver.Resolve;
             }
         }
@@ -177,6 +184,10 @@ namespace Bolt.Console
             if (!_documents.ContainsKey(output))
             {
                 _documents[output] = new DocumentGenerator();
+                if (FullTypeNames)
+                {
+                    _documents[output].Formatter.ForceFullTypeNames = true;
+                }
             }
 
             return _documents[output];

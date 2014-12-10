@@ -77,7 +77,7 @@ namespace Bolt.Generators
 
         public virtual IEnumerable<MethodInfo> GetEffectiveMethods()
         {
-            return GetEffectiveContracts().SelectMany(effectiveContract => effectiveContract.GetTypeInfo().DeclaredMethods);
+            return GetEffectiveContracts().SelectMany(effectiveContract => effectiveContract.GetTypeInfo().DeclaredMethods).Distinct();
         }
 
         protected virtual IEnumerable<Type> GetInterfaces(Type contract)

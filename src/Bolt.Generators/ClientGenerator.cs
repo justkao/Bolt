@@ -184,7 +184,7 @@ namespace Bolt.Generators
             }
 
             AddUsings(methodDescriptor.Parameters.Namespace);
-            WriteLine("var bolt_Params = new {0}();", methodDescriptor.Parameters.Name);
+            WriteLine("var bolt_Params = new {0}();", methodDescriptor.Parameters.FullName);
 
             foreach (ParameterInfo info in methodDescriptor.GetParameters())
             {
@@ -194,7 +194,7 @@ namespace Bolt.Generators
             return new GenerateRequestCodeResult()
             {
                 VariableName = "bolt_Params",
-                TypeName = methodDescriptor.Parameters.Name
+                TypeName = methodDescriptor.Parameters.FullName
             };
         }
 

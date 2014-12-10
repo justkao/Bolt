@@ -132,7 +132,7 @@ namespace Bolt.Generators
             if (methodDescriptor.HasParameterClass())
             {
                 AddUsings(methodDescriptor.Parameters.Namespace);
-                WriteLine("var parameters = await DataHandler.ReadParametersAsync<{0}>(context);", methodDescriptor.Parameters.Name);
+                WriteLine("var parameters = await DataHandler.ReadParametersAsync<{0}>(context);", methodDescriptor.Parameters.FullName);
             }
 
             string instanceType = FormatType(methodDescriptor.Method.DeclaringType);
