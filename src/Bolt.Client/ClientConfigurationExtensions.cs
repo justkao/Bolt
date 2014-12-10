@@ -5,6 +5,12 @@ namespace Bolt.Client
 {
     public static class ClientConfigurationExtensions
     {
+        public static TContract CreateProxy<TContract>(this ClientConfiguration clientConfiguration, string uri)
+            where TContract : ContractProxy
+        {
+            return clientConfiguration.CreateProxy<TContract>(new UriServerProvider(new Uri(uri)));
+        }
+
         public static TContract CreateProxy<TContract>(this ClientConfiguration clientConfiguration, Uri uri)
             where TContract : ContractProxy
         {

@@ -9,9 +9,13 @@ Bolt works best with following project structure:
 
 To start using Bolt add following post build event to <Contracts>.csproj
 
+<<<------------------------------------------------------------->>>
 
 	cd "$(SolutionDir)\packages\bolt.tool*\tools"
 	Bolt.exe -output="$(ProjectDir)\" -fromAssembly=$(TargetPath)
+
+<<<------------------------------------------------------------->>>
+
 
 After the build the client and server side code will be generated under the project directory for all interfaces.
 
@@ -51,10 +55,12 @@ Link <Contract>.Contract.cs, <Contract>.Client.cs files and use folowing code:
 
 2. Define post build step in target project. In most cases the script will look like:
 
+<<<------------------------------------------------------------->>>
+
 	cd "$(SolutionDir)\packages\bolt.tool*\tools"
 	Bolt.exe -root="$(TargetDir)\" -fromConfig="$(ProjectDir)Configuration.json"
 
-
+<<<------------------------------------------------------------->>>
 
 For more information visit the project site:
 https://github.com/justkao/Bolt
