@@ -46,7 +46,7 @@ namespace Bolt.Console
                 c.Contract = type.FullName;
                 c.Client = new ClientConfig()
                 {
-                    ForceAsync = true,
+                    ForceAsync = false,
                     Modifier = "public",
                     Suffix = "Proxy",
                     Namespace = type.Namespace

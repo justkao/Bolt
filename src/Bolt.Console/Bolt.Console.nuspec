@@ -2,12 +2,13 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <metadata>
         <id>Bolt.Tool</id>
-        <version>0.9.0</version>
-        <title>Bolt Code Generation Tool</title>
-        <authors>Martin Tomka</authors>
+    	<version>$version$</version>
+    	<title>$title$</title>
+    	<authors>$author$</authors>
+    	<owners>$author$</owners>
+    	<description>$description$</description>
         <projectUrl>https://github.com/justkao/Bolt</projectUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>The Bolt tool required to generate Bolt Client and  Server side code.</description>
         <summary>Bolt Code Generation Tool</summary>
     	<tags>bolt wcf communication owin http alternative code generation tool</tags>
     </metadata>
