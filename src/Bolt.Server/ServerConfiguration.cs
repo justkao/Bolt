@@ -4,6 +4,14 @@ namespace Bolt.Server
 {
     public class ServerConfiguration : Configuration
     {
+        public ServerConfiguration(IExceptionSerializer exceptionSerializer)
+            : base(new XmlSerializer(), exceptionSerializer)
+        {
+            DataHandler = new DataHandler(Serializer, ExceptionSerializer);
+            ErrorHandler = new ErrorHandler(DataHandler, ServerErrorCodesHeader);
+            ResponseHandler = new ResponseHandler(DataHandler);
+        }
+
         public ServerConfiguration(ISerializer serializer, IExceptionSerializer exceptionSerializer)
             : base(serializer, exceptionSerializer)
         {

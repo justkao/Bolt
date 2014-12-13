@@ -1,4 +1,4 @@
 ﻿using System.Reflection;
 
 [assembly: AssemblyTitle("Bolt.Generators")]
-[assembly: AssemblyDescription("Bolt assembly containing classes for code generation.")]
+[assembly: AssemblyDescription("Bolt library containing helper classes for code generation.")]
