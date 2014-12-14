@@ -13,7 +13,7 @@ public interface IFooService
 }
 ```
 Add *Bolt.Tool* package to project (`Install-Package Bolt.Tool`) and define following post build event: 
-```
+```Batchfile
 cd "$(SolutionDir)\packages\bolt.tool*\tools"
 Bolt.exe -output="$(ProjectDir)\" -fromAssembly=$(TargetPath)
 ```
