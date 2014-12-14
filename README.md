@@ -20,7 +20,7 @@ Add *Bolt.Tool* package to project (`Install-Package Bolt.Tool`) and define foll
 After the project is build the server and client side code will be generated. You can then link this code from other projects.
 
 ####Client
-* Add *Bolt.Client* package to project (`Install-Package Bolt.Core`)
+* Add *Bolt.Client* package to project (`Install-Package Bolt.Client`)
 * Link generated files from contract project
 * Create proxy to your service and call remote method
 ```
