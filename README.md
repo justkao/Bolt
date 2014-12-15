@@ -21,6 +21,7 @@ After the project is build the server and client side code will be generated. Yo
 
 ####Client
 * Add *Bolt.Client* package to project (`Install-Package Bolt.Client`)
+* Add *Bolt.Helpers* package to project (`Install-Package Bolt.Helpers`)
 * Link generated files from contract project
 * Create proxy to your service and call remote method
 ```c#
@@ -32,6 +33,7 @@ proxy.DoYourThing();
 
 ####Server
 * Add *Bolt.Server* package to project (`Install-Package Bolt.Server`)
+* Add *Bolt.Helpers* package to project (`Install-Package Bolt.Helpers`)
 * Link generated files from contract project
 * In you startup class use Bolt extensions to register Bolt into the pipeline
 
@@ -61,6 +63,16 @@ Bolt also supports:
 * Modularity - every component and behavior of Bolt is replaceable
 * User Code Generators - plug your own code into the generated classes
 * Configuration Based Generation - define Configuration.json file to describe how contracts should be generated
+
+#### Bolt Packages
+* **[Bolt.Core](https://www.nuget.org/packages/Bolt.Core/)** - contains common interfaces and helpers shared by both client and server. Multiple platforms are supported for this package. Portable Class Libray(PCL) 
+* **[Bolt.Client](https://www.nuget.org/packages/Bolt.Client/)** - contains client side code required to communicate with Bolt service.(PCL)
+* **[Bolt.Server](https://www.nuget.org/packages/Bolt.Server/)** - server side code required to integrate Bolt into Katana pipeline. The support for ASP.NET 5 is planned.
+* **[Bolt.Generators](https://www.nuget.org/packages/Bolt.Generators/)** - classes and helpers used by Bolt.Tool for code generation. Reference it if you need to extend the Bolt code generation.(PCL)
+* **[Bolt.Tool](https://www.nuget.org/packages/Bolt.Tool/)** - tool used to generate client and server side Bolt code.
+* **[Bolt.Helpers](https://www.nuget.org/packages/Bolt.Helpers/)** - contains concrete implementation of Bolt serializers and add additional helper classes that can be used by Bolt.
+                        
+
 
 To find out more just take a look at Bolt code or check out the [Bolt.Samples](https://github.com/justkao/Bolt.Samples)
 repository.
