@@ -3,7 +3,11 @@ using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
 
+#if OWIN
 using HttpContext = Microsoft.Owin.IOwinContext;
+#else
+using HttpContext = Microsoft.AspNet.Http.HttpContext;
+#endif
 
 namespace Bolt.Server
 {
@@ -62,20 +66,20 @@ namespace Bolt.Server
                 return Task.FromResult(0);
             }
 
-            context.Context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Context.Response.StatusCode = 500;
             return _dataHandler.WriteExceptionAsync(context, error);
         }
 
         protected virtual void CloseWithError(HttpContext context, ServerErrorCode code)
         {
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.StatusCode = 500;
             context.Response.Headers[_errorCodesHeader] = code.ToString();
             context.Response.Body.Close();
         }
 
         protected virtual void CloseWithError(HttpContext context, int code)
         {
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+            context.Response.StatusCode = 500;
             context.Response.Headers[_errorCodesHeader] = code.ToString(CultureInfo.InvariantCulture);
             context.Response.Body.Close();
         }

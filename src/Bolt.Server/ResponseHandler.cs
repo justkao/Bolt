@@ -20,7 +20,7 @@ namespace Bolt.Server
 
         public virtual Task Handle(ServerActionContext context)
         {
-            context.Context.Response.StatusCode = (int)HttpStatusCode.OK;
+            context.Context.Response.StatusCode = 200;
             context.Context.Response.ContentLength = 0;
 
             return Task.FromResult(0);
@@ -28,7 +28,7 @@ namespace Bolt.Server
 
         public virtual Task Handle<TResult>(ServerActionContext context, TResult result)
         {
-            context.Context.Response.StatusCode = (int)HttpStatusCode.OK;
+            context.Context.Response.StatusCode = 200;
             return _dataHandler.WriteResponseAsync(context, result);
         }
     }

@@ -19,6 +19,8 @@ namespace Bolt.Generators
 
         public IUserCodeGenerator UserGenerator { get; set; }
 
+        public bool UseAspNet5 { get; set; }
+
         public override void Generate(object context)
         {
             AddUsings(ServerGenerator.BoltServerNamespace, "Owin");

@@ -1,23 +1,33 @@
-﻿using Owin;
-using System;
+﻿using System;
+
+#if OWIN
+using Owin;
+using IApplicationBuilder = Owin.IAppBuilder;
+#else
+using IApplicationBuilder = Microsoft.AspNet.Builder.IApplicationBuilder;
+#endif
 
 namespace Bolt.Server
 {
     public static class BoltMiddlewareExtensions
     {
-        public static IAppBuilder UseBolt(this IAppBuilder builder, ServerConfiguration configuration)
+        public static IApplicationBuilder UseBolt(this IApplicationBuilder builder, ServerConfiguration configuration)
         {
             return builder.UseBolt(new BoltExecutor(configuration));
         }
 
-        public static IAppBuilder UseBolt(this IAppBuilder builder, IBoltExecutor executor)
+        public static IApplicationBuilder UseBolt(this IApplicationBuilder builder, IBoltExecutor executor)
         {
             builder.Properties[BoltMiddleware.BoltKey] = executor;
+#if OWIN
             builder.Use<BoltMiddleware>(new BoltMiddlewareOptions(executor));
+#else
+            builder.Use((next)=>new BoltMiddleware(next, new BoltMiddlewareOptions(executor)).Invoke);
+#endif
             return builder;
         }
 
-        public static BoltExecutor GetBolt(this IAppBuilder builder)
+        public static BoltExecutor GetBolt(this IApplicationBuilder builder)
         {
             object obj;
             builder.Properties.TryGetValue(BoltMiddleware.BoltKey, out obj);

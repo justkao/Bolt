@@ -4,7 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
+#if OWIN
 using HttpContext = Microsoft.Owin.IOwinContext;
+#else
+using HttpContext = Microsoft.AspNet.Http.HttpContext;
+#endif
 
 namespace Bolt.Server
 {
@@ -71,7 +75,7 @@ namespace Bolt.Server
             }
             finally
             {
-                context.Response.Body.Close();
+                context.Response.Body.Dispose();
             }
         }
 
@@ -89,7 +93,11 @@ namespace Bolt.Server
 
         protected virtual IContractInvoker ChooseInvoker(HttpContext context, out ActionDescriptor descriptor)
         {
+#if OWIN
             string[] parts = context.Request.Uri.ToString().Split('/', '\\');
+#else
+            string[] parts = context.Request.Path.ToString().Split('/', '\\');
+#endif
             string name = parts[parts.Length - 2];
             string actionName = parts[parts.Length - 1];
 

@@ -42,14 +42,14 @@ namespace Bolt.Server
             byte[] raw = _serializer.SerializeResponse(data, context.Action);
             if (raw == null || raw.Length == 0)
             {
-                context.Context.Response.Body.Close();
+                context.Context.Response.Body.Dispose();
                 return Task.FromResult(0);
             }
 
             context.Context.Response.ContentLength = raw.Length;
             context.Context.Response.ContentType = _serializer.ContentType;
 
-            return context.Context.Response.WriteAsync(raw, 0, raw.Length, context.RequestAborted);
+            return context.Context.Response.Body.WriteAsync(raw, 0, raw.Length, context.RequestAborted);
         }
 
         public virtual Task WriteExceptionAsync(ServerActionContext context, Exception exception)
@@ -60,7 +60,7 @@ namespace Bolt.Server
             context.Context.Response.ContentLength = raw.Length;
             context.Context.Response.ContentType = _exceptionSerializer.ContentType;
 
-            return context.Context.Response.WriteAsync(raw, 0, raw.Length, context.RequestAborted);
+            return context.Context.Response.Body.WriteAsync(raw, 0, raw.Length, context.RequestAborted);
         }
     }
 }

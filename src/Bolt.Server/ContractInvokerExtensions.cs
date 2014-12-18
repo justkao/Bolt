@@ -1,11 +1,16 @@
+#if OWIN
 using Owin;
+using IApplicationBuilder = Owin.IAppBuilder;
+#else
+using IApplicationBuilder = Microsoft.AspNet.Builder.IApplicationBuilder;
+#endif
 
 namespace Bolt.Server
 {
     public static class ContractInvokerExtensions
     {
-        public static IAppBuilder UseStateLessContractInvoker<TInvoker, TContractImplementation>(
-            this IAppBuilder builder,
+        public static IApplicationBuilder UseStateLessContractInvoker<TInvoker, TContractImplementation>(
+            this IApplicationBuilder builder,
             ServerConfiguration configuration)
             where TInvoker : ContractInvoker, new()
             where TContractImplementation : new()
@@ -13,8 +18,8 @@ namespace Bolt.Server
             return builder.UseContractInvoker<TInvoker>(configuration, new InstanceProvider<TContractImplementation>());
         }
 
-        public static IAppBuilder UseStateFullContractInvoker<TInvoker, TContractImplementation>(
-            this IAppBuilder builder,
+        public static IApplicationBuilder UseStateFullContractInvoker<TInvoker, TContractImplementation>(
+            this IApplicationBuilder builder,
             ServerConfiguration configuration,
             ActionDescriptor initInstanceAction,
             ActionDescriptor releaseInstanceAction)
@@ -30,8 +35,8 @@ namespace Bolt.Server
                     configuration.StateFullInstanceLifetime));
         }
 
-        public static IAppBuilder UseContractInvoker<TInvoker>(
-            this IAppBuilder builder,
+        public static IApplicationBuilder UseContractInvoker<TInvoker>(
+            this IApplicationBuilder builder,
             ServerConfiguration configuration,
             IInstanceProvider instanceProvider)
             where TInvoker : ContractInvoker, new()

@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Threading;
 
+#if OWIN
 using HttpContext = Microsoft.Owin.IOwinContext;
+#else
+using HttpContext = Microsoft.AspNet.Http.HttpContext;
+#endif
 
 namespace Bolt.Server
 {
@@ -22,7 +26,14 @@ namespace Bolt.Server
 
         public CancellationToken RequestAborted
         {
-            get { return Context.Request.CallCancelled; }
+            get
+            {
+#if OWIN
+                return Context.Request.CallCancelled;
+#else
+                return Context.RequestAborted;
+#endif
+            }
         }
     }
 }
