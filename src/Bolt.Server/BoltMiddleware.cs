@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Owin;
+using System;
 using System.Threading.Tasks;
 
 #if OWIN
@@ -10,6 +11,31 @@ using Microsoft.AspNet.Builder;
 
 namespace Bolt.Server
 {
+
+#if OWIN
+    public class BoltMiddleware : OwinMiddleware
+    {
+        public const string BoltKey = "bolt.executor";
+
+        public BoltMiddleware(OwinMiddleware next, BoltMiddlewareOptions options) :
+            base(next)
+        {
+            if (options == null)
+            {
+                throw new ArgumentNullException("options");
+            }
+
+            Options = options;
+        }
+
+        public BoltMiddlewareOptions Options { get; private set; }
+
+        public override async Task Invoke(HttpContext context)
+        {
+            await Options.BoltExecutor.Execute(context);
+        }
+    }
+#else
     public class BoltMiddleware
     {
         private readonly Func<HttpContext, Task> _next;
@@ -32,10 +58,7 @@ namespace Bolt.Server
         public async Task Invoke(HttpContext context)
         {
             await Options.BoltExecutor.Execute(context);
-            if (_next != null)
-            {
-                await _next(context);
-            }
         }
     }
+#endif
 }
