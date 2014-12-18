@@ -21,27 +21,23 @@ After the project is build the server and client side code will be generated. Yo
 
 ####Client
 * Add *Bolt.Client* package to project (`Install-Package Bolt.Client`)
-* Add *Bolt.Helpers* package to project (`Install-Package Bolt.Helpers`)
 * Link generated files from contract project
 * Create proxy to your service and call remote method
 ```c#
-var serializer = new JsonSerializer();
-var configuration = new ClientConfiguration(serializer, new JsonExceptionSerializer(serializer));
+var configuration = new ClientConfiguration();
 var proxy = configuration.CreateProxy<FooServiceProxy>(<service url>);
 proxy.DoYourThing();
 ```
 
 ####Server
 * Add *Bolt.Server* package to project (`Install-Package Bolt.Server`)
-* Add *Bolt.Helpers* package to project (`Install-Package Bolt.Helpers`)
 * Link generated files from contract project
 * In you startup class use Bolt extensions to register Bolt into the pipeline
 
 ```c#
 public void Configuration(IAppBuilder app)
 {
-    JsonSerializer serializer = new JsonSerializer();
-    ServerConfiguration configuration = new ServerConfiguration(serializer, new JsonExceptionSerializer(serializer));
+    ServerConfiguration configuration = new ServerConfiguration();
 
     // register bolt 
     app.UseBolt(configuration);
