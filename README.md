@@ -25,8 +25,7 @@ After the project is build the server and client side code will be generated. Yo
 * Link generated files from contract project
 * Create proxy to your service and call remote method
 ```c#
-var serializer = new JsonSerializer();
-var configuration = new ClientConfiguration(serializer, new JsonExceptionSerializer(serializer));
+var configuration = new ClientConfiguration();
 var proxy = configuration.CreateProxy<FooServiceProxy>(<service url>);
 proxy.DoYourThing();
 ```
@@ -40,8 +39,7 @@ proxy.DoYourThing();
 ```c#
 public void Configuration(IAppBuilder app)
 {
-    JsonSerializer serializer = new JsonSerializer();
-    ServerConfiguration configuration = new ServerConfiguration(serializer, new JsonExceptionSerializer(serializer));
+    ServerConfiguration configuration = new ServerConfiguration();
 
     // register bolt 
     app.UseBolt(configuration);
