@@ -74,14 +74,14 @@ namespace Bolt.Server
         {
             context.Response.StatusCode = 500;
             context.Response.Headers[_errorCodesHeader] = code.ToString();
-            context.Response.Body.Close();
+            context.Response.Body.Dispose();
         }
 
         protected virtual void CloseWithError(HttpContext context, int code)
         {
             context.Response.StatusCode = 500;
             context.Response.Headers[_errorCodesHeader] = code.ToString(CultureInfo.InvariantCulture);
-            context.Response.Body.Close();
+            context.Response.Body.Dispose();
         }
     }
 }

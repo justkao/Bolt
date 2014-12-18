@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Timers;
+using System.Threading;
 
 namespace Bolt.Server
 {
@@ -37,10 +37,8 @@ namespace Bolt.Server
 
             if (InstanceTimeout != TimeSpan.Zero)
             {
-                _timer = new Timer();
-                _timer.Interval = TimeSpan.FromMinutes(1).TotalMilliseconds;
-                _timer.Elapsed += OnTimerElapsed;
-                _timer.Enabled = true;
+                _timer = new Timer(OnTimerElapsed, null, (int)TimeSpan.FromMinutes(1).TotalMilliseconds,
+                    (int)TimeSpan.FromMinutes(1).TotalMilliseconds);
             }
         }
 
@@ -186,7 +184,7 @@ namespace Bolt.Server
             return Guid.NewGuid().ToString();
         }
 
-        private void OnTimerElapsed(object sender, ElapsedEventArgs e)
+        private void OnTimerElapsed(object state)
         {
             foreach (KeyValuePair<string, InstanceMetadata> pair in _instances)
             {
