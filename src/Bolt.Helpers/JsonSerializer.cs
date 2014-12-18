@@ -8,13 +8,18 @@ namespace Bolt.Helpers
 {
     public class JsonSerializer : ISerializer
     {
-        private readonly JsonSerializerSettings _settings = new JsonSerializerSettings()
-                                                                {
-                                                                    NullValueHandling = NullValueHandling.Ignore,
-                                                                    TypeNameHandling = TypeNameHandling.Auto,
-                                                                    Formatting = Formatting.None,
-                                                                    ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
-                                                                };
+        private readonly Newtonsoft.Json.JsonSerializer _serializer = new Newtonsoft.Json.JsonSerializer()
+        {
+            NullValueHandling = NullValueHandling.Ignore,
+            TypeNameHandling = TypeNameHandling.Auto,
+            Formatting = Formatting.None,
+            ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
+        };
+
+        public virtual string ContentType
+        {
+            get { return "application/json"; }
+        }
 
         public virtual void Write<T>(Stream stream, T data)
         {
@@ -23,9 +28,9 @@ namespace Bolt.Helpers
                 throw new ArgumentNullException("stream");
             }
 
-            using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8, 4096, true))
+            using (TextWriter writer = new StreamWriter(stream, Encoding.UTF8, 4096, true))
             {
-                writer.Write(JsonConvert.SerializeObject(data, _settings));
+                _serializer.Serialize(writer, data);
             }
         }
 
@@ -36,16 +41,13 @@ namespace Bolt.Helpers
                 throw new ArgumentNullException("stream");
             }
 
-            using (StreamReader reader = new StreamReader(stream, Encoding.UTF8, true, 4096, true))
+            using (TextReader reader = new StreamReader(stream, Encoding.UTF8, true, 4096, true))
             {
-                string rawString = reader.ReadToEnd();
-                return JsonConvert.DeserializeObject<T>(rawString, _settings);
+                using (JsonReader jsonReader = new JsonTextReader(reader))
+                {
+                    return _serializer.Deserialize<T>(jsonReader);
+                }
             }
-        }
-
-        public virtual string ContentType
-        {
-            get { return "application/json"; }
         }
     }
 }

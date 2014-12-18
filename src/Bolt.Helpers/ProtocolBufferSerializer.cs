@@ -5,6 +5,11 @@ namespace Bolt.Helpers
 {
     public class ProtocolBufferSerializer : ISerializer
     {
+        public virtual string ContentType
+        {
+            get { return "application/octet-stream"; }
+        }
+
         public virtual void Write<T>(Stream stream, T data)
         {
             if (stream == null)
@@ -28,11 +33,6 @@ namespace Bolt.Helpers
             }
 
             return ProtoBuf.Serializer.Deserialize<T>(stream);
-        }
-
-        public virtual string ContentType
-        {
-            get { return "application/octet-stream"; }
         }
     }
 }
