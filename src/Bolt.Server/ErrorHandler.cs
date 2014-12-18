@@ -1,8 +1,9 @@
-using Microsoft.Owin;
 using System;
 using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
+
+using HttpContext = Microsoft.Owin.IOwinContext;
 
 namespace Bolt.Server
 {
@@ -27,7 +28,7 @@ namespace Bolt.Server
             _errorCodesHeader = errorCodesHeader;
         }
 
-        public bool HandleBoltError(IOwinContext context, ServerErrorCode code)
+        public bool HandleBoltError(HttpContext context, ServerErrorCode code)
         {
             CloseWithError(context, code);
             return true;
@@ -65,14 +66,14 @@ namespace Bolt.Server
             return _dataHandler.WriteExceptionAsync(context, error);
         }
 
-        protected virtual void CloseWithError(IOwinContext context, ServerErrorCode code)
+        protected virtual void CloseWithError(HttpContext context, ServerErrorCode code)
         {
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             context.Response.Headers[_errorCodesHeader] = code.ToString();
             context.Response.Body.Close();
         }
 
-        protected virtual void CloseWithError(IOwinContext context, int code)
+        protected virtual void CloseWithError(HttpContext context, int code)
         {
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
             context.Response.Headers[_errorCodesHeader] = code.ToString(CultureInfo.InvariantCulture);

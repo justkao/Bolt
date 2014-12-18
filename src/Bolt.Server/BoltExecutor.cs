@@ -1,9 +1,10 @@
-﻿using Microsoft.Owin;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+
+using HttpContext = Microsoft.Owin.IOwinContext;
 
 namespace Bolt.Server
 {
@@ -49,7 +50,7 @@ namespace Bolt.Server
             return _invokers.FirstOrDefault(i => i.Descriptor == descriptor);
         }
 
-        public virtual Task Execute(IOwinContext context)
+        public virtual Task Execute(HttpContext context)
         {
             ActionDescriptor actionDescriptor;
 
@@ -74,19 +75,19 @@ namespace Bolt.Server
             }
         }
 
-        protected virtual Task HandleActionNotFound(IOwinContext context, ContractDescriptor descriptor)
+        protected virtual Task HandleActionNotFound(HttpContext context, ContractDescriptor descriptor)
         {
             Configuration.ErrorHandler.HandleBoltError(context, ServerErrorCode.ActionNotFound);
             return Task.FromResult(0);
         }
 
-        protected virtual Task HandleContractNotFound(IOwinContext context)
+        protected virtual Task HandleContractNotFound(HttpContext context)
         {
             Configuration.ErrorHandler.HandleBoltError(context, ServerErrorCode.ContractNotFound);
             return Task.FromResult(0);
         }
 
-        protected virtual IContractInvoker ChooseInvoker(IOwinContext context, out ActionDescriptor descriptor)
+        protected virtual IContractInvoker ChooseInvoker(HttpContext context, out ActionDescriptor descriptor)
         {
             string[] parts = context.Request.Uri.ToString().Split('/', '\\');
             string name = parts[parts.Length - 2];

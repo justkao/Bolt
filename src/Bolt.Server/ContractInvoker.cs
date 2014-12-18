@@ -1,7 +1,8 @@
-using Microsoft.Owin;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+
+using HttpContext = Microsoft.Owin.IOwinContext;
 
 namespace Bolt.Server
 {
@@ -96,7 +97,7 @@ namespace Bolt.Server
                                            };
         }
 
-        public virtual async Task Execute(IOwinContext context, ActionDescriptor action)
+        public virtual async Task Execute(HttpContext context, ActionDescriptor action)
         {
             ActionMetadata metadata;
             if (_actions.TryGetValue(action, out metadata))
@@ -124,7 +125,7 @@ namespace Bolt.Server
             }
         }
 
-        protected virtual void HandleActionNotImplemented(IOwinContext context)
+        protected virtual void HandleActionNotImplemented(HttpContext context)
         {
             ErrorHandler.HandleBoltError(context, ServerErrorCode.ActionNotImplemented);
         }

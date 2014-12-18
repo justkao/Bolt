@@ -1,5 +1,6 @@
-using Microsoft.Owin;
 using System.Threading.Tasks;
+
+using HttpContext = Microsoft.Owin.IOwinContext;
 
 namespace Bolt.Server
 {
@@ -11,6 +12,6 @@ namespace Bolt.Server
 
         IContractInvoker Get(ContractDescriptor descriptor);
 
-        Task Execute(IOwinContext context);
+        Task Execute(HttpContext context);
     }
 }
