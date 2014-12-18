@@ -21,7 +21,6 @@ After the project is build the server and client side code will be generated. Yo
 
 ####Client
 * Add *Bolt.Client* package to project (`Install-Package Bolt.Client`)
-* Add *Bolt.Helpers* package to project (`Install-Package Bolt.Helpers`)
 * Link generated files from contract project
 * Create proxy to your service and call remote method
 ```c#
@@ -32,7 +31,6 @@ proxy.DoYourThing();
 
 ####Server
 * Add *Bolt.Server* package to project (`Install-Package Bolt.Server`)
-* Add *Bolt.Helpers* package to project (`Install-Package Bolt.Helpers`)
 * Link generated files from contract project
 * In you startup class use Bolt extensions to register Bolt into the pipeline
 
