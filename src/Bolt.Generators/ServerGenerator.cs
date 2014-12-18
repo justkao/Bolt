@@ -31,6 +31,8 @@ namespace Bolt.Generators
 
         public string ContractDescriptorPropertyName { get; set; }
 
+        public bool UseAsp { get; set; }
+
         public string BaseClass
         {
             get
@@ -74,6 +76,7 @@ namespace Bolt.Generators
             classGenerator.Generate(context);
 
             ContractInvokerExtensionGenerator generator = CreateEx<ContractInvokerExtensionGenerator>();
+            generator.UseAsp = UseAsp;
             generator.UserGenerator = ExtensionCodeGenerator;
             generator.Modifier = Modifier;
             if (StateFullInstanceProviderBase != null)

@@ -4,6 +4,7 @@
 using Owin;
 using IApplicationBuilder = Owin.IAppBuilder;
 #else
+using Microsoft.AspNet.Builder;
 using IApplicationBuilder = Microsoft.AspNet.Builder.IApplicationBuilder;
 #endif
 
@@ -22,7 +23,7 @@ namespace Bolt.Server
 #if OWIN
             builder.Use<BoltMiddleware>(new BoltMiddlewareOptions(executor));
 #else
-            builder.Use((next)=>new BoltMiddleware(next, new BoltMiddlewareOptions(executor)).Invoke);
+            builder.UseMiddleware<BoltMiddleware>(new BoltMiddlewareOptions(executor));
 #endif
             return builder;
         }

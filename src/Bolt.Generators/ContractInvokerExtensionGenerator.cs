@@ -19,11 +19,18 @@ namespace Bolt.Generators
 
         public IUserCodeGenerator UserGenerator { get; set; }
 
-        public bool UseAspNet5 { get; set; }
+        public bool UseAsp { get; set; }
 
         public override void Generate(object context)
         {
-            AddUsings(ServerGenerator.BoltServerNamespace, "Owin");
+            if (UseAsp)
+            {
+                AddUsings(ServerGenerator.BoltServerNamespace, "Microsoft.AspNet.Builder");
+            }
+            else
+            {
+                AddUsings(ServerGenerator.BoltServerNamespace, "Owin");
+            }
 
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
             generator.Modifier = Modifier + " static";
@@ -37,9 +44,10 @@ namespace Bolt.Generators
         private void GenerateBody(ClassGenerator g)
         {
             WriteLine(
-                "public static IAppBuilder Use{0}(this IAppBuilder app, {1} instance, ServerConfiguration configuration = null)",
+                "public static {2} Use{0}(this {2} app, {1} instance, ServerConfiguration configuration = null)",
                 ContractDefinition.Name,
-                ContractDefinition.Root.FullName);
+                ContractDefinition.Root.FullName,
+                AppBuilderName);
             using (WithBlock())
             {
                 WriteLine("return app.Use{0}(new StaticInstanceProvider(instance), configuration);", ContractDefinition.Name);
@@ -47,9 +55,10 @@ namespace Bolt.Generators
             WriteLine();
 
             WriteLine(
-                "public static IAppBuilder Use{0}<TImplementation>(this IAppBuilder app, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
+                "public static {2} Use{0}<TImplementation>(this {2} app, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
                 ContractDefinition.Name,
-                ContractDefinition.Root.FullName);
+                ContractDefinition.Root.FullName,
+                AppBuilderName);
             using (WithBlock())
             {
                 WriteLine("return app.Use{0}(new InstanceProvider<TImplementation>(), configuration);", ContractDefinition.Name);
@@ -61,9 +70,10 @@ namespace Bolt.Generators
             if (initSession != null && closeSession != null)
             {
                 WriteLine(
-                    "public static IAppBuilder UseStateFull{0}<TImplementation>(this IAppBuilder app, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
+                    "public static {2} UseStateFull{0}<TImplementation>(this {2} app, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
                     ContractDefinition.Name,
-                    ContractDefinition.Root.FullName);
+                    ContractDefinition.Root.FullName,
+                    AppBuilderName);
                 using (WithBlock())
                 {
                     WriteLine(
@@ -83,9 +93,10 @@ namespace Bolt.Generators
             }
 
             WriteLine(
-                "public static IAppBuilder UseStateFull{0}<TImplementation>(this IAppBuilder app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
+                "public static {2} UseStateFull{0}<TImplementation>(this {2} app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
                 ContractDefinition.Name,
-                ContractDefinition.Root.FullName);
+                ContractDefinition.Root.FullName, 
+                AppBuilderName);
             using (WithBlock())
             {
                 WriteLine(
@@ -97,8 +108,8 @@ namespace Bolt.Generators
             WriteLine();
 
             WriteLine(
-                "public static IAppBuilder Use{0}(this IAppBuilder app, IInstanceProvider instanceProvider, ServerConfiguration configuration = null)",
-                ContractDefinition.Name);
+                "public static {1} Use{0}(this {1} app, IInstanceProvider instanceProvider, ServerConfiguration configuration = null)",
+                ContractDefinition.Name, AppBuilderName);
             using (WithBlock())
             {
                 WriteLine("var boltExecutor = app.GetBolt();");
@@ -114,6 +125,19 @@ namespace Bolt.Generators
         protected override ClassDescriptor CreateDefaultDescriptor()
         {
             return new ClassDescriptor(ContractInvoker.Name + "Extensions", ServerGenerator.BoltServerNamespace);
+        }
+
+        private string AppBuilderName
+        {
+            get
+            {
+                if (UseAsp)
+                {
+                    return "IApplicationBuilder";
+                }
+
+                return "IAppBuilder";
+            }
         }
     }
 }

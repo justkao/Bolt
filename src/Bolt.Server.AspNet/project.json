@@ -1,20 +1,23 @@
 ﻿{
     "version": "0.9.0-*",
     "dependencies": {
-        "Microsoft.AspNet.Http": "1.0.0-beta1",
         "Bolt.Core": "0.9.0.2"
     },
-    "code": [ "**\\*.cs", "..\\Bolt.Server\\*.cs","..\\Bolt.Server\\InstanceProviders\\*.cs" ],
+    "code": [ "**\\*.cs", "..\\Bolt.Server\\*.cs", "..\\Bolt.Server\\InstanceProviders\\*.cs" ],
     "frameworks": {
         "aspnetcore50": {
             "dependencies": {
                 "System.Runtime": "4.0.20-beta-22231",
+                "System.Runtime.Serialization.Primitives": "4.0.0-beta-22231",
                 "System.Collections.Concurrent": "4.0.0-beta-22231",
                 "System.Collections": "4.0.10-beta-22231",
                 "System.Threading.Timer": "4.0.0-beta-22231",
                 "System.Console": "4.0.0-beta-22231",
                 "System.Threading.Tasks": "4.0.10-beta-22231",
                 "System.Diagnostics.Debug": "4.0.10-beta-22231",
+                "System.Linq": "4.0.0-beta-22231",
+                "Microsoft.AspNet.Http": "1.0.0-beta1",
+                "Microsoft.AspNet.Http.Extensions": "1.0.0-beta1"
             }
         }
     }
