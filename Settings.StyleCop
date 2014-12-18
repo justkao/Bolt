@@ -2,7 +2,6 @@
   <GlobalSettings>
     <BooleanProperty Name="WriteCache">False</BooleanProperty>
     <CollectionProperty Name="RecognizedWords">
-      <Value>Infor</Value>
       <Value>encrypted</Value>
       <Value>validator</Value>
       <Value>appender</Value>
@@ -224,16 +223,6 @@
           </RuleSettings>
         </Rule>
         <Rule Name="PrefixCallsCorrectly">
-          <RuleSettings>
-            <BooleanProperty Name="Enabled">False</BooleanProperty>
-          </RuleSettings>
-        </Rule>
-      </Rules>
-      <AnalyzerSettings />
-    </Analyzer>
-    <Analyzer AnalyzerId="Infor.BI.StyleCop.Extension.InforRules">
-      <Rules>
-        <Rule Name="ElementNameMustNotContainDigit">
           <RuleSettings>
             <BooleanProperty Name="Enabled">False</BooleanProperty>
           </RuleSettings>
