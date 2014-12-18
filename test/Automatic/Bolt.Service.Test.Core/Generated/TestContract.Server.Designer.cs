@@ -100,7 +100,7 @@ namespace Bolt.Service.Test.Core
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
             {
-                instance.SimpleMethodWithCancellation(context.CallCancelled);
+                instance.SimpleMethodWithCancellation(context.RequestAborted);
                 await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }

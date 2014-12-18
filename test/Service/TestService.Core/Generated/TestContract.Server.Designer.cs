@@ -54,7 +54,7 @@ namespace TestService.Core
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             try
             {
-                var result = instance.UpdatePerson(parameters.Person, context.CallCancelled);
+                var result = instance.UpdatePerson(parameters.Person, context.RequestAborted);
                 await ResponseHandler.Handle(context, result);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }

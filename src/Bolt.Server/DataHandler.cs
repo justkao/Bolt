@@ -32,13 +32,13 @@ namespace Bolt.Server
 
         public virtual async Task<T> ReadParametersAsync<T>(ServerActionContext context)
         {
-            context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
-            return _serializer.DeserializeParameters<T>(await context.Context.Request.Body.CopyAsync(context.CallCancelled), context.Action);
+            context.RequestAborted.ThrowIfCancellationRequested();
+            return _serializer.DeserializeParameters<T>(await context.Context.Request.Body.CopyAsync(context.RequestAborted), context.Action);
         }
 
         public virtual Task WriteResponseAsync<T>(ServerActionContext context, T data)
         {
-            context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
+            context.RequestAborted.ThrowIfCancellationRequested();
             byte[] raw = _serializer.SerializeResponse(data, context.Action);
             if (raw == null || raw.Length == 0)
             {
@@ -49,18 +49,18 @@ namespace Bolt.Server
             context.Context.Response.ContentLength = raw.Length;
             context.Context.Response.ContentType = _serializer.ContentType;
 
-            return context.Context.Response.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
+            return context.Context.Response.WriteAsync(raw, 0, raw.Length, context.RequestAborted);
         }
 
         public virtual Task WriteExceptionAsync(ServerActionContext context, Exception exception)
         {
-            context.Context.Request.CallCancelled.ThrowIfCancellationRequested();
+            context.RequestAborted.ThrowIfCancellationRequested();
             byte[] raw = _exceptionSerializer.SerializeExceptionResponse(exception, context.Action);
 
             context.Context.Response.ContentLength = raw.Length;
             context.Context.Response.ContentType = _exceptionSerializer.ContentType;
 
-            return context.Context.Response.WriteAsync(raw, 0, raw.Length, context.Context.Request.CallCancelled);
+            return context.Context.Response.WriteAsync(raw, 0, raw.Length, context.RequestAborted);
         }
     }
 }

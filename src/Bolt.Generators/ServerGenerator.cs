@@ -172,7 +172,7 @@ namespace Bolt.Generators
                 {
                     if (info == cancellation)
                     {
-                        sb.Append("context.CallCancelled, ");
+                        sb.Append("context.RequestAborted, ");
                     }
                     else
                     {
