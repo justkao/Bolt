@@ -11,6 +11,6 @@
         NoSessionHeader = 6,
         SessionNotFound = 7,
         SessionIdNotReceived = 8,
-        BoltUnavailable = 8,
+        BoltUnavailable = 8
     }
 }

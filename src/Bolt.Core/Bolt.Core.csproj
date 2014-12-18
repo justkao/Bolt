@@ -49,6 +49,7 @@
     <Compile Include="AsyncOperationAttribute.cs" />
     <Compile Include="BoltSerializationException.cs" />
     <Compile Include="BoltServerException.cs" />
+    <Compile Include="BoltWrapperException.cs" />
     <Compile Include="CloseSessionAttribute.cs" />
     <Compile Include="CollectionExtensions.cs" />
     <Compile Include="Configuration.cs" />
@@ -61,6 +62,7 @@
     <Compile Include="ActionDescriptor.cs" />
     <Compile Include="EndpointProvider.cs" />
     <Compile Include="ErrorResponse.cs" />
+    <Compile Include="ExceptionDescriptor.cs" />
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="ActionContextBase.cs" />
     <Compile Include="IContractDescriptorProvider.cs" />
@@ -75,6 +77,8 @@
     <Compile Include="SerializeResponseException.cs" />
     <Compile Include="SerializerExtensions.cs" />
     <Compile Include="ServerErrorCode.cs" />
+    <Compile Include="ExceptionSerializerBase.cs" />
+    <Compile Include="DefaultExceptionSerializer.cs" />
     <Compile Include="StreamExtensions.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="Properties\SharedAssemblyInfo.cs" />

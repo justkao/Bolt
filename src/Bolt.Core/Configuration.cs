@@ -7,6 +7,15 @@ namespace Bolt
         public const string DefaultSessionHeader = "Bolt-Session-Id";
         public const string DefaultServerErrorCodesHeader = "Bolt-Server-Error-Code";
 
+        public Configuration()
+        {
+            Serializer = new XmlSerializer();
+            ExceptionSerializer = new DefaultExceptionSerializer(Serializer); 
+            EndpointProvider = new EndpointProvider();
+            SessionHeader = DefaultSessionHeader;
+            ServerErrorCodesHeader = DefaultServerErrorCodesHeader;
+        }
+
         public Configuration(ISerializer serializer, IExceptionSerializer exceptionSerializer)
         {
             if (serializer == null)
