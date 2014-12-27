@@ -43,7 +43,6 @@
     </Compile>
     <Compile Include="ITestContract.cs" />
     <Compile Include="IInnerTestContract.cs" />
-    <Compile Include="ParametersBase.cs" />
     <Compile Include="Person.cs" />
     <Compile Include="TestContractImplementation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

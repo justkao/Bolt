@@ -3,8 +3,6 @@
     "contracts": [
         {
             "contract": "TestService.Core.ITestContract",
-            "parametersBase": "TestService.Core.ParametersBase",
-
             "client": {
                 "forceAsync": "true"
             },
