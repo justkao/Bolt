@@ -63,6 +63,7 @@
     <Compile Include="Mono.Options\Options.cs" />
     <Compile Include="PathHelpers.cs" />
     <Compile Include="RootConfig.cs" />
+    <Compile Include="DescriptorConfig.cs" />
     <Compile Include="ServerConfig.cs" />
     <Compile Include="ContractExecution.cs" />
     <Compile Include="ConfigBase.cs" />

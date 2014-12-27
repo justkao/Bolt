@@ -10,6 +10,7 @@
         {
             "contract": "Bolt.Service.Test.Core.ITestContract",
             "context": "generatorContext2",
+            "descriptor": {},
             "client": {
                 "Generator": "CustomUserGenerator",
             },
@@ -19,6 +20,7 @@
         },
         {
             "contract": "Bolt.Service.Test.Core.ITestContractStateFull",
+            "descriptor": {},
             "client": { "Generator": "CustomUserGenerator" },
             "server": { "Generator": "CustomUserGenerator" }
         }

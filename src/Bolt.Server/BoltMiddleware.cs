@@ -1,8 +1,8 @@
-﻿using Microsoft.Owin;
-using System;
+﻿using System;
 using System.Threading.Tasks;
 
 #if OWIN
+using Microsoft.Owin;
 using HttpContext = Microsoft.Owin.IOwinContext;
 #else
 using HttpContext = Microsoft.AspNet.Http.HttpContext;

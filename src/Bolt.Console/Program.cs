@@ -187,7 +187,6 @@ namespace Bolt.Console
             {
                 Contract = "<Type>",
                 Modifier = "<public|internal>",
-                Output = "<Path>",
                 Context = "<Context> // passed to user code generators",
                 Excluded = new List<string> { "<FullTypeName>", "<FullTypeName>" },
                 Client = new ClientConfig()
@@ -213,6 +212,11 @@ namespace Bolt.Console
                     Generator = "<GeneratorName> // user defined generator for server invokers",
                     GeneratorEx = "<GeneratorName> // user defined generator for invoker extensions",
                     StateFullBase = "<FullTypeName> // base class used for statefull invokers"
+                },
+                Descriptor = new DescriptorConfig()
+                {
+                    Modifier = "<public|internal>",
+                    Output = "<Path>",
                 }
             });
 

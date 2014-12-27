@@ -13,9 +13,7 @@ namespace Bolt.Console
 
         public string GetOutput(ConfigBase config)
         {
-            string output = PathHelpers.GetOutput(config.Parent.Parent.OutputDirectory, config.Output,
-                config.GetFileName(Definition));
-
+            string output = PathHelpers.GetOutput(config.Parent.Parent.OutputDirectory, config.Output, config.GetFileName(Definition));
             return output;
         }
     }

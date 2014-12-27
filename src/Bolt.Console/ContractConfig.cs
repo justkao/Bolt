@@ -15,13 +15,13 @@ namespace Bolt.Console
         [JsonProperty(Required = Required.Always)]
         public string Contract { get; set; }
 
-        public string Output { get; set; }
-
         public List<string> Excluded { get; set; }
 
         public ClientConfig Client { get; set; }
 
         public ServerConfig Server { get; set; }
+
+        public DescriptorConfig Descriptor { get; set; }
 
         public string Modifier { get; set; }
 
@@ -71,30 +71,20 @@ namespace Bolt.Console
                 Server.Parent = this;
             }
 
-            ContractDefinition definition = ContractDefinition;
-            string output = PathHelpers.GetOutput(Parent.OutputDirectory, Output, ContractDefinition.Name + ".Contract.Designer.cs");
-            DocumentGenerator document = Parent.GetDocument(output);
-            document.Formatter.Assemblies = Parent.AssemblyCache.ToList();
-            document.Context = Context;
+            if (Descriptor != null)
+            {
+                Descriptor.Parent = this;
+            }
 
-            document.Add(new ContractGenerator()
-                             {
-                                 ContractDefinition = definition,
-                                 Modifier = GetModifier()
-                             });
-
-            document.Add(new ContractDescriptorGenerator()
-                             {
-                                 ContractDefinition = definition,
-                                 Modifier = GetModifier()
-                             });
-
-            ContractExecution execution = new ContractExecution(definition);
+            ContractExecution execution = new ContractExecution(ContractDefinition);
+            if (Descriptor != null)
+            {
+                Descriptor.Execute(execution);
+            }
             if (Client != null)
             {
                 Client.Execute(execution);
             }
-
             if (Server != null)
             {
                 Server.Execute(execution);

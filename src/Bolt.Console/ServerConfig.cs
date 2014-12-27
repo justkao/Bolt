@@ -10,8 +10,15 @@ namespace Bolt.Console
 
         public bool UseAsp { get; set; }
 
-        protected override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
+        public bool Descriptor { get; set; }
+
+        protected internal override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
         {
+            if (Descriptor)
+            {
+                IncludeDescriptors(generator, definition);
+            }
+
             ServerGenerator serverGenerator = new ServerGenerator
                                                   {
                                                       ContractDefinition = definition,

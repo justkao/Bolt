@@ -53,7 +53,7 @@ namespace Bolt.Console
             DoExecute(document, CoerceDescriptor(execution.Definition));
         }
 
-        protected abstract void DoExecute(DocumentGenerator generator, ContractDefinition definition);
+        protected internal abstract void DoExecute(DocumentGenerator generator, ContractDefinition definition);
 
         public abstract string GetFileName(ContractDefinition definition);
 
@@ -75,6 +75,14 @@ namespace Bolt.Console
             }
 
             return Excluded.Select(Parent.Parent.AssemblyCache.GetType);
+        }
+
+        protected void IncludeDescriptors(DocumentGenerator generator, ContractDefinition definition)
+        {
+            DescriptorConfig config = new DescriptorConfig();
+            config.Parent = Parent;
+            config.Modifier = "internal";
+            config.DoExecute(generator, definition);
         }
     }
 }
