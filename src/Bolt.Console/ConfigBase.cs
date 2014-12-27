@@ -47,8 +47,7 @@ namespace Bolt.Console
 
         public void Execute(ContractExecution execution)
         {
-            string output = PathHelpers.GetOutput(execution.OutputDirectory, Output, GetFileName(execution.Definition));
-            DocumentGenerator document = Parent.Parent.GetDocument(output);
+            DocumentGenerator document = Parent.Parent.GetDocument(execution.GetOutput(this));
             document.Context = Parent.Context;
             document.Formatter.Assemblies.AddRange(Parent.Parent.AssemblyCache);
             DoExecute(document, CoerceDescriptor(execution.Definition));
@@ -56,7 +55,7 @@ namespace Bolt.Console
 
         protected abstract void DoExecute(DocumentGenerator generator, ContractDefinition definition);
 
-        protected abstract string GetFileName(ContractDefinition definition);
+        public abstract string GetFileName(ContractDefinition definition);
 
         private ContractDefinition CoerceDescriptor(ContractDefinition definition)
         {

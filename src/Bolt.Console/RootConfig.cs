@@ -149,7 +149,7 @@ namespace Bolt.Console
                     {
                         string prev = File.ReadAllText(documentGenerator.Key);
                         if (prev != result)
-                        {
+                        {                            
                             File.WriteAllText(documentGenerator.Key, result);
                             System.Console.WriteLine("Generated File: '{0}'", documentGenerator.Key);
                         }
@@ -160,6 +160,12 @@ namespace Bolt.Console
                     }
                     else
                     {
+                        string directory = Path.GetDirectoryName(documentGenerator.Key);
+                        if (directory != null && !Directory.Exists(directory))
+                        {
+                            Directory.CreateDirectory(directory);
+                        }
+
                         File.WriteAllText(documentGenerator.Key, result);
                         System.Console.WriteLine("Generated File: '{0}'", documentGenerator.Key);
                     }

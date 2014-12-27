@@ -89,7 +89,7 @@ namespace Bolt.Console
                                  Modifier = GetModifier()
                              });
 
-            ContractExecution execution = new ContractExecution(definition, Path.GetDirectoryName(output));
+            ContractExecution execution = new ContractExecution(definition);
             if (Client != null)
             {
                 Client.Execute(execution);

@@ -47,7 +47,7 @@ namespace Bolt.Console
             generator.Add(clientGenerator);
         }
 
-        protected override string GetFileName(ContractDefinition definition)
+        public override string GetFileName(ContractDefinition definition)
         {
             return string.Format("{0}.Client.Designer.cs", definition.Name);
         }
