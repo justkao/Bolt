@@ -6,7 +6,7 @@ namespace Bolt.Helpers
 {
     public class JsonExceptionSerializer : ExceptionSerializerBase<string>
     {
-        private readonly JsonSerializerSettings _exceptionSerializerSettings = new JsonSerializerSettings()
+        private readonly JsonSerializerSettings _exceptionSerializerSettings = new JsonSerializerSettings
         {
             TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
             TypeNameHandling = TypeNameHandling.All,
@@ -14,7 +14,8 @@ namespace Bolt.Helpers
             ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
         };
 
-        public JsonExceptionSerializer(ISerializer serializer) : base(serializer)
+        public JsonExceptionSerializer(ISerializer serializer)
+            : base(serializer)
         {
         }
 
