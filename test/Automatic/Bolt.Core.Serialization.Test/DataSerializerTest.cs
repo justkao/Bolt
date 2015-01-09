@@ -53,6 +53,18 @@ namespace Bolt.Core.Serialization.Test
 
             Assert.AreEqual(obj, deserialized);
         }
+
+        [Test]
+        public void WriteRead_SpecificType_EnsureDeserializedProperly()
+        {
+            SimpleCustomType obj = new SimpleCustomType() { BoolProperty = false };
+            MemoryStream stream = new MemoryStream();
+            Serializer.Write(stream, obj);
+            SimpleCustomType deserialized = Serializer.Read<SimpleCustomType>(new MemoryStream(stream.ToArray()));
+
+            Assert.AreEqual(obj, deserialized);
+        }
+
         [Test]
         public void WriteRead_ComplexTypeAndSameStream_EnsureDeserializedProperly()
         {

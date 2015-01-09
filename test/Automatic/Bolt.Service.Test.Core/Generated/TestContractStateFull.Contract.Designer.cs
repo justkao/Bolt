@@ -27,7 +27,7 @@ namespace Bolt.Service.Test.Core.Parameters
     public partial class InitExParameters
     {
         [DataMember(Order = 1)]
-        public bool Fail { get; set; }
+        public bool FailOperation { get; set; }
     }
 
     [DataContract]

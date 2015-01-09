@@ -37,7 +37,10 @@ namespace Bolt.Server
 
             if (InstanceTimeout != TimeSpan.Zero)
             {
-                _timer = new Timer(OnTimerElapsed, null, (int)TimeSpan.FromMinutes(1).TotalMilliseconds,
+                _timer = new Timer(
+                    OnTimerElapsed,
+                    null,
+                    (int)TimeSpan.FromMinutes(1).TotalMilliseconds,
                     (int)TimeSpan.FromMinutes(1).TotalMilliseconds);
             }
         }
@@ -61,8 +64,7 @@ namespace Bolt.Server
                 if (existingSession != null && _instances.TryGetValue(existingSession, out instance))
                 {
                     instance.Timestamp = DateTime.UtcNow;
-                    BeforeInstanceReturned(context, instance.Instance);
-                    return (TInstance) instance.Instance;
+                    return (TInstance)instance.Instance;
                 }
 
                 instance = new InstanceMetadata(base.GetInstance<TInstance>(context));
@@ -82,7 +84,6 @@ namespace Bolt.Server
             if (_instances.TryGetValue(sessionId, out instance))
             {
                 instance.Timestamp = DateTime.UtcNow;
-                BeforeInstanceReturned(context, instance.Instance);
                 return (TInstance)instance.Instance;
             }
 
@@ -106,7 +107,8 @@ namespace Bolt.Server
                         }
                         catch (Exception e)
                         {
-                            Debug.Assert(false,
+                            Debug.Assert(
+                                false,
                                 "Instance release failed after the session initialization error. This exception will be supressed and the session initialization error will be propagated to client.",
                                 e.ToString());
                         }
@@ -126,10 +128,10 @@ namespace Bolt.Server
             }
         }
 
-        public virtual bool ReleaseInstance(string key)
+        public virtual bool ReleaseInstance(string sessionId)
         {
             InstanceMetadata instance;
-            if (_instances.TryRemove(key, out instance))
+            if (_instances.TryRemove(sessionId, out instance))
             {
                 if (instance.Instance is IDisposable)
                 {
@@ -159,18 +161,14 @@ namespace Bolt.Server
             }
         }
 
-        protected virtual void BeforeInstanceReturned(ServerActionContext context, object instance)
-        {
-        }
-
         protected virtual void OnInstanceCreated(ServerActionContext context, string sessionId)
         {
-            Console.WriteLine("New instance created for session '{0}' and contract '{1}'. Initiating action '{2}'", sessionId, context.Action.Contract, context.Action);
+            Debug.WriteLine("New instance created for session '{0}' and contract '{1}'. Initiating action '{2}'", sessionId, context.Action.Contract, context.Action);
         }
 
         protected virtual void OnInstanceReleased(ServerActionContext context, string sessionId)
         {
-            Console.WriteLine("Instance released for session '{0}' and contract '{1}'. Destroy  action '{2}'", sessionId, context.Action.Contract, context.Action);
+            Debug.WriteLine("Instance released for session '{0}' and contract '{1}'. Destroy  action '{2}'", sessionId, context.Action.Contract, context.Action);
         }
 
         protected virtual bool ShouldTimeoutInstance(object instance, DateTime timestamp)
@@ -180,8 +178,13 @@ namespace Bolt.Server
 
         protected virtual string CreateNewSession()
         {
-            Console.WriteLine("Session created ... ");
+            Debug.WriteLine("Session created ... ");
             return Guid.NewGuid().ToString();
+        }
+
+        protected string GetSession(ServerActionContext context)
+        {
+            return context.Context.Request.Headers[SessionHeader];
         }
 
         private void OnTimerElapsed(object state)
@@ -193,11 +196,6 @@ namespace Bolt.Server
                     ReleaseInstance(pair.Key);
                 }
             }
-        }
-
-        private string GetSession(ServerActionContext context)
-        {
-            return context.Context.Request.Headers[SessionHeader];
         }
 
         private class InstanceMetadata

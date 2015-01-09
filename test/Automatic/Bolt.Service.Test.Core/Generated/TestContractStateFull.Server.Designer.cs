@@ -60,7 +60,7 @@ namespace Bolt.Service.Test.Core
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
             try
             {
-                instance.InitEx(parameters.Fail);
+                instance.InitEx(parameters.FailOperation);
                 await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }

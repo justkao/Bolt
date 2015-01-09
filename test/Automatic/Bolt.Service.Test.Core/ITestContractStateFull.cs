@@ -24,7 +24,7 @@ namespace Bolt.Service.Test.Core
 
         [InitSession]
         [AsyncOperation]
-        void InitEx(bool fail);
+        void InitEx(bool failOperation);
 
         [AsyncOperation]
         void SetState(string state);
@@ -51,9 +51,9 @@ namespace Bolt.Service.Test.Core
             _initialized = true;
         }
 
-        public void InitEx(bool fail)
+        public void InitEx(bool failOperation)
         {
-            if (fail)
+            if (failOperation)
             {
                 throw new InvalidOperationException("Forced failure.");
             }

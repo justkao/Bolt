@@ -58,6 +58,7 @@
     <Compile Include="DataSerializerTest.cs" />
     <Compile Include="ExceptionSerializerTest.cs" />
     <Compile Include="CustomException.cs" />
+    <Compile Include="SimpleCustomType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

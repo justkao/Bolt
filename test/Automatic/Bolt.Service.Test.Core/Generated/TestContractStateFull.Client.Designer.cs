@@ -26,7 +26,7 @@ namespace Bolt.Service.Test.Core
     {
         Task InitAsync();
 
-        Task InitExAsync(bool fail);
+        Task InitExAsync(bool failOperation);
 
         Task SetStateAsync(string state);
 
@@ -62,17 +62,17 @@ namespace Bolt.Service.Test.Core
             return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.Init, GetCancellationToken(Descriptor.Init));
         }
 
-        public virtual void InitEx(bool fail)
+        public virtual void InitEx(bool failOperation)
         {
             var bolt_Params = new Bolt.Service.Test.Core.Parameters.InitExParameters();
-            bolt_Params.Fail = fail;
+            bolt_Params.FailOperation = failOperation;
             Channel.Send(bolt_Params, Descriptor.InitEx, GetCancellationToken(Descriptor.InitEx));
         }
 
-        public virtual Task InitExAsync(bool fail)
+        public virtual Task InitExAsync(bool failOperation)
         {
             var bolt_Params = new Bolt.Service.Test.Core.Parameters.InitExParameters();
-            bolt_Params.Fail = fail;
+            bolt_Params.FailOperation = failOperation;
             return Channel.SendAsync(bolt_Params, Descriptor.InitEx, GetCancellationToken(Descriptor.InitEx));
         }
 
