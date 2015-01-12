@@ -57,11 +57,11 @@ namespace Bolt.Server
         public override TInstance GetInstance<TInstance>(ServerActionContext context)
         {
             InstanceMetadata instance;
+            string sessionId = GetSession(context);
 
             if (context.Action == _initInstanceAction)
             {
-                string existingSession = GetSession(context);
-                if (existingSession != null && _instances.TryGetValue(existingSession, out instance))
+                if (sessionId != null && _instances.TryGetValue(sessionId, out instance))
                 {
                     instance.Timestamp = DateTime.UtcNow;
                     return (TInstance)instance.Instance;
@@ -69,13 +69,13 @@ namespace Bolt.Server
 
                 instance = new InstanceMetadata(base.GetInstance<TInstance>(context));
                 string newSession = CreateNewSession();
+                OnInstanceCreated(context, newSession);
+
                 _instances[newSession] = instance;
                 context.Context.Response.Headers[SessionHeader] = newSession;
-                OnInstanceCreated(context, newSession);
                 return (TInstance)instance.Instance;
             }
 
-            string sessionId = GetSession(context);
             if (string.IsNullOrEmpty(sessionId))
             {
                 throw new SessionHeaderNotFoundException();
@@ -99,19 +99,20 @@ namespace Bolt.Server
                     // session initialization failed, cleanup the stack
                     string session = GetSession(context);
                     context.Context.Response.Headers.Remove(SessionHeader);
-                    if (ReleaseInstance(session))
+
+                    try
                     {
-                        try
+                        if (ReleaseInstance(session))
                         {
                             OnInstanceReleased(context, session);
                         }
-                        catch (Exception e)
-                        {
-                            Debug.Assert(
-                                false,
-                                "Instance release failed after the session initialization error. This exception will be supressed and the session initialization error will be propagated to client.",
-                                e.ToString());
-                        }
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.Assert(
+                            false,
+                            "Instance release failed after the session initialization error. This exception will be supressed and the session initialization error will be propagated to client.",
+                            e.ToString());
                     }
                 }
             }

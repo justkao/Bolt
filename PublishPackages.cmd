@@ -1,6 +1,6 @@
 @ECHO OFF
  
-set version="0.9.0.2"
+set version="0.9.1.1"
 
 
 .nuget\nuget.exe push bolt_packages\Bolt.Core.%version%.nupkg
