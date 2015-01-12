@@ -12,7 +12,7 @@ public interface IFooService
     void DoYourThing();
 }
 ```
-Add *Bolt.Tool* package to project (`Install-Package Bolt.Tool`) and define following post build event: 
+Add *Bolt.Tool* package to project (`Install-Package Bolt.Tool -pre`) and define following post build event: 
 ```Batchfile
 cd "$(SolutionDir)\packages\bolt.tool*\tools"
 Bolt.exe -output="$(ProjectDir)\" -fromAssembly=$(TargetPath)
@@ -20,7 +20,7 @@ Bolt.exe -output="$(ProjectDir)\" -fromAssembly=$(TargetPath)
 After the project is build the server and client side code will be generated. You can then link this code from other projects.
 
 ####Client
-* Add *Bolt.Client* package to project (`Install-Package Bolt.Client`)
+* Add *Bolt.Client* package to project (`Install-Package Bolt.Client -pre`)
 * Link generated files from contract project
 * Create proxy to your service and call remote method
 ```c#
@@ -30,7 +30,7 @@ proxy.DoYourThing();
 ```
 
 ####Server
-* Add *Bolt.Server* package to project (`Install-Package Bolt.Server`)
+* Add *Bolt.Server* package to project (`Install-Package Bolt.Server -pre`)
 * Link generated files from contract project
 * In you startup class use Bolt extensions to register Bolt into the pipeline
 
