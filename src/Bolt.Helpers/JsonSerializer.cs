@@ -8,18 +8,23 @@ namespace Bolt.Helpers
 {
     public class JsonSerializer : ISerializer
     {
-        private readonly Newtonsoft.Json.JsonSerializer _serializer = new Newtonsoft.Json.JsonSerializer()
+        public JsonSerializer()
         {
-            NullValueHandling = NullValueHandling.Ignore,
-            TypeNameHandling = TypeNameHandling.Auto,
-            Formatting = Formatting.None,
-            ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
-        };
+            Serializer = new Newtonsoft.Json.JsonSerializer()
+                             {
+                                 NullValueHandling = NullValueHandling.Ignore,
+                                 TypeNameHandling = TypeNameHandling.Auto,
+                                 Formatting = Formatting.None,
+                                 ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
+                             };
+        }
 
-        public virtual string ContentType
+        public string ContentType
         {
             get { return "application/json"; }
         }
+
+        public Newtonsoft.Json.JsonSerializer Serializer { get; private set; }
 
         public virtual void Write<T>(Stream stream, T data)
         {
@@ -30,7 +35,7 @@ namespace Bolt.Helpers
 
             using (TextWriter writer = new StreamWriter(stream, Encoding.UTF8, 4096, true))
             {
-                _serializer.Serialize(writer, data);
+                Serializer.Serialize(writer, data);
             }
         }
 
@@ -45,7 +50,7 @@ namespace Bolt.Helpers
             {
                 using (JsonReader jsonReader = new JsonTextReader(reader))
                 {
-                    return _serializer.Deserialize<T>(jsonReader);
+                    return Serializer.Deserialize<T>(jsonReader);
                 }
             }
         }
