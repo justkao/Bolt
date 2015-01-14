@@ -50,7 +50,9 @@ namespace Bolt.Generators
                 AppBuilderName);
             using (WithBlock())
             {
-                WriteLine("return app.Use{0}(new StaticInstanceProvider(instance), configuration);", ContractDefinition.Name);
+                WriteLine(
+                    "return app.Use{0}(new StaticInstanceProvider(instance), configuration);",
+                    ContractDefinition.Name);
             }
             WriteLine();
 
@@ -61,7 +63,9 @@ namespace Bolt.Generators
                 AppBuilderName);
             using (WithBlock())
             {
-                WriteLine("return app.Use{0}(new InstanceProvider<TImplementation>(), configuration);", ContractDefinition.Name);
+                WriteLine(
+                    "return app.Use{0}(new InstanceProvider<TImplementation>(), configuration);",
+                    ContractDefinition.Name);
             }
             WriteLine();
 
@@ -95,7 +99,7 @@ namespace Bolt.Generators
             WriteLine(
                 "public static {2} UseStateFull{0}<TImplementation>(this {2} app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
                 ContractDefinition.Name,
-                ContractDefinition.Root.FullName, 
+                ContractDefinition.Root.FullName,
                 AppBuilderName);
             using (WithBlock())
             {
@@ -109,7 +113,8 @@ namespace Bolt.Generators
 
             WriteLine(
                 "public static {1} Use{0}(this {1} app, IInstanceProvider instanceProvider, ServerConfiguration configuration = null)",
-                ContractDefinition.Name, AppBuilderName);
+                ContractDefinition.Name,
+                AppBuilderName);
             using (WithBlock())
             {
                 WriteLine("var boltExecutor = app.GetBolt();");

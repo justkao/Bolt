@@ -185,7 +185,13 @@ namespace Bolt.Server
 
         protected string GetSession(ServerActionContext context)
         {
-            return context.Context.Request.Headers[SessionHeader];
+            string sessionId = context.Context.Request.Headers[SessionHeader];
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                sessionId = context.Context.Response.Headers[SessionHeader];
+            }
+
+            return sessionId;
         }
 
         private void OnTimerElapsed(object state)
