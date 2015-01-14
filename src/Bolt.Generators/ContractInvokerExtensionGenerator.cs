@@ -44,7 +44,7 @@ namespace Bolt.Generators
         private void GenerateBody(ClassGenerator g)
         {
             WriteLine(
-                "public static {2} Use{0}(this {2} app, {1} instance, ServerConfiguration configuration = null)",
+                "public static IContractInvoker Use{0}(this {2} app, {1} instance, ServerConfiguration configuration = null)",
                 ContractDefinition.Name,
                 ContractDefinition.Root.FullName,
                 AppBuilderName);
@@ -57,7 +57,7 @@ namespace Bolt.Generators
             WriteLine();
 
             WriteLine(
-                "public static {2} Use{0}<TImplementation>(this {2} app, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
+                "public static IContractInvoker Use{0}<TImplementation>(this {2} app, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
                 ContractDefinition.Name,
                 ContractDefinition.Root.FullName,
                 AppBuilderName);
@@ -74,7 +74,7 @@ namespace Bolt.Generators
             if (initSession != null && closeSession != null)
             {
                 WriteLine(
-                    "public static {2} UseStateFull{0}<TImplementation>(this {2} app, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
+                    "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} app, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
                     ContractDefinition.Name,
                     ContractDefinition.Root.FullName,
                     AppBuilderName);
@@ -97,7 +97,7 @@ namespace Bolt.Generators
             }
 
             WriteLine(
-                "public static {2} UseStateFull{0}<TImplementation>(this {2} app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
+                "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
                 ContractDefinition.Name,
                 ContractDefinition.Root.FullName,
                 AppBuilderName);
@@ -112,7 +112,7 @@ namespace Bolt.Generators
             WriteLine();
 
             WriteLine(
-                "public static {1} Use{0}(this {1} app, IInstanceProvider instanceProvider, ServerConfiguration configuration = null)",
+                "public static IContractInvoker Use{0}(this {1} app, IInstanceProvider instanceProvider, ServerConfiguration configuration = null)",
                 ContractDefinition.Name,
                 AppBuilderName);
             using (WithBlock())
@@ -123,7 +123,7 @@ namespace Bolt.Generators
                 WriteLine("invoker.InstanceProvider = instanceProvider;");
                 WriteLine("boltExecutor.Add(invoker);");
                 WriteLine();
-                WriteLine("return app;");
+                WriteLine("return invoker;");
             }
         }
 
