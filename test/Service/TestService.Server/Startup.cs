@@ -1,4 +1,5 @@
-﻿using Bolt.Helpers;
+﻿using Bolt;
+using Bolt.Helpers;
 using Bolt.Server;
 
 using Owin;
@@ -19,7 +20,7 @@ namespace TestService.Server
     {
         public void Configuration(IAppBuilder app)
         {
-            app.UseBolt(new ServerConfiguration(new ProtocolBufferSerializer(), new JsonExceptionSerializer(new JsonSerializer())));
+            app.UseBolt(new ServerConfiguration(new XmlSerializer(), new JsonExceptionSerializer(new XmlSerializer())));
             app.UseTestContract<TestContractImplementation>();
         }
     }

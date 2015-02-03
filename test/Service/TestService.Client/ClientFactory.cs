@@ -1,4 +1,5 @@
-﻿using Bolt.Client;
+﻿using Bolt;
+using Bolt.Client;
 
 using System;
 using System.Runtime.Serialization;
@@ -12,16 +13,10 @@ namespace TestService.Client
 {
     public class ClientFactory
     {
-        private class CustomSerializationBinder : SerializationBinder
-        {
-            public override Type BindToType(string assemblyName, string typeName)
-            {
-                return typeof(InvalidOperationException);
-            }
-        }
-
-        public static readonly ClientConfiguration Config = new ClientConfiguration(new ProtocolBufferSerializer(), 
-            new JsonExceptionSerializer(new JsonSerializer()), new DefaultWebRequestHandlerEx());
+        public static readonly ClientConfiguration Config = new ClientConfiguration(
+            new XmlSerializer(),
+            new JsonExceptionSerializer(new XmlSerializer()),
+            new DefaultWebRequestHandlerEx());
 
         public static ITestContract CreateIISBolt()
         {
@@ -35,14 +30,14 @@ namespace TestService.Client
 
         public static ITestContract CreateWcf()
         {
-            System.ServiceModel.ChannelFactory<ITestContract> respository = new System.ServiceModel.ChannelFactory<ITestContract>(new BasicHttpBinding());
+            ChannelFactory<ITestContract> respository = new ChannelFactory<ITestContract>(new BasicHttpBinding());
             ITestContract channel = respository.CreateChannel(new EndpointAddress(Servers.WcfServer));
             return channel;
         }
 
         public static ITestContract CreateIISWcf()
         {
-            System.ServiceModel.ChannelFactory<ITestContract> respository = new System.ServiceModel.ChannelFactory<ITestContract>(new BasicHttpBinding());
+            ChannelFactory<ITestContract> respository = new ChannelFactory<ITestContract>(new BasicHttpBinding());
             ITestContract channel = respository.CreateChannel(new EndpointAddress(Servers.IISWcfServer));
             return channel;
         }

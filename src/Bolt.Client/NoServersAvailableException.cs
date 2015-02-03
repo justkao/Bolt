@@ -2,6 +2,9 @@ using System;
 
 namespace Bolt.Client
 {
+    /// <summary>
+    /// Used to indicate that there are no more available Bolt servers.
+    /// </summary>
     public class NoServersAvailableException : Exception
     {
         public NoServersAvailableException()

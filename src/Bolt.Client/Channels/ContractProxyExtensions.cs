@@ -6,7 +6,7 @@ namespace Bolt.Client.Channels
     {
         public static RecoverableChannel Recoverable(this ContractProxy proxy)
         {
-            return ((RecoverableChannel)proxy.Channel);
+            return (RecoverableChannel)proxy.Channel;
         }
 
         public static ContractProxy WithRetries(this ContractProxy proxy, int retries, TimeSpan retryDelay)

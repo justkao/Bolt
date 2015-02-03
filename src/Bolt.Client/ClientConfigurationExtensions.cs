@@ -1,5 +1,6 @@
-﻿using Bolt.Client.Channels;
-using System;
+﻿using System;
+
+using Bolt.Client.Channels;
 
 namespace Bolt.Client
 {

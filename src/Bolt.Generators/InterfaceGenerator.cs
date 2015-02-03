@@ -92,27 +92,33 @@ namespace Bolt.Generators
             asyncBase.Insert(0, FormatType(iface));
 
             ClassGenerator classGenerator = CreateClassGenerator(new ClassDescriptor(name, iface.Namespace, asyncBase.ToArray()) { IsInterface = true });
-            classGenerator.GenerateBodyAction = ((g) =>
-            {
-                List<MethodInfo> methods = (from m in ContractDefinition.GetEffectiveMethods(iface)
-                                            where ShouldBeAsync(m, ForceAsync)
-                                            select m).ToList();
-
-
-                foreach (MethodInfo method in methods)
+            classGenerator.GenerateBodyAction = (g) =>
                 {
-                    g.WriteLine(FormatMethodDeclaration(method, true) + ";");
-                    if (!Equals(method, methods.Last()))
+                    List<MethodInfo> methods =
+                        (from m in ContractDefinition.GetEffectiveMethods(iface)
+                         where ShouldBeAsync(m, ForceAsync)
+                         select m).ToList();
+
+                    foreach (MethodInfo method in methods)
                     {
-                        g.WriteLine();
+                        g.WriteLine(FormatMethodDeclaration(method, true) + ";");
+                        if (!Equals(method, methods.Last()))
+                        {
+                            g.WriteLine();
+                        }
                     }
-                }
-            });
+                };
+
             classGenerator.Generate(context);
         }
 
         private bool ShouldHaveAsyncMethods(Type iface)
         {
+            if (ForceAsync)
+            {
+                return true;
+            }
+
             return ContractDefinition.GetEffectiveMethods(iface).Any(m => ShouldBeAsync(m, ForceAsync));
         }
     }

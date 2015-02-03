@@ -3,6 +3,9 @@ using System.Reflection;
 
 namespace Bolt
 {
+    /// <summary>
+    /// Descriptor of single Bolt action.
+    /// </summary>
     public class ActionDescriptor
     {
         private readonly string _id;
@@ -19,12 +22,24 @@ namespace Bolt
 
         public string Name { get; private set; }
 
+        /// <summary>
+        /// The parameters object used to hold all the data the action requires to be executed on server.
+        /// </summary>
         public Type Parameters { get; private set; }
 
+        /// <summary>
+        /// Owner of this action descriptor.
+        /// </summary>
         public ContractDescriptor Contract { get; private set; }
 
+        /// <summary>
+        /// The method this descriptor refers to.
+        /// </summary>
         public MethodInfo Method { get; private set; }
 
+        /// <summary>
+        /// Determines whether the action has any parameters.
+        /// </summary>
         public bool HasParameters { get; private set; }
 
         protected bool Equals(ActionDescriptor other)

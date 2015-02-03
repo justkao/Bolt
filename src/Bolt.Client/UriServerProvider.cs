@@ -2,6 +2,9 @@ using System;
 
 namespace Bolt.Client
 {
+    /// <summary>
+    /// Provides Uri just for single specified server.
+    /// </summary>
     public class UriServerProvider : IServerProvider
     {
         private readonly Uri _url;

@@ -3,6 +3,9 @@ using System.Runtime.Serialization;
 
 namespace Bolt
 {
+    /// <summary>
+    /// Exception indicating that serialization problem occured.
+    /// </summary>
     public class BoltSerializationException : SerializationException
     {
         public BoltSerializationException()

@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Bolt.Client.Channels
 {
+    /// <summary>
+    /// Recoverable Bolt channel. 
+    /// </summary>
     public class RecoverableChannel : ChannelBase
     {
         public RecoverableChannel(RecoverableChannel proxy)
@@ -189,7 +192,7 @@ namespace Bolt.Client.Channels
 
         protected override Uri GetRemoteConnection()
         {
-            Open(); 
+            Open();
             return ServerProvider.GetServer();
         }
 

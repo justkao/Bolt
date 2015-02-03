@@ -2,6 +2,9 @@
 
 namespace Bolt.Client.Channels
 {
+    /// <summary>
+    /// Simple non recoverable channel used to communicate with specific Bolt server.
+    /// </summary>
     public class DelegatedChannel : ChannelBase
     {
         private readonly Uri _server;

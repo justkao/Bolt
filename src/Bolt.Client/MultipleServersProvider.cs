@@ -4,6 +4,10 @@ using System.Linq;
 
 namespace Bolt.Client
 {
+    /// <summary>
+    /// The server provider that picks servers from the available server pool.
+    /// </summary>
+    /// <remarks>The server are picked randomly from the pool, last unavailable server is ignored.</remarks>
     public class MultipleServersProvider : IServerProvider
     {
         private readonly List<Uri> _servers;

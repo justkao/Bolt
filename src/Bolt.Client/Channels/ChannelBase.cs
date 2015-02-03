@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Bolt.Client.Channels
 {
+    /// <summary>
+    /// Base implementation for <see cref="IChannel"/>.
+    /// </summary>
     public abstract class ChannelBase : IChannel
     {
         protected ChannelBase(ChannelBase proxy)
