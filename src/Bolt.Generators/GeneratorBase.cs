@@ -87,6 +87,26 @@ namespace Bolt.Generators
             return true;
         }
 
+        public virtual Type GetReturnType(MethodInfo method)
+        {
+            if (method.ReturnType == typeof(void))
+            {
+                return null;
+            }
+
+            if (method.ReturnType == typeof(Task))
+            {
+                return null;
+            }
+
+            if (typeof(Task).GetTypeInfo().IsAssignableFrom(method.ReturnType.GetTypeInfo()))
+            {
+                return method.ReturnType.GetTypeInfo().GenericTypeArguments.First();
+            }
+
+            return method.ReturnType;
+        }
+
         public virtual bool IsAsync(MethodInfo method)
         {
             return method.IsAsync();

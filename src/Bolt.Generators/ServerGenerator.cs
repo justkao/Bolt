@@ -140,18 +140,17 @@ namespace Bolt.Generators
 
             string instanceType = FormatType(methodDescriptor.Method.DeclaringType);
             WriteLine("var instance = InstanceProvider.GetInstance<{0}>(context);", instanceType);
+
+            if (HasReturnValue(methodDescriptor.Method))
+            {
+                WriteLine("{0} result;", FormatType(GetReturnType(methodDescriptor.Method)));
+            }
+
+            WriteLine();
             WriteLine("try");
             using (WithBlock())
             {
-                string result = GenerateInvocationCode("instance", "parameters", methodDescriptor);
-                if (!string.IsNullOrEmpty(result))
-                {
-                    WriteLine("await ResponseHandler.Handle(context, result);");
-                }
-                else
-                {
-                    WriteLine("await ResponseHandler.Handle(context);");
-                }
+                GenerateInvocationCode("instance", "parameters", "result", methodDescriptor);
                 WriteLine("InstanceProvider.ReleaseInstance(context, instance, null);", instanceType);
             }
             WriteLine("catch (Exception e)");
@@ -160,9 +159,21 @@ namespace Bolt.Generators
                 WriteLine("InstanceProvider.ReleaseInstance(context, instance, e);", instanceType);
                 WriteLine("throw;");
             }
+
+            WriteLine();
+
+            if (HasReturnValue(methodDescriptor.Method))
+            {
+                WriteLine("await ResponseHandler.Handle(context, result);");
+            }
+            else
+            {
+                WriteLine("await ResponseHandler.Handle(context);");
+            }
+
         }
 
-        public virtual string GenerateInvocationCode(string instanceName, string parametersInstance, MethodDescriptor method)
+        public virtual string GenerateInvocationCode(string instanceName, string parametersInstance, string resultVariable, MethodDescriptor method)
         {
             string parametersBody = string.Empty;
 
@@ -190,11 +201,11 @@ namespace Bolt.Generators
             {
                 if (IsAsync(method.Method))
                 {
-                    WriteLine("var result = await {0}.{1}({2});", instanceName, method.Name, parametersBody);
+                    WriteLine("{3} = await {0}.{1}({2});", instanceName, method.Name, parametersBody, resultVariable);
                 }
                 else
                 {
-                    WriteLine("var result = {0}.{1}({2});", instanceName, method.Name, parametersBody);
+                    WriteLine("{3} = {0}.{1}({2});", instanceName, method.Name, parametersBody, resultVariable);
                 }
 
                 return "result";

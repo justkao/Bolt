@@ -41,10 +41,10 @@ namespace Bolt.Service.Test.Core
         protected virtual async Task TestContractStateFull_Init(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
+
             try
             {
                 instance.Init();
-                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -52,16 +52,18 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context);
         }
 
         protected virtual async Task TestContractStateFull_InitEx(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<Bolt.Service.Test.Core.Parameters.InitExParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
+
             try
             {
                 instance.InitEx(parameters.FailOperation);
-                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -69,16 +71,18 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context);
         }
 
         protected virtual async Task TestContractStateFull_SetState(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<Bolt.Service.Test.Core.Parameters.SetStateParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
+
             try
             {
                 instance.SetState(parameters.State);
-                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -86,15 +90,18 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context);
         }
 
         protected virtual async Task TestContractStateFull_GetState(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
+            string result;
+
             try
             {
-                var result = instance.GetState();
-                await ResponseHandler.Handle(context, result);
+                result = instance.GetState();
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -102,15 +109,17 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context, result);
         }
 
         protected virtual async Task TestContractStateFull_NextCallWillFailProxy(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
+
             try
             {
                 instance.NextCallWillFailProxy();
-                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -118,15 +127,17 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context);
         }
 
         protected virtual async Task TestContractStateFull_Destroy(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractStateFull>(context);
+
             try
             {
                 instance.Destroy();
-                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -134,6 +145,8 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context);
         }
     }
 }

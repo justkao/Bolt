@@ -50,10 +50,10 @@ namespace Bolt.Service.Test.Core
         {
             var parameters = await DataHandler.ReadParametersAsync<Bolt.Service.Test.Core.Parameters.SimpleMethodWithSimpleArgumentsParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
+
             try
             {
                 instance.SimpleMethodWithSimpleArguments(parameters.Val);
-                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -61,15 +61,17 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context);
         }
 
         protected virtual async Task TestContract_SimpleMethod(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
+
             try
             {
                 instance.SimpleMethod();
-                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -77,15 +79,17 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context);
         }
 
         protected virtual async Task TestContract_SimpleMethodExAsync(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
+
             try
             {
                 await instance.SimpleMethodExAsync();
-                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -93,15 +97,17 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context);
         }
 
         protected virtual async Task TestContract_SimpleMethodWithCancellation(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
+
             try
             {
                 instance.SimpleMethodWithCancellation(context.RequestAborted);
-                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -109,15 +115,18 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context);
         }
 
         protected virtual async Task TestContract_ComplexFunction(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
+            CompositeType result;
+
             try
             {
-                var result = instance.ComplexFunction();
-                await ResponseHandler.Handle(context, result);
+                result = instance.ComplexFunction();
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -125,16 +134,18 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context, result);
         }
 
         protected virtual async Task TestContractInner_SimpleMethodWithComplexParameter(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<Bolt.Service.Test.Core.Parameters.SimpleMethodWithComplexParameterParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
+
             try
             {
                 instance.SimpleMethodWithComplexParameter(parameters.CompositeType);
-                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -142,15 +153,18 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context);
         }
 
         protected virtual async Task TestContractInner_SimpleFunction(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
+            int result;
+
             try
             {
-                var result = instance.SimpleFunction();
-                await ResponseHandler.Handle(context, result);
+                result = instance.SimpleFunction();
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -158,15 +172,18 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context, result);
         }
 
         protected virtual async Task TestContractInner_FunctionReturningHugeData(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
+            List<CompositeType> result;
+
             try
             {
-                var result = instance.FunctionReturningHugeData();
-                await ResponseHandler.Handle(context, result);
+                result = instance.FunctionReturningHugeData();
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -174,16 +191,18 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context, result);
         }
 
         protected virtual async Task TestContractInner_MethodTakingHugeData(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<Bolt.Service.Test.Core.Parameters.MethodTakingHugeDataParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
+
             try
             {
                 instance.MethodTakingHugeData(parameters.Arg);
-                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -191,16 +210,18 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context);
         }
 
         protected virtual async Task TestContractInner_MethodWithNotSerializableType(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<Bolt.Service.Test.Core.Parameters.MethodWithNotSerializableTypeParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
+
             try
             {
                 instance.MethodWithNotSerializableType(parameters.Arg);
-                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -208,15 +229,18 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context);
         }
 
         protected virtual async Task TestContractInner_FunctionWithNotSerializableType(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
+            NotSerializableType result;
+
             try
             {
-                var result = instance.FunctionWithNotSerializableType();
-                await ResponseHandler.Handle(context, result);
+                result = instance.FunctionWithNotSerializableType();
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -224,15 +248,18 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context, result);
         }
 
         protected virtual async Task TestContractInner_SimpleAsyncFunction(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
+            int result;
+
             try
             {
-                var result = await instance.SimpleAsyncFunction();
-                await ResponseHandler.Handle(context, result);
+                result = await instance.SimpleAsyncFunction();
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -240,16 +267,18 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context, result);
         }
 
         protected virtual async Task TestContractInner_MethodWithManyArguments(Bolt.Server.ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<Bolt.Service.Test.Core.Parameters.MethodWithManyArgumentsParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContractInner>(context);
+
             try
             {
                 instance.MethodWithManyArguments(parameters.Arg1, parameters.Arg2, parameters.Time);
-                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -257,15 +286,17 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context);
         }
 
         protected virtual async Task ExcludedContract_ThisMethodShouldBeExcluded(Bolt.Server.ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<IExcludedContract>(context);
+
             try
             {
                 instance.ThisMethodShouldBeExcluded();
-                await ResponseHandler.Handle(context);
                 InstanceProvider.ReleaseInstance(context, instance, null);
             }
             catch (Exception e)
@@ -273,6 +304,8 @@ namespace Bolt.Service.Test.Core
                 InstanceProvider.ReleaseInstance(context, instance, e);
                 throw;
             }
+
+            await ResponseHandler.Handle(context);
         }
     }
 }
