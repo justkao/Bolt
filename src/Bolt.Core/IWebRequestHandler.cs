@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Bolt
 {
+    /// <summary>
+    /// Extensibility point for web request processing used to implement operations that are not supported by portable class library.
+    /// </summary>
     public interface IWebRequestHandler
     {
         Task<HttpWebResponse> GetResponseAsync(HttpWebRequest request, TimeSpan timeout, CancellationToken cancellation);

@@ -3,7 +3,7 @@
 namespace Bolt
 {
     /// <summary>
-    /// Indicates that error occured on server during deserialization of parameters.
+    /// Indicates that error occurred on server during deserialization of parameters.
     /// </summary>
     public class DeserializeParametersException : BoltSerializationException
     {

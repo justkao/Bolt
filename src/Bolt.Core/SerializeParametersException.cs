@@ -2,6 +2,9 @@
 
 namespace Bolt
 {
+    /// <summary>
+    /// Indicates that error occurred on client during serialization of request parameters.
+    /// </summary>
     public class SerializeParametersException : BoltSerializationException
     {
         public SerializeParametersException()
