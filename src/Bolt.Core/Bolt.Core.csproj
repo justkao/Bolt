@@ -58,7 +58,6 @@
     <Compile Include="Empty.cs" />
     <Compile Include="ActionDescriptor.cs" />
     <Compile Include="EndpointProvider.cs" />
-    <Compile Include="ErrorResponse.cs" />
     <Compile Include="ExceptionDescriptor.cs" />
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="ActionContextBase.cs" />

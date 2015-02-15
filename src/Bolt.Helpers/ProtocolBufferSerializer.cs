@@ -1,10 +1,19 @@
-﻿using System;
+﻿using ProtoBuf.Meta;
+using System;
 using System.IO;
 
 namespace Bolt.Helpers
 {
     public class ProtocolBufferSerializer : ISerializer
     {
+        private readonly RuntimeTypeModel _model;
+
+        public ProtocolBufferSerializer()
+        {
+            _model = TypeModel.Create();
+            _model.UseImplicitZeroDefaults = false;
+        }
+
         public virtual string ContentType
         {
             get { return "application/octet-stream"; }
@@ -17,7 +26,12 @@ namespace Bolt.Helpers
                 throw new ArgumentNullException("stream");
             }
 
-            ProtoBuf.Serializer.Serialize(stream, data);
+            if (Equals(data, null))
+            {
+                return;
+            }
+
+            _model.Serialize(stream, data);
         }
 
         public virtual T Read<T>(Stream stream)
@@ -32,7 +46,7 @@ namespace Bolt.Helpers
                 return default(T);
             }
 
-            return ProtoBuf.Serializer.Deserialize<T>(stream);
+            return (T)_model.Deserialize(stream, null, typeof(T));
         }
     }
 }

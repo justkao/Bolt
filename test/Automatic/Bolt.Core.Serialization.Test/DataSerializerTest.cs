@@ -50,7 +50,6 @@ namespace Bolt.Core.Serialization.Test
             MemoryStream stream = new MemoryStream();
             Serializer.Write(stream, obj);
             CompositeType deserialized = Serializer.Read<CompositeType>(new MemoryStream(stream.ToArray()));
-
             Assert.AreEqual(obj, deserialized);
         }
 
