@@ -40,7 +40,7 @@ namespace Bolt.Console
                     }
                 },
                 {
-                    "fromConfig=", "The path to configuration file.",
+                    "fromConfig=", "Generates Bolt code from configuration file.",
                     v =>
                     {
                         inputPath = v;
