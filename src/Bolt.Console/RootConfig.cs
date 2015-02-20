@@ -59,6 +59,12 @@ namespace Bolt.Console
                     Namespace = type.Namespace
                 };
 
+                c.Descriptor = new DescriptorConfig()
+                {
+                    Modifier = "public",
+                    Namespace = type.Namespace
+                };
+
                 root.Contracts.Add(c);
             }
 
@@ -149,7 +155,7 @@ namespace Bolt.Console
                     {
                         string prev = File.ReadAllText(documentGenerator.Key);
                         if (prev != result)
-                        {                            
+                        {
                             File.WriteAllText(documentGenerator.Key, result);
                             System.Console.WriteLine("Generated File: '{0}'", documentGenerator.Key);
                         }
