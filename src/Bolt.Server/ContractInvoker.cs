@@ -2,98 +2,63 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-#if OWIN
-using HttpContext = Microsoft.Owin.IOwinContext;
-#else
-using HttpContext = Microsoft.AspNet.Http.HttpContext;
-#endif
-
 namespace Bolt.Server
 {
-    public class ContractInvoker : IContractInvoker
+    public abstract class ContractInvoker : IContractInvoker
     {
         private readonly IDictionary<ActionDescriptor, ActionMetadata> _actions = new Dictionary<ActionDescriptor, ActionMetadata>();
 
-        public ContractInvoker(ContractDescriptor descriptor)
+        protected ContractInvoker(ContractDescriptor descriptor)
         {
             if (descriptor == null)
             {
-                throw new ArgumentNullException("descriptor");
+                throw new ArgumentNullException(nameof(descriptor));
             }
 
             Descriptor = descriptor;
         }
 
-        private IInstanceProvider _instanceProvider;
+        public ContractDescriptor Descriptor { get; set; }
 
-        private IResponseHandler _responseHandler;
+        public IInstanceProvider InstanceProvider { get; set; }
 
-        private IDataHandler _dataHandler;
+        public IDataHandler DataHandler { get; set; }
 
-        public IErrorHandler ErrorHandler { get; set; }
+        public IResponseHandler ResponseHandler { get; set; }
 
-        public ContractDescriptor Descriptor { get; protected set; }
-
-        public IInstanceProvider InstanceProvider
+        public virtual void Init(IBoltRouteHandler parent, IInstanceProvider instanceProvider)
         {
-            get
+            if (parent == null)
             {
-                if (_instanceProvider == null)
-                {
-                    throw new InvalidOperationException("Instance provider is not initialized.");
-                }
-
-                return _instanceProvider;
+                throw new ArgumentNullException(nameof(parent));
             }
 
-            set { _instanceProvider = value; }
-        }
-
-        public IDataHandler DataHandler
-        {
-            get
+            if (instanceProvider == null)
             {
-                if (_dataHandler == null)
-                {
-                    throw new InvalidOperationException("DataHandler is not initialized.");
-                }
-
-                return _dataHandler;
+                throw new ArgumentNullException(nameof(instanceProvider));
             }
 
-            set { _dataHandler = value; }
+            DataHandler = parent.DataHandler;
+            ResponseHandler = parent.ResponseHandler;
+            InstanceProvider = instanceProvider;
+
+            InitActions();
         }
 
-        public IResponseHandler ResponseHandler
-        {
-            get
-            {
-                if (_responseHandler == null)
-                {
-                    throw new InvalidOperationException("Response handler is not initialized.");
-                }
-
-                return _responseHandler;
-            }
-
-            set { _responseHandler = value; }
-        }
-
-        public void Init(ServerConfiguration configuration)
-        {
-            DataHandler = configuration.DataHandler;
-            ResponseHandler = configuration.ResponseHandler;
-            ErrorHandler = configuration.ErrorHandler;
-
-            Init();
-        }
-
-        public virtual void Init()
-        {
-        }
+        protected abstract void InitActions();
 
         protected virtual void AddAction(ActionDescriptor descriptor, Func<ServerActionContext, Task> action)
         {
+            if (descriptor == null)
+            {
+                throw new ArgumentNullException(nameof(descriptor));
+            }
+
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
             _actions[descriptor] = new ActionMetadata()
                                            {
                                                Descriptor = descriptor,
@@ -101,37 +66,22 @@ namespace Bolt.Server
                                            };
         }
 
-        public virtual async Task Execute(HttpContext context, ActionDescriptor action)
+        public virtual async Task Execute(ServerActionContext context)
         {
-            ActionMetadata metadata;
-            if (_actions.TryGetValue(action, out metadata))
+            if (context == null)
             {
-                ServerActionContext ctxt = new ServerActionContext(context, action);
+                throw new ArgumentNullException(nameof(context));
+            }
 
-                Exception error = null;
-                try
-                {
-                    await metadata.Action(ctxt);
-                }
-                catch (Exception e)
-                {
-                    error = e;
-                }
-
-                if (error != null)
-                {
-                    await ErrorHandler.HandleError(ctxt, error);
-                }
+            ActionMetadata metadata;
+            if (_actions.TryGetValue(context.Action, out metadata))
+            {
+                await metadata.Action(context);
             }
             else
             {
-                HandleActionNotImplemented(context);
+                throw new BoltServerException(ServerErrorCode.ActionNotImplemented, context.Action, context.Context.Request.Path.ToString());
             }
-        }
-
-        protected virtual void HandleActionNotImplemented(HttpContext context)
-        {
-            ErrorHandler.HandleBoltError(context, ServerErrorCode.ActionNotImplemented);
         }
 
         private class ActionMetadata

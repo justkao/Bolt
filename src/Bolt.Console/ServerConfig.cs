@@ -8,8 +8,6 @@ namespace Bolt.Console
 
         public string GeneratorEx { get; set; }
 
-        public bool UseAsp { get; set; }
-
         public bool Descriptor { get; set; }
 
         protected internal override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
@@ -25,8 +23,7 @@ namespace Bolt.Console
                                                       Namespace = Namespace,
                                                       Name = Name,
                                                       StateFullInstanceProviderBase = StateFullBase,
-                                                      Modifier = GetModifier(),
-                                                      UseAsp = UseAsp
+                                                      Modifier = GetModifier()
                                                   };
 
             if (!string.IsNullOrEmpty(Suffix))

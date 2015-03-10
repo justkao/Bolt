@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace Bolt.Server
@@ -12,7 +11,7 @@ namespace Bolt.Server
         {
             if (dataHandler == null)
             {
-                throw new ArgumentNullException("dataHandler");
+                throw new ArgumentNullException(nameof(dataHandler));
             }
 
             _dataHandler = dataHandler;

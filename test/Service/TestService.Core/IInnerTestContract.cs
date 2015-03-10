@@ -1,6 +1,6 @@
-﻿using Bolt;
-using System.ServiceModel;
+﻿using System.ServiceModel;
 using System.Threading.Tasks;
+using Bolt;
 
 namespace TestService.Core
 {

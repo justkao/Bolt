@@ -71,7 +71,7 @@ namespace Bolt.Generators
             foreach (MethodInfo method in methods)
             {
                 MethodDescriptor methodDescriptor = MetadataProvider.GetMethodDescriptor(ContractDefinition, method);
-                g.WritePublicReadonlyProperty(FormatType<ActionDescriptor>(), methodDescriptor.Name, false);
+                g.WritePublicReadonlyProperty(BoltConstants.ActionDescriptor, methodDescriptor.Name, false);
                 if (!Equals(method, methods.Last()))
                 {
                     WriteLine();
@@ -82,7 +82,7 @@ namespace Bolt.Generators
         protected override ClassDescriptor CreateDefaultDescriptor()
         {
             ClassDescriptor descriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
-            descriptor.BaseClasses = new[] { FormatType<ContractDescriptor>() };
+            descriptor.BaseClasses = new[] { BoltConstants.ContractDescriptor };
             return descriptor;
         }
     }

@@ -102,10 +102,6 @@
       <Project>{c8d9762e-4b32-4711-bf3c-eb4ea485743f}</Project>
       <Name>Bolt.Server</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Bolt.Core\Bolt.Core.csproj">
-      <Project>{6d1f7d95-3346-4308-8b6f-2b5aab0d022f}</Project>
-      <Name>Bolt.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\TestService.Core\TestService.Core.csproj">
       <Project>{9975CC72-8C2F-4515-B93D-A6A58324087C}</Project>
       <Name>TestService.Core</Name>

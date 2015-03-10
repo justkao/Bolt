@@ -5,25 +5,16 @@ namespace Bolt.Client
     /// <summary>
     /// The Bolt configuration of the client. 
     /// </summary>
-    public class ClientConfiguration : Configuration
+    public class ClientConfiguration : BoltOptions
     {
         public ClientConfiguration()
         {
-            IWebRequestHandler requestHandler = new DefaultWebRequestHandler();
-            DataHandler = new DataHandler(Serializer, ExceptionSerializer, requestHandler);
-            RequestForwarder = new RequestForwarder(DataHandler, requestHandler, new ServerErrorProvider(ServerErrorCodesHeader));
-        }
-
-        public ClientConfiguration(ISerializer serializer, IExceptionSerializer exceptionSerializer, IWebRequestHandler webRequestHandler = null)
-            : base(serializer, exceptionSerializer)
-        {
-            if (webRequestHandler == null)
-            {
-                webRequestHandler = new DefaultWebRequestHandler();
-            }
-
-            DataHandler = new DataHandler(serializer, ExceptionSerializer, webRequestHandler);
-            RequestForwarder = new RequestForwarder(DataHandler, webRequestHandler, new ServerErrorProvider(ServerErrorCodesHeader));
+            RequestHandler = new WebRequestHandler();
+            Serializer = new JsonSerializer();
+            ExceptionSerializer = new JsonExceptionSerializer(Serializer);
+            DataHandler = new DataHandler(Serializer, ExceptionSerializer, RequestHandler);
+            RequestForwarder = new RequestForwarder(DataHandler, RequestHandler, new ServerErrorProvider(ServerErrorCodesHeader));
+            EndpointProvider = new EndpointProvider();
         }
 
         /// <summary>
@@ -40,5 +31,25 @@ namespace Bolt.Client
         /// Gets or sets the default response timeout.
         /// </summary>
         public TimeSpan DefaultResponseTimeout { get; set; }
+
+        /// <summary>
+        /// Gets or sets the serializer.
+        /// </summary>
+        public ISerializer Serializer { get; set; }
+
+        /// <summary>
+        /// Gets or sets the exception serializer.
+        /// </summary>
+        public IExceptionSerializer ExceptionSerializer { get; set; }
+
+        /// <summary>
+        /// Gets or sets the exception serializer.
+        /// </summary>
+        public IWebRequestHandler RequestHandler { get; set; }
+
+        /// <summary>
+        /// Gets or sets the endpoint provider.
+        /// </summary>
+        public IEndpointProvider EndpointProvider{ get; set; }
     }
 }

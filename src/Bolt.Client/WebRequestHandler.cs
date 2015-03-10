@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Bolt
 {
-    public class DefaultWebRequestHandler : IWebRequestHandler
+    public class WebRequestHandler : IWebRequestHandler
     {
         [DebuggerStepThrough]
         public virtual async Task<HttpWebResponse> GetResponseAsync(HttpWebRequest request, TimeSpan timeout, CancellationToken cancellation)
@@ -96,19 +96,53 @@ namespace Bolt
         [DebuggerStepThrough]
         public virtual Stream GetRequestStream(HttpWebRequest response)
         {
-            return TaskExtensions.Execute(response.GetRequestStreamAsync);
+            return response.GetRequestStream();
         }
 
         [DebuggerStepThrough]
         protected virtual WebResponse GetResponseCore(HttpWebRequest webRequest, TimeSpan timeout)
         {
-            return TaskExtensions.Execute(() => GetResponseCoreAsync(webRequest, timeout));
+            if (timeout != TimeSpan.Zero)
+            {
+                webRequest.Timeout = (int)timeout.TotalMilliseconds;
+            }
+
+            try
+            {
+                return webRequest.GetResponse();
+            }
+            catch (WebException e)
+            {
+                if (e.Status == WebExceptionStatus.Timeout)
+                {
+                    throw new TimeoutException();
+                }
+
+                throw;
+            }
         }
 
         [DebuggerStepThrough]
-        protected virtual Task<WebResponse> GetResponseCoreAsync(HttpWebRequest webRequest, TimeSpan timeout)
+        protected virtual async Task<WebResponse> GetResponseCoreAsync(HttpWebRequest webRequest, TimeSpan timeout)
         {
-            return webRequest.GetResponseAsync();
+            if (timeout != TimeSpan.Zero)
+            {
+                webRequest.Timeout = (int)timeout.TotalMilliseconds;
+            }
+
+            try
+            {
+                return await webRequest.GetResponseAsync();
+            }
+            catch (WebException e)
+            {
+                if (e.Status == WebExceptionStatus.Timeout)
+                {
+                    throw new TimeoutException();
+                }
+
+                throw;
+            }
         }
     }
 }

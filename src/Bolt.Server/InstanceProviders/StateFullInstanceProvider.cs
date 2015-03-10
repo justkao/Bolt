@@ -10,28 +10,29 @@ namespace Bolt.Server
     {
         private readonly ActionDescriptor _initInstanceAction;
         private readonly ActionDescriptor _releaseInstanceAction;
+        private readonly BoltServerOptions _options;
+
         private readonly ConcurrentDictionary<string, InstanceMetadata> _instances = new ConcurrentDictionary<string, InstanceMetadata>();
         private readonly Timer _timer;
 
-        public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader, TimeSpan instanceTimeout)
+        public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, BoltServerOptions options)
         {
             if (initInstanceAction == null)
             {
-                throw new ArgumentNullException("initInstanceAction");
+                throw new ArgumentNullException(nameof(initInstanceAction));
             }
 
             if (releaseInstanceAction == null)
             {
-                throw new ArgumentNullException("releaseInstanceAction");
+                throw new ArgumentNullException(nameof(releaseInstanceAction));
             }
 
-            if (string.IsNullOrEmpty(sessionHeader))
+            if (options == null)
             {
-                throw new ArgumentNullException("sessionHeader");
+                throw new ArgumentNullException(nameof(options));
             }
 
-            SessionHeader = sessionHeader;
-            InstanceTimeout = instanceTimeout;
+            _options = options;
             _initInstanceAction = initInstanceAction;
             _releaseInstanceAction = releaseInstanceAction;
 
@@ -50,9 +51,9 @@ namespace Bolt.Server
             get { return _instances.Count; }
         }
 
-        public string SessionHeader { get; private set; }
+        public string SessionHeader =>_options.SessionHeader;
 
-        public TimeSpan InstanceTimeout { get; private set; }
+        public TimeSpan InstanceTimeout => _options.SessionTimeout;
 
         public override TInstance GetInstance<TInstance>(ServerActionContext context)
         {

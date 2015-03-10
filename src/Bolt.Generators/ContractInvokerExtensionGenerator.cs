@@ -19,18 +19,9 @@ namespace Bolt.Generators
 
         public IUserCodeGenerator UserGenerator { get; set; }
 
-        public bool UseAsp { get; set; }
-
         public override void Generate(object context)
         {
-            if (UseAsp)
-            {
-                AddUsings(ServerGenerator.BoltServerNamespace, "Microsoft.AspNet.Builder");
-            }
-            else
-            {
-                AddUsings(ServerGenerator.BoltServerNamespace, "Owin");
-            }
+            AddUsings(BoltConstants.BoltServerNamespace);
 
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
             generator.Modifier = Modifier + " static";
@@ -44,27 +35,27 @@ namespace Bolt.Generators
         private void GenerateBody(ClassGenerator g)
         {
             WriteLine(
-                "public static IContractInvoker Use{0}(this {2} app, {1} instance, ServerConfiguration configuration = null)",
+                "public static IContractInvoker Use{0}(this {2} bolt, {1} instance)",
                 ContractDefinition.Name,
                 ContractDefinition.Root.FullName,
-                AppBuilderName);
+                BoltRouteHandler);
             using (WithBlock())
             {
                 WriteLine(
-                    "return app.Use{0}(new StaticInstanceProvider(instance), configuration);",
+                    "return bolt.Use{0}(new StaticInstanceProvider(instance));",
                     ContractDefinition.Name);
             }
             WriteLine();
 
             WriteLine(
-                "public static IContractInvoker Use{0}<TImplementation>(this {2} app, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
+                "public static IContractInvoker Use{0}<TImplementation>(this {2} bolt) where TImplementation: {1}, new()",
                 ContractDefinition.Name,
                 ContractDefinition.Root.FullName,
-                AppBuilderName);
+                BoltRouteHandler);
             using (WithBlock())
             {
                 WriteLine(
-                    "return app.Use{0}(new InstanceProvider<TImplementation>(), configuration);",
+                    "return bolt.Use{0}(new InstanceProvider<TImplementation>());",
                     ContractDefinition.Name);
             }
             WriteLine();
@@ -74,10 +65,11 @@ namespace Bolt.Generators
             if (initSession != null && closeSession != null)
             {
                 WriteLine(
-                    "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} app, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
+                    "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} bolt, {3} options = null) where TImplementation: {1}, new()",
                     ContractDefinition.Name,
                     ContractDefinition.Root.FullName,
-                    AppBuilderName);
+                    BoltRouteHandler, 
+                    BoltConstants.BoltServerOptions);
                 using (WithBlock())
                 {
                     WriteLine(
@@ -89,7 +81,7 @@ namespace Bolt.Generators
                         MetadataProvider.GetContractDescriptor(ContractDefinition).Name,
                         MetadataProvider.GetMethodDescriptor(ContractDefinition, closeSession).Name);
                     WriteLine(
-                        "return app.Use{0}(new {1}<TImplementation>(initSessionAction, closeSessionAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime), configuration);",
+                        "return bolt.Use{0}(new {1}<TImplementation>(initSessionAction, closeSessionAction, options ?? bolt.Options));",
                         ContractDefinition.Name,
                         StateFullInstanceProviderBase);
                 }
@@ -97,14 +89,15 @@ namespace Bolt.Generators
             }
 
             WriteLine(
-                "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: {1}, new()",
+                "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, {3} options = null) where TImplementation: {1}, new()",
                 ContractDefinition.Name,
                 ContractDefinition.Root.FullName,
-                AppBuilderName);
+                BoltRouteHandler, 
+                BoltConstants.BoltServerOptions);
             using (WithBlock())
             {
                 WriteLine(
-                    "return app.Use{0}(new {1}<TImplementation>(initInstanceAction, releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime), configuration);",
+                    "return bolt.Use{0}(new {1}<TImplementation>(initInstanceAction, releaseInstanceAction, options ?? bolt.Options));",
                     ContractDefinition.Name,
                     StateFullInstanceProviderBase);
             }
@@ -112,16 +105,14 @@ namespace Bolt.Generators
             WriteLine();
 
             WriteLine(
-                "public static IContractInvoker Use{0}(this {1} app, IInstanceProvider instanceProvider, ServerConfiguration configuration = null)",
+                "public static IContractInvoker Use{0}(this {1} bolt, IInstanceProvider instanceProvider)",
                 ContractDefinition.Name,
-                AppBuilderName);
+                BoltRouteHandler);
             using (WithBlock())
             {
-                WriteLine("var boltExecutor = app.GetBolt();");
                 WriteLine("var invoker = new {0}();", ContractInvoker.FullName);
-                WriteLine("invoker.Init(configuration ?? boltExecutor.Configuration);");
-                WriteLine("invoker.InstanceProvider = instanceProvider;");
-                WriteLine("boltExecutor.Add(invoker);");
+                WriteLine("invoker.Init(bolt, instanceProvider);");
+                WriteLine("bolt.Add(invoker);");
                 WriteLine();
                 WriteLine("return invoker;");
             }
@@ -129,19 +120,14 @@ namespace Bolt.Generators
 
         protected override ClassDescriptor CreateDefaultDescriptor()
         {
-            return new ClassDescriptor(ContractInvoker.Name + "Extensions", ServerGenerator.BoltServerNamespace);
+            return new ClassDescriptor(ContractInvoker.Name + "Extensions", BoltConstants.BoltServerNamespace);
         }
 
-        private string AppBuilderName
+        private string BoltRouteHandler
         {
             get
             {
-                if (UseAsp)
-                {
-                    return "IApplicationBuilder";
-                }
-
-                return "IAppBuilder";
+                return BoltConstants.BoltRouteHandler;
             }
         }
     }

@@ -1,35 +1,33 @@
+using Microsoft.AspNet.Http;
+using Microsoft.Framework.OptionsModel;
 using System;
 using System.Globalization;
 using System.Net;
 using System.Threading.Tasks;
 
-#if OWIN
-using HttpContext = Microsoft.Owin.IOwinContext;
-#else
-using HttpContext = Microsoft.AspNet.Http.HttpContext;
-#endif
 
 namespace Bolt.Server
 {
     public class ErrorHandler : IErrorHandler
     {
         private readonly IDataHandler _dataHandler;
-        private readonly string _errorCodesHeader;
 
-        public ErrorHandler(IDataHandler dataHandler, string errorCodesHeader)
+        private readonly BoltServerOptions _options;
+
+        public ErrorHandler(IDataHandler dataHandler, IOptions<BoltServerOptions> serverOptions)
         {
             if (dataHandler == null)
             {
-                throw new ArgumentNullException("dataHandler");
+                throw new ArgumentNullException(nameof(dataHandler));
             }
 
-            if (string.IsNullOrEmpty(errorCodesHeader))
+            if (serverOptions == null)
             {
-                throw new ArgumentNullException("errorCodesHeader");
+                throw new ArgumentNullException(nameof(serverOptions));
             }
 
             _dataHandler = dataHandler;
-            _errorCodesHeader = errorCodesHeader;
+            _options = serverOptions.Options;
         }
 
         public bool HandleBoltError(HttpContext context, ServerErrorCode code)
@@ -73,14 +71,14 @@ namespace Bolt.Server
         protected virtual void CloseWithError(HttpContext context, ServerErrorCode code)
         {
             context.Response.StatusCode = 500;
-            context.Response.Headers[_errorCodesHeader] = code.ToString();
+            context.Response.Headers[_options.ServerErrorCodesHeader] = code.ToString();
             context.Response.Body.Dispose();
         }
 
         protected virtual void CloseWithError(HttpContext context, int code)
         {
             context.Response.StatusCode = 500;
-            context.Response.Headers[_errorCodesHeader] = code.ToString(CultureInfo.InvariantCulture);
+            context.Response.Headers[_options.ServerErrorCodesHeader] = code.ToString(CultureInfo.InvariantCulture);
             context.Response.Body.Dispose();
         }
     }

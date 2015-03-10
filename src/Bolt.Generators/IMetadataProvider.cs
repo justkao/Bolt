@@ -27,7 +27,7 @@ namespace Bolt.Generators
         {
             if (contract.ParametersBase == null && method.GetParameters().Count(m => m.ParameterType != typeof(CancellationToken)) == 0)
             {
-                return new ClassDescriptor(typeof(Empty));
+                return new ClassDescriptor(BoltConstants.EmptyName, BoltConstants.EmptyNamespace);
             }
 
             string ns = method.DeclaringType.Namespace + ".Parameters";

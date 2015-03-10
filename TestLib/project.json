@@ -1,0 +1,19 @@
+﻿{
+    "version": "1.0.0-*",
+    "dependencies": {
+    },
+
+    "frameworks" : {
+        "aspnet50" : { 
+            "dependencies": {
+            }
+        },
+        "aspnetcore50" : { 
+            "dependencies": {
+                "System.Runtime": "4.0.20-beta-22523",
+                "System.Xml.XmlSerializer": "4.0.10-beta-22605",
+                "System.Threading.Tasks": "4.0.10-beta-22605"
+            }
+        }
+    }
+}

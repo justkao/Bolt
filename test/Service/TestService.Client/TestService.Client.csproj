@@ -35,11 +35,22 @@
     <StartupObject />
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Bolt.Client, Version=0.10.0.0, Culture=neutral, PublicKeyToken=91c622221105d1b2, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\src\artifacts\bin\Bolt.Client\Debug\aspnet50\Bolt.Client.dll</HintPath>
+    </Reference>
+    <Reference Include="Bolt.Core, Version=0.10.0.0, Culture=neutral, PublicKeyToken=91c622221105d1b2, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\src\artifacts\bin\Bolt.Core\Debug\aspnet50\Bolt.Core.dll</HintPath>
+    </Reference>
     <Reference Include="EntityFramework">
       <HintPath>..\..\..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.dll</HintPath>
     </Reference>
     <Reference Include="EntityFramework.SqlServer">
       <HintPath>..\..\..\packages\EntityFramework.6.1.2\lib\net45\EntityFramework.SqlServer.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Framework.Logging.Interfaces">
+      <HintPath>..\..\..\packages\Microsoft.Framework.Logging.Interfaces.1.0.0-beta2\lib\net45\Microsoft.Framework.Logging.Interfaces.dll</HintPath>
     </Reference>
     <Reference Include="protobuf-net">
       <HintPath>..\..\..\packages\protobuf-net.2.0.0.668\lib\net40\protobuf-net.dll</HintPath>
@@ -73,18 +84,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Bolt.Client\Bolt.Client.csproj">
-      <Project>{65a1f42f-de09-415a-8a68-65e017fe63a8}</Project>
-      <Name>Bolt.Client</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Bolt.Core\Bolt.Core.csproj">
-      <Project>{6d1f7d95-3346-4308-8b6f-2b5aab0d022f}</Project>
-      <Name>Bolt.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Bolt.Helpers\Bolt.Helpers.csproj">
-      <Project>{b0b083fd-a0a9-4709-8e14-5892b6f41846}</Project>
-      <Name>Bolt.Helpers</Name>
-    </ProjectReference>
     <ProjectReference Include="..\TestService.Core\TestService.Core.csproj">
       <Project>{9975cc72-8c2f-4515-b93d-a6a58324087c}</Project>
       <Name>TestService.Core</Name>

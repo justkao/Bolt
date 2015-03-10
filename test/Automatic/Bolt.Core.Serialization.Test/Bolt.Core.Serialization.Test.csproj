@@ -62,10 +62,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Bolt.Core\Bolt.Core.csproj">
-      <Project>{6d1f7d95-3346-4308-8b6f-2b5aab0d022f}</Project>
-      <Name>Bolt.Core</Name>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\src\Bolt.Helpers\Bolt.Helpers.csproj">
       <Project>{b0b083fd-a0a9-4709-8e14-5892b6f41846}</Project>
       <Name>Bolt.Helpers</Name>

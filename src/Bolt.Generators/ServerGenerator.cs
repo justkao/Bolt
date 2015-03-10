@@ -5,14 +5,10 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-
 namespace Bolt.Generators
 {
     public class ServerGenerator : ContractGeneratorBase
     {
-        private const string InvokerName = "ContractInvoker";
-        private const string ServerExecutionContext = "Bolt.Server.ServerActionContext";
-        public const string BoltServerNamespace = "Bolt.Server";
         private string _baseClass;
 
         public ServerGenerator()
@@ -31,15 +27,13 @@ namespace Bolt.Generators
 
         public string ContractDescriptorPropertyName { get; set; }
 
-        public bool UseAsp { get; set; }
-
         public string BaseClass
         {
             get
             {
                 if (_baseClass == null)
                 {
-                    return string.Format("{0}.{1}<{2}>", BoltServerNamespace, InvokerName, MetadataProvider.GetContractDescriptor(ContractDefinition).FullName);
+                    return string.Format("{0}.{1}<{2}>", BoltConstants.BoltServerNamespace, BoltConstants.InvokerName, MetadataProvider.GetContractDescriptor(ContractDefinition).FullName);
                 }
 
                 return _baseClass;
@@ -67,7 +61,7 @@ namespace Bolt.Generators
 
         public override void Generate(object context)
         {
-            AddUsings(BoltServerNamespace);
+            AddUsings(BoltConstants.BoltServerNamespace);
 
             ClassGenerator classGenerator = CreateClassGenerator(ContractDescriptor);
             classGenerator.Modifier = Modifier;
@@ -76,7 +70,6 @@ namespace Bolt.Generators
             classGenerator.Generate(context);
 
             ContractInvokerExtensionGenerator generator = CreateEx<ContractInvokerExtensionGenerator>();
-            generator.UseAsp = UseAsp;
             generator.UserGenerator = ExtensionCodeGenerator;
             generator.Modifier = Modifier;
             if (StateFullInstanceProviderBase != null)
@@ -94,13 +87,13 @@ namespace Bolt.Generators
 
         private void WriteInvocationMethod(MethodDescriptor methodDescriptor, ClassGenerator classGenerator)
         {
-            string declaration = string.Format("{2} {0}({1} context)", FormatMethodName(methodDescriptor.Method), ServerExecutionContext, FormatType<Task>());
+            string declaration = string.Format("{2} {0}({1} context)", FormatMethodName(methodDescriptor.Method), BoltConstants.ServerExecutionContext, FormatType<Task>());
             classGenerator.WriteMethod(declaration, g => WriteInvocationMethodBody(methodDescriptor), "protected virtual async");
         }
 
         private void GenerateInvocatorBody(ClassGenerator g)
         {
-            g.WriteLine("public override void Init()");
+            g.WriteLine("protected override void InitActions()");
             using (WithBlock())
             {
                 foreach (MethodInfo method in ContractDefinition.GetEffectiveMethods())
@@ -111,9 +104,6 @@ namespace Bolt.Generators
                         MetadataProvider.GetMethodDescriptor(ContractDefinition, method).Name,
                         FormatMethodName(method));
                 }
-
-                WriteLine();
-                WriteLine("base.Init();");
             }
             WriteLine();
 

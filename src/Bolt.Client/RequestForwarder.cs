@@ -23,7 +23,7 @@ namespace Bolt.Client
 
             _dataHandler = dataHandler;
             _serverErrorProvider = serverErrorProvider;
-            _webRequestHandler = webRequestHandler ?? new DefaultWebRequestHandler();
+            _webRequestHandler = webRequestHandler ?? new WebRequestHandler();
         }
 
         public virtual ResponseDescriptor<T> GetResponse<T, TParameters>(ClientActionContext context, TParameters parameters)

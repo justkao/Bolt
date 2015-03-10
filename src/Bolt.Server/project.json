@@ -1,3 +1,44 @@
 ﻿{
-    "shared": "**\\*.cs"
+    "version": "1.0.0-*",
+    "dependencies": {
+        "Newtonsoft.Json": "6.0.7",
+        "Microsoft.Framework.Logging.Interfaces": "1.0.0-beta3",
+        "Microsoft.Framework.DependencyInjection": "1.0.0-beta3",
+        "Microsoft.Framework.ConfigurationModel": "1.0.0-beta3",
+        "Microsoft.AspNet.Http": "1.0.0-beta3",
+        "Microsoft.Framework.OptionsModel": "1.0.0-beta3",
+        "Microsoft.AspNet.Routing": "1.0.0-beta3",
+        "Bolt.Core": "1.0.0-*"
+    },
+    "frameworks": {
+        "aspnet50": {
+            "frameworkAssemblies": {
+                "System.Runtime": "",
+                "System.Collections": "",
+                "System.Runtime.Serialization": "",
+                "System.Xml": "",
+                "System.Net": "",
+                "System.Net.Http": ""
+            },
+            "dependencies": {
+            }
+        },
+        "aspnetcore50": {
+            "dependencies": {
+                "System.Runtime": "4.0.20-beta-22523",
+                "System.Xml.XmlSerializer": "4.0.10-beta-22605",
+                "System.Collections": "4.0.10-beta-22605",
+                "System.Linq": "4.0.0-beta-22605",
+                "System.Threading.Tasks": "4.0.10-beta-22605",
+                "System.Threading.Timer": "4.0.0-beta-22605",
+                "System.Net.Http": "4.0.0-beta-22605",
+                "System.Reflection": "4.0.10-beta-22605",
+                "System.Runtime.Serialization.Primitives": "4.0.0-beta-22605",
+                "System.Diagnostics.Debug": "4.0.10-beta-22605",
+                "System.Threading": "4.0.10-beta-22605",
+                "System.Net.Primitives": "4.0.10-beta-22605",
+                "System.Runtime.Serialization.Xml": "4.0.10-beta-22605"
+            }
+        }
+    }
 }

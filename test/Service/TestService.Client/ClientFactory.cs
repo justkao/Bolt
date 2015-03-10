@@ -1,22 +1,12 @@
-﻿using Bolt;
-using Bolt.Client;
-
-using System;
-using System.Runtime.Serialization;
+﻿using Bolt.Client;
 using System.ServiceModel;
-
-using Bolt.Helpers;
-
 using TestService.Core;
 
 namespace TestService.Client
 {
     public class ClientFactory
     {
-        public static readonly ClientConfiguration Config = new ClientConfiguration(
-            new XmlSerializer(),
-            new JsonExceptionSerializer(new XmlSerializer()),
-            new DefaultWebRequestHandlerEx());
+        public static readonly ClientConfiguration Config = new ClientConfiguration();
 
         public static ITestContract CreateIISBolt()
         {

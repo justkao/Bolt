@@ -44,8 +44,10 @@
     <Compile Include="..\Bolt.Core\Properties\SharedAssemblyInfo.cs">
       <Link>SharedAssemblyInfo.cs</Link>
     </Compile>
+    <Compile Include="BoltConstants.cs" />
     <Compile Include="ClassDescriptor.cs" />
     <Compile Include="ClassGenerator.cs" />
+    <Compile Include="CollectionExtensions.cs" />
     <Compile Include="ContractDefinition.cs" />
     <Compile Include="ContractInvokerExtensionGenerator.cs" />
     <Compile Include="EasyDispose.cs" />
@@ -65,12 +67,6 @@
     <Compile Include="ServerGenerator.cs" />
     <Compile Include="TypeFormatter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Bolt.Core\Bolt.Core.csproj">
-      <Project>{6D1F7D95-3346-4308-8B6F-2B5AAB0D022F}</Project>
-      <Name>Bolt.Core</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

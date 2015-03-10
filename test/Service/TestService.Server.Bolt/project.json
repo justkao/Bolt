@@ -1,0 +1,25 @@
+﻿{
+    "webroot": "wwwroot",
+    "version": "1.0.0-*",
+    "dependencies": {
+        "Microsoft.AspNet.Server.IIS": "1.0.0-beta3",
+        "Bolt.Server": "1.0.0-*",
+        "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-beta3"
+    },
+    "code": [
+        "*.cs",
+        "../TestService.Core/Generated/TestContract.Contract.Designer.cs",
+        "../TestService.Core/Generated/TestContract.Server.Designer.cs",
+        "../TestService.Core/ITestContract.cs",
+        "../TestService.Core/IInnerTestContract.cs",
+        "../TestService.Core/Person.cs",
+        "../TestService.Core/TestContractImplementation.cs" 
+    ],
+    "frameworks": {
+        "aspnet50": {
+            "frameworkAssemblies": {
+                "System.ServiceModel": "" 
+            }
+        }
+    }
+}

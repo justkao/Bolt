@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Threading;
-
-#if OWIN
-using HttpContext = Microsoft.Owin.IOwinContext;
-#else
-using HttpContext = Microsoft.AspNet.Http.HttpContext;
-#endif
+using Microsoft.AspNet.Http;
 
 namespace Bolt.Server
 {
@@ -16,24 +11,14 @@ namespace Bolt.Server
         {
             if (context == null)
             {
-                throw new ArgumentNullException("context");
+                throw new ArgumentNullException(nameof(context));
             }
 
             Context = context;
         }
 
-        public HttpContext Context { get; private set; }
+        public HttpContext Context { get; }
 
-        public CancellationToken RequestAborted
-        {
-            get
-            {
-#if OWIN
-                return Context.Request.CallCancelled;
-#else
-                return Context.RequestAborted;
-#endif
-            }
-        }
+        public CancellationToken RequestAborted => Context.RequestAborted;
     }
 }

@@ -13,22 +13,19 @@ namespace Bolt.Server
         {
             if (serializer == null)
             {
-                throw new ArgumentNullException("serializer");
+                throw new ArgumentNullException(nameof(serializer));
             }
 
             if (exceptionSerializer == null)
             {
-                throw new ArgumentNullException("exceptionSerializer");
+                throw new ArgumentNullException(nameof(exceptionSerializer));
             }
 
             _serializer = serializer;
             _exceptionSerializer = exceptionSerializer;
         }
 
-        public virtual string ContentType
-        {
-            get { return _serializer.ContentType; }
-        }
+        public virtual string ContentType => _serializer.ContentType;
 
         public virtual async Task<T> ReadParametersAsync<T>(ServerActionContext context)
         {

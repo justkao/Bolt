@@ -15,7 +15,6 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Bolt.Server;
-using Owin;
 using TestService.Core;
 using TestService.Core.Parameters;
 
@@ -24,7 +23,7 @@ namespace TestService.Core
 {
     public partial class TestContractInvoker : Bolt.Server.ContractInvoker<TestService.Core.TestContractDescriptor>
     {
-        public override void Init()
+        protected override void InitActions()
         {
             AddAction(Descriptor.UpdatePerson, TestContract_UpdatePerson);
             AddAction(Descriptor.UpdatePersonThatThrowsInvalidOperationException, TestContract_UpdatePersonThatThrowsInvalidOperationException);
@@ -44,8 +43,6 @@ namespace TestService.Core
             AddAction(Descriptor.InnerOperationExAsync, InnerTestContract_InnerOperationExAsync);
             AddAction(Descriptor.InnerOperation2, InnerTestContract2_InnerOperation2);
             AddAction(Descriptor.InnerOperationExAsync2, InnerTestContract2_InnerOperationExAsync2);
-
-            base.Init();
         }
 
         protected virtual async Task TestContract_UpdatePerson(Bolt.Server.ServerActionContext context)
@@ -394,28 +391,26 @@ namespace Bolt.Server
 {
     public static partial class TestContractInvokerExtensions
     {
-        public static IContractInvoker UseTestContract(this IAppBuilder app, TestService.Core.ITestContract instance, ServerConfiguration configuration = null)
+        public static IContractInvoker UseTestContract(this Bolt.Server.IBoltRouteHandler bolt, TestService.Core.ITestContract instance)
         {
-            return app.UseTestContract(new StaticInstanceProvider(instance), configuration);
+            return bolt.UseTestContract(new StaticInstanceProvider(instance));
         }
 
-        public static IContractInvoker UseTestContract<TImplementation>(this IAppBuilder app, ServerConfiguration configuration = null) where TImplementation: TestService.Core.ITestContract, new()
+        public static IContractInvoker UseTestContract<TImplementation>(this Bolt.Server.IBoltRouteHandler bolt) where TImplementation: TestService.Core.ITestContract, new()
         {
-            return app.UseTestContract(new InstanceProvider<TImplementation>(), configuration);
+            return bolt.UseTestContract(new InstanceProvider<TImplementation>());
         }
 
-        public static IContractInvoker UseStateFullTestContract<TImplementation>(this IAppBuilder app, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, string sessionHeader = null, TimeSpan? sessionTimeout = null, ServerConfiguration configuration = null) where TImplementation: TestService.Core.ITestContract, new()
+        public static IContractInvoker UseStateFullTestContract<TImplementation>(this Bolt.Server.IBoltRouteHandler bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, Bolt.Server.BoltServerOptions options = null) where TImplementation: TestService.Core.ITestContract, new()
         {
-            return app.UseTestContract(new StateFullInstanceProvider<TImplementation>(initInstanceAction, releaseInstanceAction, sessionHeader ?? app.GetBolt().Configuration.SessionHeader, sessionTimeout ?? app.GetBolt().Configuration.StateFullInstanceLifetime), configuration);
+            return bolt.UseTestContract(new StateFullInstanceProvider<TImplementation>(initInstanceAction, releaseInstanceAction, options ?? bolt.Options));
         }
 
-        public static IContractInvoker UseTestContract(this IAppBuilder app, IInstanceProvider instanceProvider, ServerConfiguration configuration = null)
+        public static IContractInvoker UseTestContract(this Bolt.Server.IBoltRouteHandler bolt, IInstanceProvider instanceProvider)
         {
-            var boltExecutor = app.GetBolt();
             var invoker = new TestService.Core.TestContractInvoker();
-            invoker.Init(configuration ?? boltExecutor.Configuration);
-            invoker.InstanceProvider = instanceProvider;
-            boltExecutor.Add(invoker);
+            invoker.Init(bolt, instanceProvider);
+            bolt.Add(invoker);
 
             return invoker;
         }

@@ -1,9 +1,9 @@
 namespace Bolt.Server
 {
-    public class ContractInvoker<T> : ContractInvoker
+    public abstract class ContractInvoker<T> : ContractInvoker
         where T : ContractDescriptor
     {
-        public ContractInvoker()
+        protected ContractInvoker()
             : base(ContractDescriptor<T>.Instance)
         {
         }

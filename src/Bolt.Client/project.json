@@ -1,0 +1,22 @@
+﻿{
+    "version": "1.0.0-*",
+    "authors": [ "Martin Tomka" ],
+    "description": "Bolt Core library containing common classes and helpers shared by client and server.",
+    "frameworks": {
+        "aspnet50": {
+            "frameworkAssemblies": {
+                "System.Runtime": "",
+                "System.Collections": "",
+                "System.Runtime.Serialization": "",
+                "System.Xml": "",
+                "System.Net": "",
+                "System.Net.Http": ""
+            },
+            "dependencies": {
+            }
+        }
+    },
+    "dependencies": {
+        "Bolt.Core": "1.0.0-*"
+    }
+}
