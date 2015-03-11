@@ -2,36 +2,43 @@
 {
     internal static class BoltConstants
     {
-        public const string ActionDescriptor = "Bolt.ActionDescriptor";
+        internal static class Core
+        {
+            public const string Namespace = "Bolt";
 
-        public const string ContractDescriptor = "Bolt.ContractDescriptor";
+            public static readonly ClassDescriptor ActionDescriptor = new ClassDescriptor("ActionDescriptor", Namespace);
 
-        public const string AsyncOperationAttribute = "Bolt.AsyncOperationAttribute";
+            public static readonly ClassDescriptor ContractDescriptor = new ClassDescriptor("ContractDescriptor", Namespace);
 
-        public const string InitSessionAttribute = "Bolt.InitSessionAttribute";
+            public static readonly ClassDescriptor AsyncOperationAttribute = new ClassDescriptor("AsyncOperationAttribute", Namespace);
 
-        public const string CloseSessionAttribute = "Bolt.CloseSessionAttribute";
+            public static readonly ClassDescriptor InitSessionAttribute = new ClassDescriptor("InitSessionAttribute", Namespace);
 
-        public const string EmptyNamespace = "Bolt";
+            public static readonly ClassDescriptor CloseSessionAttribute = new ClassDescriptor("CloseSessionAttribute", Namespace);
 
-        public const string EmptyName = "Empty";
+            public static readonly ClassDescriptor Empty = new ClassDescriptor("Empty", Namespace);
+        }
 
-        public const string Empty = EmptyNamespace + "."  + EmptyName;
+        internal static class Server
+        {
+            public const string Namespace = "Bolt.Server";
 
-        public const string InvokerName = "ContractInvoker";
+            public static readonly ClassDescriptor ContractInvoker = new ClassDescriptor("ContractInvoker", Namespace);
 
-        public const string ServerExecutionContext = "Bolt.Server.ServerActionContext";
+            public static readonly ClassDescriptor ServerActionContext = new ClassDescriptor("ServerActionContext", Namespace);
 
-        public const string BoltServerNamespace = "Bolt.Server";
+            public static readonly ClassDescriptor BoltServerOptions = new ClassDescriptor("BoltServerOptions", Namespace);
 
-        public const string BoltServerOptions = "Bolt.Server.BoltServerOptions";
+            public static readonly ClassDescriptor BoltRouteHandlerInterface = new ClassDescriptor("IBoltRouteHandler", Namespace);
+        }
 
-        public const string BoltRouteHandler = "Bolt.Server.IBoltRouteHandler";
+        internal static class Client
+        {
+            public const string Namespace = "Bolt.Client";
 
-        public const string BoltClientNamespace = "Bolt.Client";
+            public const string ChannelsNamespace = Namespace + ".Channels";
 
-        public const string BoltChannelsNamespace = "Bolt.Client.Channels";
-
-        public const string BoltChannelInterface = "IChannel";
+            public static readonly ClassDescriptor ChannelInterface = new ClassDescriptor("IChannel", Namespace);
+        }
     }
 }

@@ -21,8 +21,8 @@ namespace Bolt.Generators
         {
         }
 
-        public ClassDescriptor(string name, string ns)
-            : this(name, ns, new string[0])
+        public ClassDescriptor(string name, string @namespace)
+            : this(name, @namespace, new string[0])
         {
         }
 

@@ -33,7 +33,11 @@ namespace Bolt.Generators
             {
                 if (_baseClass == null)
                 {
-                    return string.Format("{0}.{1}<{2}>", BoltConstants.BoltServerNamespace, BoltConstants.InvokerName, MetadataProvider.GetContractDescriptor(ContractDefinition).FullName);
+                    return string.Format(
+                        "{0}.{1}<{2}>",
+                        BoltConstants.Server.Namespace,
+                        FormatType(BoltConstants.Server.ContractInvoker),
+                        MetadataProvider.GetContractDescriptor(ContractDefinition).FullName);
                 }
 
                 return _baseClass;
@@ -61,7 +65,7 @@ namespace Bolt.Generators
 
         public override void Generate(object context)
         {
-            AddUsings(BoltConstants.BoltServerNamespace);
+            AddUsings(BoltConstants.Server.Namespace);
 
             ClassGenerator classGenerator = CreateClassGenerator(ContractDescriptor);
             classGenerator.Modifier = Modifier;
@@ -87,7 +91,7 @@ namespace Bolt.Generators
 
         private void WriteInvocationMethod(MethodDescriptor methodDescriptor, ClassGenerator classGenerator)
         {
-            string declaration = string.Format("{2} {0}({1} context)", FormatMethodName(methodDescriptor.Method), BoltConstants.ServerExecutionContext, FormatType<Task>());
+            string declaration = string.Format("{2} {0}({1} context)", FormatMethodName(methodDescriptor.Method), BoltConstants.Server.ServerActionContext, FormatType<Task>());
             classGenerator.WriteMethod(declaration, g => WriteInvocationMethodBody(methodDescriptor), "protected virtual async");
         }
 
@@ -152,15 +156,10 @@ namespace Bolt.Generators
 
             WriteLine();
 
-            if (HasReturnValue(methodDescriptor.Method))
-            {
-                WriteLine("await ResponseHandler.Handle(context, result);");
-            }
-            else
-            {
-                WriteLine("await ResponseHandler.Handle(context);");
-            }
-
+            WriteLine(
+                HasReturnValue(methodDescriptor.Method)
+                    ? "await ResponseHandler.Handle(context, result);"
+                    : "await ResponseHandler.Handle(context);");
         }
 
         public virtual string GenerateInvocationCode(string instanceName, string parametersInstance, string resultVariable, MethodDescriptor method)

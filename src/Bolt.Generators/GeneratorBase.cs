@@ -184,6 +184,11 @@ namespace Bolt.Generators
             return Formatter.FormatType(typeof(T));
         }
 
+        public virtual string FormatType(ClassDescriptor descriptor)
+        {
+            return Formatter.FormatType(descriptor);
+        }
+
         public virtual string FormatType(Type type)
         {
             return Formatter.FormatType(type);
@@ -213,7 +218,6 @@ namespace Bolt.Generators
         {
             Output.WriteLine();
         }
-
 
         public virtual void BeginNamespace(string name)
         {

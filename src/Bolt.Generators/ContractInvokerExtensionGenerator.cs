@@ -1,4 +1,3 @@
-
 using System.Reflection;
 
 namespace Bolt.Generators
@@ -21,7 +20,7 @@ namespace Bolt.Generators
 
         public override void Generate(object context)
         {
-            AddUsings(BoltConstants.BoltServerNamespace);
+            AddUsings(BoltConstants.Server.Namespace);
 
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
             generator.Modifier = Modifier + " static";
@@ -68,8 +67,8 @@ namespace Bolt.Generators
                     "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} bolt, {3} options = null) where TImplementation: {1}, new()",
                     ContractDefinition.Name,
                     ContractDefinition.Root.FullName,
-                    BoltRouteHandler, 
-                    BoltConstants.BoltServerOptions);
+                    BoltRouteHandler,
+                    BoltConstants.Server.BoltServerOptions);
                 using (WithBlock())
                 {
                     WriteLine(
@@ -92,8 +91,8 @@ namespace Bolt.Generators
                 "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, {3} options = null) where TImplementation: {1}, new()",
                 ContractDefinition.Name,
                 ContractDefinition.Root.FullName,
-                BoltRouteHandler, 
-                BoltConstants.BoltServerOptions);
+                BoltRouteHandler,
+                BoltConstants.Server.BoltServerOptions);
             using (WithBlock())
             {
                 WriteLine(
@@ -120,14 +119,14 @@ namespace Bolt.Generators
 
         protected override ClassDescriptor CreateDefaultDescriptor()
         {
-            return new ClassDescriptor(ContractInvoker.Name + "Extensions", BoltConstants.BoltServerNamespace);
+            return new ClassDescriptor(ContractInvoker.Name + "Extensions", BoltConstants.Server.Namespace);
         }
 
         private string BoltRouteHandler
         {
             get
             {
-                return BoltConstants.BoltRouteHandler;
+                return FormatType(BoltConstants.Server.BoltRouteHandlerInterface);
             }
         }
     }

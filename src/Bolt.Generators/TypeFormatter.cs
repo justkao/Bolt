@@ -38,6 +38,16 @@ namespace Bolt.Generators
 
         public bool ForceFullTypeNames { get; set; }
 
+        public virtual string FormatType(ClassDescriptor descriptor)
+        {
+            if (_namespaces.Contains(descriptor.Namespace))
+            {
+                return descriptor.Name;
+            }
+
+            return descriptor.FullName;
+        }
+
         public virtual string FormatType(Type type)
         {
             return DoFormat(type);

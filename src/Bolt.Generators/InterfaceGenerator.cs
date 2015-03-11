@@ -92,7 +92,7 @@ namespace Bolt.Generators
             asyncBase.Insert(0, FormatType(iface));
 
             ClassGenerator classGenerator = CreateClassGenerator(new ClassDescriptor(name, iface.Namespace, asyncBase.ToArray()) { IsInterface = true });
-            classGenerator.GenerateBodyAction = (g) =>
+            classGenerator.GenerateBodyAction = g =>
                 {
                     List<MethodInfo> methods =
                         (from m in ContractDefinition.GetEffectiveMethods(iface)

@@ -27,13 +27,13 @@ namespace Bolt.Generators
         {
             if (contract.ParametersBase == null && method.GetParameters().Count(m => m.ParameterType != typeof(CancellationToken)) == 0)
             {
-                return new ClassDescriptor(BoltConstants.EmptyName, BoltConstants.EmptyNamespace);
+                return BoltConstants.Core.Empty;
             }
 
             string ns = method.DeclaringType.Namespace + ".Parameters";
             string name = method.Name + "Parameters";
 
-            return new ClassDescriptor(name, ns, contract.ParametersBase != null ? new[] { contract.ParametersBase.FullName } : new string[0] { });
+            return new ClassDescriptor(name, ns, contract.ParametersBase != null ? new[] { contract.ParametersBase.FullName } : new string[] { });
         }
     }
 }

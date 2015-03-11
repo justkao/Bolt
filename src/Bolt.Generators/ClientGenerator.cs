@@ -29,7 +29,6 @@ namespace Bolt.Generators
                 if (_contractDescriptorProperty == null)
                 {
                     return string.Format("{0}Descriptor", ContractDefinition.Name);
-
                 }
 
                 return _contractDescriptorProperty;
@@ -54,7 +53,7 @@ namespace Bolt.Generators
 
         public override void Generate(object context)
         {
-            AddUsings(BoltConstants.BoltClientNamespace, BoltConstants.BoltChannelsNamespace);
+            AddUsings(BoltConstants.Client.Namespace, BoltConstants.Client.ChannelsNamespace);
 
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
             generator.Modifier = Modifier;
@@ -62,7 +61,7 @@ namespace Bolt.Generators
             generator.GenerateBodyAction = g =>
                 {
                     g.GenerateConstructor(g.Descriptor.FullName + " proxy", "proxy");
-                    g.GenerateConstructor(string.Format("{0} channel", BoltConstants.BoltChannelInterface), "channel");
+                    g.GenerateConstructor(string.Format("{0} channel", FormatType(BoltConstants.Client.ChannelInterface)), "channel");
 
                     List<Type> contracts = ContractDefinition.GetEffectiveContracts().ToList();
                     foreach (Type type in contracts)
@@ -174,8 +173,8 @@ namespace Bolt.Generators
             {
                 return new GenerateRequestCodeResult()
                 {
-                    VariableName = BoltConstants.Empty + ".Instance",
-                    TypeName = BoltConstants.Empty
+                    VariableName = FormatType(BoltConstants.Core.Empty) + ".Instance",
+                    TypeName = FormatType(BoltConstants.Core.Empty)
                 };
             }
 

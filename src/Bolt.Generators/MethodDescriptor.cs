@@ -25,7 +25,7 @@ namespace Bolt.Generators
 
         public bool HasParameterClass()
         {
-            return Parameters != null && Parameters.FullName != BoltConstants.Empty;
+            return Parameters != null && Parameters.FullName != BoltConstants.Core.Empty.FullName;
         }
 
         public IEnumerable<ParameterInfo> GetAllParameters()
