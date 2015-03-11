@@ -61,7 +61,7 @@ namespace Bolt.Generators
             generator.GenerateBodyAction = g =>
                 {
                     g.GenerateConstructor(g.Descriptor.FullName + " proxy", "proxy");
-                    g.GenerateConstructor(string.Format("{0} channel", FormatType(BoltConstants.Client.ChannelInterface)), "channel");
+                    g.GenerateConstructor(string.Format("{0} channel", FormatType(BoltConstants.Client.Channel)), "channel");
 
                     List<Type> contracts = ContractDefinition.GetEffectiveContracts().ToList();
                     foreach (Type type in contracts)

@@ -29,7 +29,7 @@
 
             public static readonly ClassDescriptor BoltServerOptions = new ClassDescriptor("BoltServerOptions", Namespace);
 
-            public static readonly ClassDescriptor BoltRouteHandlerInterface = new ClassDescriptor("IBoltRouteHandler", Namespace);
+            public static readonly ClassDescriptor BoltRouteHandlerInterface = new ClassDescriptor("IBoltRouteHandler", Namespace) { IsInterface = true };
         }
 
         internal static class Client
@@ -38,7 +38,7 @@
 
             public const string ChannelsNamespace = Namespace + ".Channels";
 
-            public static readonly ClassDescriptor ChannelInterface = new ClassDescriptor("IChannel", Namespace);
+            public static readonly ClassDescriptor Channel = new ClassDescriptor("IChannel", Namespace) { IsInterface = true };
         }
     }
 }
