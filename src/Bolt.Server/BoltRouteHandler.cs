@@ -7,6 +7,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Routing;
 using Microsoft.Framework.OptionsModel;
+using System.Text;
+using System.Diagnostics;
 
 namespace Bolt.Server
 {
@@ -70,11 +72,11 @@ namespace Bolt.Server
                 throw new InvalidOperationException( string.Format("Invoker for contract '{0}' already registered.", invoker.Descriptor.Name));
             }
 
+            Logger.WriteInformation("Adding contract: {0}", invoker.Descriptor.Name);
             _invokers.Add(invoker);
-            Console.WriteLine("Adding contract: {0}", invoker.Descriptor.Name);
             foreach (ActionDescriptor descriptor in invoker.Descriptor)
             {
-                Console.WriteLine("     Action: {0}", descriptor.Name);
+                Logger.WriteInformation("Action: {0}", descriptor.Name);
             }
         }
 
@@ -119,27 +121,43 @@ namespace Bolt.Server
                 return;
             }
 
-            string contractName = result[1];
-            string actionName= result[2];
-
+            var contractName = result[1];
+            var actionName= result[2];
 
             IContractInvoker found = _invokers.FirstOrDefault(i => string.CompareOrdinal(i.Descriptor.Name, contractName) == 0);
             if (found == null)
             {
+                if (!string.IsNullOrEmpty(Options.Prefix))
+                {
+                    Logger.WriteWarning("Contract with name '{0}' not found in registered contracts at '{1}'", contractName, path);
+
+                    // we have defined bolt prefix, report error about contract not found
+                    ErrorHandler.HandleBoltError(context.HttpContext, ServerErrorCode.ContractNotFound);
+                    context.IsHandled = true;
+                }
+
+                // just pass to next middleware in chain
                 return;
             }
 
+            // at this point Bolt will handle the request
+            context.IsHandled = true;
             var actionDescriptor = found.Descriptor.FirstOrDefault(a => string.CompareOrdinal(a.Name, actionName) == 0);
             if (actionDescriptor == null)
             {
                 ErrorHandler.HandleBoltError(context.HttpContext, ServerErrorCode.ActionNotFound);
-                context.IsHandled = true;
                 return;
             }
 
             ServerActionContext ctxt = new ServerActionContext(context.HttpContext, actionDescriptor);
             using (Logger.BeginScope("Execute"))
             {
+                Stopwatch watch = null;
+                if ( Logger.IsEnabled(LogLevel.Verbose))
+                {
+                    watch = Stopwatch.StartNew();
+                }
+
                 try
                 {
                     await found.Execute(ctxt);
@@ -147,10 +165,19 @@ namespace Bolt.Server
                 catch (BoltServerException e) when (e.Error != null)
                 {
                     ErrorHandler.HandleBoltError(context.HttpContext, e.Error.Value);
+                    Logger.WriteError("Execution of '{0}' failed with Bolt error '{1}'", actionDescriptor, e.Error);
                 }
                 catch (Exception e)
                 {
                     await ErrorHandler.HandleError(ctxt, e);
+                    Logger.WriteError("Execution of '{0}' failed with Bolt error '{1}'", actionDescriptor, e);
+                }
+                finally
+                {
+                    if (watch != null)
+                    {
+                        Logger.WriteVerbose("Execution of '{0}' has taken '{1}ms'", actionDescriptor, watch.ElapsedMilliseconds);
+                    }
                 }
             }
         }

@@ -21,14 +21,15 @@ namespace Bolt.Server
         {
             context.Context.Response.StatusCode = 200;
             context.Context.Response.ContentLength = 0;
-
+            context.Context.Response.Body.Dispose();
             return Task.FromResult(0);
         }
 
-        public virtual Task Handle<TResult>(ServerActionContext context, TResult result)
+        public virtual async Task Handle<TResult>(ServerActionContext context, TResult result)
         {
             context.Context.Response.StatusCode = 200;
-            return _dataHandler.WriteResponseAsync(context, result);
+            await _dataHandler.WriteResponseAsync(context, result);
+            context.Context.Response.Body.Dispose();
         }
     }
 }

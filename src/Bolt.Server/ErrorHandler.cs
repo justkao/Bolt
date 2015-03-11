@@ -36,36 +36,37 @@ namespace Bolt.Server
             return true;
         }
 
-        public virtual Task HandleError(ServerActionContext context, Exception error)
+        public virtual async Task HandleError(ServerActionContext context, Exception error)
         {
             if (error is DeserializeParametersException)
             {
                 CloseWithError(context.Context, ServerErrorCode.Deserialization);
-                return Task.FromResult(0);
+                return;
             }
 
             if (error is SerializeResponseException)
             {
                 CloseWithError(context.Context, ServerErrorCode.Serialization);
-                return Task.FromResult(0);
+                return;
 
             }
 
             if (error is SessionHeaderNotFoundException)
             {
                 CloseWithError(context.Context, ServerErrorCode.NoSessionHeader);
-                return Task.FromResult(0);
+                return;
 
             }
 
             if (error is SessionNotFoundException)
             {
                 CloseWithError(context.Context, ServerErrorCode.SessionNotFound);
-                return Task.FromResult(0);
+                return;
             }
 
             context.Context.Response.StatusCode = 500;
-            return _dataHandler.WriteExceptionAsync(context, error);
+            await _dataHandler.WriteExceptionAsync(context, error);
+            context.Context.Response.Body.Dispose();
         }
 
         protected virtual void CloseWithError(HttpContext context, ServerErrorCode code)

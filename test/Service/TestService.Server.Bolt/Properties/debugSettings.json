@@ -1,0 +1,9 @@
+{
+  "profiles": [
+    {
+      "name": "web ",
+      "commandName": "web ",
+      "commandLineArgs": "--server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:9000"
+    }
+  ]
+}
