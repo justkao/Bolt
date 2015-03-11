@@ -91,7 +91,7 @@ namespace Bolt.Generators
 
         private void WriteInvocationMethod(MethodDescriptor methodDescriptor, ClassGenerator classGenerator)
         {
-            string declaration = string.Format("{2} {0}({1} context)", FormatMethodName(methodDescriptor.Method), BoltConstants.Server.ServerActionContext, FormatType<Task>());
+            string declaration = string.Format("{2} {0}({1} context)", FormatMethodName(methodDescriptor.Method), FormatType(BoltConstants.Server.ServerActionContext), FormatType<Task>());
             classGenerator.WriteMethod(declaration, g => WriteInvocationMethodBody(methodDescriptor), "protected virtual async");
         }
 

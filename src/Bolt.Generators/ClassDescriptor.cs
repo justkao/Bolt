@@ -48,5 +48,10 @@ namespace Bolt.Generators
         public IEnumerable<string> BaseClasses { get; set; }
 
         public bool IsInterface { get; set; }
+
+        public override string ToString()
+        {
+            return FullName;
+        }
     }
 }

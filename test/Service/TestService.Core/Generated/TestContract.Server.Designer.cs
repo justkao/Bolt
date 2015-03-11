@@ -45,7 +45,7 @@ namespace TestService.Core
             AddAction(Descriptor.InnerOperationExAsync2, InnerTestContract2_InnerOperationExAsync2);
         }
 
-        protected virtual async Task TestContract_UpdatePerson(Bolt.Server.ServerActionContext context)
+        protected virtual async Task TestContract_UpdatePerson(ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.UpdatePersonParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
@@ -65,7 +65,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context, result);
         }
 
-        protected virtual async Task TestContract_UpdatePersonThatThrowsInvalidOperationException(Bolt.Server.ServerActionContext context)
+        protected virtual async Task TestContract_UpdatePersonThatThrowsInvalidOperationException(ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
@@ -85,7 +85,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context, result);
         }
 
-        protected virtual async Task TestContract_DoNothingAsAsync(Bolt.Server.ServerActionContext context)
+        protected virtual async Task TestContract_DoNothingAsAsync(ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
 
@@ -103,7 +103,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context);
         }
 
-        protected virtual async Task TestContract_DoNothing(Bolt.Server.ServerActionContext context)
+        protected virtual async Task TestContract_DoNothing(ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
 
@@ -121,7 +121,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context);
         }
 
-        protected virtual async Task TestContract_DoNothingWithComplexParameterAsAsync(Bolt.Server.ServerActionContext context)
+        protected virtual async Task TestContract_DoNothingWithComplexParameterAsAsync(ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.DoNothingWithComplexParameterAsAsyncParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
@@ -140,7 +140,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context);
         }
 
-        protected virtual async Task TestContract_DoNothingWithComplexParameter(Bolt.Server.ServerActionContext context)
+        protected virtual async Task TestContract_DoNothingWithComplexParameter(ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.DoNothingWithComplexParameterParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
@@ -159,7 +159,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context);
         }
 
-        protected virtual async Task TestContract_GetSimpleType(Bolt.Server.ServerActionContext context)
+        protected virtual async Task TestContract_GetSimpleType(ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetSimpleTypeParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
@@ -179,7 +179,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context, result);
         }
 
-        protected virtual async Task TestContract_GetSimpleTypeAsAsync(Bolt.Server.ServerActionContext context)
+        protected virtual async Task TestContract_GetSimpleTypeAsAsync(ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetSimpleTypeAsAsyncParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
@@ -198,7 +198,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context);
         }
 
-        protected virtual async Task TestContract_GetSinglePerson(Bolt.Server.ServerActionContext context)
+        protected virtual async Task TestContract_GetSinglePerson(ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetSinglePersonParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
@@ -218,7 +218,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context, result);
         }
 
-        protected virtual async Task TestContract_GetSinglePersonAsAsync(Bolt.Server.ServerActionContext context)
+        protected virtual async Task TestContract_GetSinglePersonAsAsync(ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetSinglePersonAsAsyncParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
@@ -238,7 +238,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context, result);
         }
 
-        protected virtual async Task TestContract_GetManyPersons(Bolt.Server.ServerActionContext context)
+        protected virtual async Task TestContract_GetManyPersons(ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
             List<Person> result;
@@ -257,7 +257,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context, result);
         }
 
-        protected virtual async Task TestContract_GetManyPersonsAsAsync(Bolt.Server.ServerActionContext context)
+        protected virtual async Task TestContract_GetManyPersonsAsAsync(ServerActionContext context)
         {
             var parameters = await DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetManyPersonsAsAsyncParameters>(context);
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
@@ -277,7 +277,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context, result);
         }
 
-        protected virtual async Task TestContract_Throws(Bolt.Server.ServerActionContext context)
+        protected virtual async Task TestContract_Throws(ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
 
@@ -295,7 +295,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context);
         }
 
-        protected virtual async Task TestContract_ThrowsCustom(Bolt.Server.ServerActionContext context)
+        protected virtual async Task TestContract_ThrowsCustom(ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<ITestContract>(context);
 
@@ -313,7 +313,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context);
         }
 
-        protected virtual async Task InnerTestContract_InnerOperation(Bolt.Server.ServerActionContext context)
+        protected virtual async Task InnerTestContract_InnerOperation(ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<IInnerTestContract>(context);
 
@@ -331,7 +331,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context);
         }
 
-        protected virtual async Task InnerTestContract_InnerOperationExAsync(Bolt.Server.ServerActionContext context)
+        protected virtual async Task InnerTestContract_InnerOperationExAsync(ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<IInnerTestContract>(context);
 
@@ -349,7 +349,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context);
         }
 
-        protected virtual async Task InnerTestContract2_InnerOperation2(Bolt.Server.ServerActionContext context)
+        protected virtual async Task InnerTestContract2_InnerOperation2(ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<IInnerTestContract2>(context);
 
@@ -367,7 +367,7 @@ namespace TestService.Core
             await ResponseHandler.Handle(context);
         }
 
-        protected virtual async Task InnerTestContract2_InnerOperationExAsync2(Bolt.Server.ServerActionContext context)
+        protected virtual async Task InnerTestContract2_InnerOperationExAsync2(ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<IInnerTestContract2>(context);
 
@@ -391,22 +391,22 @@ namespace Bolt.Server
 {
     public static partial class TestContractInvokerExtensions
     {
-        public static IContractInvoker UseTestContract(this Bolt.Server.IBoltRouteHandler bolt, TestService.Core.ITestContract instance)
+        public static IContractInvoker UseTestContract(this IBoltRouteHandler bolt, TestService.Core.ITestContract instance)
         {
             return bolt.UseTestContract(new StaticInstanceProvider(instance));
         }
 
-        public static IContractInvoker UseTestContract<TImplementation>(this Bolt.Server.IBoltRouteHandler bolt) where TImplementation: TestService.Core.ITestContract, new()
+        public static IContractInvoker UseTestContract<TImplementation>(this IBoltRouteHandler bolt) where TImplementation: TestService.Core.ITestContract, new()
         {
             return bolt.UseTestContract(new InstanceProvider<TImplementation>());
         }
 
-        public static IContractInvoker UseStateFullTestContract<TImplementation>(this Bolt.Server.IBoltRouteHandler bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, Bolt.Server.BoltServerOptions options = null) where TImplementation: TestService.Core.ITestContract, new()
+        public static IContractInvoker UseStateFullTestContract<TImplementation>(this IBoltRouteHandler bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, Bolt.Server.BoltServerOptions options = null) where TImplementation: TestService.Core.ITestContract, new()
         {
             return bolt.UseTestContract(new StateFullInstanceProvider<TImplementation>(initInstanceAction, releaseInstanceAction, options ?? bolt.Options));
         }
 
-        public static IContractInvoker UseTestContract(this Bolt.Server.IBoltRouteHandler bolt, IInstanceProvider instanceProvider)
+        public static IContractInvoker UseTestContract(this IBoltRouteHandler bolt, IInstanceProvider instanceProvider)
         {
             var invoker = new TestService.Core.TestContractInvoker();
             invoker.Init(bolt, instanceProvider);
