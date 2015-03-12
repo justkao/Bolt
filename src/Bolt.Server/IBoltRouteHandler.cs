@@ -4,11 +4,9 @@ namespace Bolt.Server
 {
     public interface IBoltRouteHandler : IRouter
     {
+        IServerDataHandler DataHandler { get; }
+
         IResponseHandler ResponseHandler { get; }
-
-        IDataHandler DataHandler{ get; }
-
-        IErrorHandler ErrorHandler { get; }
 
         BoltServerOptions Options { get; }
 

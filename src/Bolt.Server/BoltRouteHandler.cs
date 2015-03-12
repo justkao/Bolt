@@ -1,14 +1,14 @@
-﻿using Microsoft.AspNet.Http;
-using Microsoft.Framework.Logging;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
+using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;
-using System.Text;
-using System.Diagnostics;
 
 namespace Bolt.Server
 {
@@ -16,7 +16,7 @@ namespace Bolt.Server
     {
         private readonly List<IContractInvoker> _invokers = new List<IContractInvoker>();
 
-        public BoltRouteHandler(ILoggerFactory factory, IResponseHandler responseHandler, IDataHandler dataHandler, IErrorHandler errorHandler, IOptions<BoltServerOptions> options)
+        public BoltRouteHandler(ILoggerFactory factory, IResponseHandler responseHandler, IServerDataHandler dataHandler, IOptions<BoltServerOptions> options)
         {
             if (factory == null)
             {
@@ -33,11 +33,6 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(dataHandler));
             }
 
-            if (errorHandler == null)
-            {
-                throw new ArgumentNullException(nameof(errorHandler));
-            }
-
             if (options == null)
             {
                 throw new ArgumentNullException(nameof(options));
@@ -45,16 +40,13 @@ namespace Bolt.Server
 
             ResponseHandler = responseHandler;
             DataHandler = dataHandler;
-            ErrorHandler = errorHandler;
             Options = options.Options;
             Logger = factory.Create<BoltRouteHandler>();
         }
 
         public IResponseHandler ResponseHandler { get; }
 
-        public IDataHandler DataHandler { get; }
-
-        public IErrorHandler ErrorHandler { get; }
+        public IServerDataHandler DataHandler { get; }
 
         public BoltServerOptions Options { get; }
 
@@ -85,18 +77,6 @@ namespace Bolt.Server
             return _invokers.FirstOrDefault(i => i.Descriptor == descriptor);
         }
 
-        protected virtual Task HandleActionNotFound(HttpContext context, ContractDescriptor descriptor)
-        {
-           ErrorHandler.HandleBoltError(context, ServerErrorCode.ActionNotFound);
-            return Task.FromResult(0);
-        }
-
-        protected virtual Task HandleContractNotFound(HttpContext context)
-        {
-            ErrorHandler.HandleBoltError(context, ServerErrorCode.ContractNotFound);
-            return Task.FromResult(0);
-        }
-
         public IEnumerator<IContractInvoker> GetEnumerator()
         {
             return _invokers.GetEnumerator();
@@ -110,21 +90,24 @@ namespace Bolt.Server
         public virtual async Task RouteAsync(RouteContext context)
         {
             var path = context.HttpContext.Request.Path;
-            if (!string.IsNullOrEmpty(Options.Prefix) && !path.StartsWithSegments(new PathString("/" + Options.Prefix)))
+            if (!string.IsNullOrEmpty(Options.Prefix))
             {
-                return;
+                if (!path.StartsWithSegments(new PathString("/" + Options.Prefix), out path))
+                {
+                    return;
+                }
             }
 
             var result = path.Value.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-            if (result.Length < 3)
+            if (result.Length < 2)
             {
                 return;
             }
 
-            var contractName = result[1];
-            var actionName= result[2];
+            var contractName = result[0];
+            var actionName= result[1];
 
-            IContractInvoker found = _invokers.FirstOrDefault(i => string.CompareOrdinal(i.Descriptor.Name, contractName) == 0);
+            var found = _invokers.FirstOrDefault(i => string.CompareOrdinal(i.Descriptor.Name, contractName) == 0);
             if (found == null)
             {
                 if (!string.IsNullOrEmpty(Options.Prefix))
@@ -132,7 +115,7 @@ namespace Bolt.Server
                     Logger.WriteWarning("Contract with name '{0}' not found in registered contracts at '{1}'", contractName, path);
 
                     // we have defined bolt prefix, report error about contract not found
-                    ErrorHandler.HandleBoltError(context.HttpContext, ServerErrorCode.ContractNotFound);
+                    ResponseHandler.HandleBoltError(context.HttpContext, ServerErrorCode.ContractNotFound);
                     context.IsHandled = true;
                 }
 
@@ -145,11 +128,11 @@ namespace Bolt.Server
             var actionDescriptor = found.Descriptor.FirstOrDefault(a => string.CompareOrdinal(a.Name, actionName) == 0);
             if (actionDescriptor == null)
             {
-                ErrorHandler.HandleBoltError(context.HttpContext, ServerErrorCode.ActionNotFound);
+                ResponseHandler.HandleBoltError(context.HttpContext, ServerErrorCode.ActionNotFound);
                 return;
             }
 
-            ServerActionContext ctxt = new ServerActionContext(context.HttpContext, actionDescriptor);
+            var ctxt = new ServerActionContext(context.HttpContext, actionDescriptor);
             using (Logger.BeginScope("Execute"))
             {
                 Stopwatch watch = null;
@@ -162,15 +145,16 @@ namespace Bolt.Server
                 {
                     await found.Execute(ctxt);
                 }
-                catch (BoltServerException e) when (e.Error != null)
-                {
-                    ErrorHandler.HandleBoltError(context.HttpContext, e.Error.Value);
-                    Logger.WriteError("Execution of '{0}' failed with Bolt error '{1}'", actionDescriptor, e.Error);
-                }
                 catch (Exception e)
                 {
-                    await ErrorHandler.HandleError(ctxt, e);
-                    Logger.WriteError("Execution of '{0}' failed with Bolt error '{1}'", actionDescriptor, e);
+                    var responseHandler = ResponseHandler;
+                    if (found is ContractInvoker)
+                    {
+                        responseHandler = (found as ContractInvoker).ResponseHandler;
+                    }
+
+                    await responseHandler.HandleError(ctxt, e);
+                    Logger.WriteError("Execution of '{0}' failed with error '{1}'", actionDescriptor, e);
                 }
                 finally
                 {
@@ -186,6 +170,5 @@ namespace Bolt.Server
         {
             return string.Empty;
         }
-
     }
 }

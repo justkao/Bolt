@@ -1,7 +1,6 @@
-﻿using System;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Routing;
+﻿using Microsoft.AspNet.Builder;
 using Microsoft.Framework.DependencyInjection;
+using System;
 
 namespace Bolt.Server
 {

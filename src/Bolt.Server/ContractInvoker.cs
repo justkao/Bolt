@@ -22,7 +22,7 @@ namespace Bolt.Server
 
         public IInstanceProvider InstanceProvider { get; set; }
 
-        public IDataHandler DataHandler { get; set; }
+        public IServerDataHandler DataHandler { get; set; }
 
         public IResponseHandler ResponseHandler { get; set; }
 

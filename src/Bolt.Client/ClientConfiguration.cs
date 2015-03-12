@@ -5,15 +5,16 @@ namespace Bolt.Client
     /// <summary>
     /// The Bolt configuration of the client. 
     /// </summary>
-    public class ClientConfiguration : BoltOptions
+    public class ClientConfiguration
     {
         public ClientConfiguration()
         {
+            Options = new BoltOptions();
             RequestHandler = new WebRequestHandler();
             Serializer = new JsonSerializer();
             ExceptionSerializer = new JsonExceptionSerializer(Serializer);
             DataHandler = new DataHandler(Serializer, ExceptionSerializer, RequestHandler);
-            RequestForwarder = new RequestForwarder(DataHandler, RequestHandler, new ServerErrorProvider(ServerErrorCodesHeader));
+            RequestForwarder = new RequestForwarder(DataHandler, RequestHandler, new ServerErrorProvider(Options.ServerErrorCodesHeader));
             EndpointProvider = new EndpointProvider();
         }
 
@@ -51,5 +52,10 @@ namespace Bolt.Client
         /// Gets or sets the endpoint provider.
         /// </summary>
         public IEndpointProvider EndpointProvider{ get; set; }
+
+        /// <summary>
+        /// Gets or sets the Bolt options.
+        /// </summary>
+        public BoltOptions Options { get; set; }
     }
 }

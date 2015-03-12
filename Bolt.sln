@@ -32,6 +32,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestService.Server.Wcf", "t
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "TestService.Server.Bolt", "test\Service\TestService.Server.Bolt\TestService.Server.Bolt.kproj", "{1E541977-3F26-4159-9C4E-67DD88BAF2C9}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "TestService.Server.Bolt.IIS", "test\Service\TestService.Server.Bolt.IIS\TestService.Server.Bolt.IIS.kproj", "{65AF142E-ABC1-4A16-ADC6-5D1DB5F37A56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -74,6 +76,10 @@ Global
 		{1E541977-3F26-4159-9C4E-67DD88BAF2C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E541977-3F26-4159-9C4E-67DD88BAF2C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E541977-3F26-4159-9C4E-67DD88BAF2C9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65AF142E-ABC1-4A16-ADC6-5D1DB5F37A56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65AF142E-ABC1-4A16-ADC6-5D1DB5F37A56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65AF142E-ABC1-4A16-ADC6-5D1DB5F37A56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65AF142E-ABC1-4A16-ADC6-5D1DB5F37A56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -84,5 +90,6 @@ Global
 		{6949E8AE-46CF-433E-88EB-19AF408E0207} = {63239D72-01D3-46A2-A1EB-298749857051}
 		{D1C82C58-B3A4-4C18-BDCB-6E1B82D99226} = {63239D72-01D3-46A2-A1EB-298749857051}
 		{1E541977-3F26-4159-9C4E-67DD88BAF2C9} = {63239D72-01D3-46A2-A1EB-298749857051}
+		{65AF142E-ABC1-4A16-ADC6-5D1DB5F37A56} = {63239D72-01D3-46A2-A1EB-298749857051}
 	EndGlobalSection
 EndGlobal

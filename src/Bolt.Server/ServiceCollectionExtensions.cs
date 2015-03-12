@@ -7,7 +7,7 @@ namespace Bolt.Server
 {
     public static class ServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureBoltOptions(this IServiceCollection services, Action<BoltOptions> configure)
+        public static IServiceCollection ConfigureBoltOptions(this IServiceCollection services, Action<BoltServerOptions> configure)
         {
             services.Configure(configure);
             return services;
@@ -18,8 +18,7 @@ namespace Bolt.Server
             services.AddTransient<ISerializer, JsonSerializer>();
             services.AddTransient<IExceptionSerializer, JsonExceptionSerializer>();
             services.AddTransient<IResponseHandler, ResponseHandler>();
-            services.AddTransient<IDataHandler, DataHandler>();
-            services.AddTransient<IErrorHandler, ErrorHandler>();
+            services.AddTransient<IServerDataHandler, ServerDataHandler>();
             services.AddTransient<IBoltRouteHandler, BoltRouteHandler>();
 
             return services;

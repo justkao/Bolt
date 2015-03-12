@@ -22,13 +22,13 @@ namespace Bolt.Client.Channels
         protected RecoverableStatefullChannel(Uri server, ClientConfiguration clientConfiguration)
             : base(new UriServerProvider(server), clientConfiguration)
         {
-            _sessionHeaderName = clientConfiguration.SessionHeader;
+            _sessionHeaderName = clientConfiguration.Options.SessionHeader;
         }
 
         protected RecoverableStatefullChannel(IServerProvider serverProvider, ClientConfiguration clientConfiguration)
             : base(serverProvider, clientConfiguration)
         {
-            _sessionHeaderName = clientConfiguration.SessionHeader;
+            _sessionHeaderName = clientConfiguration.Options.SessionHeader;
         }
 
         protected RecoverableStatefullChannel(RecoverableStatefullChannel<TContract> proxy)

@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Bolt.Server
 {
-    public interface IDataHandler
+    public interface IServerDataHandler
     {
         Task<T> ReadParametersAsync<T>(ServerActionContext context);
 

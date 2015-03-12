@@ -17,7 +17,10 @@ namespace TestService.Server.Bolt
             services.AddLogging();
             services.AddOptions();
             services.AddBolt();
-            // services.ConfigureBoltOptions(a => { });
+            services.ConfigureBoltOptions(a =>
+            {
+                a.Prefix = "bolt";
+            });
         }
 
         public void Configure(IApplicationBuilder app)
