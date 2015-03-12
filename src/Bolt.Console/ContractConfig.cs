@@ -1,9 +1,10 @@
-﻿using Bolt.Generators;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+
+using Bolt.Generators;
+
+using Newtonsoft.Json;
 
 namespace Bolt.Console
 {

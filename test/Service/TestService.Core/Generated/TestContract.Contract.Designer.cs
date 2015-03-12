@@ -7,19 +7,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Runtime;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
-
-using TestService.Core;
-using TestService.Core.Parameters;
-
 
 namespace TestService.Core.Parameters
 {
