@@ -7,11 +7,18 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 using Bolt.Client;
 using Bolt.Client.Channels;
+using TestService.Core;
+using TestService.Core.Parameters;
+
 
 namespace TestService.Core
 {

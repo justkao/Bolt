@@ -4,36 +4,24 @@ namespace Bolt.Server
 {
     public static class BoltRouteHandlerExtensions
     {
-        public static TInvoker UseStateLessContractInvoker<TInvoker, TContractImplementation>(
-            this IBoltRouteHandler bolt)
+        public static TInvoker UseStateLess<TInvoker, TContractImplementation>(this IBoltRouteHandler bolt)
             where TInvoker : ContractInvoker, new()
             where TContractImplementation : new()
         {
-            return bolt.UseContractInvoker<TInvoker>(new InstanceProvider<TContractImplementation>());
+            return bolt.Use<TInvoker>(new InstanceProvider<TContractImplementation>());
         }
 
-        public static TInvoker UseStateFullContractInvoker<TInvoker, TContractImplementation>(
-            this IBoltRouteHandler bolt,
-            ActionDescriptor initInstanceAction,
-            ActionDescriptor releaseInstanceAction, 
-            BoltServerOptions options = null)
+        public static TInvoker UseStateFull<TInvoker, TContractImplementation>(this IBoltRouteHandler bolt, ActionDescriptor init, ActionDescriptor release, BoltServerOptions options = null)
             where TInvoker : ContractInvoker, new()
             where TContractImplementation : new()
         {
-            options = options ?? bolt.Options;
-
-            return bolt.UseContractInvoker<TInvoker>(
-                new StateFullInstanceProvider<TContractImplementation>(
-                    initInstanceAction,
-                    releaseInstanceAction, options));
+            return bolt.Use<TInvoker>(new StateFullInstanceProvider<TContractImplementation>(init, release, options ?? bolt.Options));
         }
 
-        public static TInvoker UseContractInvoker<TInvoker>(
-            this IBoltRouteHandler bolt,
-            IInstanceProvider instanceProvider)
+        public static TInvoker Use<TInvoker>(this IBoltRouteHandler bolt, IInstanceProvider instanceProvider)
             where TInvoker : ContractInvoker, new()
         {
-            if ( bolt == null)
+            if (bolt == null)
             {
                 throw new ArgumentNullException(nameof(bolt));
             }
