@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
+using Microsoft.AspNet.Security.DataProtection;
 
 namespace TestService.Server.Bolt
 {
@@ -17,6 +18,7 @@ namespace TestService.Server.Bolt
             services.AddLogging();
             services.AddOptions();
             services.AddBolt();
+            services.AddDataProtection();
             services.ConfigureBoltOptions(a =>
             {
                 a.Prefix = "bolt";

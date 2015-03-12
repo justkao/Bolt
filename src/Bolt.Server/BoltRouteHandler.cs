@@ -145,6 +145,21 @@ namespace Bolt.Server
                 {
                     await found.Execute(ctxt);
                 }
+                catch(OperationCanceledException)
+                {
+                    if (!context.HttpContext.RequestAborted.IsCancellationRequested)
+                    {
+                        var responseHandler = ResponseHandler;
+                        if (found is ContractInvoker)
+                        {
+                            responseHandler = (found as ContractInvoker).ResponseHandler;
+                        }
+
+                        // TODO: is this ok ? 
+                        context.HttpContext.Response.Body.Dispose();
+                        Logger.WriteError("Action '{0}' was cancelled.", actionDescriptor);
+                    }
+                }
                 catch (Exception e)
                 {
                     var responseHandler = ResponseHandler;
