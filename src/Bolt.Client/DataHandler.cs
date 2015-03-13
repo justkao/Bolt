@@ -1,33 +1,28 @@
 ﻿using System;
 using System.IO;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace Bolt.Client
 {
-    public class DataHandler : IDataHandler
+    public class ClientDataHandler : IClientDataHandler
     {
         private readonly ISerializer _serializer;
         private readonly IExceptionSerializer _exceptionSerializer;
-        private readonly IWebRequestHandler _requestHandler;
 
-        public DataHandler(ISerializer serializer, IExceptionSerializer exceptionSerializer, IWebRequestHandler requestHandler)
+        public ClientDataHandler(ISerializer serializer, IExceptionSerializer exceptionSerializer)
         {
             if (serializer == null)
             {
-                throw new ArgumentNullException("serializer");
+                throw new ArgumentNullException(nameof(serializer));
             }
             if (exceptionSerializer == null)
             {
-                throw new ArgumentNullException("exceptionSerializer");
-            }
-            if (requestHandler == null)
-            {
-                throw new ArgumentNullException("requestHandler");
+                throw new ArgumentNullException(nameof(exceptionSerializer));
             }
 
             _serializer = serializer;
             _exceptionSerializer = exceptionSerializer;
-            _requestHandler = requestHandler;
         }
 
         public virtual string ContentType
@@ -39,38 +34,12 @@ namespace Bolt.Client
         {
             if (typeof(T) == typeof(Empty))
             {
-                using (_requestHandler.GetRequestStream(context.Request))
-                {
-                    // auto set content length to 0
-                    return;
-                }
+                // auto set content length to 0
+                return;
             }
 
             byte[] raw = _serializer.SerializeParameters(parameters, context.Action);
-            using (Stream stream = _requestHandler.GetRequestStream(context.Request))
-            {
-                stream.Write(raw, 0, raw.Length);
-            }
-        }
-
-        public virtual async Task WriteParametersAsync<T>(ClientActionContext context, T parameters)
-        {
-            if (typeof(T) == typeof(Empty))
-            {
-                using (await context.Request.GetRequestStreamAsync())
-                {
-                    // auto set content length to 0
-                    return;
-                }
-            }
-
-            context.Cancellation.ThrowIfCancellationRequested();
-
-            byte[] raw = _serializer.SerializeParameters(parameters, context.Action);
-            using (Stream stream = await context.Request.GetRequestStreamAsync())
-            {
-                await stream.WriteAsync(raw, 0, raw.Length, context.Cancellation);
-            }
+            context.Request.Content = new ByteArrayContent(raw);
         }
 
         public virtual async Task<T> ReadResponseAsync<T>(ClientActionContext context)
@@ -80,38 +49,32 @@ namespace Bolt.Client
                 return default(T);
             }
 
-            using (Stream stream = context.Response.GetResponseStream())
+            using (Stream stream = new MemoryStream(await context.Response.Content.ReadAsByteArrayAsync()))
             {
-                return _serializer.DeserializeResponse<T>(await stream.CopyAsync(context.Cancellation), context.Action);
-            }
-        }
+                if (stream.Length == 0)
+                {
+                    return default(T);
+                }
 
-        public virtual T ReadResponse<T>(ClientActionContext context)
-        {
-            if (typeof(T) == typeof(Empty))
-            {
-                return default(T);
-            }
-
-            using (Stream stream = context.Response.GetResponseStream())
-            {
-                return _serializer.DeserializeResponse<T>(stream.Copy(), context.Action);
+                return _serializer.DeserializeResponse<T>(stream, context.Action);
             }
         }
 
         public virtual Exception ReadException(ClientActionContext context)
         {
-            using (Stream stream = context.Response.GetResponseStream())
-            {
-                return _exceptionSerializer.DeserializeExceptionResponse(stream.Copy(), context.Action);
-            }
+            return TaskExtensions.Execute(() => ReadExceptionAsync(context));
         }
 
         public virtual async Task<Exception> ReadExceptionAsync(ClientActionContext context)
         {
-            using (Stream stream = context.Response.GetResponseStream())
+            using (Stream stream = new MemoryStream(await context.Response.Content.ReadAsByteArrayAsync()))
             {
-                return _exceptionSerializer.DeserializeExceptionResponse(await stream.CopyAsync(context.Cancellation), context.Action);
+                if (stream.Length == 0)
+                {
+                    return null;
+                }
+
+                return _exceptionSerializer.DeserializeExceptionResponse(stream, context.Action);
             }
         }
     }

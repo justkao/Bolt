@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Net;
+using System.Net.Http;
 using System.Threading;
 
 namespace Bolt.Client
@@ -9,7 +9,7 @@ namespace Bolt.Client
     /// </summary>
     public class ClientActionContext : ActionContextBase, IDisposable
     {
-        public ClientActionContext(ActionDescriptor action, HttpWebRequest request, Uri server, CancellationToken cancellation)
+        public ClientActionContext(ActionDescriptor action, HttpRequestMessage request, Uri server, CancellationToken cancellation)
             : base(action)
         {
             if (request == null)
@@ -35,7 +35,7 @@ namespace Bolt.Client
         /// <summary>
         /// The raw <see cref="HttpWebRequest"/>.
         /// </summary>
-        public HttpWebRequest Request { get; private set; }
+        public HttpRequestMessage Request { get; private set; }
 
         /// <summary>
         /// Cancellation token for current request.
@@ -45,7 +45,7 @@ namespace Bolt.Client
         /// <summary>
         /// The server response or null if the request has not been send yet.
         /// </summary>
-        public HttpWebResponse Response { get; set; }
+        public HttpResponseMessage Response { get; set; }
 
         /// <summary>
         /// The timeout for the request.

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,22 +18,22 @@ namespace Bolt.Client.Channels
                 throw new ArgumentNullException("proxy");
             }
 
-            RequestForwarder = proxy.RequestForwarder;
+            requestHandler = proxy.requestHandler;
             EndpointProvider = proxy.EndpointProvider;
             IsClosed = proxy.IsClosed;
         }
 
         protected ChannelBase(ClientConfiguration configuration)
-            : this(configuration.RequestForwarder, configuration.EndpointProvider)
+            : this(configuration.RequestHandler, configuration.EndpointProvider)
         {
             DefaultResponseTimeout = configuration.DefaultResponseTimeout;
         }
 
-        protected ChannelBase(IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+        protected ChannelBase(IRequestHandler requestHandler, IEndpointProvider endpointProvider)
         {
-            if (requestForwarder == null)
+            if (requestHandler == null)
             {
-                throw new ArgumentNullException("requestForwarder");
+                throw new ArgumentNullException("requestHandler");
             }
 
             if (endpointProvider == null)
@@ -40,11 +41,11 @@ namespace Bolt.Client.Channels
                 throw new ArgumentNullException("endpointProvider");
             }
 
-            RequestForwarder = requestForwarder;
+            requestHandler = requestHandler;
             EndpointProvider = endpointProvider;
         }
 
-        public IRequestForwarder RequestForwarder { get; private set; }
+        public IRequestHandler requestHandler { get; private set; }
 
         public IEndpointProvider EndpointProvider { get; private set; }
 
@@ -89,7 +90,7 @@ namespace Bolt.Client.Channels
 
         public void Send<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
-            SendCore<Empty, TRequestParameters>(parameters, descriptor, cancellation);
+            TaskExtensions.Execute(() => SendCoreAsync<Empty, TRequestParameters>(parameters, descriptor, cancellation));
         }
 
         public TResult Send<TResult, TRequestParameters>(
@@ -97,7 +98,7 @@ namespace Bolt.Client.Channels
             ActionDescriptor descriptor,
             CancellationToken cancellation)
         {
-            return SendCore<TResult, TRequestParameters>(parameters, descriptor, cancellation);
+            return TaskExtensions.Execute(() => SendCoreAsync<TResult, TRequestParameters>(parameters, descriptor, cancellation));
         }
 
         public virtual void Close()
@@ -130,26 +131,10 @@ namespace Bolt.Client.Channels
             CancellationToken cancellation,
             object parameters)
         {
-            return new ClientActionContext(actionDescriptor, CreateWebRequest(server, actionDescriptor), server, cancellation)
+            return new ClientActionContext(actionDescriptor, CreateRequest(server, actionDescriptor), server, cancellation)
                        {
                            ResponseTimeout = DefaultResponseTimeout
                        };
-        }
-
-        public virtual T SendCore<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
-        {
-            EnsureNotClosed();
-            ValidateParameters(parameters, descriptor);
-
-            Uri server = GetRemoteConnection();
-
-            using (ClientActionContext ctxt = CreateContext(server, descriptor, cancellation, parameters))
-            {
-                BeforeSending(ctxt);
-                ResponseDescriptor<T> result = RequestForwarder.GetResponse<T, TParameters>(ctxt, parameters);
-                AfterReceived(ctxt);
-                return result.GetResultOrThrow();
-            }
         }
 
         public virtual async Task<T> SendCoreAsync<T, TParameters>(
@@ -165,7 +150,7 @@ namespace Bolt.Client.Channels
             using (ClientActionContext ctxt = CreateContext(server, descriptor, cancellation, parameters))
             {
                 BeforeSending(ctxt);
-                ResponseDescriptor<T> result = await RequestForwarder.GetResponseAsync<T, TParameters>(ctxt, parameters);
+                ResponseDescriptor<T> result = await requestHandler.GetResponseAsync<T, TParameters>(ctxt, parameters);
                 AfterReceived(ctxt);
                 return result.GetResultOrThrow();
             }
@@ -179,12 +164,15 @@ namespace Bolt.Client.Channels
         {
         }
 
-        protected virtual HttpWebRequest CreateWebRequest(Uri server, ActionDescriptor descriptor)
+        protected virtual HttpRequestMessage CreateRequest(Uri server, ActionDescriptor descriptor)
         {
             Uri uri = EndpointProvider.GetEndpoint(server, descriptor);
-            HttpWebRequest request = WebRequest.CreateHttp(uri);
-            request.Method = "Post";
-            return request;
+
+            return new HttpRequestMessage()
+            {
+                RequestUri = uri,
+                Method = HttpMethod.Post
+            };
         }
 
         protected virtual void OnClosed()

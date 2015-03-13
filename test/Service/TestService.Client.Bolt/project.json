@@ -1,7 +1,16 @@
 ﻿{
     "version": "1.0.0-*",
-    "authors": [ "Martin Tomka" ],
-    "description": "Bolt Core library containing common classes and helpers shared by client and server.",
+    "code": [
+        "**/*.cs",
+        "../TestService.Core/Person.cs"
+    ],
+    "dependencies": {
+        "Bolt.Core": "",
+        "Bolt.Client": ""
+    },
+    "commands": {
+        "TestService.Client.Bolt": "run"
+    },
     "frameworks": {
         "aspnet50": {
             "frameworkAssemblies": {
@@ -9,23 +18,21 @@
                 "System.Collections": "",
                 "System.Runtime.Serialization": "",
                 "System.Xml": "",
-                "System.Net.Http": ""
-            },
-            "dependencies": {
+                "System.Net.Http": "",
+                "System.Diagnostics.Debug": ""
             }
         },
         "aspnetcore50": {
             "dependencies": {
+                "System.Console": "4.0.0-beta-22523",
                 "System.Runtime": "4.0.20-beta-22523",
                 "System.Collections": "4.0.10-beta-22605",
                 "System.Linq": "4.0.0-beta-22605",
                 "System.Threading.Timer": "4.0.0-beta-22605",
                 "System.Diagnostics.Debug": "4.0.10-beta-22605",
-                "System.Threading": "4.0.10-beta-22605"
+                "System.Threading": "4.0.10-beta-22605",
+                "System.Reflection.TypeExtensions": "4.0.0-beta-22605",
             }
         }
-    },
-    "dependencies": {
-        "Bolt.Core": "1.0.0-*"
     }
 }

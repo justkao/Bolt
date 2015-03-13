@@ -1,5 +1,5 @@
 using System;
-using System.Net;
+using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -30,8 +30,8 @@ namespace Bolt.Client.Channels
             ServerProvider = serverProvider;
         }
 
-        public RecoverableChannel(IServerProvider serverProvider, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
-            : base(requestForwarder, endpointProvider)
+        public RecoverableChannel(IServerProvider serverProvider, IRequestHandler requestHandler, IEndpointProvider endpointProvider)
+            : base(requestHandler, endpointProvider)
         {
             ServerProvider = serverProvider;
         }
@@ -41,70 +41,6 @@ namespace Bolt.Client.Channels
         public TimeSpan RetryDelay { get; set; }
 
         public IServerProvider ServerProvider { get; private set; }
-
-        public override sealed T SendCore<T, TParameters>(
-            TParameters parameters,
-            ActionDescriptor descriptor,
-            CancellationToken cancellation)
-        {
-            EnsureNotClosed();
-
-            int tries = 0;
-
-            while (true)
-            {
-                Exception error = null;
-                Uri connection = null;
-                try
-                {
-                    connection = GetRemoteConnection();
-                }
-                catch (Exception e)
-                {
-                    e.EnsureNotCancelled();
-
-                    if (!HandleOpenConnectionError(e))
-                    {
-                        throw;
-                    }
-
-                    error = e;
-                }
-
-                if (connection != null)
-                {
-                    using (ClientActionContext ctxt = CreateContext(connection, descriptor, cancellation, parameters))
-                    {
-                        try
-                        {
-                            BeforeSending(ctxt);
-                            ResponseDescriptor<T> result = RequestForwarder.GetResponse<T, TParameters>(ctxt, parameters);
-                            AfterReceived(ctxt);
-                            return result.GetResultOrThrow();
-                        }
-                        catch (Exception e)
-                        {
-                            e.EnsureNotCancelled();
-                            error = e;
-                        }
-
-                        if (!HandleError(ctxt, error))
-                        {
-                            throw error;
-                        }
-                    }
-                }
-
-                tries++;
-                if (tries > Retries)
-                {
-                    IsClosed = true;
-                    throw error;
-                }
-
-                TaskExtensions.Sleep(RetryDelay, cancellation);
-            }
-        }
 
         public sealed override async Task<T> SendCoreAsync<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
@@ -139,7 +75,7 @@ namespace Bolt.Client.Channels
                         try
                         {
                             BeforeSending(ctxt);
-                            ResponseDescriptor<T> result = await RequestForwarder.GetResponseAsync<T, TParameters>(ctxt, parameters);
+                            ResponseDescriptor<T> result = await requestHandler.GetResponseAsync<T, TParameters>(ctxt, parameters);
                             AfterReceived(ctxt);
                             return result.GetResultOrThrow();
                         }
@@ -169,12 +105,9 @@ namespace Bolt.Client.Channels
 
         protected virtual bool HandleError(ClientActionContext context, Exception error)
         {
-            if (error is WebException)
+            if (error is HttpRequestException)
             {
-                if ((error as WebException).Response == null)
-                {
-                    ServerProvider.OnServerUnavailable(context.Server);
-                }
+                ServerProvider.OnServerUnavailable(context.Server);
             }
 
             return HandleErrorCore(error);
@@ -220,12 +153,9 @@ namespace Bolt.Client.Channels
                 }
             }
 
-            if (error is WebException)
+            if (error is HttpRequestException)
             {
-                if ((error as WebException).Response == null)
-                {
-                    return true;
-                }
+                return true;
             }
 
             return false;

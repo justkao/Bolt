@@ -4,9 +4,6 @@ using Bolt.Server;
 using TestService.Core;
 using System;
 using System.Linq;
-using Microsoft.Framework.Logging;
-using Microsoft.Framework.Logging.Console;
-using Microsoft.AspNet.Security.DataProtection;
 
 namespace TestService.Server.Bolt
 {
@@ -27,7 +24,7 @@ namespace TestService.Server.Bolt
 
         public void Configure(IApplicationBuilder app)
         {
-            app.ApplicationServices.GetRequiredService<ILoggerFactory>().AddConsole(LogLevel.Verbose);
+            // app.ApplicationServices.GetRequiredService<ILoggerFactory>().AddConsole(LogLevel.Verbose);
 
             app.UseBolt(b => {
                 b.UseTestContract(new TestContractImplementation());

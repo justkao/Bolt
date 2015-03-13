@@ -34,7 +34,7 @@ namespace TestService.Client
             Console.WriteLine("Executing '{0}', Repeats = '{1}' ", actionName, count);
             Console.WriteLine();
 
-            // Execute(action, count, ClientFactory.CreateWcf(), "WCF", actionName);
+            Execute(action, count, ClientFactory.CreateWcf(), "WCF", actionName);
             Execute(action, count, ClientFactory.CreateBolt(), "Bolt", actionName);
             //Execute(action, count, ClientFactory.CreateIISBolt(), "Bolt-IIS", actionName);
             //Execute(action, count, ClientFactory.CreateIISWcf(), "WCF-IIS", actionName);

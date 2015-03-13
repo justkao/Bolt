@@ -11,7 +11,7 @@ namespace Bolt.Client
     public class MultipleServersProvider : IServerProvider
     {
         private readonly List<Uri> _servers;
-        private readonly Random _random = new Random();
+        private int _server;
         private Uri _lastServer;
         private Uri _lastUnavailableServer;
 
@@ -84,8 +84,9 @@ namespace Bolt.Client
                 return serverPool[0];
             }
 
-            int index = _random.Next(0, serverPool.Count - 1);
-            return serverPool[index];
+            _server++;
+            int index = _server;
+            return serverPool[index % serverPool.Count];
         }
     }
 }

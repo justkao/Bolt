@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 
 namespace Bolt.Client
 {
@@ -9,7 +10,7 @@ namespace Bolt.Client
     /// <typeparam name="TResponse">The type of response.</typeparam>
     public struct ResponseDescriptor<TResponse>
     {
-        public ResponseDescriptor(HttpWebResponse response, ClientActionContext context, Exception error, ResponseErrorType errorType)
+        public ResponseDescriptor(HttpResponseMessage response, ClientActionContext context, Exception error, ResponseErrorType errorType)
             : this()
         {
             Context = context;
@@ -18,7 +19,7 @@ namespace Bolt.Client
             Response = response;
         }
 
-        public ResponseDescriptor(HttpWebResponse response, ClientActionContext context, TResponse result)
+        public ResponseDescriptor(HttpResponseMessage response, ClientActionContext context, TResponse result)
             : this()
         {
             Response = response;
@@ -31,7 +32,7 @@ namespace Bolt.Client
         /// <summary>
         /// The server response.
         /// </summary>
-        public HttpWebResponse Response { get; private set; }
+        public HttpResponseMessage Response { get; private set; }
 
         /// <summary>
         /// The context of request action.

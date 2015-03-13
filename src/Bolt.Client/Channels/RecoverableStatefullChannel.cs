@@ -40,9 +40,9 @@ namespace Bolt.Client.Channels
         protected RecoverableStatefullChannel(
             IServerProvider serverProvider,
             string sessionHeaderName,
-            IRequestForwarder requestForwarder,
+            IRequestHandler requestHandler,
             IEndpointProvider endpointProvider)
-            : base(serverProvider, requestForwarder, endpointProvider)
+            : base(serverProvider, requestHandler, endpointProvider)
         {
             _sessionHeaderName = sessionHeaderName;
         }
@@ -91,7 +91,7 @@ namespace Bolt.Client.Channels
 
                         DelegatedChannel channel = new DelegatedChannel(
                             _activeConnection,
-                            RequestForwarder,
+                            requestHandler,
                             EndpointProvider,
                             (c) =>
                             {
@@ -135,7 +135,7 @@ namespace Bolt.Client.Channels
 
                         DelegatedChannel channel = new DelegatedChannel(
                             _activeConnection,
-                            RequestForwarder,
+                            requestHandler,
                             EndpointProvider,
                             (c) =>
                             {
@@ -241,7 +241,7 @@ namespace Bolt.Client.Channels
 
         protected TContract CreateContract(Uri server)
         {
-            return CreateContract(new DelegatedChannel(server, RequestForwarder, EndpointProvider, BeforeSending, AfterReceived));
+            return CreateContract(new DelegatedChannel(server, requestHandler, EndpointProvider, BeforeSending, AfterReceived));
         }
 
         private Uri EnsureConnection()
@@ -268,7 +268,7 @@ namespace Bolt.Client.Channels
                     CreateContract(
                         new DelegatedChannel(
                             connection,
-                            RequestForwarder,
+                            requestHandler,
                             EndpointProvider,
                             (c) =>
                             {
@@ -280,10 +280,7 @@ namespace Bolt.Client.Channels
                                 if (sessionId == null)
                                 {
                                     action = ctxt.Action;
-                                    if (ctxt.Response != null && ctxt.Response.Headers[_sessionHeaderName] != null)
-                                    {
-                                        sessionId = ctxt.Response.Headers[_sessionHeaderName];
-                                    }
+                                    sessionId = ctxt.Response.Headers.GetHeaderValue(_sessionHeaderName);
                                 }
                             }));
 
@@ -344,7 +341,7 @@ namespace Bolt.Client.Channels
                     CreateContract(
                         new DelegatedChannel(
                             connection,
-                            RequestForwarder,
+                            requestHandler,
                             EndpointProvider,
                             (c) =>
                             {
@@ -356,10 +353,8 @@ namespace Bolt.Client.Channels
                                 if (sessionId == null)
                                 {
                                     action = ctxt.Action;
-                                    if (ctxt.Response != null && ctxt.Response.Headers[_sessionHeaderName] != null)
-                                    {
-                                        sessionId = ctxt.Response.Headers[_sessionHeaderName];
-                                    }
+                                    sessionId = ctxt.Response.Headers.GetHeaderValue(_sessionHeaderName);
+
                                 }
                             }));
 
@@ -409,7 +404,7 @@ namespace Bolt.Client.Channels
         {
             if (!string.IsNullOrEmpty(sessionId))
             {
-                context.Request.Headers[_sessionHeaderName] = sessionId;
+                context.Request.Headers.Add(_sessionHeaderName, sessionId);
             }
         }
     }

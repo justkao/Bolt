@@ -47,7 +47,7 @@ namespace Bolt.Client
 
         protected virtual ServerErrorCode? TryReadBoltError(ClientActionContext context)
         {
-            string value = context.Response.Headers[_errorCodeHeader];
+            string value = context.Response.Headers.GetHeaderValue(_errorCodeHeader);
             if (string.IsNullOrEmpty(value))
             {
                 return null;
@@ -64,7 +64,7 @@ namespace Bolt.Client
 
         protected virtual int? TryReadErrorCode(ClientActionContext context)
         {
-            string value = context.Response.Headers[_errorCodeHeader];
+            string value = context.Response.Headers.GetHeaderValue(_errorCodeHeader);
             if (string.IsNullOrEmpty(value))
             {
                 return null;
