@@ -5,7 +5,7 @@ namespace Bolt.Client
     /// <summary>
     /// Helper used to extract Exception from response.
     /// </summary>
-    public interface IServerErrorProvider
+    public interface IClientErrorProvider
     {
         /// <summary>
         /// Try reads the Exception from server response. Special <see cref="BoltServerException"/> might be returned if response contains <see cref="Configuration.DefaultServerErrorCodesHeader"/> header.

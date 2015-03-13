@@ -16,7 +16,7 @@ namespace Bolt.Server
     {
         private readonly List<IContractInvoker> _invokers = new List<IContractInvoker>();
 
-        public BoltRouteHandler(ILoggerFactory factory, IResponseHandler responseHandler, IServerDataHandler dataHandler, IOptions<BoltServerOptions> options)
+        public BoltRouteHandler(ILoggerFactory factory, IResponseHandler responseHandler, IServerDataHandler dataHandler, IServerErrorHandler errorHandler, IOptions<BoltServerOptions> options)
         {
             if (factory == null)
             {
@@ -38,15 +38,23 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(options));
             }
 
+            if (errorHandler == null)
+            {
+                throw new ArgumentNullException(nameof(errorHandler));
+            }
+
             ResponseHandler = responseHandler;
             DataHandler = dataHandler;
             Options = options.Options;
             Logger = factory.Create<BoltRouteHandler>();
+            ErrorHandler = errorHandler;
         }
 
         public IResponseHandler ResponseHandler { get; }
 
         public IServerDataHandler DataHandler { get; }
+
+        public IServerErrorHandler ErrorHandler { get; }
 
         public BoltServerOptions Options { get; }
 
@@ -115,7 +123,7 @@ namespace Bolt.Server
                     Logger.WriteWarning("Contract with name '{0}' not found in registered contracts at '{1}'", contractName, path);
 
                     // we have defined bolt prefix, report error about contract not found
-                    ResponseHandler.HandleBoltError(context.HttpContext, ServerErrorCode.ContractNotFound);
+                    ErrorHandler.HandleBoltError(context.HttpContext, ServerErrorCode.ContractNotFound);
                     context.IsHandled = true;
                 }
 
@@ -128,7 +136,7 @@ namespace Bolt.Server
             var actionDescriptor = found.Descriptor.FirstOrDefault(a => string.CompareOrdinal(a.Name, actionName) == 0);
             if (actionDescriptor == null)
             {
-                ResponseHandler.HandleBoltError(context.HttpContext, ServerErrorCode.ActionNotFound);
+                ErrorHandler.HandleBoltError(context.HttpContext, ServerErrorCode.ActionNotFound);
                 return;
             }
 

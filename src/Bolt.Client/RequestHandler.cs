@@ -9,22 +9,22 @@ namespace Bolt.Client
     public class RequestHandler : DelegatingHandler, IRequestHandler
     {
         private readonly IClientDataHandler _dataHandler;
-        private readonly IServerErrorProvider _serverErrorProvider;
+        private readonly IClientErrorProvider _errorProvider;
 
-        public RequestHandler(IClientDataHandler dataHandler, IServerErrorProvider serverErrorProvider, HttpMessageHandler webRequestHandler = null)
+        public RequestHandler(IClientDataHandler dataHandler, IClientErrorProvider errorProvider, HttpMessageHandler webRequestHandler = null)
             : base(webRequestHandler ?? new HttpClientHandler())
         {
             if (dataHandler == null)
             {
-                throw new ArgumentNullException("dataHandler");
+                throw new ArgumentNullException(nameof(dataHandler));
             }
-            if (serverErrorProvider == null)
+            if (errorProvider == null)
             {
-                throw new ArgumentNullException("serverErrorProvider");
+                throw new ArgumentNullException(nameof(errorProvider));
             }
 
             _dataHandler = dataHandler;
-            _serverErrorProvider = serverErrorProvider;
+            _errorProvider = errorProvider;
         }
 
         public virtual ResponseDescriptor<T> GetResponse<T, TParameters>(ClientActionContext context, TParameters parameters)
@@ -125,7 +125,7 @@ namespace Bolt.Client
 
         protected virtual Exception ReadBoltServerErrorIfAvailable(ClientActionContext context)
         {
-            return _serverErrorProvider.TryReadServerError(context);
+            return _errorProvider.TryReadServerError(context);
         }
     }
 }

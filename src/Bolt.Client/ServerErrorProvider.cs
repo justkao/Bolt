@@ -3,11 +3,11 @@ using System.Net;
 
 namespace Bolt.Client
 {
-    public class ServerErrorProvider : IServerErrorProvider
+    public class ClientErrorProvider : IClientErrorProvider
     {
         private readonly string _errorCodeHeader;
 
-        public ServerErrorProvider(string errorCodeHeader)
+        public ClientErrorProvider(string errorCodeHeader)
         {
             if (errorCodeHeader == null)
             {

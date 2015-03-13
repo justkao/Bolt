@@ -19,6 +19,7 @@ namespace Bolt.Server
             services.AddTransient<IResponseHandler, ResponseHandler>();
             services.AddTransient<IServerDataHandler, ServerDataHandler>();
             services.AddTransient<IBoltRouteHandler, BoltRouteHandler>();
+            services.AddTransient<IServerErrorHandler, ServerErrorHandler>();
 
             return services;
         }
