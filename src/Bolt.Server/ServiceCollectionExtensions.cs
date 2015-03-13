@@ -15,7 +15,7 @@ namespace Bolt.Server
         public static IServiceCollection AddBolt(this IServiceCollection services, IConfiguration configuration = null)
         {
             services.AddTransient<ISerializer, JsonSerializer>();
-            services.AddTransient<IExceptionSerializer, JsonExceptionSerializer>();
+            services.AddTransient<IExceptionWrapper, JsonExceptionWrapper>();
             services.AddTransient<IResponseHandler, ResponseHandler>();
             services.AddTransient<IServerDataHandler, ServerDataHandler>();
             services.AddTransient<IBoltRouteHandler, BoltRouteHandler>();

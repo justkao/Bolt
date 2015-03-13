@@ -1,12 +1,13 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace Bolt
 {
     public interface ISerializer
     {
-        void Write<T>(Stream stream, T data);
+        void Write(Stream stream, object data);
 
-        T Read<T>(Stream stream);
+        object Read(Type type, Stream stream);
 
         string ContentType { get; }
     }

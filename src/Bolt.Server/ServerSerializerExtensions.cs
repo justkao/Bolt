@@ -72,34 +72,5 @@ namespace Bolt.Server
                 throw new SerializeResponseException(string.Format("Failed to serialize response data for action '{0}'.", actionDescriptor), e);
             }
         }
-
-        public static byte[] SerializeExceptionResponse(this IExceptionSerializer serializer, Exception exception, ActionDescriptor actionDescriptor)
-        {
-            if (Equals(exception, null))
-            {
-                return null;
-            }
-
-            try
-            {
-                MemoryStream stream = new MemoryStream();
-                serializer.Serialize(stream, exception);
-                return stream.ToArray();
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
-            }
-            catch (SerializeResponseException)
-            {
-                throw;
-            }
-            catch (Exception e)
-            {
-                e.EnsureNotCancelled();
-
-                throw new SerializeResponseException(string.Format("Failed to serialize exception response for action '{0}'.", actionDescriptor), e);
-            }
-        }
     }
 }

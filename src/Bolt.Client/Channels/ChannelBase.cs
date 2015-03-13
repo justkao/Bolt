@@ -18,7 +18,7 @@ namespace Bolt.Client.Channels
                 throw new ArgumentNullException("proxy");
             }
 
-            requestHandler = proxy.requestHandler;
+            RequestHandler = proxy.RequestHandler;
             EndpointProvider = proxy.EndpointProvider;
             IsClosed = proxy.IsClosed;
         }
@@ -41,11 +41,11 @@ namespace Bolt.Client.Channels
                 throw new ArgumentNullException("endpointProvider");
             }
 
-            requestHandler = requestHandler;
+            RequestHandler = requestHandler;
             EndpointProvider = endpointProvider;
         }
 
-        public IRequestHandler requestHandler { get; private set; }
+        public IRequestHandler RequestHandler { get; private set; }
 
         public IEndpointProvider EndpointProvider { get; private set; }
 
@@ -150,7 +150,7 @@ namespace Bolt.Client.Channels
             using (ClientActionContext ctxt = CreateContext(server, descriptor, cancellation, parameters))
             {
                 BeforeSending(ctxt);
-                ResponseDescriptor<T> result = await requestHandler.GetResponseAsync<T, TParameters>(ctxt, parameters);
+                ResponseDescriptor<T> result = await RequestHandler.GetResponseAsync<T, TParameters>(ctxt, parameters);
                 AfterReceived(ctxt);
                 return result.GetResultOrThrow();
             }

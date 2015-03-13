@@ -8,21 +8,21 @@ namespace Bolt.Client
     public class ClientDataHandler : IClientDataHandler
     {
         private readonly ISerializer _serializer;
-        private readonly IExceptionSerializer _exceptionSerializer;
+        private readonly IExceptionWrapper _exceptionWrapper;
 
-        public ClientDataHandler(ISerializer serializer, IExceptionSerializer exceptionSerializer)
+        public ClientDataHandler(ISerializer serializer, IExceptionWrapper exceptionWrapper)
         {
             if (serializer == null)
             {
                 throw new ArgumentNullException(nameof(serializer));
             }
-            if (exceptionSerializer == null)
+            if (exceptionWrapper == null)
             {
-                throw new ArgumentNullException(nameof(exceptionSerializer));
+                throw new ArgumentNullException(nameof(exceptionWrapper));
             }
 
             _serializer = serializer;
-            _exceptionSerializer = exceptionSerializer;
+            _exceptionWrapper = exceptionWrapper;
         }
 
         public virtual string ContentType
@@ -60,11 +60,6 @@ namespace Bolt.Client
             }
         }
 
-        public virtual Exception ReadException(ClientActionContext context)
-        {
-            return TaskExtensions.Execute(() => ReadExceptionAsync(context));
-        }
-
         public virtual async Task<Exception> ReadExceptionAsync(ClientActionContext context)
         {
             using (Stream stream = new MemoryStream(await context.Response.Content.ReadAsByteArrayAsync()))
@@ -74,7 +69,13 @@ namespace Bolt.Client
                     return null;
                 }
 
-                return _exceptionSerializer.DeserializeExceptionResponse(stream, context.Action);
+                object result = _serializer.DeserializeExceptionResponse(_exceptionWrapper.Type, stream, context.Action);
+                if (result == null)
+                {
+                    return null;
+                }
+
+                return _exceptionWrapper.Unwrap(result);
             }
         }
     }

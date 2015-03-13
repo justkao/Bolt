@@ -4,10 +4,9 @@ using Newtonsoft.Json;
 
 namespace Bolt
 {
-    public class JsonExceptionSerializer : ExceptionSerializerBase<string>
+    public class JsonExceptionWrapper : ExceptionWrapper<string>
     {
-        public JsonExceptionSerializer(ISerializer serializer)
-            : base(serializer)
+        public JsonExceptionWrapper()
         {
             ExceptionSerializerSettings = new JsonSerializerSettings
                                               {
@@ -20,14 +19,14 @@ namespace Bolt
 
         public JsonSerializerSettings ExceptionSerializerSettings { get; private set; }
 
-        protected override string CreateDescriptor(Exception exception)
+        protected override Exception UnwrapCore(string wrappedException)
         {
-            return JsonConvert.SerializeObject(exception, ExceptionSerializerSettings);
+            return JsonConvert.DeserializeObject<Exception>(wrappedException, ExceptionSerializerSettings);
         }
 
-        protected override Exception CreateException(string descriptor)
+        protected override string WrapCore(Exception exception)
         {
-            return JsonConvert.DeserializeObject<Exception>(descriptor, ExceptionSerializerSettings);
+            return JsonConvert.SerializeObject(exception, ExceptionSerializerSettings);
         }
     }
 }

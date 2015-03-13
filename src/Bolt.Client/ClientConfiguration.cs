@@ -12,8 +12,8 @@ namespace Bolt.Client
         {
             Options = new BoltOptions();
             Serializer = new JsonSerializer();
-            ExceptionSerializer = new JsonExceptionSerializer(Serializer);
-            DataHandler = new ClientDataHandler(Serializer, ExceptionSerializer);
+            ExceptionWrapper = new JsonExceptionWrapper();
+            DataHandler = new ClientDataHandler(Serializer, ExceptionWrapper);
             RequestHandler = new RequestHandler(DataHandler, new ServerErrorProvider(Options.ServerErrorCodesHeader));
             EndpointProvider = new EndpointProvider();
         }
@@ -41,7 +41,7 @@ namespace Bolt.Client
         /// <summary>
         /// Gets or sets the exception serializer.
         /// </summary>
-        public IExceptionSerializer ExceptionSerializer { get; set; }
+        public IExceptionWrapper ExceptionWrapper { get; set; }
 
         /// <summary>
         /// Gets or sets the endpoint provider.

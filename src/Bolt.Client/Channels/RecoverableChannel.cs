@@ -75,7 +75,7 @@ namespace Bolt.Client.Channels
                         try
                         {
                             BeforeSending(ctxt);
-                            ResponseDescriptor<T> result = await requestHandler.GetResponseAsync<T, TParameters>(ctxt, parameters);
+                            ResponseDescriptor<T> result = await RequestHandler.GetResponseAsync<T, TParameters>(ctxt, parameters);
                             AfterReceived(ctxt);
                             return result.GetResultOrThrow();
                         }

@@ -94,32 +94,31 @@ namespace Bolt.Client
             catch (Exception e)
             {
                 e.EnsureNotCancelled();
-
-                throw new DeserializeResponseException(
-                    string.Format("Failed to deserialize response data for action '{0}'.", actionDescriptor), e);
+                throw new DeserializeResponseException(string.Format("Failed to deserialize response data for action '{0}'.", actionDescriptor), e);
             }
         }
 
         /// <summary>
-        /// Deserialize the server error response into Exception class.
+        /// Deserialize the server response into the concrete type.
         /// </summary>
-        /// <param name="serializer">The exception serializer instance.</param>
-        /// <param name="rawException">The stream used to deserialize the exception.</param>
+        /// <typeparam name="T">The type of data to deserialize.</typeparam>
+        /// <param name="serializer">The data serializer instance.</param>
+        /// <param name="stream">The stream used to deserialize the data.</param>
         /// <param name="actionDescriptor">The action context of deserialize operation.</param>
-        /// <returns>The deserialized Exception or null if stream is null or empty.</returns>
+        /// <returns>The deserialized data or default(T) if stream is null or empty.</returns>
         /// <exception cref="TimeoutException">Thrown if timeout occurred.</exception>
         /// <exception cref="OperationCanceledException">Thrown if operation was cancelled.</exception>
         /// <exception cref="DeserializeResponseException">Thrown if any error occurred during deserialization.</exception>
-        public static Exception DeserializeExceptionResponse(this IExceptionSerializer serializer, Stream rawException, ActionDescriptor actionDescriptor)
+        public static object DeserializeExceptionResponse(this ISerializer serializer, Type type, Stream stream, ActionDescriptor actionDescriptor)
         {
-            if (rawException == null)
+            if (stream == null || stream.Length == 0)
             {
                 return null;
             }
 
             try
             {
-                return serializer.Deserialize(rawException);
+                return serializer.Read(type, stream);
             }
             catch (TimeoutException)
             {
@@ -136,9 +135,7 @@ namespace Bolt.Client
             catch (Exception e)
             {
                 e.EnsureNotCancelled();
-
-                throw new DeserializeResponseException(
-                    string.Format("Failed to deserialize exception response for action '{0}'.", actionDescriptor), e);
+                throw new DeserializeResponseException(string.Format("Failed to deserialize exception response data for action '{0}'.", actionDescriptor), e);
             }
         }
     }

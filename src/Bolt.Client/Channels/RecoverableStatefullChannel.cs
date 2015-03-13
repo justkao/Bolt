@@ -91,7 +91,7 @@ namespace Bolt.Client.Channels
 
                         DelegatedChannel channel = new DelegatedChannel(
                             _activeConnection,
-                            requestHandler,
+                            RequestHandler,
                             EndpointProvider,
                             (c) =>
                             {
@@ -135,7 +135,7 @@ namespace Bolt.Client.Channels
 
                         DelegatedChannel channel = new DelegatedChannel(
                             _activeConnection,
-                            requestHandler,
+                            RequestHandler,
                             EndpointProvider,
                             (c) =>
                             {
@@ -241,7 +241,7 @@ namespace Bolt.Client.Channels
 
         protected TContract CreateContract(Uri server)
         {
-            return CreateContract(new DelegatedChannel(server, requestHandler, EndpointProvider, BeforeSending, AfterReceived));
+            return CreateContract(new DelegatedChannel(server, RequestHandler, EndpointProvider, BeforeSending, AfterReceived));
         }
 
         private Uri EnsureConnection()
@@ -268,7 +268,7 @@ namespace Bolt.Client.Channels
                     CreateContract(
                         new DelegatedChannel(
                             connection,
-                            requestHandler,
+                            RequestHandler,
                             EndpointProvider,
                             (c) =>
                             {
@@ -341,7 +341,7 @@ namespace Bolt.Client.Channels
                     CreateContract(
                         new DelegatedChannel(
                             connection,
-                            requestHandler,
+                            RequestHandler,
                             EndpointProvider,
                             (c) =>
                             {

@@ -94,24 +94,24 @@ namespace TestService.Core
     {
         public TestContractDescriptor() : base(typeof(TestService.Core.ITestContract), "TestContract")
         {
-            UpdatePerson = Add("UpdatePerson", typeof(TestService.Core.Parameters.UpdatePersonParameters), typeof(ITestContract).GetMethod("UpdatePerson"));
-            UpdatePersonThatThrowsInvalidOperationException = Add("UpdatePersonThatThrowsInvalidOperationException", typeof(TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters), typeof(ITestContract).GetMethod("UpdatePersonThatThrowsInvalidOperationException"));
-            DoNothingAsAsync = Add("DoNothingAsAsync", typeof(Bolt.Empty), typeof(ITestContract).GetMethod("DoNothingAsAsync"));
-            DoNothing = Add("DoNothing", typeof(Bolt.Empty), typeof(ITestContract).GetMethod("DoNothing"));
-            DoNothingWithComplexParameterAsAsync = Add("DoNothingWithComplexParameterAsAsync", typeof(TestService.Core.Parameters.DoNothingWithComplexParameterAsAsyncParameters), typeof(ITestContract).GetMethod("DoNothingWithComplexParameterAsAsync"));
-            DoNothingWithComplexParameter = Add("DoNothingWithComplexParameter", typeof(TestService.Core.Parameters.DoNothingWithComplexParameterParameters), typeof(ITestContract).GetMethod("DoNothingWithComplexParameter"));
-            GetSimpleType = Add("GetSimpleType", typeof(TestService.Core.Parameters.GetSimpleTypeParameters), typeof(ITestContract).GetMethod("GetSimpleType"));
-            GetSimpleTypeAsAsync = Add("GetSimpleTypeAsAsync", typeof(TestService.Core.Parameters.GetSimpleTypeAsAsyncParameters), typeof(ITestContract).GetMethod("GetSimpleTypeAsAsync"));
-            GetSinglePerson = Add("GetSinglePerson", typeof(TestService.Core.Parameters.GetSinglePersonParameters), typeof(ITestContract).GetMethod("GetSinglePerson"));
-            GetSinglePersonAsAsync = Add("GetSinglePersonAsAsync", typeof(TestService.Core.Parameters.GetSinglePersonAsAsyncParameters), typeof(ITestContract).GetMethod("GetSinglePersonAsAsync"));
-            GetManyPersons = Add("GetManyPersons", typeof(Bolt.Empty), typeof(ITestContract).GetMethod("GetManyPersons"));
-            GetManyPersonsAsAsync = Add("GetManyPersonsAsAsync", typeof(TestService.Core.Parameters.GetManyPersonsAsAsyncParameters), typeof(ITestContract).GetMethod("GetManyPersonsAsAsync"));
-            Throws = Add("Throws", typeof(Bolt.Empty), typeof(ITestContract).GetMethod("Throws"));
-            ThrowsCustom = Add("ThrowsCustom", typeof(Bolt.Empty), typeof(ITestContract).GetMethod("ThrowsCustom"));
-            InnerOperation = Add("InnerOperation", typeof(Bolt.Empty), typeof(IInnerTestContract).GetMethod("InnerOperation"));
-            InnerOperationExAsync = Add("InnerOperationExAsync", typeof(Bolt.Empty), typeof(IInnerTestContract).GetMethod("InnerOperationExAsync"));
-            InnerOperation2 = Add("InnerOperation2", typeof(Bolt.Empty), typeof(IInnerTestContract2).GetMethod("InnerOperation2"));
-            InnerOperationExAsync2 = Add("InnerOperationExAsync2", typeof(Bolt.Empty), typeof(IInnerTestContract2).GetMethod("InnerOperationExAsync2"));
+            UpdatePerson = Add("UpdatePerson", typeof(TestService.Core.Parameters.UpdatePersonParameters), typeof(ITestContract).GetTypeInfo().GetMethod("UpdatePerson"));
+            UpdatePersonThatThrowsInvalidOperationException = Add("UpdatePersonThatThrowsInvalidOperationException", typeof(TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters), typeof(ITestContract).GetTypeInfo().GetMethod("UpdatePersonThatThrowsInvalidOperationException"));
+            DoNothingAsAsync = Add("DoNothingAsAsync", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("DoNothingAsAsync"));
+            DoNothing = Add("DoNothing", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("DoNothing"));
+            DoNothingWithComplexParameterAsAsync = Add("DoNothingWithComplexParameterAsAsync", typeof(TestService.Core.Parameters.DoNothingWithComplexParameterAsAsyncParameters), typeof(ITestContract).GetTypeInfo().GetMethod("DoNothingWithComplexParameterAsAsync"));
+            DoNothingWithComplexParameter = Add("DoNothingWithComplexParameter", typeof(TestService.Core.Parameters.DoNothingWithComplexParameterParameters), typeof(ITestContract).GetTypeInfo().GetMethod("DoNothingWithComplexParameter"));
+            GetSimpleType = Add("GetSimpleType", typeof(TestService.Core.Parameters.GetSimpleTypeParameters), typeof(ITestContract).GetTypeInfo().GetMethod("GetSimpleType"));
+            GetSimpleTypeAsAsync = Add("GetSimpleTypeAsAsync", typeof(TestService.Core.Parameters.GetSimpleTypeAsAsyncParameters), typeof(ITestContract).GetTypeInfo().GetMethod("GetSimpleTypeAsAsync"));
+            GetSinglePerson = Add("GetSinglePerson", typeof(TestService.Core.Parameters.GetSinglePersonParameters), typeof(ITestContract).GetTypeInfo().GetMethod("GetSinglePerson"));
+            GetSinglePersonAsAsync = Add("GetSinglePersonAsAsync", typeof(TestService.Core.Parameters.GetSinglePersonAsAsyncParameters), typeof(ITestContract).GetTypeInfo().GetMethod("GetSinglePersonAsAsync"));
+            GetManyPersons = Add("GetManyPersons", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("GetManyPersons"));
+            GetManyPersonsAsAsync = Add("GetManyPersonsAsAsync", typeof(TestService.Core.Parameters.GetManyPersonsAsAsyncParameters), typeof(ITestContract).GetTypeInfo().GetMethod("GetManyPersonsAsAsync"));
+            Throws = Add("Throws", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("Throws"));
+            ThrowsCustom = Add("ThrowsCustom", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("ThrowsCustom"));
+            InnerOperation = Add("InnerOperation", typeof(Bolt.Empty), typeof(IInnerTestContract).GetTypeInfo().GetMethod("InnerOperation"));
+            InnerOperationExAsync = Add("InnerOperationExAsync", typeof(Bolt.Empty), typeof(IInnerTestContract).GetTypeInfo().GetMethod("InnerOperationExAsync"));
+            InnerOperation2 = Add("InnerOperation2", typeof(Bolt.Empty), typeof(IInnerTestContract2).GetTypeInfo().GetMethod("InnerOperation2"));
+            InnerOperationExAsync2 = Add("InnerOperationExAsync2", typeof(Bolt.Empty), typeof(IInnerTestContract2).GetTypeInfo().GetMethod("InnerOperationExAsync2"));
         }
 
         public static readonly TestContractDescriptor Default = new TestContractDescriptor();

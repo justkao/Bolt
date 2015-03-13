@@ -6,26 +6,6 @@ namespace Bolt
 {
     public class XmlSerializer : ISerializer
     {
-        public void Write<T>(Stream stream, T data)
-        {
-            if (stream == null)
-            {
-                throw new ArgumentNullException("stream");
-            }
-
-            GetSerializer<T>().WriteObject(stream, data);
-        }
-
-        public T Read<T>(Stream stream)
-        {
-            if (stream == null)
-            {
-                throw new ArgumentNullException("stream");
-            }
-
-            return (T)GetSerializer<T>().ReadObject(stream);
-        }
-
         public string ContentType
         {
             get
@@ -34,9 +14,19 @@ namespace Bolt
             }
         }
 
-        private DataContractSerializer GetSerializer<T>()
+        public void Write(Stream stream, object data)
         {
-            return new DataContractSerializer(typeof(T));
+            new DataContractSerializer(data.GetType()).WriteObject(stream, data);
+        }
+
+        public object Read(Type type, Stream stream)
+        {
+            if (stream == null)
+            {
+                throw new ArgumentNullException("stream");
+            }
+
+            return new DataContractSerializer(type).ReadObject(stream);
         }
     }
 }
