@@ -10,9 +10,9 @@ namespace Bolt.Client
     {
         private readonly IClientDataHandler _dataHandler;
         private readonly IServerErrorProvider _serverErrorProvider;
-        private readonly HttpMessageHandler _webRequestHandler;
 
         public RequestHandler(IClientDataHandler dataHandler, IServerErrorProvider serverErrorProvider, HttpMessageHandler webRequestHandler = null)
+            : base(webRequestHandler ?? new HttpClientHandler())
         {
             if (dataHandler == null)
             {
@@ -25,7 +25,6 @@ namespace Bolt.Client
 
             _dataHandler = dataHandler;
             _serverErrorProvider = serverErrorProvider;
-            _webRequestHandler = webRequestHandler ?? new HttpClientHandler();
         }
 
         public virtual ResponseDescriptor<T> GetResponse<T, TParameters>(ClientActionContext context, TParameters parameters)
@@ -120,7 +119,6 @@ namespace Bolt.Client
             catch (Exception e)
             {
                 e.EnsureNotCancelled();
-
                 return new ResponseDescriptor<T>(context.Response, context, e, ResponseErrorType.Communication);
             }
         }
