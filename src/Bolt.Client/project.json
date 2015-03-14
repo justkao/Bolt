@@ -1,8 +1,25 @@
 ﻿{
-    "version": "1.0.0-*",
+    "version": "0.11.0-alpha",
     "authors": [ "Martin Tomka" ],
-    "description": "Bolt Core library containing common classes and helpers shared by client and server.",
+    "description": "Bolt portable client library used to access Bolt based services.",
+    "dependencies": {
+        "Bolt.Common": { "type": "build" },
+        "Bolt.Core": "1.0.0-*"
+    },
     "frameworks": {
+        "net45": {
+            "frameworkAssemblies": {
+                "System.Collections": { "version": "", "type": "build" },
+                "System.Diagnostics.Debug": { "version": "", "type": "build" },
+                "System.Linq": { "version": "", "type": "build" },
+                "System.Reflection": { "version": "", "type": "build" },
+                "System.Reflection.Extensions": { "version": "", "type": "build" },
+                "System.Runtime": { "version": "", "type": "build" },
+                "System.Runtime.Serialization": { "version": "", "type": "build" },
+                "System.Threading": { "version": "", "type": "build" },
+                "System.Net.Http": { "version": "", "type": "build" }
+            }
+        },
         "aspnet50": {
             "frameworkAssemblies": {
                 "System.Runtime": "",
@@ -24,9 +41,5 @@
                 "System.Threading": "4.0.10-beta-22605"
             }
         }
-    },
-    "dependencies": {
-        "Bolt.Common": {  "type": "build" },
-        "Bolt.Core": "1.0.0-*"
     }
 }

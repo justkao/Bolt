@@ -1,16 +1,13 @@
 using Bolt.Generators;
-using Microsoft.Framework.Runtime;
 using Microsoft.Framework.Runtime.Common.CommandLine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.PortableExecutable;
 
 namespace Bolt.Console
 {
@@ -18,30 +15,26 @@ namespace Bolt.Console
     {
         private readonly Dictionary<string, DocumentGenerator> _documents = new Dictionary<string, DocumentGenerator>();
 
-        public RootConfig(IAssemblyLoadContext loader)
+        public RootConfig(AssemblyCache cache)
         {
             Contracts = new List<ContractConfig>();
-            AssemblyCache = new AssemblyCache(loader);
-            Loader = loader;
+            AssemblyCache = cache;
         }
 
-        [JsonIgnore]
-        public IAssemblyLoadContext Loader { get; set; }
-
-        public static RootConfig CreateFromConfig(IAssemblyLoadContext loader, string file)
+        public static RootConfig CreateFromConfig(AssemblyCache cache, string file)
         {
             file = Path.GetFullPath(file);
             string content = File.ReadAllText(file);
-            return CreateFromConfig(loader, Path.GetDirectoryName(file), content);
+            return CreateFromConfig(cache, Path.GetDirectoryName(file), content);
         }
 
-        public static RootConfig CreateFromConfig(IAssemblyLoadContext loader, string outputDirectory, string content)
+        public static RootConfig CreateFromConfig(AssemblyCache cache, string outputDirectory, string content)
         {
-            RootConfig config = JsonConvert.DeserializeObject<RootConfig>(
-                content,
-                new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Include, Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() });
+            var settings = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Include, Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
+
+            RootConfig config = JsonConvert.DeserializeObject<RootConfig>(content, settings);
             config.OutputDirectory = outputDirectory;
-            config.Loader = loader;
+            config.AssemblyCache = cache;
 
             foreach (ContractConfig contract in config.Contracts)
             {
@@ -59,9 +52,9 @@ namespace Bolt.Console
             return config;
         }
 
-        public static RootConfig CreateFromAssembly(IAssemblyLoadContext loader, string assembly)
+        public static RootConfig CreateFromAssembly(AssemblyCache cache, string assembly)
         {
-            RootConfig root = new RootConfig(loader);
+            RootConfig root = new RootConfig(cache);
             root.Assemblies = new List<string>() { Path.GetFullPath(assembly) };
             root.Contracts = new List<ContractConfig>();
             

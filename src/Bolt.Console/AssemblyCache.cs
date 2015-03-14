@@ -1,4 +1,3 @@
-using Microsoft.Framework.Runtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -11,25 +10,40 @@ namespace Bolt.Console
     public class AssemblyCache : IEnumerable<Assembly>
     {
         private readonly Dictionary<string, Assembly> _assemblies = new Dictionary<string, Assembly>();
-        private readonly IAssemblyLoadContext _loader;
 
-        public AssemblyCache(IAssemblyLoadContext loader)
+#if !NET45
+        [Microsoft.Framework.Runtime.AssemblyNeutral]
+        public interface IAssemblyLoadContext : IDisposable
         {
-            _loader = loader;
+            Assembly Load(string name);
+            Assembly LoadFile(string path);
+            Assembly LoadStream(Stream assemblyStream, Stream assemblySymbols);
         }
 
+        private readonly Microsoft.Framework.Runtime.IAssemblyLoadContext _loader;
+
+        public AssemblyCache(IServiceProvider serviceProvider)
+        {
+            _loader = ((Microsoft.Framework.Runtime.IAssemblyLoadContextFactory)serviceProvider.GetService(typeof(Microsoft.Framework.Runtime.IAssemblyLoadContextFactory))).Create();
+        }
+#else
+        public AssemblyCache(IServiceProvider serviceProvider)
+        {
+        }
+#endif 
         public Assembly Add(string assemblyPath)
         {
             assemblyPath = Path.GetFullPath(assemblyPath);
-
             Assembly assembly;
             if (_assemblies.TryGetValue(assemblyPath, out assembly))
             {
                 return assembly;
             }
-
+#if !NET45
             assembly = _loader.LoadFile(assemblyPath);
-
+#else
+            assembly = Assembly.LoadFrom(assemblyPath);
+#endif 
             _assemblies.Add(assemblyPath, assembly);
             return assembly;
         }

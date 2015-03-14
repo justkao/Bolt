@@ -1,19 +1,30 @@
 ﻿{
-    "version": "1.0.0-*",
+    "version": "0.11.0-alpha",
     "authors": [ "Martin Tomka" ],
     "description": "Bolt Core library containing common classes and helpers shared by client and server.",
     "dependencies": {
         "Newtonsoft.Json": "6.0.7",
         "Bolt.Common": { "type": "build" }
     },
-
     "frameworks": {
+        "net45": {
+            "frameworkAssemblies": {
+                "System.Collections": { "version": "", "type": "build" },
+                "System.Diagnostics.Debug": { "version": "", "type": "build" },
+                "System.Linq": { "version": "", "type": "build" },
+                "System.Reflection": { "version": "", "type": "build" },
+                "System.Reflection.Extensions": { "version": "", "type": "build" },
+                "System.Runtime": { "version": "", "type": "build" },
+                "System.Runtime.Serialization": { "version": "", "type": "build" },
+                "System.Threading": { "version": "", "type": "build" },
+                "System.Net.Http": { "version": "", "type": "build" }
+            }
+        },
         "aspnet50": {
             "frameworkAssemblies": {
                 "System.Runtime": "",
                 "System.Collections": "",
                 "System.Runtime.Serialization": "",
-                "System.Xml": "",
                 "System.Net": "",
                 "System.Net.Http": ""
             },
@@ -23,7 +34,6 @@
         "aspnetcore50": {
             "dependencies": {
                 "System.Runtime": "4.0.20-beta-22523",
-                "System.Xml.XmlSerializer": "4.0.10-beta-22605",
                 "System.Collections": "4.0.10-beta-22605",
                 "System.Linq": "4.0.0-beta-22605",
                 "System.Threading.Tasks": "4.0.10-beta-22605",
@@ -31,10 +41,7 @@
                 "System.Reflection": "4.0.10-beta-22605",
                 "System.Runtime.Serialization.Primitives": "4.0.0-beta-22605",
                 "System.Diagnostics.Debug": "4.0.10-beta-22605",
-                "System.Threading": "4.0.10-beta-22605",
-                "System.Net.Primitives": "4.0.10-beta-22605",
-                "System.Runtime.Serialization.Xml": "4.0.10-beta-22605",
-                
+                "System.Threading": "4.0.10-beta-22605"
             }
         }
     }

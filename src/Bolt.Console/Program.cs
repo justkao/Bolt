@@ -1,5 +1,4 @@
-﻿using Microsoft.Framework.Runtime;
-using Microsoft.Framework.Runtime.Common.CommandLine;
+﻿using Microsoft.Framework.Runtime.Common.CommandLine;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,12 +9,12 @@ namespace Bolt.Console
     public class Program
     {
         private readonly IServiceProvider _hostServices;
-        private readonly IAssemblyLoadContext _loadContext;
+        private AssemblyCache _cache;
 
-        public Program(IServiceProvider services, IApplicationEnvironment environment)
+        public Program(IServiceProvider services)
         {
             _hostServices = services;
-            _loadContext = ((IAssemblyLoadContextFactory)_hostServices.GetService(typeof(IAssemblyLoadContextFactory))).Create();
+            _cache = new AssemblyCache(_hostServices);
         }
 
         public int Main(string[] args)
@@ -40,7 +39,7 @@ namespace Bolt.Console
                 {
                     try
                     {
-                        string result = CreateSampleConfiguration(_loadContext).Serialize();
+                        string result = CreateSampleConfiguration(_cache).Serialize();
                         string outputFile = PathHelpers.GetOutput(Directory.GetCurrentDirectory(), argRoot.Value, "bolt.example.json");
                         bool exist = File.Exists(outputFile);
                         File.WriteAllText(outputFile, result);
@@ -86,7 +85,7 @@ namespace Bolt.Console
 
                     try
                     {
-                        string json = RootConfig.CreateFromAssembly(_loadContext, input.Value).Serialize();
+                        string json = RootConfig.CreateFromAssembly(_cache, input.Value).Serialize();
                         var outputFile = PathHelpers.GetOutput(Path.GetDirectoryName(input.Value), output.Value(), "bolt.configuration.json");
                         bool exist = File.Exists(outputFile);
                         File.WriteAllText(outputFile, json);
@@ -135,7 +134,7 @@ namespace Bolt.Console
                     {
                         try
                         {
-                            rootConfig = RootConfig.CreateFromAssembly(_loadContext, input.Value);
+                            rootConfig = RootConfig.CreateFromAssembly(_cache, input.Value);
                         }
                         catch(Exception e)
                         {
@@ -146,7 +145,7 @@ namespace Bolt.Console
                     {
                         try
                         {
-                            rootConfig = RootConfig.CreateFromConfig(_loadContext, input.Value);
+                            rootConfig = RootConfig.CreateFromConfig(_cache, input.Value);
                         }
                         catch (Exception e)
                         {
@@ -178,9 +177,9 @@ namespace Bolt.Console
             return 1;
         }
 
-        private static RootConfig CreateSampleConfiguration(IAssemblyLoadContext loader)
+        private static RootConfig CreateSampleConfiguration(AssemblyCache cache)
         {
-            RootConfig rootConfig = new RootConfig(loader);
+            RootConfig rootConfig = new RootConfig(cache);
             rootConfig.Modifier = "<public|internal>";
             rootConfig.Assemblies = new List<string>() { "<AssemblyPath>", "<AssemblyPath>", "<AssemblyPath>" };
             rootConfig.Generators = new List<GeneratorConfig>()
