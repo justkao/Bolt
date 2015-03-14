@@ -1,4 +1,6 @@
-﻿using Mono.Options;
+﻿using Microsoft.Framework.Runtime;
+using Microsoft.Framework.DependencyInjection;
+using Microsoft.Framework.Runtime.Common.CommandLine;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,166 +9,135 @@ namespace Bolt.Console
 {
     public class Program
     {
-        private enum BoltAction
+        private readonly IServiceProvider _hostServices;
+        private readonly IAssemblyLoadContext _loadContext;
+
+        public Program(IServiceProvider services)
         {
-            GenerateCode,
-            GenerateCodeFromAssembly,
-            Help,
-            GenerateConfig,
-            GenerateExample
+            _hostServices = services;
+            _loadContext = ((IAssemblyLoadContextFactory)_hostServices.GetService(typeof(IAssemblyLoadContextFactory))).Create();
         }
 
-        public static int Main(string[] args)
+        public int Main(string[] args)
         {
-            BoltAction action = BoltAction.Help;
-            string workingDirectory = null;
-            string inputPath = null;
-            string outputPath = null;
+            var app = new CommandLineApplication();
+            app.Name = "bolt";
 
-            OptionSet set = new OptionSet()
+            app.OnExecute(() =>
             {
-                {
-                    "h|help", "Shows help for bolt tool.",
-                    (v) => { action = BoltAction.Help; }
-                },
-                {
-                    "root=", "The working directory for assembly loading.",
-                    v => workingDirectory = v
-                },
-                {
-                    "example", "Generates configuration example.", v =>
-                    {
-                        action = BoltAction.GenerateExample;
-                    }
-                },
-                {
-                    "fromConfig=", "The path to configuration file.",
-                    v =>
-                    {
-                        inputPath = v;
-                        action = BoltAction.GenerateCode;
-                    }
-                },
-                {
-                    "createConfig=", "Generates Configuration.json file for all interfaces in defined assembly.",
-                    v =>
-                    {
-                        inputPath = v;
-                        action = BoltAction.GenerateConfig;
-                    }
-                },
-                {
-                    "fromAssembly=", "Generates Bolt code from interfaces defined in assembly.",
-                    v =>
-                    {
-                        inputPath = v;
-                        action = BoltAction.GenerateCodeFromAssembly;
-                    }
-                },
-                {
-                    "output=", "Defines output file or directory.",
-                    v =>
-                    {
-                        outputPath = v;
-                    }
-                },
-            };
+                app.ShowHelp();
+                return 2;
+            });
 
-            try
+            app.Command("example", c =>
             {
-                set.Parse(args);
-            }
-            catch (OptionException e)
-            {
-                System.Console.WriteLine(e.Message);
-                System.Console.WriteLine("Try 'Bolt --help' for more information.");
-                return 0;
-            }
+                c.Description = "Generates Bolt configuration example file.";
+                var argRoot = c.Argument("[output]", "The output file path. If no value is specified Bolt.Example.json file is generated in current directory.");
+                c.HelpOption("-?|-h|--help");
 
-            if (!string.IsNullOrEmpty(workingDirectory))
-            {
-                Directory.SetCurrentDirectory(workingDirectory);
-            }
-            string outputFile = null;
-
-            try
-            {
-                switch (action)
+                c.OnExecute(() =>
                 {
-                    case BoltAction.GenerateCode:
-                        EnsureInput(inputPath, set);
-                        RootConfig rootConfig = RootConfig.Load(inputPath);
-                        rootConfig.OutputDirectory = outputPath ?? Path.GetDirectoryName(inputPath);
-                        rootConfig.Generate();
-                        break;
-                    case BoltAction.Help:
-                        ShowHelp(set);
-                        break;
-                    case BoltAction.GenerateCodeFromAssembly:
-                        EnsureInput(inputPath, set);
-                        RootConfig config = RootConfig.Create(inputPath);
-                        config.OutputDirectory = outputPath ?? Path.GetDirectoryName(inputPath);
-                        config.Generate();
-                        break;
-                    case BoltAction.GenerateConfig:
-                        EnsureInput(inputPath, set);
-                        string json = RootConfig.Create(inputPath).Serialize();
-                        outputFile = PathHelpers.GetOutput(Path.GetDirectoryName(inputPath), outputPath, "Configuration.json");
-                        File.WriteAllText(outputFile, json);
-                        break;
-                    case BoltAction.GenerateExample:
-                        string result = CreateSampleConfiguration().Serialize();
-                        outputFile = PathHelpers.GetOutput(Environment.CurrentDirectory, outputPath, "Bolt.Example.json");
-                        File.WriteAllText(outputFile, result);
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
-            }
-            catch (Exception e)
-            {
-                ConsoleColor prev = System.Console.ForegroundColor;
-                System.Console.ForegroundColor = ConsoleColor.Red;
-                System.Console.WriteLine("Failed to execute '{0}' action.", action);
-                System.Console.WriteLine("Error: '{0}'", e.Message);
-                System.Console.ForegroundColor = ConsoleColor.Gray;
-                System.Console.WriteLine(e.ToString());
-                System.Console.WriteLine(e.ToString());
-                System.Console.ForegroundColor = prev;
-                return 1;
-            }
+                    string result = CreateSampleConfiguration(_loadContext).Serialize();
+                    string outputFile = PathHelpers.GetOutput(Directory.GetCurrentDirectory(), argRoot.Value, "Bolt.Example.json");
+                    File.WriteAllText(outputFile, result);
 
-            return 0;
+                    System.Console.WriteLine("Example configuration file created: {0}", outputFile);
+                    System.Console.WriteLine();
+
+                    return 0;
+                });
+            });
+
+            app.Command("createConfig", c =>
+            {
+                c.Description = "Generates Configuration.json file for all interfaces in defined assembly.";
+                var input = c.Argument("[input]", "Path to assembly with interface for which the Bolt configuration will be generated.");
+                var output = c.Option("--output <PATH>", "Output directory or file that will be used to write Bolt configuration. If no path is specified the 'Configuration.json' file will be generated in current directory.", CommandOptionType.SingleValue);
+
+                c.HelpOption("-?|-h|--help");
+
+                c.OnExecute(() =>
+                {
+                    if (!File.Exists(input.Value))
+                    {
+                        System.Console.WriteLine("Assembly must be specified.");
+                        return 1;
+                    }
+
+                    string json = RootConfig.Create(_loadContext, input.Value).Serialize();
+                    var outputFile = PathHelpers.GetOutput(Path.GetDirectoryName(input.Value), output.Value(), "Configuration.json");
+                    File.WriteAllText(outputFile, json);
+                    System.Console.WriteLine("Configuration file created: {0}", outputFile);
+                    System.Console.WriteLine();
+
+                    return 0;
+                });
+            });
+
+            app.Command("fromAssembly", c =>
+            {
+                c.Description = "Generate Bolt contract configuration for all interfaces that are defined in assembly.";
+                var input = c.Argument("[input]", "Path to assembly with interfaces for which the Bolt code will be generated.");
+                var output = c.Option("--output <DIRECTORY>", "Directory where the Bolt code will be generated. If not specified directory of input file will be used.", CommandOptionType.SingleValue);
+                c.HelpOption("-?|-h|--help");
+
+                c.OnExecute(() =>
+                {
+                    if (!File.Exists(input.Value))
+                    {
+                        System.Console.WriteLine("Assembly must be specified.");
+                        return 1;
+                    }
+
+                    RootConfig rootConfig = RootConfig.Create(_loadContext, input.Value);
+                    if (output.HasValue())
+                    {
+                        rootConfig.OutputDirectory = output.Value();
+                    }
+                    else
+                    {
+                        rootConfig.OutputDirectory = Path.GetDirectoryName(input.Value);
+                    }
+
+                    return rootConfig.Generate();
+                });
+            });
+
+            app.Command("fromConfig", c =>
+            {
+                c.Description = "Generates Bolt code for contracts defined in configuration file.";
+                var input = c.Argument("[input]", "Path to Bolt configuration file with contract definitions.");
+                var output = c.Option("--output <DIRECTORY>", "Directory where the Bolt code will be generated. If not specified directory of input file will be used.", CommandOptionType.SingleValue);
+                c.HelpOption("-?|-h|--help");
+
+                c.OnExecute(() =>
+                {
+                    if (!File.Exists(input.Value))
+                    {
+                        System.Console.WriteLine("Bolt Configuration must be specified.");
+                        return 1;
+                    }
+
+                    RootConfig rootConfig = RootConfig.Load(_loadContext, input.Value);
+                    if ( output.HasValue())
+                    {
+                        rootConfig.OutputDirectory = output.Value();
+                    }
+                    else
+                    {
+                        rootConfig.OutputDirectory = Path.GetDirectoryName(input.Value);
+                    }
+
+                    return rootConfig.Generate();
+                });
+            });
+
+            return app.Execute(args);
         }
 
-        private static void EnsureInput(string inputPath, OptionSet set)
+        private static RootConfig CreateSampleConfiguration(IAssemblyLoadContext loader)
         {
-            if (string.IsNullOrEmpty(inputPath))
-            {
-                System.Console.Error.WriteLine("The input must be specified.");
-                set.WriteOptionDescriptions(System.Console.Error);
-                Environment.Exit(-1);
-            }
-
-            if (!File.Exists(inputPath))
-            {
-                System.Console.Error.WriteLine("The file '{0}' does not exist.", inputPath);
-                set.WriteOptionDescriptions(System.Console.Error);
-                Environment.Exit(-1);
-            }
-        }
-
-        private static void ShowHelp(OptionSet p)
-        {
-            System.Console.WriteLine("Usage: Bolt [OPTIONS]");
-            System.Console.WriteLine();
-            System.Console.WriteLine("Options:");
-            p.WriteOptionDescriptions(System.Console.Out);
-        }
-
-        private static RootConfig CreateSampleConfiguration()
-        {
-            RootConfig rootConfig = new RootConfig();
+            RootConfig rootConfig = new RootConfig(loader);
             rootConfig.Modifier = "<public|internal>";
             rootConfig.Assemblies = new List<string>() { "<AssemblyPath>", "<AssemblyPath>", "<AssemblyPath>" };
             rootConfig.Generators = new List<GeneratorConfig>()

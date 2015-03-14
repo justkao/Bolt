@@ -1,4 +1,5 @@
 using Bolt.Generators;
+using Microsoft.Framework.Runtime;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
@@ -8,6 +9,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.PortableExecutable;
 
 namespace Bolt.Console
 {
@@ -15,26 +17,30 @@ namespace Bolt.Console
     {
         private readonly Dictionary<string, DocumentGenerator> _documents = new Dictionary<string, DocumentGenerator>();
 
-        public RootConfig()
+        public RootConfig(IAssemblyLoadContext loader)
         {
             Contracts = new List<ContractConfig>();
-            AssemblyCache = new AssemblyCache();
+            AssemblyCache = new AssemblyCache(loader);
+            Loader = loader;
         }
 
-        public static RootConfig Load(string file)
+        [JsonIgnore]
+        public IAssemblyLoadContext Loader { get; set; }
+
+        public static RootConfig Load(IAssemblyLoadContext loader, string file)
         {
             file = Path.GetFullPath(file);
             string content = File.ReadAllText(file);
-            return Load(Path.GetDirectoryName(file), content);
+            return Load(loader, Path.GetDirectoryName(file), content);
         }
 
-        public static RootConfig Create(string assembly)
+        public static RootConfig Create(IAssemblyLoadContext loader, string assembly)
         {
-            RootConfig root = new RootConfig();
+            RootConfig root = new RootConfig(loader);
             root.Assemblies = new List<string>() { Path.GetFullPath(assembly) };
             root.Contracts = new List<ContractConfig>();
-
-            foreach (Type type in Assembly.LoadFrom(assembly).GetTypes())
+            
+            foreach (TypeInfo type in root.AssemblyCache.Add(assembly).DefinedTypes)
             {
                 if (!type.IsInterface)
                 {
@@ -52,6 +58,13 @@ namespace Bolt.Console
                     Namespace = type.Namespace
                 };
 
+                c.Descriptor = new DescriptorConfig()
+                {
+                    Modifier = "public",
+                    Suffix = "Invoker",
+                    Namespace = type.Namespace
+                };
+
                 c.Server = new ServerConfig()
                 {
                     Modifier = "public",
@@ -65,12 +78,13 @@ namespace Bolt.Console
             return root;
         }
 
-        public static RootConfig Load(string outputDirectory, string content)
+        public static RootConfig Load(IAssemblyLoadContext loader, string outputDirectory, string content)
         {
             RootConfig config = JsonConvert.DeserializeObject<RootConfig>(
                 content,
                 new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Include, Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() });
             config.OutputDirectory = outputDirectory;
+            config.Loader = loader;
 
             foreach (ContractConfig contract in config.Contracts)
             {
@@ -113,16 +127,13 @@ namespace Bolt.Console
                 new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore, Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() });
         }
 
-        public void Generate()
+        public int Generate()
         {
             List<string> directories =
                 Assemblies.Select(Path.GetDirectoryName)
                     .Concat(new[] { Directory.GetCurrentDirectory() })
                     .Distinct()
                     .ToList();
-
-            AssemblyResolver resolver = new AssemblyResolver(directories.ToArray());
-            AppDomain.CurrentDomain.AssemblyResolve += resolver.Resolve;
 
             foreach (string assembly in Assemblies)
             {
@@ -131,43 +142,67 @@ namespace Bolt.Console
 
             Stopwatch watch = Stopwatch.StartNew();
 
+            foreach (ContractConfig contract in Contracts)
+            {
+                try
+                {
+                    contract.Generate();
+                }
+                catch (Exception e)
+                {
+                    System.Console.WriteLine("Failed to generate contract: '{0}'", contract.Contract);
+                    System.Console.WriteLine("Error:");
+                    System.Console.WriteLine(e);
+                    System.Console.WriteLine();
+
+                    return 1;
+                }
+            }
+
             try
             {
                 System.Console.WriteLine();
                 System.Console.WriteLine("Generating files ... ");
                 System.Console.WriteLine();
 
-                foreach (ContractConfig contract in Contracts)
-                {
-                    contract.Generate();
-                }
-
                 foreach (KeyValuePair<string, DocumentGenerator> documentGenerator in _documents)
                 {
-                    string result = documentGenerator.Value.GetResult();
-                    if (File.Exists(documentGenerator.Key))
+                    try
                     {
-                        string prev = File.ReadAllText(documentGenerator.Key);
-                        if (prev != result)
-                        {                            
-                            File.WriteAllText(documentGenerator.Key, result);
-                            System.Console.WriteLine("Generated File: '{0}'", documentGenerator.Key);
+                        string result = documentGenerator.Value.GetResult();
+                        if (File.Exists(documentGenerator.Key))
+                        {
+                            string prev = File.ReadAllText(documentGenerator.Key);
+                            if (prev != result)
+                            {
+                                File.WriteAllText(documentGenerator.Key, result);
+                                System.Console.WriteLine("Generated File: '{0}'", documentGenerator.Key);
+                            }
+                            else
+                            {
+                                System.Console.WriteLine("No changes detected for file: '{0}'", documentGenerator.Key);
+                            }
                         }
                         else
                         {
-                            System.Console.WriteLine("No changes detected for file: '{0}'", documentGenerator.Key);
+                            string directory = Path.GetDirectoryName(documentGenerator.Key);
+                            if (directory != null && !Directory.Exists(directory))
+                            {
+                                Directory.CreateDirectory(directory);
+                            }
+
+                            File.WriteAllText(documentGenerator.Key, result);
+                            System.Console.WriteLine("Generated File: '{0}'", documentGenerator.Key);
                         }
                     }
-                    else
+                    catch(Exception e)
                     {
-                        string directory = Path.GetDirectoryName(documentGenerator.Key);
-                        if (directory != null && !Directory.Exists(directory))
-                        {
-                            Directory.CreateDirectory(directory);
-                        }
+                        System.Console.WriteLine("Failed to generate file: '{0}'", documentGenerator.Key);
+                        System.Console.WriteLine("Error:");
+                        System.Console.WriteLine(e);
+                        System.Console.WriteLine();
 
-                        File.WriteAllText(documentGenerator.Key, result);
-                        System.Console.WriteLine("Generated File: '{0}'", documentGenerator.Key);
+                        return 1;
                     }
                 }
             }
@@ -176,8 +211,9 @@ namespace Bolt.Console
                 System.Console.WriteLine();
                 System.Console.WriteLine("Generation of {0} files has taken {1}ms", _documents.Count, watch.ElapsedMilliseconds);
                 System.Console.WriteLine();
-                AppDomain.CurrentDomain.AssemblyResolve -= resolver.Resolve;
             }
+
+            return 0;
         }
 
         public DocumentGenerator GetDocument(string output)
@@ -198,7 +234,7 @@ namespace Bolt.Console
 
             return _documents[output];
         }
-
+        /*
         private class AssemblyResolver
         {
             private readonly string[] _directories;
@@ -277,14 +313,14 @@ namespace Bolt.Console
 
                     fullName = fullName.Split(new[] { ',' })[0];
 
-                    string found = files.FirstOrDefault(f => string.Equals(fullName, Path.GetFileNameWithoutExtension(f), StringComparison.InvariantCultureIgnoreCase));
+                    string found = files.FirstOrDefault(f => string.Equals(fullName, Path.GetFileNameWithoutExtension(f), StringComparison.OrdinalIgnoreCase));
 
                     if (found == null)
                     {
                         return null;
                     }
 
-                    return Assembly.Load(File.ReadAllBytes(found));
+                    return _AppDomain.Load(File.ReadAllBytes(found));
                 }
                 catch (Exception)
                 {
@@ -294,12 +330,13 @@ namespace Bolt.Console
             }
 
         }
+        */
 
         public IUserCodeGenerator GetGenerator(string generatorName)
         {
             GeneratorConfig found =
                 Generators.EmptyIfNull().FirstOrDefault(
-                    g => string.Equals(g.Name, generatorName, StringComparison.InvariantCultureIgnoreCase));
+                    g => string.Equals(g.Name, generatorName, StringComparison.OrdinalIgnoreCase));
 
             if (found == null)
             {

@@ -9,7 +9,7 @@ namespace Bolt.Console
         {
             if (defaultPath == null)
             {
-                defaultPath = Environment.CurrentDirectory;
+                defaultPath = Directory.GetCurrentDirectory();
             }
 
             if (string.IsNullOrEmpty(userDefinedPath))

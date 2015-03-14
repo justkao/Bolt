@@ -53,16 +53,6 @@
     <Compile Include="Servers.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Bolt.Console\Bolt.Console.csproj">
-      <Project>{7e15c5a0-a53e-4971-88a4-1884f095ad23}</Project>
-      <Name>Bolt.Console</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\..\src\Bolt.Generators\Bolt.Generators.csproj">
-      <Project>{984c96c8-c777-4361-a270-c716103d9c93}</Project>
-      <Name>Bolt.Generators</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
   <ItemGroup />

@@ -87,12 +87,12 @@ namespace Bolt.Generators
 
         public MethodInfo GetInitSessionMethod()
         {
-            return GetEffectiveMethods().FirstOrDefault(m => m.GetCustomAttributes().FirstOrDefault(a => a.GetType().FullName == BoltConstants.Core.InitSessionAttribute.FullName) != null);
+            return GetEffectiveMethods().FirstOrDefault(m => m.CustomAttributes.FirstOrDefault(a => a.GetType().FullName == BoltConstants.Core.InitSessionAttribute.FullName) != null);
         }
 
         public MethodInfo GetCloseSessionMethod()
         {
-            return GetEffectiveMethods().FirstOrDefault(m => m.GetCustomAttributes().FirstOrDefault(a => a.GetType().FullName == BoltConstants.Core.CloseSessionAttribute.FullName) != null);
+            return GetEffectiveMethods().FirstOrDefault(m => m.CustomAttributes.FirstOrDefault(a => a.GetType().FullName == BoltConstants.Core.CloseSessionAttribute.FullName) != null);
         }
 
         private IEnumerable<Type> GetInterfacesInternal(IEnumerable<Type> interfaces)

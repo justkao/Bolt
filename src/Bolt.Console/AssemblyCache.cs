@@ -1,3 +1,4 @@
+using Microsoft.Framework.Runtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,23 +9,31 @@ namespace Bolt.Console
 {
     public class AssemblyCache : IEnumerable<Assembly>
     {
-        private readonly List<Assembly> _assemblies = new List<Assembly>();
-        private readonly List<string> _assemblyPath = new List<string>();
+        private readonly Dictionary<string, Assembly> _assemblies = new Dictionary<string, Assembly>();
+        private readonly IAssemblyLoadContext _loader;
 
-        public void Add(string assemblyPath)
+        public AssemblyCache(IAssemblyLoadContext loader)
         {
-            if (_assemblyPath.Contains(assemblyPath))
+            _loader = loader;
+        }
+
+        public Assembly Add(string assemblyPath)
+        {
+            Assembly assembly;
+            if (_assemblies.TryGetValue(assemblyPath, out assembly))
             {
-                return;
+                return assembly;
             }
 
-            _assemblies.Add(Assembly.Load(File.ReadAllBytes(assemblyPath)));
-            _assemblyPath.Add(assemblyPath);
+            assembly = _loader.LoadFile(assemblyPath);
+
+            _assemblies.Add(assemblyPath, assembly);
+            return assembly;
         }
 
         public Type GetType(string fullName)
         {
-            foreach (Assembly assembly in _assemblies)
+            foreach (Assembly assembly in _assemblies.Values)
             {
                 Type type = assembly.GetType(fullName);
                 if (type != null)
@@ -38,7 +47,7 @@ namespace Bolt.Console
 
         public IEnumerator<Assembly> GetEnumerator()
         {
-            return _assemblies.GetEnumerator();
+            return _assemblies.Values.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()

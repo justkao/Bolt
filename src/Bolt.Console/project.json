@@ -1,0 +1,34 @@
+﻿{
+    "version": "1.0.0-*",
+    "authors": [ "Martin Tomka" ],
+    "dependencies": {
+        "Bolt.Generators": "",
+        "Microsoft.Framework.CommandLineUtils": { "version": "1.0.0-beta3", "type": "build" },
+        "Newtonsoft.Json": "6.0.7",
+        "Microsoft.Framework.Runtime": "1.0.0-beta3"
+    },
+    "frameworks": {
+        "aspnet50": {
+            "frameworkAssemblies": {
+                "System.Runtime": "",
+                "System.Collections": "",
+                "System.Runtime.Serialization": ""
+            }
+        },
+        "aspnetcore50": {
+            "dependencies": {
+                "System.Runtime": "4.0.20-beta-22523",
+                "System.Collections": "4.0.10-beta-22605",
+                "System.Linq": "4.0.0-beta-22605",
+                "System.Reflection.Primitives": "4.0.0-beta-22605",
+                "System.Reflection": "4.0.10-beta-22605",
+                "System.Runtime.Serialization.Primitives": "4.0.0-beta-22605",
+                "System.Diagnostics.Debug": "4.0.10-beta-22605",
+                "System.Console": "4.0.0-beta-22605"
+            }
+        }
+    },
+    "commands": {
+        "Bolt.Console": "run"
+    }
+}

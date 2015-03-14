@@ -23,10 +23,8 @@ namespace Bolt.Generators
             foreach (KeyValuePair<string, string> pair in properties)
             {
                 PropertyInfo property =
-                    generator.GetType()
-                        .GetRuntimeProperties()
-                        .FirstOrDefault(
-                            p => string.Equals(p.Name, pair.Key, StringComparison.OrdinalIgnoreCase));
+                    generator.GetType().GetTypeInfo().DeclaredProperties
+                        .FirstOrDefault(p => string.Equals(p.Name, pair.Key, StringComparison.OrdinalIgnoreCase));
 
                 if (property == null)
                 {
@@ -38,7 +36,8 @@ namespace Bolt.Generators
                     continue;
                 }
 
-                property.SetValue(generator, Convert.ChangeType(pair.Value, property.PropertyType));
+                // TODO: reference package ? 
+                // property.SetValue(generator, Convert.ChangeType(pair.Value, property.PropertyType));
             }
 
             return generator;
