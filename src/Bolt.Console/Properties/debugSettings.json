@@ -1,0 +1,9 @@
+{
+  "profiles": [
+    {
+      "name": "Bolt.Console",
+      "commandName": "Bolt.Console",
+      "commandLineArgs": "code ..\\Bolt.Client\\bin\\Debug\\Bolt.Client.dll"
+    }
+  ]
+}

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 namespace Bolt.Console
@@ -19,6 +20,8 @@ namespace Bolt.Console
 
         public Assembly Add(string assemblyPath)
         {
+            assemblyPath = Path.GetFullPath(assemblyPath);
+
             Assembly assembly;
             if (_assemblies.TryGetValue(assemblyPath, out assembly))
             {
@@ -29,6 +32,19 @@ namespace Bolt.Console
 
             _assemblies.Add(assemblyPath, assembly);
             return assembly;
+        }
+
+        public IEnumerable<TypeInfo> GetTypes(Assembly assembly)
+        {
+            try
+            {
+                return assembly.DefinedTypes;
+            }
+            catch (ReflectionTypeLoadException e)
+            {
+                var errors = e.LoaderExceptions.OfType<FileLoadException>().ToArray();
+                throw e;
+            }
         }
 
         public Type GetType(string fullName)

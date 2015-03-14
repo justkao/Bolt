@@ -1,5 +1,6 @@
 using Bolt.Generators;
 using Microsoft.Framework.Runtime;
+using Microsoft.Framework.Runtime.Common.CommandLine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System;
@@ -27,20 +28,44 @@ namespace Bolt.Console
         [JsonIgnore]
         public IAssemblyLoadContext Loader { get; set; }
 
-        public static RootConfig Load(IAssemblyLoadContext loader, string file)
+        public static RootConfig CreateFromConfig(IAssemblyLoadContext loader, string file)
         {
             file = Path.GetFullPath(file);
             string content = File.ReadAllText(file);
-            return Load(loader, Path.GetDirectoryName(file), content);
+            return CreateFromConfig(loader, Path.GetDirectoryName(file), content);
         }
 
-        public static RootConfig Create(IAssemblyLoadContext loader, string assembly)
+        public static RootConfig CreateFromConfig(IAssemblyLoadContext loader, string outputDirectory, string content)
+        {
+            RootConfig config = JsonConvert.DeserializeObject<RootConfig>(
+                content,
+                new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Include, Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() });
+            config.OutputDirectory = outputDirectory;
+            config.Loader = loader;
+
+            foreach (ContractConfig contract in config.Contracts)
+            {
+                contract.Parent = config;
+            }
+
+            if (config.Generators != null)
+            {
+                foreach (GeneratorConfig generator in config.Generators)
+                {
+                    generator.Parent = config;
+                }
+            }
+
+            return config;
+        }
+
+        public static RootConfig CreateFromAssembly(IAssemblyLoadContext loader, string assembly)
         {
             RootConfig root = new RootConfig(loader);
             root.Assemblies = new List<string>() { Path.GetFullPath(assembly) };
             root.Contracts = new List<ContractConfig>();
             
-            foreach (TypeInfo type in root.AssemblyCache.Add(assembly).DefinedTypes)
+            foreach (TypeInfo type in root.AssemblyCache.GetTypes(root.AssemblyCache.Add(assembly)))
             {
                 if (!type.IsInterface)
                 {
@@ -76,30 +101,6 @@ namespace Bolt.Console
             }
 
             return root;
-        }
-
-        public static RootConfig Load(IAssemblyLoadContext loader, string outputDirectory, string content)
-        {
-            RootConfig config = JsonConvert.DeserializeObject<RootConfig>(
-                content,
-                new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Include, Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() });
-            config.OutputDirectory = outputDirectory;
-            config.Loader = loader;
-
-            foreach (ContractConfig contract in config.Contracts)
-            {
-                contract.Parent = config;
-            }
-
-            if (config.Generators != null)
-            {
-                foreach (GeneratorConfig generator in config.Generators)
-                {
-                    generator.Parent = config;
-                }
-            }
-
-            return config;
         }
 
         [JsonIgnore]
@@ -150,25 +151,29 @@ namespace Bolt.Console
                 }
                 catch (Exception e)
                 {
-                    System.Console.WriteLine("Failed to generate contract: '{0}'", contract.Contract);
-                    System.Console.WriteLine("Error:");
-                    System.Console.WriteLine(e);
-                    System.Console.WriteLine();
+                    AnsiConsole.Error.WriteLine($"Failed to generate contract: '{contract.Contract.Bold().White()}'");
+                    AnsiConsole.Output.WriteLine("Error:");
+                    AnsiConsole.Output.WriteLine(e.ToString());
+                    AnsiConsole.Output.WriteLine(Environment.NewLine);
 
                     return 1;
                 }
             }
 
-            try
-            {
-                System.Console.WriteLine();
-                System.Console.WriteLine("Generating files ... ");
-                System.Console.WriteLine();
+            AnsiConsole.Output.WriteLine($"Generating files ... ");
 
-                foreach (KeyValuePair<string, DocumentGenerator> documentGenerator in _documents)
+            foreach (var filesInDirectory in _documents.GroupBy(f=>Path.GetDirectoryName(f.Key)))
+            {
+                AnsiConsole.Output.WriteLine(string.Join(string.Empty, Enumerable.Repeat("-", filesInDirectory.Key.Count() + 12).ToArray()));
+                AnsiConsole.Output.WriteLine($"Directory: {filesInDirectory.Key.Bold().White()}");
+                AnsiConsole.Output.WriteLine(Environment.NewLine);
+
+                foreach (var documentGenerator in filesInDirectory)
                 {
                     try
                     {
+                        string status;
+
                         string result = documentGenerator.Value.GetResult();
                         if (File.Exists(documentGenerator.Key))
                         {
@@ -176,11 +181,11 @@ namespace Bolt.Console
                             if (prev != result)
                             {
                                 File.WriteAllText(documentGenerator.Key, result);
-                                System.Console.WriteLine("Generated File: '{0}'", documentGenerator.Key);
+                                status = "Overwritten".Green().Bold();
                             }
                             else
                             {
-                                System.Console.WriteLine("No changes detected for file: '{0}'", documentGenerator.Key);
+                                status = "Skipped".White();
                             }
                         }
                         else
@@ -192,26 +197,22 @@ namespace Bolt.Console
                             }
 
                             File.WriteAllText(documentGenerator.Key, result);
-                            System.Console.WriteLine("Generated File: '{0}'", documentGenerator.Key);
+                            status = "Generated".Green();
                         }
-                    }
-                    catch(Exception e)
-                    {
-                        System.Console.WriteLine("Failed to generate file: '{0}'", documentGenerator.Key);
-                        System.Console.WriteLine("Error:");
-                        System.Console.WriteLine(e);
-                        System.Console.WriteLine();
 
-                        return 1;
+                        AnsiConsole.Output.WriteLine($"{status}: {Path.GetFileName(documentGenerator.Key).White().Bold()}");
+                    }
+                    catch (Exception e)
+                    {
+                        return Program.HandleError($"File Generation Failed: {Path.GetFileName(documentGenerator.Key).White()}", e);
                     }
                 }
             }
-            finally
-            {
-                System.Console.WriteLine();
-                System.Console.WriteLine("Generation of {0} files has taken {1}ms", _documents.Count, watch.ElapsedMilliseconds);
-                System.Console.WriteLine();
-            }
+
+            AnsiConsole.Output.WriteLine(Environment.NewLine);
+            AnsiConsole.Output.WriteLine("Status:");
+            AnsiConsole.Output.WriteLine($"{"Files Generated,".Green().Bold()}  {watch.ElapsedMilliseconds}ms elapsed");
+            AnsiConsole.Output.WriteLine(Environment.NewLine);
 
             return 0;
         }

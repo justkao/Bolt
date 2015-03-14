@@ -1,5 +1,4 @@
 ﻿using Microsoft.Framework.Runtime;
-using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Runtime.Common.CommandLine;
 using System;
 using System.Collections.Generic;
@@ -12,7 +11,7 @@ namespace Bolt.Console
         private readonly IServiceProvider _hostServices;
         private readonly IAssemblyLoadContext _loadContext;
 
-        public Program(IServiceProvider services)
+        public Program(IServiceProvider services, IApplicationEnvironment environment)
         {
             _hostServices = services;
             _loadContext = ((IAssemblyLoadContextFactory)_hostServices.GetService(typeof(IAssemblyLoadContextFactory))).Create();
@@ -22,6 +21,7 @@ namespace Bolt.Console
         {
             var app = new CommandLineApplication();
             app.Name = "bolt";
+            AnsiConsole.Output.WriteLine(Environment.NewLine);
 
             app.OnExecute(() =>
             {
@@ -31,65 +31,113 @@ namespace Bolt.Console
 
             app.Command("example", c =>
             {
-                c.Description = "Generates Bolt configuration example file.";
-                var argRoot = c.Argument("[output]", "The output file path. If no value is specified Bolt.Example.json file is generated in current directory.");
+                c.Description = "Generates configuration file example.";
+                var argRoot = c.Argument("[output]", "The output configuration file path. If no value is specified then 'bolt.example.json' file will be generated in current directory.");
                 c.HelpOption("-?|-h|--help");
 
                 c.OnExecute(() =>
                 {
-                    string result = CreateSampleConfiguration(_loadContext).Serialize();
-                    string outputFile = PathHelpers.GetOutput(Directory.GetCurrentDirectory(), argRoot.Value, "Bolt.Example.json");
-                    File.WriteAllText(outputFile, result);
+                    try
+                    {
+                        string result = CreateSampleConfiguration(_loadContext).Serialize();
+                        string outputFile = PathHelpers.GetOutput(Directory.GetCurrentDirectory(), argRoot.Value, "bolt.example.json");
+                        File.WriteAllText(outputFile, result);
 
-                    System.Console.WriteLine("Example configuration file created: {0}", outputFile);
-                    System.Console.WriteLine();
+                        AnsiConsole.Output.WriteLine($"Example created: {outputFile.White().Bold()}");
+                    }
+                    catch(Exception e)
+                    {
+                        return HandleError("Failed to generate example configuration file.", e);
+                    }
 
                     return 0;
                 });
             });
 
-            app.Command("createConfig", c =>
+            app.Command("config", c =>
             {
-                c.Description = "Generates Configuration.json file for all interfaces in defined assembly.";
-                var input = c.Argument("[input]", "Path to assembly with interface for which the Bolt configuration will be generated.");
-                var output = c.Option("--output <PATH>", "Output directory or file that will be used to write Bolt configuration. If no path is specified the 'Configuration.json' file will be generated in current directory.", CommandOptionType.SingleValue);
+                c.Description = "Generates configuration file for all interfaces in assembly.";
+                var input = c.Argument("[input]", "Assembly used to generate configuration file.");
+                var output = c.Option("--output <PATH>", "Directory or configuration file path. If no path is specified then the 'bolt.configuration.json' configuration file will be generated in current directory.", CommandOptionType.SingleValue);
 
                 c.HelpOption("-?|-h|--help");
 
                 c.OnExecute(() =>
                 {
-                    if (!File.Exists(input.Value))
+                    if (string.IsNullOrEmpty(input.Value))
                     {
-                        System.Console.WriteLine("Assembly must be specified.");
+                        AnsiConsole.Output.WriteLine("Assembly must be specified.".Yellow());
                         return 1;
                     }
 
-                    string json = RootConfig.Create(_loadContext, input.Value).Serialize();
-                    var outputFile = PathHelpers.GetOutput(Path.GetDirectoryName(input.Value), output.Value(), "Configuration.json");
-                    File.WriteAllText(outputFile, json);
-                    System.Console.WriteLine("Configuration file created: {0}", outputFile);
-                    System.Console.WriteLine();
+                    if (!File.Exists(input.Value))
+                    {
+                        AnsiConsole.Output.WriteLine($"Assembly not found: {input.Value.White()}".Yellow());
+                        return 1;
+                    }
+
+                    try
+                    {
+                        string json = RootConfig.CreateFromAssembly(_loadContext, input.Value).Serialize();
+                        var outputFile = PathHelpers.GetOutput(Path.GetDirectoryName(input.Value), output.Value(), "bolt.configuration.json");
+                        File.WriteAllText(outputFile, json);
+                        AnsiConsole.Output.WriteLine($"Bolt configuration file created: {outputFile.White()}");
+                    }
+                    catch (Exception e)
+                    {
+                        return HandleError("Failed to generate Bolt configuration file.", e);
+                    }
 
                     return 0;
                 });
             });
 
-            app.Command("fromAssembly", c =>
+            app.Command("code", c =>
             {
-                c.Description = "Generate Bolt contract configuration for all interfaces that are defined in assembly.";
-                var input = c.Argument("[input]", "Path to assembly with interfaces for which the Bolt code will be generated.");
-                var output = c.Option("--output <DIRECTORY>", "Directory where the Bolt code will be generated. If not specified directory of input file will be used.", CommandOptionType.SingleValue);
+                c.Description = "Generates code from assembly or from configuration file.";
+                var input = c.Argument("[input]", "Path to the assembly or configuration file.");
+                var output = c.Option("--output <DIRECTORY>", "Directory where the Bolt code will be generated. If directory is not specified then the input path directory will be used instead.", CommandOptionType.SingleValue);
                 c.HelpOption("-?|-h|--help");
 
                 c.OnExecute(() =>
                 {
-                    if (!File.Exists(input.Value))
+                    if (string.IsNullOrEmpty(input.Value))
                     {
-                        System.Console.WriteLine("Assembly must be specified.");
+                        AnsiConsole.Output.WriteLine("Input path must be specified.".Yellow());
                         return 1;
                     }
 
-                    RootConfig rootConfig = RootConfig.Create(_loadContext, input.Value);
+                    if (!File.Exists(input.Value))
+                    {
+                        AnsiConsole.Output.WriteLine($"File not found: {input.Value.White().Bold()}".Yellow());
+                        return 1;
+                    }
+
+                    RootConfig rootConfig;
+
+                    if (Path.GetExtension(input.Value) == ".exe" || Path.GetExtension(input.Value) == ".dll")
+                    {
+                        try
+                        {
+                            rootConfig = RootConfig.CreateFromAssembly(_loadContext, input.Value);
+                        }
+                        catch(Exception e)
+                        {
+                            return HandleError($"Failed to read assembly: {input.Value.White().Bold()}", e);
+                        }
+                    }
+                    else
+                    {
+                        try
+                        {
+                            rootConfig = RootConfig.CreateFromConfig(_loadContext, input.Value);
+                        }
+                        catch (Exception e)
+                        {
+                            return HandleError($"Failed to read Bolt configuration: {input.Value.White().Bold()}", e);
+                        }
+                    }
+
                     if (output.HasValue())
                     {
                         rootConfig.OutputDirectory = output.Value();
@@ -103,36 +151,15 @@ namespace Bolt.Console
                 });
             });
 
-            app.Command("fromConfig", c =>
-            {
-                c.Description = "Generates Bolt code for contracts defined in configuration file.";
-                var input = c.Argument("[input]", "Path to Bolt configuration file with contract definitions.");
-                var output = c.Option("--output <DIRECTORY>", "Directory where the Bolt code will be generated. If not specified directory of input file will be used.", CommandOptionType.SingleValue);
-                c.HelpOption("-?|-h|--help");
-
-                c.OnExecute(() =>
-                {
-                    if (!File.Exists(input.Value))
-                    {
-                        System.Console.WriteLine("Bolt Configuration must be specified.");
-                        return 1;
-                    }
-
-                    RootConfig rootConfig = RootConfig.Load(_loadContext, input.Value);
-                    if ( output.HasValue())
-                    {
-                        rootConfig.OutputDirectory = output.Value();
-                    }
-                    else
-                    {
-                        rootConfig.OutputDirectory = Path.GetDirectoryName(input.Value);
-                    }
-
-                    return rootConfig.Generate();
-                });
-            });
-
             return app.Execute(args);
+        }
+
+        internal static int HandleError(string message, Exception e)
+        {
+            AnsiConsole.Error.WriteLine(message.Red().Bold());
+            AnsiConsole.Output.WriteLine(e.ToString());
+
+            return 1;
         }
 
         private static RootConfig CreateSampleConfiguration(IAssemblyLoadContext loader)
