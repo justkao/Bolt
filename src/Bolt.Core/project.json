@@ -3,7 +3,8 @@
     "authors": [ "Martin Tomka" ],
     "description": "Bolt Core library containing common classes and helpers shared by client and server.",
     "dependencies": {
-        "Newtonsoft.Json": "6.0.7"
+        "Newtonsoft.Json": "6.0.7",
+        "Bolt.Common": { "type": "build" }
     },
 
     "frameworks": {

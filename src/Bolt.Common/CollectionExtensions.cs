@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Bolt
 {
-    public static class CollectionExtensions
+    internal static class CollectionExtensions
     {
         public static IEnumerable<T> EmptyIfNull<T>(this IEnumerable<T> source)
         {

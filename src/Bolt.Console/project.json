@@ -5,7 +5,8 @@
         "Bolt.Generators": "",
         "Microsoft.Framework.CommandLineUtils": { "version": "1.0.0-beta3", "type": "build" },
         "Newtonsoft.Json": "6.0.7",
-        "Microsoft.Framework.Runtime": "1.0.0-beta3"
+        "Microsoft.Framework.Runtime": "1.0.0-beta3",
+        "Bolt.Common": { "type": "build" }
     },
     "frameworks": {
         "aspnet50": {
@@ -27,8 +28,5 @@
                 "System.Console": "4.0.0-beta-22605"
             }
         }
-    },
-    "commands": {
-        "Bolt.Console": "run"
     }
 }

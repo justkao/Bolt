@@ -211,7 +211,7 @@ namespace Bolt.Console
 
             AnsiConsole.Output.WriteLine(Environment.NewLine);
             AnsiConsole.Output.WriteLine("Status:");
-            AnsiConsole.Output.WriteLine($"{"Files Generated,".Green().Bold()}  {watch.ElapsedMilliseconds}ms elapsed");
+            AnsiConsole.Output.WriteLine($"{(_documents.Count + " Files Generated,").Green().Bold()}  {watch.ElapsedMilliseconds}ms elapsed");
             AnsiConsole.Output.WriteLine(Environment.NewLine);
 
             return 0;

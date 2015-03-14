@@ -9,7 +9,7 @@
         "Microsoft.Framework.OptionsModel": "1.0.0-beta3",
         "Microsoft.AspNet.Routing": "1.0.0-beta3",
         "Bolt.Core": "1.0.0-*",
-        "Microsoft.Framework.CommandLineUtils": { "version": "1.0.0-*", "type": "build" }
+        "Bolt.Common": { "type": "build" }
     },
     "frameworks": {
         "aspnet50": {

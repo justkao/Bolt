@@ -3,6 +3,7 @@ using Microsoft.Framework.Runtime.Common.CommandLine;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace Bolt.Console
 {
@@ -22,7 +23,7 @@ namespace Bolt.Console
             var app = new CommandLineApplication();
             app.Name = "bolt";
             AnsiConsole.Output.WriteLine(Environment.NewLine);
-
+            app.VersionOption("--version", GetVersion());
             app.OnExecute(() =>
             {
                 app.ShowHelp();
@@ -41,9 +42,16 @@ namespace Bolt.Console
                     {
                         string result = CreateSampleConfiguration(_loadContext).Serialize();
                         string outputFile = PathHelpers.GetOutput(Directory.GetCurrentDirectory(), argRoot.Value, "bolt.example.json");
+                        bool exist = File.Exists(outputFile);
                         File.WriteAllText(outputFile, result);
-
-                        AnsiConsole.Output.WriteLine($"Example created: {outputFile.White().Bold()}");
+                        if (exist)
+                        {
+                            AnsiConsole.Output.WriteLine($"Examle overwritten: {outputFile.White().Bold()}".Green().Bold());
+                        }
+                        else
+                        {
+                            AnsiConsole.Output.WriteLine($"Example created: {outputFile.White().Bold()}".Green());
+                        }
                     }
                     catch(Exception e)
                     {
@@ -80,8 +88,16 @@ namespace Bolt.Console
                     {
                         string json = RootConfig.CreateFromAssembly(_loadContext, input.Value).Serialize();
                         var outputFile = PathHelpers.GetOutput(Path.GetDirectoryName(input.Value), output.Value(), "bolt.configuration.json");
+                        bool exist = File.Exists(outputFile);
                         File.WriteAllText(outputFile, json);
-                        AnsiConsole.Output.WriteLine($"Bolt configuration file created: {outputFile.White()}");
+                        if (exist)
+                        {
+                            AnsiConsole.Output.WriteLine($"Configuration overwritten: {outputFile.White().Bold()}".Green().Bold());
+                        }
+                        else
+                        {
+                            AnsiConsole.Output.WriteLine($"Configuration created: {outputFile.White().Bold()}".Green());
+                        }
                     }
                     catch (Exception e)
                     {
@@ -219,6 +235,13 @@ namespace Bolt.Console
             });
 
             return rootConfig;
+        }
+
+        private static string GetVersion()
+        {
+            var assembly = typeof(Program).GetTypeInfo().Assembly;
+            var assemblyInformationalVersionAttribute = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>();
+            return assemblyInformationalVersionAttribute.InformationalVersion;
         }
     }
 }

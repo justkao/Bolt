@@ -1,12 +1,15 @@
 ﻿{
     "version": "1.0.0-*",
     "authors": [ "Martin Tomka" ],
+    "dependencies": {
+        "Bolt.Common": { "type": "build" }
+    },
     "frameworks": {
         "aspnet50": {
             "frameworkAssemblies": {
                 "System.Runtime": "",
                 "System.Collections": "",
-                "System.Runtime.Serialization":"" 
+                "System.Runtime.Serialization": ""
             }
         },
         "aspnetcore50": {
