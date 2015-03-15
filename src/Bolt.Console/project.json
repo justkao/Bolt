@@ -3,12 +3,14 @@
     "description": "Bolt code generation tool used by client and server.",
     "authors": [ "Martin Tomka" ],
     "dependencies": {
-        "Bolt.Generators": "",
         "Microsoft.Framework.CommandLineUtils": { "version": "1.0.0-beta3", "type": "build" },
         "Newtonsoft.Json": "6.0.7",
-        "Bolt.Common": { "type": "build" }
+        "Bolt.Common": { "type": "build" },
+        "Bolt.Generators": ""
     },
     "frameworks": {
+        "net45": {
+        },
         "aspnet50": {
             "frameworkAssemblies": {
                 "System.Runtime": "",
@@ -29,11 +31,11 @@
                 "System.Runtime.Serialization.Primitives": "4.0.0-beta-22605",
                 "System.Diagnostics.Debug": "4.0.10-beta-22605",
                 "System.Console": "4.0.0-beta-22605",
-                "Microsoft.Framework.Runtime": "1.0.0-beta3"
+                "Microsoft.Framework.Runtime": "1.0.0-beta3",
             }
         }
     },
-    "commands": {
-        "Bolt.Console": "run"
+        "commands": {
+            "Bolt.Console": "run"
+        }
     }
-}

@@ -24,6 +24,7 @@ namespace Bolt.Console
             app.VersionOption("--version", GetVersion());
             app.OnExecute(() =>
             {
+                _cache.Dispose();
                 app.ShowHelp();
                 return 2;
             });
@@ -166,7 +167,9 @@ namespace Bolt.Console
                 });
             });
 
-            return app.Execute(args);
+            var code = app.Execute(args);
+            _cache.Dispose();
+            return code;
         }
 
         internal static int HandleError(string message, Exception e)

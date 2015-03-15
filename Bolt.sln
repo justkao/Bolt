@@ -17,8 +17,6 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Common", "src\Bolt.Com
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "TestService.Server.Bolt", "test\Service\TestService.Server.Bolt\TestService.Server.Bolt.kproj", "{1E541977-3F26-4159-9C4E-67DD88BAF2C9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{5CD517A4-E34C-42EC-823E-941CF279110E}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "service", "service", "{9FDE6EDF-148A-44B4-9E0D-DFAA864D4906}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "TestService.Client.Bolt", "test\Service\TestService.Client.Bolt\TestService.Client.Bolt.kproj", "{92A516C3-A78C-4E2B-A6E1-18C73BC95AD1}"

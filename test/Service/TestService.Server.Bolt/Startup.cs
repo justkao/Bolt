@@ -17,12 +17,11 @@ namespace TestService.Server.Bolt
             services.AddLogging();
             services.AddOptions();
             services.AddBolt();
-            services.AddDataProtection();
         }
 
         public void Configure(IApplicationBuilder app)
         {
-            app.ApplicationServices.GetRequiredService<ILoggerFactory>().AddConsole(LogLevel.Verbose);
+            app.ApplicationServices.GetRequiredService<ILoggerFactory>().AddConsole(LogLevel.Information);
 
             app.UseBolt(b => {
                 b.UseTestContract(new TestContractImplementation());

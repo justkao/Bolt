@@ -8,74 +8,70 @@ using System.Reflection;
 
 namespace Bolt.Console
 {
-    public class AssemblyCache : IEnumerable<Assembly>
-    {
-        private readonly Dictionary<string, Assembly> _assemblies = new Dictionary<string, Assembly>();
-
 #if !NET45
-        [Microsoft.Framework.Runtime.AssemblyNeutral]
-        public interface IAssemblyLoadContext : IDisposable
-        {
-            Assembly Load(string name);
-            Assembly LoadFile(string path);
-            Assembly LoadStream(Stream assemblyStream, Stream assemblySymbols);
-        }
-
-        private readonly Microsoft.Framework.Runtime.IAssemblyLoadContext _loader;
-
-        public AssemblyCache(IServiceProvider serviceProvider)
-        {
-            _loader = ((Microsoft.Framework.Runtime.IAssemblyLoadContextFactory)serviceProvider.GetService(typeof(Microsoft.Framework.Runtime.IAssemblyLoadContextFactory))).Create();
-        }
+    public class AssemblyCache : IEnumerable<Assembly>, IDisposable, Microsoft.Framework.Runtime.IAssemblyLoader
+    {
+        private readonly Microsoft.Framework.Runtime.IAssemblyLoadContext _loadContext;
+        private readonly Microsoft.Framework.Runtime.IAssemblyLoaderContainer _container;
+        private readonly IDisposable _loaderRegistration = null;
 #else
+    public class AssemblyCache : IEnumerable<Assembly>, IDisposable
+    {
+#endif
+        private readonly Dictionary<string, Assembly> _assemblies = new Dictionary<string, Assembly>();
+        private readonly HashSet<string> _dirs = new HashSet<string>();
+
         public AssemblyCache(IServiceProvider serviceProvider)
         {
+#if !NET45
+            _loadContext = ((Microsoft.Framework.Runtime.IAssemblyLoadContextAccessor)serviceProvider.GetService(typeof(Microsoft.Framework.Runtime.IAssemblyLoadContextAccessor))).GetLoadContext(typeof(Program).GetTypeInfo().Assembly);
+            _container = ((Microsoft.Framework.Runtime.IAssemblyLoaderContainer)serviceProvider.GetService(typeof(Microsoft.Framework.Runtime.IAssemblyLoaderContainer)));
+            _loaderRegistration = _container.AddLoader(this);
+#else
+            AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
+            {
+                return Load(e.Name.Split(new[]{','}, StringSplitOptions.RemoveEmptyEntries).First().Trim());
+            };
+#endif
         }
-#endif 
-        public Assembly Add(string assemblyPath)
+
+        public Assembly Load(string assemblyPath)
         {
+            var original = assemblyPath;
+            if (!File.Exists(assemblyPath))
+            {
+                assemblyPath = FindAssembly(assemblyPath);
+            }
+
+            if (string.IsNullOrEmpty(assemblyPath))
+            {
+                throw new FileNotFoundException($"Assembly {original} not found.");
+            }
+
             assemblyPath = Path.GetFullPath(assemblyPath);
+            string directory = Path.GetDirectoryName(assemblyPath);
+            string assemblyName = Path.GetFileName(assemblyPath);
+
             Assembly assembly;
-            if (_assemblies.TryGetValue(assemblyPath, out assembly))
+            if (_assemblies.TryGetValue(assemblyName, out assembly))
             {
                 return assembly;
             }
 #if !NET45         
-            assembly = _loader.LoadFile(assemblyPath);
+            assembly = _loadContext.LoadFile(assemblyPath);
 #else
             assembly = Assembly.LoadFrom(assemblyPath);
 #endif 
-            _assemblies[assemblyPath] = assembly;
+            _assemblies[assemblyName] = assembly;
+            _dirs.Add(directory);
 
-            AnsiConsole.Output.WriteLine($"Assembly loaded: {assemblyPath.Bold()}");
+            AnsiConsole.Output.WriteLine($"Assembly loaded: {assemblyName.Bold()}");
             return assembly;
         }
 
         public IEnumerable<TypeInfo> GetTypes(Assembly assembly)
         {
-            List<string> directories = _assemblies.Keys.Select(Path.GetDirectoryName).Where(d => !string.IsNullOrEmpty(d)).ToList();
-
-            while (true)
-            {
-                try
-                {
-                    return assembly.ExportedTypes.Select(t => t.GetTypeInfo());
-                }
-                catch (FileLoadException e)
-                {
-                    if (!TryLoadAssembly(e.FileName, directories))
-                    {
-                        throw e;
-                    }
-                }
-                catch (FileNotFoundException e)
-                {
-                    if (!TryLoadAssembly(e.FileName, directories))
-                    {
-                        throw e;
-                    }
-                }
-            }
+            return assembly.ExportedTypes.Select(t => t.GetTypeInfo());
         }
 
         public Type GetType(string fullName)
@@ -102,40 +98,50 @@ namespace Bolt.Console
             return GetEnumerator();
         }
 
-        private bool TryLoadAssembly(string rawName, List<string> directories)
+        private string FindAssembly(string name)
         {
-            string fileName = rawName.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).First().Trim();
+            name = name.Trim();
+            string extension = Path.GetExtension(name);
+            bool hasExtension = false;
 
-            foreach(var dir in directories.Distinct())
+            if (!string.IsNullOrEmpty(extension))
             {
-                var files = Directory.GetFiles(dir);
-                var found = Directory.GetFiles(dir).Where(f => string.CompareOrdinal(Path.GetFileName(f), fileName + ".dll") == 0).FirstOrDefault();
-                if (found == null)
+                hasExtension = new[] { ".exe", ".dll" }.Any(ext => string.CompareOrdinal(extension, ext) == 0);
+            }
+
+            foreach (var dir in _dirs)
+            {
+                string file = Path.Combine(dir, name);
+
+                if (hasExtension)
                 {
-                    found = Directory.GetFiles(dir).Where(f => string.CompareOrdinal(Path.GetFileName(f), fileName + ".exe") == 0).FirstOrDefault();
-                    if (found == null)
+                    if (File.Exists(file))
                     {
-                        continue;
+                        return file;
                     }
                 }
+                else
+                {
+                    if (File.Exists(file + ".dll"))
+                    {
+                        return file + ".dll";
+                    }
 
-                if (_assemblies.ContainsKey(found))
-                {
-                    return false;
-                }
-
-                try
-                {
-                    GetTypes(Add(found));
-                    return true;
-                }
-                catch
-                {
-                    return false;
+                    if (File.Exists(file + ".exe"))
+                    {
+                        return file + ".exe";
+                    }
                 }
             }
 
-            return false;
+            return null;
+        }
+
+        public void Dispose()
+        {
+#if !NET45
+            _loaderRegistration?.Dispose();
+#endif
         }
     }
 }

@@ -45,15 +45,15 @@ namespace TestService.Client.Bolt
                 action(channel);
             }
 
-            // Stopwatch watch = Stopwatch.StartNew();
+            Stopwatch watch = Stopwatch.StartNew();
 
             for (int i = 0; i < count; i++)
             {
                 action(channel);
             }
 
-            // long elapsed = watch.ElapsedMilliseconds;
-            // Console.WriteLine("{0, -10} {1}ms", type, elapsed);
+            long elapsed = watch.ElapsedMilliseconds;
+            Console.WriteLine("{0, -10} {1}ms", type, elapsed);
 
             if (channel is IDisposable)
             {

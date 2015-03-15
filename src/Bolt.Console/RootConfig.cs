@@ -58,7 +58,7 @@ namespace Bolt.Console
             root.Assemblies = new List<string>() { Path.GetFullPath(assembly) };
             root.Contracts = new List<ContractConfig>();
             
-            foreach (TypeInfo type in root.AssemblyCache.GetTypes(root.AssemblyCache.Add(assembly)))
+            foreach (TypeInfo type in root.AssemblyCache.GetTypes(root.AssemblyCache.Load(assembly)))
             {
                 if (!type.IsInterface)
                 {
@@ -134,7 +134,7 @@ namespace Bolt.Console
 
             foreach (string assembly in Assemblies)
             {
-                AssemblyCache.Add(assembly);
+                AssemblyCache.Load(assembly);
             }
 
             Stopwatch watch = Stopwatch.StartNew();
