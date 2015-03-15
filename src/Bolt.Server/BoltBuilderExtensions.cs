@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNet.Builder;
 using Microsoft.Framework.DependencyInjection;
+using Microsoft.Framework.Logging;
 using System;
 
 namespace Bolt.Server
 {
-    public static class BuliderExtensions
+    public static class BoltBuilderExtensions
     {
         /// <summary>
         /// Adds Bolt to the <see cref="IApplicationBuilder"/> request execution pipeline.
@@ -25,7 +26,9 @@ namespace Bolt.Server
             }
 
             var bolt = app.ApplicationServices.GetRequiredService<IBoltRouteHandler>();
+            app.ApplicationServices.GetRequiredService<ILoggerFactory>().Create("Bolt").WriteInformation("Registering Bolt middleware. Prefix: {0}", bolt.Options.Prefix);
             registerContracts(bolt);
+
             return app.UseRouter(bolt);
         }
     }

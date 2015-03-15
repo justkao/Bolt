@@ -1,18 +1,17 @@
 ﻿using System;
-using Microsoft.Framework.ConfigurationModel;
 using Microsoft.Framework.DependencyInjection;
 
 namespace Bolt.Server
 {
-    public static class ServiceCollectionExtensions
+    public static class BoltServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureBoltOptions(this IServiceCollection services, Action<BoltServerOptions> configure)
+        public static IServiceCollection ConfigureBolt(this IServiceCollection services, Action<BoltServerOptions> configure)
         {
             services.Configure(configure);
             return services;
         }
 
-        public static IServiceCollection AddBolt(this IServiceCollection services, IConfiguration configuration = null)
+        public static IServiceCollection AddBolt(this IServiceCollection services)
         {
             services.AddTransient<ISerializer, JsonSerializer>();
             services.AddTransient<IExceptionWrapper, JsonExceptionWrapper>();
