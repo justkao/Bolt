@@ -32,5 +32,8 @@
                 "Microsoft.Framework.Runtime": "1.0.0-beta3"
             }
         }
+    },
+    "commands": {
+        "Bolt.Console": "run"
     }
 }

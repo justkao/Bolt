@@ -21,7 +21,6 @@ namespace Bolt.Console
         {
             var app = new CommandLineApplication();
             app.Name = "bolt";
-            AnsiConsole.Output.WriteLine(Environment.NewLine);
             app.VersionOption("--version", GetVersion());
             app.OnExecute(() =>
             {
@@ -135,6 +134,7 @@ namespace Bolt.Console
                         try
                         {
                             rootConfig = RootConfig.CreateFromAssembly(_cache, input.Value);
+                            rootConfig.IgnoreGeneratorErrors = true;
                         }
                         catch(Exception e)
                         {
@@ -171,8 +171,10 @@ namespace Bolt.Console
 
         internal static int HandleError(string message, Exception e)
         {
+            AnsiConsole.Output.WriteLine(Environment.NewLine);
             AnsiConsole.Error.WriteLine(message.Red().Bold());
             AnsiConsole.Output.WriteLine(e.ToString());
+            AnsiConsole.Output.WriteLine(Environment.NewLine);
 
             return 1;
         }

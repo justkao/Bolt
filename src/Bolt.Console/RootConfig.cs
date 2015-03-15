@@ -107,6 +107,9 @@ namespace Bolt.Console
         [JsonProperty(Required = Required.Always)]
         public List<ContractConfig> Contracts { get; set; }
 
+        [JsonIgnore]
+        public bool IgnoreGeneratorErrors { get; set; }
+
         public string Modifier { get; set; }
 
         public bool FullTypeNames { get; set; }
@@ -144,15 +147,16 @@ namespace Bolt.Console
                 }
                 catch (Exception e)
                 {
-                    AnsiConsole.Error.WriteLine($"Failed to generate contract: '{contract.Contract.Bold().White()}'");
-                    AnsiConsole.Output.WriteLine("Error:");
-                    AnsiConsole.Output.WriteLine(e.ToString());
-                    AnsiConsole.Output.WriteLine(Environment.NewLine);
+                    if (!IgnoreGeneratorErrors)
+                    {
+                        return Program.HandleError($"Failed to generate contract: {contract.Contract.Bold().White()}", e);
+                    }
 
-                    return 1;
+                    Program.HandleError($"Skipped contract generation: {contract.Contract.Bold().White()}", e);
                 }
             }
 
+            AnsiConsole.Output.WriteLine(Environment.NewLine);
             AnsiConsole.Output.WriteLine($"Generating files ... ");
 
             foreach (var filesInDirectory in _documents.GroupBy(f=>Path.GetDirectoryName(f.Key)))

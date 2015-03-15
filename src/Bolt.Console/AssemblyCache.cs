@@ -1,3 +1,4 @@
+using Microsoft.Framework.Runtime.Common.CommandLine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -39,25 +40,41 @@ namespace Bolt.Console
             {
                 return assembly;
             }
-#if !NET45
+#if !NET45         
             assembly = _loader.LoadFile(assemblyPath);
 #else
             assembly = Assembly.LoadFrom(assemblyPath);
 #endif 
-            _assemblies.Add(assemblyPath, assembly);
+            _assemblies[assemblyPath] = assembly;
+
+            AnsiConsole.Output.WriteLine($"Assembly loaded: {assemblyPath.Bold()}");
             return assembly;
         }
 
         public IEnumerable<TypeInfo> GetTypes(Assembly assembly)
         {
-            try
+            List<string> directories = _assemblies.Keys.Select(Path.GetDirectoryName).Where(d => !string.IsNullOrEmpty(d)).ToList();
+
+            while (true)
             {
-                return assembly.DefinedTypes;
-            }
-            catch (ReflectionTypeLoadException e)
-            {
-                var errors = e.LoaderExceptions.OfType<FileLoadException>().ToArray();
-                throw e;
+                try
+                {
+                    return assembly.ExportedTypes.Select(t => t.GetTypeInfo());
+                }
+                catch (FileLoadException e)
+                {
+                    if (!TryLoadAssembly(e.FileName, directories))
+                    {
+                        throw e;
+                    }
+                }
+                catch (FileNotFoundException e)
+                {
+                    if (!TryLoadAssembly(e.FileName, directories))
+                    {
+                        throw e;
+                    }
+                }
             }
         }
 
@@ -83,6 +100,42 @@ namespace Bolt.Console
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        private bool TryLoadAssembly(string rawName, List<string> directories)
+        {
+            string fileName = rawName.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).First().Trim();
+
+            foreach(var dir in directories.Distinct())
+            {
+                var files = Directory.GetFiles(dir);
+                var found = Directory.GetFiles(dir).Where(f => string.CompareOrdinal(Path.GetFileName(f), fileName + ".dll") == 0).FirstOrDefault();
+                if (found == null)
+                {
+                    found = Directory.GetFiles(dir).Where(f => string.CompareOrdinal(Path.GetFileName(f), fileName + ".exe") == 0).FirstOrDefault();
+                    if (found == null)
+                    {
+                        continue;
+                    }
+                }
+
+                if (_assemblies.ContainsKey(found))
+                {
+                    return false;
+                }
+
+                try
+                {
+                    GetTypes(Add(found));
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+            return false;
         }
     }
 }
