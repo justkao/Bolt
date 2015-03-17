@@ -38,47 +38,46 @@ namespace Bolt.Console
 
         public void AddDirectory(string dir)
         {
+            if (string.IsNullOrEmpty(dir))
+            {
+                return;
+            }
+
             dir = Path.GetFullPath(dir);
-            AnsiConsole.Output.WriteLine($"Directory '{dir.Bold()}' added to assembly search paths.");
-            _dirs.Add(Path.GetFullPath(dir));
+            if (!_dirs.Contains(dir))
+            {
+                AnsiConsole.Output.WriteLine($"Directory '{dir.Bold()}' added to assembly search paths.");
+                _dirs.Add(dir);
+            }
         }
 
-        public Assembly Load(string assemblyPath)
+        public Assembly Load(string assembly)
         {
-            var original = assemblyPath;
-            if (!File.Exists(assemblyPath))
+            var originalName = assembly;
+            if (!File.Exists(assembly))
             {
-                assemblyPath = FindAssembly(assemblyPath);
-                if (string.IsNullOrEmpty(assemblyPath))
+                assembly = FindAssembly(assembly);
+                if (string.IsNullOrEmpty(assembly))
                 {
-                    AnsiConsole.Output.WriteLine($"Assembly {original} could not be located.".Yellow());
+                    AnsiConsole.Output.WriteLine($"Assembly {originalName} could not be located.".Yellow());
+                    throw new FileNotFoundException($"Assembly {originalName} not found.");
                 }
             }
 
-            if (string.IsNullOrEmpty(assemblyPath))
+            string assemblyName = Path.GetFileName(assembly);
+            Assembly loadedAssembly;
+            if (_assemblies.TryGetValue(assemblyName, out loadedAssembly))
             {
-                throw new FileNotFoundException($"Assembly {original} not found.");
-            }
-
-            assemblyPath = Path.GetFullPath(assemblyPath);
-            string directory = Path.GetDirectoryName(assemblyPath);
-            string assemblyName = Path.GetFileName(assemblyPath);
-
-            Assembly assembly;
-            if (_assemblies.TryGetValue(assemblyName, out assembly))
-            {
-                return assembly;
+                return loadedAssembly;
             }
 #if !NET45         
-            assembly = _loadContext.LoadFile(assemblyPath);
+            loadedAssembly = _loadContext.LoadFile(assembly);
 #else
-            assembly = Assembly.LoadFrom(assemblyPath);
+            loadedAssembly = Assembly.LoadFrom(assembly);
 #endif 
-            _assemblies[assemblyName] = assembly;
-            _dirs.Add(directory);
-
+            _assemblies[assemblyName] = loadedAssembly;
             AnsiConsole.Output.WriteLine($"Assembly loaded: {assemblyName.Bold()}");
-            return assembly;
+            return loadedAssembly;
         }
 
         public IEnumerable<TypeInfo> GetTypes(Assembly assembly)

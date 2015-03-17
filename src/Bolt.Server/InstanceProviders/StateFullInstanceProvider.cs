@@ -8,8 +8,6 @@ namespace Bolt.Server
 {
     public class StateFullInstanceProvider : InstanceProvider, IDisposable
     {
-        private readonly ActionDescriptor _initInstanceAction;
-        private readonly ActionDescriptor _releaseInstanceAction;
         private readonly BoltServerOptions _options;
 
         private readonly ConcurrentDictionary<string, InstanceMetadata> _instances = new ConcurrentDictionary<string, InstanceMetadata>();
@@ -33,10 +31,10 @@ namespace Bolt.Server
             }
 
             _options = options;
-            _initInstanceAction = initInstanceAction;
-            _releaseInstanceAction = releaseInstanceAction;
+            InitSession = initInstanceAction;
+            CloseSession = releaseInstanceAction;
 
-            if (InstanceTimeout != TimeSpan.Zero)
+            if (SessionTimeout != TimeSpan.Zero)
             {
                 _timer = new Timer(
                     OnTimerElapsed,
@@ -46,21 +44,22 @@ namespace Bolt.Server
             }
         }
 
-        public int Count
-        {
-            get { return _instances.Count; }
-        }
+        public int Count =>_instances.Count;
 
         public string SessionHeader =>_options.SessionHeader;
 
-        public TimeSpan InstanceTimeout => _options.SessionTimeout;
+        public TimeSpan SessionTimeout => _options.SessionTimeout;
+
+        public ActionDescriptor InitSession { get; }
+
+        public ActionDescriptor CloseSession { get; }
 
         public override TInstance GetInstance<TInstance>(ServerActionContext context)
         {
             InstanceMetadata instance;
             string sessionId = GetSession(context);
 
-            if (context.Action == _initInstanceAction)
+            if (context.Action == InitSession)
             {
                 if (sessionId != null && _instances.TryGetValue(sessionId, out instance))
                 {
@@ -93,7 +92,7 @@ namespace Bolt.Server
 
         public override void ReleaseInstance(ServerActionContext context, object obj, Exception error)
         {
-            if (context.Action == _initInstanceAction)
+            if (context.Action == InitSession)
             {
                 if (error != null)
                 {
@@ -117,7 +116,7 @@ namespace Bolt.Server
                     }
                 }
             }
-            else if (context.Action == _releaseInstanceAction)
+            else if (context.Action == CloseSession)
             {
                 string sessionId = GetSession(context);
                 if (!string.IsNullOrEmpty(sessionId))
@@ -175,7 +174,7 @@ namespace Bolt.Server
 
         protected virtual bool ShouldTimeoutInstance(object instance, DateTime timestamp)
         {
-            return (DateTime.UtcNow - timestamp) > InstanceTimeout;
+            return (DateTime.UtcNow - timestamp) > SessionTimeout;
         }
 
         protected virtual string CreateNewSession()

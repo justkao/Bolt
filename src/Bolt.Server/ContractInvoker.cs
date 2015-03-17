@@ -26,6 +26,8 @@ namespace Bolt.Server
 
         public IResponseHandler ResponseHandler { get; set; }
 
+        public IBoltRouteHandler Parent { get; private set; }
+
         public virtual void Init(IBoltRouteHandler parent, IInstanceProvider instanceProvider)
         {
             if (parent == null)
@@ -38,6 +40,7 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(instanceProvider));
             }
 
+            Parent = parent;
             DataHandler = parent.DataHandler;
             ResponseHandler = parent.ResponseHandler;
             InstanceProvider = instanceProvider;

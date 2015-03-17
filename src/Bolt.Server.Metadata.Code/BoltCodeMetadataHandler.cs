@@ -13,10 +13,10 @@ namespace Bolt.Server.Generator
         {
         }
 
-        public override async Task<bool> HandleContractMetadataAsync(HttpContext context, ContractDescriptor descriptor)
+        public override async Task<bool> HandleContractMetadataAsync(HttpContext context, IContractInvoker descriptor)
         {
             DocumentGenerator generator = new DocumentGenerator();
-            var definition = new ContractDefinition(descriptor.Type);
+            var definition = new ContractDefinition(descriptor.Descriptor.Type);
 
             var contractGen = new ContractDescriptorGenerator() { ContractDefinition = definition };
             var interfaceGen = new InterfaceGenerator() { ContractDefinition = definition, ForceAsync=true };

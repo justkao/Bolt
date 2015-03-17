@@ -5,8 +5,8 @@
     /// </summary>
     public class BoltOptions
     {
-        public const string DefaultSessionHeader = "Bolt-Session-Id";
-        public const string DefaultServerErrorCodesHeader = "Bolt-Server-Error-Code";
+        public const string DefaultSessionHeader = "Bolt-Session";
+        public const string DefaultServerErrorCodesHeader = "Bolt-Error";
 
         public BoltOptions()
         {

@@ -143,7 +143,7 @@ namespace Bolt.Server
             {
                 if (!string.IsNullOrEmpty(Options.Prefix))
                 {
-                    await HandleContractRootAsync(context, found.Descriptor);
+                    await HandleContractRootAsync(context, found);
                 }
 
                 return;
@@ -224,7 +224,7 @@ namespace Bolt.Server
             return descriptor.Find(actionName);
         }
 
-        protected virtual async Task HandleContractRootAsync(RouteContext context, ContractDescriptor descriptor)
+        protected virtual async Task HandleContractRootAsync(RouteContext context, IContractInvoker descriptor)
         {
             try
             {
@@ -244,7 +244,7 @@ namespace Bolt.Server
         {
             try
             {
-                var handled = await MetadataHandler?.HandleBoltMetadataAsync(context.HttpContext, _invokers.Select(i => i.Descriptor));
+                var handled = await MetadataHandler?.HandleBoltMetadataAsync(context.HttpContext, _invokers);
                 if (handled)
                 {
                     context.IsHandled = true;

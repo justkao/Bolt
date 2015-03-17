@@ -132,6 +132,11 @@ namespace Bolt.Console
                     .Distinct()
                     .ToList();
 
+            foreach (string dir in directories)
+            {
+                AssemblyCache.AddDirectory(dir);
+            }
+
             foreach (string assembly in Assemblies)
             {
                 AssemblyCache.Load(assembly);
@@ -232,103 +237,6 @@ namespace Bolt.Console
 
             return _documents[output];
         }
-        /*
-        private class AssemblyResolver
-        {
-            private readonly string[] _directories;
-            private readonly ConcurrentDictionary<string, List<string>> _directoryFiles = new ConcurrentDictionary<string, List<string>>();
-
-            public AssemblyResolver(params string[] directories)
-            {
-                _directories = directories.Where(d => !string.IsNullOrEmpty(d)).Distinct().ToArray();
-            }
-
-            public Assembly Resolve(object sender, ResolveEventArgs e)
-            {
-                Assembly result = DoResolve(e);
-                if (result == null)
-                {
-                    System.Console.WriteLine("Assembly not resolved: {0}", e.Name);
-                }
-
-                return result;
-            }
-
-            private Assembly DoResolve(ResolveEventArgs e)
-            {
-                if (e.RequestingAssembly != null)
-                {
-                    AssemblyName[] references = e.RequestingAssembly.GetReferencedAssemblies();
-
-                    foreach (AssemblyName name in references)
-                    {
-                        foreach (string dir in _directories)
-                        {
-                            if (TryLoadAssembly(name.Name, GetFiles(dir)) != null)
-                            {
-                                break;
-                            }
-                        }
-                    }
-                }
-
-                foreach (string dir in _directories.Where(p => !string.IsNullOrEmpty(p)))
-                {
-                    Assembly ass = TryLoadAssembly(e.Name, GetFiles(dir));
-                    if (ass != null)
-                    {
-                        return ass;
-                    }
-                }
-
-                return null;
-            }
-
-            private IEnumerable<string> GetFiles(string dir)
-            {
-                return _directoryFiles.GetOrAdd(
-                    dir,
-                    d =>
-                    {
-                        DirectoryInfo directory = new DirectoryInfo(Path.GetDirectoryName(dir));
-                        return
-                            directory.GetFiles("*.dll", SearchOption.AllDirectories)
-                                .Concat(directory.GetFiles("*.exe", SearchOption.AllDirectories))
-                                .Select(f => f.FullName)
-                                .ToList();
-                    });
-            }
-
-            private static Assembly TryLoadAssembly(string fullName, IEnumerable<string> files)
-            {
-                try
-                {
-                    Assembly assemblyFound = AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(a => a.FullName == fullName);
-                    if (assemblyFound != null)
-                    {
-                        return assemblyFound;
-                    }
-
-                    fullName = fullName.Split(new[] { ',' })[0];
-
-                    string found = files.FirstOrDefault(f => string.Equals(fullName, Path.GetFileNameWithoutExtension(f), StringComparison.OrdinalIgnoreCase));
-
-                    if (found == null)
-                    {
-                        return null;
-                    }
-
-                    return _AppDomain.Load(File.ReadAllBytes(found));
-                }
-                catch (Exception)
-                {
-                    Debug.Assert(false, "Assembly load failed.");
-                    return null;
-                }
-            }
-
-        }
-        */
 
         public IUserCodeGenerator GetGenerator(string generatorName)
         {

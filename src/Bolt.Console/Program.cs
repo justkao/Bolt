@@ -126,11 +126,14 @@ namespace Bolt.Console
 
                     if (!File.Exists(input.Value))
                     {
+
+
                         AnsiConsole.Output.WriteLine($"File not found: {input.Value.White().Bold()}".Yellow());
                         return 1;
                     }
 
-                    foreach(var dir in dirOption.Values)
+                    _cache.AddDirectory(Path.GetDirectoryName(Path.GetFullPath(input.Value)));
+                    foreach (var dir in dirOption.Values)
                     {
                         if (Directory.Exists(dir))
                         {
