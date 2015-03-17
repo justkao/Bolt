@@ -1,0 +1,19 @@
+{
+    "version": "1.0.0-*",
+    "dependencies": {
+        "Bolt.Server": "0.11.0-alpha",
+        "Bolt.Generators": "0.11.0-alpha"
+    },
+
+    "frameworks": {
+        "aspnet50": {
+            "dependencies": {
+            }
+        },
+        "aspnetcore50": {
+            "dependencies": {
+                "System.Runtime": "4.0.20-beta-22523"
+            }
+        }
+    }
+}

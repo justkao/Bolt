@@ -71,7 +71,17 @@ namespace Bolt.Server
 
         protected virtual void CloseWithError(HttpContext context, ServerErrorCode code)
         {
-            context.Response.StatusCode = 500;
+            int statusCode = 500;
+
+            switch(code)
+            {
+                case ServerErrorCode.ActionNotFound:
+                case ServerErrorCode.ContractNotFound:
+                    statusCode = 404;
+                    break;
+            }
+
+            context.Response.StatusCode = statusCode;
             context.Response.Headers[_options.ServerErrorCodesHeader] = code.ToString();
             context.Response.Body.Dispose();
         }

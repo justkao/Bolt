@@ -112,6 +112,8 @@ namespace Bolt.Console
                 c.Description = "Generates code from assembly or from configuration file.";
                 var input = c.Argument("[input]", "Path to the assembly or configuration file.");
                 var output = c.Option("--output <DIRECTORY>", "Directory where the Bolt code will be generated. If directory is not specified then the input path directory will be used instead.", CommandOptionType.SingleValue);
+                var dirOption = c.Option("--dir <PATH>", "Directories where contract assemblies are located.", CommandOptionType.MultipleValue);
+
                 c.HelpOption("-?|-h|--help");
 
                 c.OnExecute(() =>
@@ -126,6 +128,14 @@ namespace Bolt.Console
                     {
                         AnsiConsole.Output.WriteLine($"File not found: {input.Value.White().Bold()}".Yellow());
                         return 1;
+                    }
+
+                    foreach(var dir in dirOption.Values)
+                    {
+                        if (Directory.Exists(dir))
+                        {
+                            _cache.AddDirectory(dir);
+                        }
                     }
 
                     RootConfig rootConfig;

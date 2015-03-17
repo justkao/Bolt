@@ -4,7 +4,8 @@
         "Bolt.Server": "1.0.0-*",
         "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-beta3",
         "Microsoft.AspNet.Server.WebListener": "1.0.0-beta3",
-        "Microsoft.Framework.Logging.Console": "1.0.0-beta3"
+        "Microsoft.Framework.Logging.Console": "1.0.0-beta3",
+        "Microsoft.AspNet.Server.IIS": "1.0.0-beta3"
     },
     "code": [
         "*.cs",
@@ -23,7 +24,7 @@
         }
     },
     "commands": {
-        "kestrel": "Microsoft.AspNet.Hosting --server Kestrel --server.urls http://localhost:9000",
-        "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:9000"
+        "web": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.WebListener --server.urls http://localhost:9000",
+        "iis": "Microsoft.AspNet.Hosting --server Microsoft.AspNet.Server.IIS --server.urls http://localhost:9002"
     }
 }

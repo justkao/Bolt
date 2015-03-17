@@ -225,6 +225,11 @@ namespace TestService.Core
             return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.InnerOperation, GetCancellationToken(Descriptor.InnerOperation));
         }
 
+        public virtual Task<string> InnerOperation3()
+        {
+            return Channel.SendAsync<string, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.InnerOperation3, GetCancellationToken(Descriptor.InnerOperation3));
+        }
+
         public virtual Task InnerOperationExAsync()
         {
             return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.InnerOperationExAsync, GetCancellationToken(Descriptor.InnerOperationExAsync));

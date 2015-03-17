@@ -33,6 +33,9 @@ namespace Bolt.Generators
 
         private void GenerateBody(ClassGenerator g)
         {
+            MethodInfo initSession = ContractDefinition.GetInitSessionMethod();
+            MethodInfo closeSession = ContractDefinition.GetCloseSessionMethod();
+
             WriteLine(
                 "public static IContractInvoker Use{0}(this {2} bolt, {1} instance)",
                 ContractDefinition.Name,
@@ -59,8 +62,6 @@ namespace Bolt.Generators
             }
             WriteLine();
 
-            MethodInfo initSession = ContractDefinition.GetInitSessionMethod();
-            MethodInfo closeSession = ContractDefinition.GetCloseSessionMethod();
             if (initSession != null && closeSession != null)
             {
                 WriteLine(

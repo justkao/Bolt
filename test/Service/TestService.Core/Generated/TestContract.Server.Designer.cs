@@ -40,6 +40,7 @@ namespace TestService.Core
             AddAction(Descriptor.Throws, TestContract_Throws);
             AddAction(Descriptor.ThrowsCustom, TestContract_ThrowsCustom);
             AddAction(Descriptor.InnerOperation, InnerTestContract_InnerOperation);
+            AddAction(Descriptor.InnerOperation3, InnerTestContract_InnerOperation3);
             AddAction(Descriptor.InnerOperationExAsync, InnerTestContract_InnerOperationExAsync);
             AddAction(Descriptor.InnerOperation2, InnerTestContract2_InnerOperation2);
             AddAction(Descriptor.InnerOperationExAsync2, InnerTestContract2_InnerOperationExAsync2);
@@ -331,6 +332,25 @@ namespace TestService.Core
             await ResponseHandler.Handle(context);
         }
 
+        protected virtual async Task InnerTestContract_InnerOperation3(ServerActionContext context)
+        {
+            var instance = InstanceProvider.GetInstance<IInnerTestContract>(context);
+            string result;
+
+            try
+            {
+                result = await instance.InnerOperation3();
+                InstanceProvider.ReleaseInstance(context, instance, null);
+            }
+            catch (Exception e)
+            {
+                InstanceProvider.ReleaseInstance(context, instance, e);
+                throw;
+            }
+
+            await ResponseHandler.Handle(context, result);
+        }
+
         protected virtual async Task InnerTestContract_InnerOperationExAsync(ServerActionContext context)
         {
             var instance = InstanceProvider.GetInstance<IInnerTestContract>(context);
@@ -391,28 +411,56 @@ namespace Bolt.Server
 {
     public static partial class TestContractInvokerExtensions
     {
-        public static IContractInvoker UseTestContract(this IBoltRouteHandler bolt, TestService.Core.ITestContract instance)
-        {
-            return bolt.UseTestContract(new StaticInstanceProvider(instance));
-        }
-
-        public static IContractInvoker UseTestContract<TImplementation>(this IBoltRouteHandler bolt) where TImplementation: TestService.Core.ITestContract, new()
-        {
-            return bolt.UseTestContract(new InstanceProvider<TImplementation>());
-        }
-
-        public static IContractInvoker UseStateFullTestContract<TImplementation>(this IBoltRouteHandler bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, Bolt.Server.BoltServerOptions options = null) where TImplementation: TestService.Core.ITestContract, new()
-        {
-            return bolt.UseTestContract(new StateFullInstanceProvider<TImplementation>(initInstanceAction, releaseInstanceAction, options ?? bolt.Options));
-        }
-
-        public static IContractInvoker UseTestContract(this IBoltRouteHandler bolt, IInstanceProvider instanceProvider)
-        {
-            var invoker = new TestService.Core.TestContractInvoker();
-            invoker.Init(bolt, instanceProvider);
-            bolt.Add(invoker);
-
-            return invoker;
-        }
     }
 }
+/*
+Execution of 'ServerGenerator' generator failed with error 'System.IO.FileLoadException: Could not load file or assembly 'Bolt.Core, Version=0.11.0.0, Culture=neutral, PublicKeyToken=null' or one of its dependencies. Invalid pointer (Exception from HRESULT: 0x80004003 (E_POINTER))
+File name: 'Bolt.Core, Version=0.11.0.0, Culture=neutral, PublicKeyToken=null' ---> System.NullReferenceException: Object reference not set to an instance of an object.
+   at Microsoft.Framework.Runtime.ProjectExportProviderHelper.GetExportsRecursive(ICache cache, ILibraryManager manager, ILibraryExportProvider libraryExportProvider, ILibraryKey target, Func`2 include)
+   at Microsoft.Framework.Runtime.ProjectExportProviderHelper.GetExportsRecursive(ICache cache, ILibraryManager manager, ILibraryExportProvider libraryExportProvider, ILibraryKey target, Boolean dependenciesOnly)
+   at Microsoft.Framework.Runtime.ProjectLibraryExportProvider.<>c__DisplayClass1.<GetLibraryExport>b__5()
+   at System.Lazy`1.CreateValue()
+   at System.Lazy`1.LazyInitValue()
+   at System.Lazy`1.get_Value()
+   at Microsoft.Framework.Runtime.ProjectLibraryExportProvider.<>c__DisplayClass2.<GetLibraryExport>b__6()
+   at Microsoft.Framework.Runtime.Roslyn.RoslynProjectReferenceProvider.GetProjectReference(Project project, ILibraryKey target, Func`1 referenceResolver, IList`1 outgoingReferences)
+   at Microsoft.Framework.Runtime.ProjectLibraryExportProvider.<>c__DisplayClass0.<GetLibraryExport>b__3(CacheContext ctx)
+   at Microsoft.Framework.Runtime.CacheExtensions.<>c__DisplayClass0`1.<Get>b__1(CacheContext ctx)
+   at Microsoft.Framework.Runtime.Cache.CreateEntry(Object k, Func`2 acquire)
+   at Microsoft.Framework.Runtime.Cache.<>c__DisplayClass10.<AddEntry>b__11()
+   at System.Lazy`1.CreateValue()
+   at System.Lazy`1.LazyInitValue()
+   at System.Lazy`1.get_Value()
+   at Microsoft.Framework.Runtime.Cache.Get(Object key, Func`2 factory)
+   at Microsoft.Framework.Runtime.CacheExtensions.Get[T](ICache cache, Object key, Func`2 factory)
+   at Microsoft.Framework.Runtime.ProjectLibraryExportProvider.GetLibraryExport(ILibraryKey target)
+   at Microsoft.Framework.Runtime.CompositeLibraryExportProvider.<>c__DisplayClass0.<GetLibraryExport>b__1(ILibraryExportProvider r)
+   at System.Linq.Enumerable.WhereSelectArrayIterator`2.MoveNext()
+   at System.Linq.Enumerable.FirstOrDefault[TSource](IEnumerable`1 source, Func`2 predicate)
+   at Microsoft.Framework.Runtime.CompositeLibraryExportProvider.GetLibraryExport(ILibraryKey target)
+   at Microsoft.Framework.Runtime.LibraryManager.GetLibraryExport(String name, String aspect)
+   at Microsoft.Framework.Runtime.Loader.ProjectAssemblyLoader.Load(String name, IAssemblyLoadContext loadContext)
+   at Microsoft.Framework.Runtime.Loader.ProjectAssemblyLoader.Load(String name)
+   at klr.host.LoaderContainer.Load(String name)
+   at klr.hosting.RuntimeBootstrapper.<>c__DisplayClass0.<ExecuteAsync>b__8(AssemblyName assemblyName)
+   at klr.hosting.RuntimeBootstrapper.<>c__DisplayClass0.<ExecuteAsync>b__11(Object sender, ResolveEventArgs a)
+   at System.AppDomain.OnAssemblyResolveEvent(RuntimeAssembly assembly, String assemblyFullName)
+   at System.ModuleHandle.ResolveMethod(RuntimeModule module, Int32 methodToken, IntPtr* typeInstArgs, Int32 typeInstCount, IntPtr* methodInstArgs, Int32 methodInstCount)
+   at System.ModuleHandle.ResolveMethodHandleInternalCore(RuntimeModule module, Int32 methodToken, IntPtr[] typeInstantiationContext, Int32 typeInstCount, IntPtr[] methodInstantiationContext, Int32 methodInstCount)
+   at System.ModuleHandle.ResolveMethodHandleInternal(RuntimeModule module, Int32 methodToken, RuntimeTypeHandle[] typeInstantiationContext, RuntimeTypeHandle[] methodInstantiationContext)
+   at System.Reflection.CustomAttributeData..ctor(RuntimeModule scope, CustomAttributeRecord caRecord)
+   at System.Reflection.CustomAttributeData.GetCustomAttributes(RuntimeModule module, Int32 tkTarget)
+   at System.Reflection.CustomAttributeData.GetCustomAttributesInternal(RuntimeMethodInfo target)
+   at System.Reflection.RuntimeMethodInfo.GetCustomAttributesData()
+   at System.Reflection.MemberInfo.get_CustomAttributes()
+   at Bolt.Generators.ContractDefinition.<>c__DisplayClass3.<GetInitSessionMethod>b__4(MethodInfo m) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ContractDefinition.cs:line 90
+   at System.Linq.Enumerable.FirstOrDefault[TSource](IEnumerable`1 source, Func`2 predicate)
+   at Bolt.Generators.ContractDefinition.GetInitSessionMethod() in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ContractDefinition.cs:line 90
+   at Bolt.Generators.ContractInvokerExtensionGenerator.GenerateBody(ClassGenerator g) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ContractInvokerExtensionGenerator.cs:line 36
+   at Bolt.Generators.ClassGenerator.Generate(Object context) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ClassGenerator.cs:line 118
+   at Bolt.Generators.ContractInvokerExtensionGenerator.Generate(Object context) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ContractInvokerExtensionGenerator.cs:line 29
+   at Bolt.Generators.ServerGenerator.Generate(Object context) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ServerGenerator.cs:line 84
+   at Bolt.Generators.DocumentGenerator.Generate(Object context) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\DocumentGenerator.cs:line 56
+
+'
+*/

@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Framework.DependencyInjection;
+using Bolt.Server.Metadata;
 
 namespace Bolt.Server
 {
@@ -19,6 +20,7 @@ namespace Bolt.Server
             services.AddTransient<IServerDataHandler, ServerDataHandler>();
             services.AddTransient<IBoltRouteHandler, BoltRouteHandler>();
             services.AddTransient<IServerErrorHandler, ServerErrorHandler>();
+            services.AddTransient<IBoltMetadataHandler, BoltMetadataHandler>();
 
             return services;
         }

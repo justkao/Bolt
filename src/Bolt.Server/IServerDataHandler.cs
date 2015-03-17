@@ -5,6 +5,8 @@ namespace Bolt.Server
 {
     public interface IServerDataHandler
     {
+        ISerializer Serializer { get; }
+
         Task<T> ReadParametersAsync<T>(ServerActionContext context);
 
         Task WriteResponseAsync<T>(ServerActionContext context, T data);

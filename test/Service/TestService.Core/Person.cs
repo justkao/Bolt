@@ -18,19 +18,41 @@ namespace TestService.Core
         [DataMember(Order = 4)]
         public DateTime BornDate { get; set; }
 
-        [DataMember(Order = 5)]
-        public string Address { get; set; }
+        [DataMember(Order = 5, IsRequired = false)]
+        public Address Address { get; set; }
 
         public static Person Create(int id)
         {
             return new Person()
-                       {
-                           Name = "Name" + id,
-                           Address = "Address" + id,
-                           BornDate = DateTime.UtcNow,
-                           Id = id,
-                           Surname = "Surname" + id
-                       };
+            {
+                Name = "Name" + id,
+                Address = new Address() { City = "Address" + id },
+                BornDate = DateTime.UtcNow,
+                Id = id,
+                Surname = "Surname" + id
+            };
         }
+    }
+
+    [DataContract]
+    public enum AddresType
+    {
+        [EnumMember]
+        Local,
+        [EnumMember]
+        Remote
+    }
+
+    [DataContract]
+    public class Address
+    {
+        [DataMember(Order = 1)]
+        public string City { get; set; }
+
+        [DataMember(Order = 2)]
+        public string State { get; set; }
+
+        [DataMember(Order = 3)]
+        public AddresType Type { get; set; }
     }
 }

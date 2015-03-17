@@ -19,6 +19,8 @@ namespace TestService.Core
         [AsyncOperation]
         void InnerOperation();
 
+        Task<string> InnerOperation3();
+
         Task InnerOperationExAsync();
     }
 }

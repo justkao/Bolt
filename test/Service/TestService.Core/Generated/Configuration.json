@@ -1,5 +1,5 @@
 ﻿{
-    "assemblies": [ "TestService.Core.dll" ],
+    "assemblies": [ "TestService.Core.dll", "Bolt.Core" ],
     "contracts": [
         {
             "contract": "TestService.Core.ITestContract",

@@ -35,11 +35,12 @@ namespace TestService.Core
 
         public Task DoNothingAsAsync()
         {
-            return Task.FromResult(0);
+            return Task.Delay(200);
         }
 
         public void DoNothing()
         {
+            Thread.Sleep(200);
         }
 
         public Task DoNothingWithComplexParameterAsAsync(List<Person> person)
@@ -117,6 +118,11 @@ namespace TestService.Core
         public Task InnerOperationExAsync2()
         {
             throw new NotImplementedException();
+        }
+
+        public Task<string> InnerOperation3()
+        {
+            return Task.FromResult("InnerOperation3");
         }
     }
 }

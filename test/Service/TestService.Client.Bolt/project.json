@@ -2,7 +2,13 @@
     "version": "1.0.0-*",
     "code": [
         "**/*.cs",
-        "../TestService.Core/Person.cs"
+        "../TestService.Core/Person.cs",
+        "../TestService.Core/Generated/TestContract.Client.Designer.cs",
+        "../TestService.Core/Generated/TestContract.Contract.Designer.cs",
+        "../TestService.Core/ITestContract.cs",
+        "../TestService.Core/IInnerTestContract.cs",
+        "../TestService.Core/Servers.cs"
+
     ],
     "dependencies": {
         "Bolt.Core": "",
@@ -19,19 +25,9 @@
                 "System.Runtime.Serialization": "",
                 "System.Xml": "",
                 "System.Net.Http": "",
-                "System.Diagnostics.Debug": ""
-            }
-        },
-        "aspnetcore50": {
-            "dependencies": {
-                "System.Console": "4.0.0-beta-22523",
-                "System.Runtime": "4.0.20-beta-22523",
-                "System.Collections": "4.0.10-beta-22605",
-                "System.Linq": "4.0.0-beta-22605",
-                "System.Threading.Timer": "4.0.0-beta-22605",
-                "System.Diagnostics.Debug": "4.0.10-beta-22605",
-                "System.Threading": "4.0.10-beta-22605",
-                "System.Reflection.TypeExtensions": "4.0.0-beta-22605",
+                "System.Diagnostics.Debug": "",
+                "System.ServiceModel": ""
+
             }
         }
     }

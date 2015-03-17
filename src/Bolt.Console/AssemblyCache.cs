@@ -2,6 +2,7 @@ using Microsoft.Framework.Runtime.Common.CommandLine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -35,12 +36,23 @@ namespace Bolt.Console
 #endif
         }
 
+        public void AddDirectory(string dir)
+        {
+            dir = Path.GetFullPath(dir);
+            AnsiConsole.Output.WriteLine($"Directory '{dir.Bold()}' added to assembly search paths.");
+            _dirs.Add(Path.GetFullPath(dir));
+        }
+
         public Assembly Load(string assemblyPath)
         {
             var original = assemblyPath;
             if (!File.Exists(assemblyPath))
             {
                 assemblyPath = FindAssembly(assemblyPath);
+                if (string.IsNullOrEmpty(assemblyPath))
+                {
+                    AnsiConsole.Output.WriteLine($"Assembly {original} could not be located.".Yellow());
+                }
             }
 
             if (string.IsNullOrEmpty(assemblyPath))
@@ -106,11 +118,13 @@ namespace Bolt.Console
 
             if (!string.IsNullOrEmpty(extension))
             {
-                hasExtension = new[] { ".exe", ".dll" }.Any(ext => string.CompareOrdinal(extension, ext) == 0);
+                hasExtension = new[] { ".exe", ".dll" }.Any(ext => string.CompareOrdinal(extension.ToLowerInvariant(), ext) == 0);
             }
 
             foreach (var dir in _dirs)
             {
+                AnsiConsole.Output.WriteLine($"Lookup of assembly '{name.Bold()}' in directory '{dir.Bold()}'.");
+
                 string file = Path.Combine(dir, name);
 
                 if (hasExtension)

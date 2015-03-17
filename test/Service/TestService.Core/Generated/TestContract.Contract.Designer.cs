@@ -92,6 +92,10 @@ namespace TestService.Core
 {
     public partial class TestContractDescriptor : Bolt.ContractDescriptor
     {
+        protected TestContractDescriptor(Type type, string name) : base(type, name)
+        {
+        }
+
         public TestContractDescriptor() : base(typeof(TestService.Core.ITestContract), "TestContract")
         {
             UpdatePerson = Add("UpdatePerson", typeof(TestService.Core.Parameters.UpdatePersonParameters), typeof(ITestContract).GetTypeInfo().GetMethod("UpdatePerson"));
@@ -109,6 +113,7 @@ namespace TestService.Core
             Throws = Add("Throws", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("Throws"));
             ThrowsCustom = Add("ThrowsCustom", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("ThrowsCustom"));
             InnerOperation = Add("InnerOperation", typeof(Bolt.Empty), typeof(IInnerTestContract).GetTypeInfo().GetMethod("InnerOperation"));
+            InnerOperation3 = Add("InnerOperation3", typeof(Bolt.Empty), typeof(IInnerTestContract).GetTypeInfo().GetMethod("InnerOperation3"));
             InnerOperationExAsync = Add("InnerOperationExAsync", typeof(Bolt.Empty), typeof(IInnerTestContract).GetTypeInfo().GetMethod("InnerOperationExAsync"));
             InnerOperation2 = Add("InnerOperation2", typeof(Bolt.Empty), typeof(IInnerTestContract2).GetTypeInfo().GetMethod("InnerOperation2"));
             InnerOperationExAsync2 = Add("InnerOperationExAsync2", typeof(Bolt.Empty), typeof(IInnerTestContract2).GetTypeInfo().GetMethod("InnerOperationExAsync2"));
@@ -145,6 +150,8 @@ namespace TestService.Core
         public  Bolt.ActionDescriptor ThrowsCustom { get; private set; }
 
         public  Bolt.ActionDescriptor InnerOperation { get; private set; }
+
+        public  Bolt.ActionDescriptor InnerOperation3 { get; private set; }
 
         public  Bolt.ActionDescriptor InnerOperationExAsync { get; private set; }
 

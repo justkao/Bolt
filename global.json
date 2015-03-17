@@ -1,3 +1,10 @@
-﻿{
-    "sources": ["src", "test", "test/Service", "test/Automatic"]
+{
+    "sources": [
+        "src",
+        "test",
+        "test/Service",
+        "test/Automatic",
+        "wrap",
+        "."
+    ]
 }

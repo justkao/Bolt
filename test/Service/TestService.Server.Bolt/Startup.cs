@@ -6,6 +6,7 @@ using System;
 using System.Linq;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
+using System.Threading;
 
 namespace TestService.Server.Bolt
 {
@@ -14,6 +15,9 @@ namespace TestService.Server.Bolt
         // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            ThreadPool.SetMinThreads(100, 100);
+            ThreadPool.SetMinThreads(1000, 1000);
+
             services.AddLogging();
             services.AddOptions();
             services.AddBolt();
@@ -23,8 +27,9 @@ namespace TestService.Server.Bolt
         {
             app.ApplicationServices.GetRequiredService<ILoggerFactory>().AddConsole(LogLevel.Information);
 
-            app.UseBolt(b => {
-                b.UseTestContract(new TestContractImplementation());
+            app.UseBolt(b =>
+            {
+                b.Use<TestContractInvoker>(new StaticInstanceProvider(new TestContractImplementation()));
             });
 
             var server = app.Server as Microsoft.AspNet.Server.WebListener.ServerInformation;

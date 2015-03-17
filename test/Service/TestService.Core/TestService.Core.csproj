@@ -42,6 +42,9 @@
     <Reference Include="System.Runtime, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\..\src\Bolt.Common\CollectionExtensions.cs">
+      <Link>CollectionExtensions.cs</Link>
+    </Compile>
     <Compile Include="..\..\Automatic\Bolt.Service.Test.Core\CompositeType.cs">
       <Link>CompositeType.cs</Link>
     </Compile>
@@ -63,6 +66,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>$(TargetDir)Bolt.exe -fromConfig=$(ProjectDir)\Generated\Configuration.json</PostBuildEvent>
+    <PostBuildEvent>cd "$(SolutionDir)src\Bolt.Console"
+k run code $(ProjectDir)\Generated\Configuration.json --dir $(TargetDir) --dir $(SolutionDir)src\Bolt.Core\bin\debug\net45\</PostBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PreBuildEvent>cd "$(SolutionDir)src\Bolt.Core"
+kpm build</PreBuildEvent>
   </PropertyGroup>
 </Project>
