@@ -7,10 +7,13 @@ namespace Bolt.Server
         public BoltServerOptions()
         {
             Prefix = "bolt";
+            DetailedServerErrors = true;
         }
 
         public TimeSpan SessionTimeout { get; set; }
 
         public string Prefix { get; set; }
+
+        public bool DetailedServerErrors { get; set; }
     }
 }

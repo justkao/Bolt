@@ -82,15 +82,13 @@ namespace Bolt.Server
             }
 
             context.Response.StatusCode = statusCode;
-            context.Response.Headers[_options.ServerErrorCodesHeader] = code.ToString();
-            context.Response.Body.Dispose();
+            context.Response.Headers[_options.ServerErrorHeader] = code.ToString();
         }
 
         protected virtual void CloseWithError(HttpContext context, int code)
         {
             context.Response.StatusCode = 500;
-            context.Response.Headers[_options.ServerErrorCodesHeader] = code.ToString(CultureInfo.InvariantCulture);
-            context.Response.Body.Dispose();
+            context.Response.Headers[_options.ServerErrorHeader] = code.ToString(CultureInfo.InvariantCulture);
         }
     }
 }

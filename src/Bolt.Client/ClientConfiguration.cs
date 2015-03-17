@@ -14,7 +14,7 @@ namespace Bolt.Client
             Serializer = new JsonSerializer();
             ExceptionWrapper = new JsonExceptionWrapper();
             DataHandler = new ClientDataHandler(Serializer, ExceptionWrapper);
-            RequestHandler = new RequestHandler(DataHandler, new ClientErrorProvider(Options.ServerErrorCodesHeader));
+            RequestHandler = new RequestHandler(DataHandler, new ClientErrorProvider(Options.ServerErrorHeader));
             EndpointProvider = new EndpointProvider();
         }
 

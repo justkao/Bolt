@@ -21,6 +21,7 @@ namespace Bolt.Server
             services.AddTransient<IBoltRouteHandler, BoltRouteHandler>();
             services.AddTransient<IServerErrorHandler, ServerErrorHandler>();
             services.AddTransient<IBoltMetadataHandler, BoltMetadataHandler>();
+            services.AddTransient<IQueryParameterBinder, QueryParameterBinder>();
 
             return services;
         }

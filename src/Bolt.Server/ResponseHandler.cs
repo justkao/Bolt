@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNet.Http;
+﻿using Bolt.Common;
+using Microsoft.AspNet.Http;
 using Microsoft.Framework.Logging;
+using Microsoft.Framework.OptionsModel;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Bolt.Server
@@ -13,7 +16,9 @@ namespace Bolt.Server
 
         private readonly IServerErrorHandler _errorHandler;
 
-        public ResponseHandler(ILoggerFactory factory, IServerDataHandler dataHandler, IServerErrorHandler errorHandler)
+        private readonly BoltServerOptions _options;
+
+        public ResponseHandler(ILoggerFactory factory, IServerDataHandler dataHandler, IServerErrorHandler errorHandler, IOptions<BoltServerOptions> options)
         {
             if (dataHandler == null)
             {
@@ -30,9 +35,15 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(errorHandler));
             }
 
+            if (options == null)
+            {
+                throw new ArgumentNullException(nameof(options));
+            }
+
             _dataHandler = dataHandler;
             _logger = factory.Create<ResponseHandler>();
             _errorHandler = errorHandler;
+            _options = options.Options;
         }
 
         public virtual Task Handle(ServerActionContext context)
@@ -56,6 +67,21 @@ namespace Bolt.Server
 
             if (_errorHandler.HandleError(context, error))
             {
+                if (_options.DetailedServerErrors)
+                {
+                    try
+                    {
+                        await _dataHandler.WriteResponseAsync(context, error.GetAll().Select(e => e.Message));
+                        // await _dataHandler.WriteExceptionAsync(context, error);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.WriteError("Failed to serialize exception that occured during execution of '{0}' action. \nExecution Error: '{1}'\nSerializationError: '{2}'", context.Action, error, e);
+                        return;
+                    }
+                }
+
+                context.Context.Response.Body.Dispose();
                 return;
             }
 

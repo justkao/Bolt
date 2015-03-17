@@ -6,12 +6,12 @@
     public class BoltOptions
     {
         public const string DefaultSessionHeader = "Bolt-Session";
-        public const string DefaultServerErrorCodesHeader = "Bolt-Error";
+        public const string DefaultServerErrorHeader = "Bolt-Error";
 
         public BoltOptions()
         {
             SessionHeader = DefaultSessionHeader;
-            ServerErrorCodesHeader = DefaultServerErrorCodesHeader;
+            ServerErrorHeader = DefaultServerErrorHeader;
         }
 
         /// <summary>
@@ -22,6 +22,6 @@
         /// <summary>
         ///  The header name used to store server errors.
         /// </summary>
-        public string ServerErrorCodesHeader { get; set; }
+        public string ServerErrorHeader { get; set; }
     }
 }

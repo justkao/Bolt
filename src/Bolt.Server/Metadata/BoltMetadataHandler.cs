@@ -97,7 +97,7 @@ namespace Bolt.Server.Metadata
                 return m;
             }
 
-            m.ErrorHeader = (invoker.Parent as BoltRouteHandler)?.Options.ServerErrorCodesHeader;
+            m.ErrorHeader = (invoker.Parent as BoltRouteHandler)?.Options.ServerErrorHeader;
             m.ContentType = invoker.DataHandler.Serializer.ContentType;
             var statefullProvder = invoker.InstanceProvider as StateFullInstanceProvider;
             if (statefullProvder != null)

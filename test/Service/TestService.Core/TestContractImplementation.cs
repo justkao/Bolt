@@ -54,7 +54,7 @@ namespace TestService.Core
 
         public int GetSimpleType(int arg)
         {
-            return new Random().Next();
+            return arg;
         }
 
         public Task GetSimpleTypeAsAsync(int arg)
