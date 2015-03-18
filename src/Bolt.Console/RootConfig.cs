@@ -1,3 +1,4 @@
+using Bolt.Common;
 using Bolt.Generators;
 using Microsoft.Framework.Runtime.Common.CommandLine;
 using Newtonsoft.Json;

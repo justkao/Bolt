@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 
-namespace Microsoft.Framework.Internal
+namespace Bolt.Common
 {
     internal class PropertyHelper
     {
@@ -28,6 +28,8 @@ namespace Microsoft.Framework.Internal
 
         private readonly Func<object, object> _valueGetter;
 
+        private Action<object, object> _valueSetter;
+
         /// <summary>
         /// Initializes a fast <see cref="PropertyHelper"/>.
         /// This constructor does not cache the helper. For caching, use <see cref="GetProperties(object)"/>.
@@ -46,6 +48,18 @@ namespace Microsoft.Framework.Internal
         public object GetValue(object instance)
         {
             return _valueGetter(instance);
+        }
+
+        public void SetValue(object instance, object value)
+        {
+            var setter = _valueSetter;
+            if ( setter == null)
+            {
+                setter = MakeFastPropertySetter(Property);
+            }
+
+            _valueSetter = setter;
+            setter(instance, value);
         }
 
         /// <summary>

@@ -3,7 +3,9 @@
     "authors": [ "Martin Tomka" ],
     "description": "Bolt library containing helper classes for code generation.",
     "dependencies": {
-        "Bolt.Common": { "type": "build" }
+        "Bolt.Common": { "type": "build" },
+        "Bolt.Common.Conversion": { "type": "build" }
+
     },
     "frameworks": {
         "net45": {
@@ -23,12 +25,13 @@
         "aspnetcore50": {
             "dependencies": {
                 "System.Runtime": "4.0.20-beta-22523",
-                "System.Collections": "4.0.10-beta-22605",
                 "System.Linq": "4.0.0-beta-22605",
-                "System.Reflection.Primitives": "4.0.0-beta-22605",
                 "System.Reflection": "4.0.10-beta-22605",
+                "System.Reflection.Extensions": "4.0.0-beta-22605",
                 "System.Runtime.Serialization.Primitives": "4.0.0-beta-22605",
-                "System.Diagnostics.Debug": "4.0.10-beta-22605"
+                "System.Diagnostics.Debug": "4.0.10-beta-22605",
+                "System.ComponentModel.TypeConverter": "4.0.0-beta-22605",
+                "System.Collections.Concurrent": "4.0.0-beta-22605"
             }
         }
     }

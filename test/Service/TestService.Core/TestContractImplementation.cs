@@ -35,12 +35,11 @@ namespace TestService.Core
 
         public Task DoNothingAsAsync()
         {
-            return Task.Delay(200);
+            return Task.FromResult(0);
         }
 
         public void DoNothing()
         {
-            Thread.Sleep(200);
         }
 
         public Task DoNothingWithComplexParameterAsAsync(List<Person> person)
