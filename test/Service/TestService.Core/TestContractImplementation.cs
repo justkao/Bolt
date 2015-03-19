@@ -8,6 +8,10 @@ namespace TestService.Core
 {
     public class TestContractImplementation : ITestContract
     {
+        public TestContractImplementation(IServiceProvider provider)
+        {
+        }
+
         public Person UpdatePerson(Person person, CancellationToken cancellation)
         {
             return null;

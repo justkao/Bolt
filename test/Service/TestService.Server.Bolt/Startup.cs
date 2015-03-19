@@ -29,7 +29,7 @@ namespace TestService.Server.Bolt
 
             app.UseBolt(b =>
             {
-                b.Use<TestContractInvoker>(new StaticInstanceProvider(new TestContractImplementation()));
+                b.Use<TestContractInvoker>(new InstanceProvider<TestContractImplementation>());
             });
 
             var server = app.Server as Microsoft.AspNet.Server.WebListener.ServerInformation;

@@ -1,17 +1,27 @@
-﻿using System;
+﻿using Microsoft.Framework.DependencyInjection;
+using System;
 
 namespace Bolt.Server
 {
-    public class StateFullInstanceProvider<T> : StateFullInstanceProvider where T : new()
+    public class StateFullInstanceProvider<T> : StateFullInstanceProvider
     {
+        private Func<IServiceProvider, object[], object> _factory;
+
         public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, BoltServerOptions options)
             : base(initInstanceAction, releaseInstanceAction, options)
         {
         }
 
-        protected override object CreateInstance(Type type)
+        protected override object CreateInstance(ServerActionContext context, Type type)
         {
-            return new T();
+            var factory = _factory;
+            if (factory == null)
+            {
+                factory = ActivatorUtilities.CreateFactory(typeof(T), Type.EmptyTypes);
+                _factory = factory;
+            }
+
+            return factory(context.Context.ApplicationServices, null);
         }
     }
 }

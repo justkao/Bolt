@@ -1,12 +1,17 @@
-﻿using System;
+﻿using Microsoft.Framework.DependencyInjection;
+using System;
+using System.Collections.Concurrent;
 
 namespace Bolt.Server
 {
     public class InstanceProvider : IInstanceProvider
     {
+        private readonly ConcurrentDictionary<Type, Func<IServiceProvider, object[], object>> _typeActivatorCache =
+               new ConcurrentDictionary<Type, Func<IServiceProvider, object[], object>>();
+
         public virtual T GetInstance<T>(ServerActionContext context)
         {
-            return (T)CreateInstance(typeof(T));
+            return (T)CreateInstance(context, typeof(T));
         }
 
         public virtual void ReleaseInstance(ServerActionContext context, object obj, Exception error)
@@ -17,9 +22,10 @@ namespace Bolt.Server
             }
         }
 
-        protected virtual object CreateInstance(Type type)
+        protected virtual object CreateInstance(ServerActionContext context, Type type)
         {
-            return Activator.CreateInstance(type);
+            var createFactory = _typeActivatorCache.GetOrAdd(type, (t) => ActivatorUtilities.CreateFactory(type, Type.EmptyTypes));
+            return createFactory(context.Context.ApplicationServices, null);
         }
     }
 }
