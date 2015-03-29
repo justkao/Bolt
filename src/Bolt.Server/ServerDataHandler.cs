@@ -9,7 +9,7 @@ namespace Bolt.Server
         private readonly IExceptionWrapper _exceptionWrapper;
         private static readonly Task<Empty> EmptyParametersTask = Task.FromResult(Empty.Instance);
 
-        public ServerDataHandler(ISerializer serializer, IExceptionWrapper exceptionWrapper, IQueryParameterBinder parameterBinder)
+        public ServerDataHandler(ISerializer serializer, IExceptionWrapper exceptionWrapper, IParameterBinder parameterBinder)
         {
             if (serializer == null)
             {
@@ -35,7 +35,7 @@ namespace Bolt.Server
 
         public ISerializer Serializer { get; }
 
-        public IQueryParameterBinder ParameterBinder { get; }
+        public IParameterBinder ParameterBinder { get; }
 
         public virtual async Task<T> ReadParametersAsync<T>(ServerActionContext context)
         {
@@ -48,7 +48,7 @@ namespace Bolt.Server
 
             if (context.Context.Request.Method == "GET")
             {
-                return ParameterBinder.BindParameters<T>(context);
+                return await ParameterBinder.BindParametersAsync<T>(context);
             }
 
             return Serializer.DeserializeParameters<T>(await context.Context.Request.Body.CopyAsync(context.RequestAborted), context.Action);

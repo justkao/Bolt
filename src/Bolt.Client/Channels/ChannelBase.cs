@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt.Common;
+using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -15,7 +16,7 @@ namespace Bolt.Client.Channels
         {
             if (proxy == null)
             {
-                throw new ArgumentNullException("proxy");
+                throw new ArgumentNullException(nameof(proxy));
             }
 
             RequestHandler = proxy.RequestHandler;
@@ -33,12 +34,12 @@ namespace Bolt.Client.Channels
         {
             if (requestHandler == null)
             {
-                throw new ArgumentNullException("requestHandler");
+                throw new ArgumentNullException(nameof(requestHandler));
             }
 
             if (endpointProvider == null)
             {
-                throw new ArgumentNullException("endpointProvider");
+                throw new ArgumentNullException(nameof(endpointProvider));
             }
 
             RequestHandler = requestHandler;
@@ -55,75 +56,42 @@ namespace Bolt.Client.Channels
 
         public TimeSpan DefaultResponseTimeout { get; set; }
 
-        public virtual CancellationToken GetCancellationToken(ActionDescriptor descriptor)
+        public virtual void Open()
         {
-            return CancellationToken.None;
+            TaskExtensions.Execute(() => OpenAsync());
         }
 
-        public virtual void Open()
+        public virtual Task OpenAsync()
         {
             EnsureNotClosed();
 
             if (IsOpened)
             {
-                return;
+                return CompletedTask.Done;
             }
 
             IsOpened = true;
-        }
-
-        public virtual Task OpenAsync()
-        {
-            Open();
-            return Task.FromResult(0);
-        }
-
-        public Task SendAsync<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
-        {
-            return SendCoreAsync<Empty, TRequestParameters>(parameters, descriptor, cancellation);
-        }
-
-        public Task<TResult> SendAsync<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
-        {
-            return SendCoreAsync<TResult, TRequestParameters>(parameters, descriptor, cancellation);
-        }
-
-        public void Send<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
-        {
-            TaskExtensions.Execute(() => SendCoreAsync<Empty, TRequestParameters>(parameters, descriptor, cancellation));
-        }
-
-        public TResult Send<TResult, TRequestParameters>(
-            TRequestParameters parameters,
-            ActionDescriptor descriptor,
-            CancellationToken cancellation)
-        {
-            return TaskExtensions.Execute(() => SendCoreAsync<TResult, TRequestParameters>(parameters, descriptor, cancellation));
+            return CompletedTask.Done;
         }
 
         public virtual void Close()
         {
-            if (IsClosed)
-            {
-                return;
-            }
-
-            IsClosed = true;
-            OnClosed();
+            TaskExtensions.Execute(() => CloseAsync());
         }
 
         public virtual Task CloseAsync()
         {
-            Close();
-            return Task.FromResult(0);
+            if (IsClosed)
+            {
+                return CompletedTask.Done;
+            }
+
+            IsClosed = true;
+            OnClosed();
+            return CompletedTask.Done;
         }
 
-        protected abstract Uri GetRemoteConnection();
-
-        protected virtual Task<Uri> GetRemoteConnectionAsync()
-        {
-            return Task.FromResult(GetRemoteConnection());
-        }
+        protected abstract Task<Uri> GetRemoteConnectionAsync();
 
         protected virtual ClientActionContext CreateContext(
             Uri server,
@@ -132,12 +100,12 @@ namespace Bolt.Client.Channels
             object parameters)
         {
             return new ClientActionContext(actionDescriptor, CreateRequest(server, actionDescriptor), server, cancellation)
-                       {
-                           ResponseTimeout = DefaultResponseTimeout
-                       };
+            {
+                ResponseTimeout = DefaultResponseTimeout
+            };
         }
 
-        public virtual async Task<T> SendCoreAsync<T, TParameters>(
+        public virtual async Task<T> SendAsync<T, TParameters>(
             TParameters parameters,
             ActionDescriptor descriptor,
             CancellationToken cancellation)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
 namespace Bolt.Generators
 {
@@ -53,7 +54,7 @@ namespace Bolt.Generators
 
         public override void Generate(object context)
         {
-            AddUsings(BoltConstants.Client.Namespace, BoltConstants.Client.ChannelsNamespace);
+            AddUsings(BoltConstants.Client.Namespace, BoltConstants.Client.ChannelsNamespace, "System.Threading");
 
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
             generator.Modifier = Modifier;
@@ -124,7 +125,7 @@ namespace Bolt.Generators
                         if (IsAsync(method))
                         {
                             WriteLine(
-                                "return Channel.SendAsync<{0}, {1}>({2}, {3});",
+                                "return SendAsync<{0}, {1}>({2}, {3});",
                                 FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType),
                                 result.TypeName,
                                 result.VariableName,
@@ -133,7 +134,7 @@ namespace Bolt.Generators
                         else if (forceAsync)
                         {
                             WriteLine(
-                                "return Channel.SendAsync<{0}, {1}>({2}, {3});",
+                                "return SendAsync<{0}, {1}>({2}, {3});",
                                 FormatType(method.ReturnType),
                                 result.TypeName,
                                 result.VariableName,
@@ -142,7 +143,7 @@ namespace Bolt.Generators
                         else
                         {
                             WriteLine(
-                                "return Channel.Send<{0}, {1}>({2}, {3});",
+                                "return Send<{0}, {1}>({2}, {3});",
                                 FormatType(method.ReturnType),
                                 result.TypeName,
                                 result.VariableName,
@@ -153,15 +154,15 @@ namespace Bolt.Generators
                     {
                         if (IsAsync(method))
                         {
-                            WriteLine("return Channel.SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
+                            WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
                         }
                         else if (forceAsync)
                         {
-                            WriteLine("return Channel.SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
+                            WriteLine("return SendAsync({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
                         }
                         else
                         {
-                            WriteLine("Channel.Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
+                            WriteLine("Send({0}, {1});", result.VariableName, DeclareEndpoint(descriptor, cancellation));
                         }
                     }
                 });
@@ -206,7 +207,7 @@ namespace Bolt.Generators
 
             if (cancellationTokenParameter == null)
             {
-                return string.Format("{0}, GetCancellationToken({1})", descriptorReference, descriptorReference);
+                return string.Format("{0}, CancellationToken.None", descriptorReference, descriptorReference);
             }
 
             return string.Format("{0}, {1}", descriptorReference, cancellationTokenParameter.Name);

@@ -13,7 +13,7 @@ namespace Bolt.Client.Channels
         {
             if (proxy == null)
             {
-                throw new ArgumentNullException("proxy");
+                throw new ArgumentNullException(nameof(proxy));
             }
 
             Descriptor = proxy.Descriptor;
@@ -30,12 +30,12 @@ namespace Bolt.Client.Channels
         {
             if (contractDescriptor == null)
             {
-                throw new ArgumentNullException("contractDescriptor");
+                throw new ArgumentNullException(nameof(contractDescriptor));
             }
 
             if (channel == null)
             {
-                throw new ArgumentNullException("channel");
+                throw new ArgumentNullException(nameof(channel));
             }
 
             Descriptor = contractDescriptor;
@@ -53,11 +53,6 @@ namespace Bolt.Client.Channels
         public IChannel Channel { get; private set; }
 
         #region IChannel Implementation
-
-        public virtual CancellationToken GetCancellationToken(ActionDescriptor descriptor)
-        {
-            return Channel.GetCancellationToken(descriptor);
-        }
 
         public void Dispose()
         {
@@ -94,24 +89,32 @@ namespace Bolt.Client.Channels
             get { return Channel.IsClosed; }
         }
 
-        Task IChannel.SendAsync<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        Task<TResult> IChannel.SendAsync<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
-            return Channel.SendAsync(parameters, descriptor, cancellation);
+            return SendAsync<TResult, TRequestParameters>(parameters, descriptor, cancellation);
         }
 
-        Task<TResult> IChannel.SendAsync<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        protected Task SendAsync<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        {
+            return SendAsync<Empty, TRequestParameters>(parameters, descriptor, cancellation);
+        }
+
+        protected Task<TResult> SendAsync<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
             return Channel.SendAsync<TResult, TRequestParameters>(parameters, descriptor, cancellation);
         }
 
-        void IChannel.Send<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        protected void Send<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
-            Channel.Send(parameters, descriptor, cancellation);
+            TaskExtensions.Execute(() => SendAsync<Empty, TRequestParameters>(parameters, descriptor, cancellation));
         }
 
-        TResult IChannel.Send<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        public TResult Send<TResult, TRequestParameters>(
+            TRequestParameters parameters,
+            ActionDescriptor descriptor,
+            CancellationToken cancellation)
         {
-            return Channel.Send<TResult, TRequestParameters>(parameters, descriptor, cancellation);
+            return TaskExtensions.Execute(() => SendAsync<TResult, TRequestParameters>(parameters, descriptor, cancellation));
         }
 
         #endregion

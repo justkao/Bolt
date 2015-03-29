@@ -11,8 +11,7 @@
         "Microsoft.Framework.OptionsModel": "1.0.0-beta3",
         "Microsoft.AspNet.Routing": "1.0.0-beta3",
         "Bolt.Core": "1.0.0-*",
-        "Bolt.Common": { "type": "build" },
-        "Bolt.Common.Conversion": { "type": "build" }
+        "Bolt.Common": { "type": "build" }
     },
     "frameworks": {
         "aspnet50": {

@@ -42,7 +42,7 @@ namespace Bolt.Client.Channels
 
         public IServerProvider ServerProvider { get; private set; }
 
-        public sealed override async Task<T> SendCoreAsync<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        public sealed override async Task<T> SendAsync<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
             EnsureNotClosed();
 
@@ -85,7 +85,7 @@ namespace Bolt.Client.Channels
                             error = e;
                         }
 
-                        if (!await HandleErrorAsync(ctxt, error))
+                        if (!HandleError(ctxt, error))
                         {
                             throw error;
                         }
@@ -113,19 +113,14 @@ namespace Bolt.Client.Channels
             return HandleErrorCore(error);
         }
 
-        protected virtual Task<bool> HandleErrorAsync(ClientActionContext context, Exception error)
-        {
-            return Task.FromResult(HandleError(context, error));
-        }
-
         protected virtual bool HandleOpenConnectionError(Exception error)
         {
             return HandleErrorCore(error);
         }
 
-        protected override Uri GetRemoteConnection()
+        protected override async Task<Uri> GetRemoteConnectionAsync()
         {
-            Open();
+            await OpenAsync();
             return ServerProvider.GetServer();
         }
 

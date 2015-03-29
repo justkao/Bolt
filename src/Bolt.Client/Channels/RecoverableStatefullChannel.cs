@@ -57,60 +57,10 @@ namespace Bolt.Client.Channels
             get { return true; }
         }
 
-        public override void Open()
-        {
-            EnsureConnection();
-            IsOpened = true;
-        }
-
         public override async Task OpenAsync()
         {
             await EnsureConnectionAsync();
             IsOpened = true;
-        }
-
-        public override void Close()
-        {
-            if (IsClosed)
-            {
-                return;
-            }
-
-            using (_syncRoot.Enter())
-            {
-                if (IsClosed)
-                {
-                    return;
-                }
-
-                try
-                {
-                    if (_activeConnection != null)
-                    {
-                        string sessionId = _sessionId;
-
-                        DelegatedChannel channel = new DelegatedChannel(
-                            _activeConnection,
-                            RequestHandler,
-                            EndpointProvider,
-                            (c) =>
-                            {
-                                BeforeSending(c);
-                                WriteSessionHeader(c, sessionId);
-                            },
-                            AfterReceived);
-
-                        TContract contract = CreateContract(channel);
-                        OnProxyClosing(contract);
-                    }
-                }
-                finally
-                {
-                    _activeConnection = null;
-                    _sessionId = null;
-                    base.Close();
-                }
-            }
         }
 
         public override async Task CloseAsync()
@@ -157,21 +107,9 @@ namespace Bolt.Client.Channels
             }
         }
 
-        protected abstract void OnProxyOpening(TContract contract);
+        protected abstract Task OnProxyClosingAsync(TContract contract);
 
-        protected abstract void OnProxyClosing(TContract contract);
-
-        protected virtual Task OnProxyClosingAsync(TContract contract)
-        {
-            OnProxyClosing(contract);
-            return Task.FromResult(0);
-        }
-
-        protected virtual Task OnProxyOpeningAsync(TContract contract)
-        {
-            OnProxyOpening(contract);
-            return Task.FromResult(0);
-        }
+        protected abstract Task OnProxyOpeningAsync(TContract contract);
 
         protected override bool HandleError(ClientActionContext context, Exception error)
         {
@@ -210,14 +148,6 @@ namespace Bolt.Client.Channels
             base.BeforeSending(context);
         }
 
-        protected override Uri GetRemoteConnection()
-        {
-            EnsureNotClosed();
-            Uri uri = EnsureConnection();
-            IsOpened = true;
-            return uri;
-        }
-
         protected override async Task<Uri> GetRemoteConnectionAsync()
         {
             EnsureNotClosed();
@@ -242,80 +172,6 @@ namespace Bolt.Client.Channels
         protected TContract CreateContract(Uri server)
         {
             return CreateContract(new DelegatedChannel(server, RequestHandler, EndpointProvider, BeforeSending, AfterReceived));
-        }
-
-        private Uri EnsureConnection()
-        {
-            EnsureNotClosed();
-
-            if (_activeConnection != null)
-            {
-                return _activeConnection;
-            }
-
-            using (_syncRoot.Enter())
-            {
-                if (_activeConnection != null)
-                {
-                    return _activeConnection;
-                }
-
-                Uri connection = ServerProvider.GetServer();
-                string sessionId = null;
-                ActionDescriptor action = null;
-
-                TContract contract =
-                    CreateContract(
-                        new DelegatedChannel(
-                            connection,
-                            RequestHandler,
-                            EndpointProvider,
-                            (c) =>
-                            {
-                                WriteSessionHeader(c, sessionId);
-                                BeforeSending(c);
-                            },
-                            (ctxt) =>
-                            {
-                                if (sessionId == null)
-                                {
-                                    action = ctxt.Action;
-                                    sessionId = ctxt.Response.Headers.GetHeaderValue(_sessionHeaderName);
-                                }
-                            }));
-
-                try
-                {
-                    OnProxyOpening(contract);
-                }
-                catch (Exception)
-                {
-                    if (sessionId != null)
-                    {
-                        try
-                        {
-                            OnProxyClosing(contract);
-                        }
-                        catch (Exception)
-                        {
-                            // OK, we tried to close pending proxy
-                        }
-                    }
-
-                    throw;
-                }
-
-                if (sessionId == null)
-                {
-                    throw new BoltServerException(ServerErrorCode.SessionIdNotReceived, action, connection.ToString());
-                }
-
-                OnConnectionOpened(_activeConnection, _sessionId);
-
-                _activeConnection = connection;
-                _sessionId = sessionId;
-                return connection;
-            }
         }
 
         private async Task<Uri> EnsureConnectionAsync()

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Bolt.Client.Channels
 {
@@ -31,27 +32,19 @@ namespace Bolt.Client.Channels
 
         protected override void BeforeSending(ClientActionContext context)
         {
-            if (_beforeSending != null)
-            {
-                _beforeSending(context);
-            }
-
+            _beforeSending?.Invoke(context);
             base.BeforeSending(context);
         }
 
         protected override void AfterReceived(ClientActionContext context)
         {
-            if (_afterReceived != null)
-            {
-                _afterReceived(context);
-            }
-
+            _afterReceived?.Invoke(context);
             base.AfterReceived(context);
         }
 
-        protected override Uri GetRemoteConnection()
+        protected override Task<Uri> GetRemoteConnectionAsync()
         {
-            return _server;
+            return Task.FromResult(_server);
         }
     }
 }

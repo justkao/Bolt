@@ -14,6 +14,7 @@ namespace Bolt.Console
     {
         private readonly Microsoft.Framework.Runtime.IAssemblyLoadContext _loadContext;
         private readonly Microsoft.Framework.Runtime.IAssemblyLoaderContainer _container;
+        private readonly Microsoft.Framework.Runtime.ILibraryManager _libraryManager;
         private readonly IDisposable _loaderRegistration = null;
 #else
     public class AssemblyCache : IEnumerable<Assembly>, IDisposable
@@ -28,6 +29,7 @@ namespace Bolt.Console
             _loadContext = ((Microsoft.Framework.Runtime.IAssemblyLoadContextAccessor)serviceProvider.GetService(typeof(Microsoft.Framework.Runtime.IAssemblyLoadContextAccessor))).GetLoadContext(typeof(Program).GetTypeInfo().Assembly);
             _container = ((Microsoft.Framework.Runtime.IAssemblyLoaderContainer)serviceProvider.GetService(typeof(Microsoft.Framework.Runtime.IAssemblyLoaderContainer)));
             _loaderRegistration = _container.AddLoader(this);
+            _libraryManager = ((Microsoft.Framework.Runtime.ILibraryManager)serviceProvider.GetService(typeof(Microsoft.Framework.Runtime.ILibraryManager)));
 #else
             AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
             {

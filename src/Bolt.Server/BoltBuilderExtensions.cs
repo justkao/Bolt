@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNet.Builder;
+﻿using Bolt.Server;
+using Microsoft.AspNet.Builder;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using System;
 
-namespace Bolt.Server
+namespace Microsoft.AspNet.Builder
 {
     public static class BoltBuilderExtensions
     {

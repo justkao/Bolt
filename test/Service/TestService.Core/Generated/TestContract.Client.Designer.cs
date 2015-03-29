@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Bolt.Client;
@@ -72,181 +73,181 @@ namespace TestService.Core
         {
         }
 
-        public virtual Person UpdatePerson(Person person, System.Threading.CancellationToken cancellation)
+        public virtual Person UpdatePerson(Person person, CancellationToken cancellation)
         {
             var bolt_Params = new TestService.Core.Parameters.UpdatePersonParameters();
             bolt_Params.Person = person;
-            return Channel.Send<Person, TestService.Core.Parameters.UpdatePersonParameters>(bolt_Params, Descriptor.UpdatePerson, cancellation);
+            return Send<Person, TestService.Core.Parameters.UpdatePersonParameters>(bolt_Params, Descriptor.UpdatePerson, cancellation);
         }
 
-        public virtual Task<Person> UpdatePersonAsync(Person person, System.Threading.CancellationToken cancellation)
+        public virtual Task<Person> UpdatePersonAsync(Person person, CancellationToken cancellation)
         {
             var bolt_Params = new TestService.Core.Parameters.UpdatePersonParameters();
             bolt_Params.Person = person;
-            return Channel.SendAsync<Person, TestService.Core.Parameters.UpdatePersonParameters>(bolt_Params, Descriptor.UpdatePerson, cancellation);
+            return SendAsync<Person, TestService.Core.Parameters.UpdatePersonParameters>(bolt_Params, Descriptor.UpdatePerson, cancellation);
         }
 
         public virtual Person UpdatePersonThatThrowsInvalidOperationException(Person person)
         {
             var bolt_Params = new TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters();
             bolt_Params.Person = person;
-            return Channel.Send<Person, TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters>(bolt_Params, Descriptor.UpdatePersonThatThrowsInvalidOperationException, GetCancellationToken(Descriptor.UpdatePersonThatThrowsInvalidOperationException));
+            return Send<Person, TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters>(bolt_Params, Descriptor.UpdatePersonThatThrowsInvalidOperationException, CancellationToken.None);
         }
 
         public virtual Task<Person> UpdatePersonThatThrowsInvalidOperationExceptionAsync(Person person)
         {
             var bolt_Params = new TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters();
             bolt_Params.Person = person;
-            return Channel.SendAsync<Person, TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters>(bolt_Params, Descriptor.UpdatePersonThatThrowsInvalidOperationException, GetCancellationToken(Descriptor.UpdatePersonThatThrowsInvalidOperationException));
+            return SendAsync<Person, TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters>(bolt_Params, Descriptor.UpdatePersonThatThrowsInvalidOperationException, CancellationToken.None);
         }
 
         public virtual Task DoNothingAsAsync()
         {
-            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.DoNothingAsAsync, GetCancellationToken(Descriptor.DoNothingAsAsync));
+            return SendAsync(Bolt.Empty.Instance, Descriptor.DoNothingAsAsync, CancellationToken.None);
         }
 
         public virtual void DoNothing()
         {
-            Channel.Send(Bolt.Empty.Instance, Descriptor.DoNothing, GetCancellationToken(Descriptor.DoNothing));
+            Send(Bolt.Empty.Instance, Descriptor.DoNothing, CancellationToken.None);
         }
 
         public virtual Task DoNothingAsync()
         {
-            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.DoNothing, GetCancellationToken(Descriptor.DoNothing));
+            return SendAsync(Bolt.Empty.Instance, Descriptor.DoNothing, CancellationToken.None);
         }
 
         public virtual Task DoNothingWithComplexParameterAsAsync(List<Person> person)
         {
             var bolt_Params = new TestService.Core.Parameters.DoNothingWithComplexParameterAsAsyncParameters();
             bolt_Params.Person = person;
-            return Channel.SendAsync(bolt_Params, Descriptor.DoNothingWithComplexParameterAsAsync, GetCancellationToken(Descriptor.DoNothingWithComplexParameterAsAsync));
+            return SendAsync(bolt_Params, Descriptor.DoNothingWithComplexParameterAsAsync, CancellationToken.None);
         }
 
         public virtual void DoNothingWithComplexParameter(List<Person> person)
         {
             var bolt_Params = new TestService.Core.Parameters.DoNothingWithComplexParameterParameters();
             bolt_Params.Person = person;
-            Channel.Send(bolt_Params, Descriptor.DoNothingWithComplexParameter, GetCancellationToken(Descriptor.DoNothingWithComplexParameter));
+            Send(bolt_Params, Descriptor.DoNothingWithComplexParameter, CancellationToken.None);
         }
 
         public virtual Task DoNothingWithComplexParameterAsync(List<Person> person)
         {
             var bolt_Params = new TestService.Core.Parameters.DoNothingWithComplexParameterParameters();
             bolt_Params.Person = person;
-            return Channel.SendAsync(bolt_Params, Descriptor.DoNothingWithComplexParameter, GetCancellationToken(Descriptor.DoNothingWithComplexParameter));
+            return SendAsync(bolt_Params, Descriptor.DoNothingWithComplexParameter, CancellationToken.None);
         }
 
         public virtual int GetSimpleType(int arg)
         {
             var bolt_Params = new TestService.Core.Parameters.GetSimpleTypeParameters();
             bolt_Params.Arg = arg;
-            return Channel.Send<int, TestService.Core.Parameters.GetSimpleTypeParameters>(bolt_Params, Descriptor.GetSimpleType, GetCancellationToken(Descriptor.GetSimpleType));
+            return Send<int, TestService.Core.Parameters.GetSimpleTypeParameters>(bolt_Params, Descriptor.GetSimpleType, CancellationToken.None);
         }
 
         public virtual Task<int> GetSimpleTypeAsync(int arg)
         {
             var bolt_Params = new TestService.Core.Parameters.GetSimpleTypeParameters();
             bolt_Params.Arg = arg;
-            return Channel.SendAsync<int, TestService.Core.Parameters.GetSimpleTypeParameters>(bolt_Params, Descriptor.GetSimpleType, GetCancellationToken(Descriptor.GetSimpleType));
+            return SendAsync<int, TestService.Core.Parameters.GetSimpleTypeParameters>(bolt_Params, Descriptor.GetSimpleType, CancellationToken.None);
         }
 
         public virtual Task GetSimpleTypeAsAsync(int arg)
         {
             var bolt_Params = new TestService.Core.Parameters.GetSimpleTypeAsAsyncParameters();
             bolt_Params.Arg = arg;
-            return Channel.SendAsync(bolt_Params, Descriptor.GetSimpleTypeAsAsync, GetCancellationToken(Descriptor.GetSimpleTypeAsAsync));
+            return SendAsync(bolt_Params, Descriptor.GetSimpleTypeAsAsync, CancellationToken.None);
         }
 
         public virtual Person GetSinglePerson(Person person)
         {
             var bolt_Params = new TestService.Core.Parameters.GetSinglePersonParameters();
             bolt_Params.Person = person;
-            return Channel.Send<Person, TestService.Core.Parameters.GetSinglePersonParameters>(bolt_Params, Descriptor.GetSinglePerson, GetCancellationToken(Descriptor.GetSinglePerson));
+            return Send<Person, TestService.Core.Parameters.GetSinglePersonParameters>(bolt_Params, Descriptor.GetSinglePerson, CancellationToken.None);
         }
 
         public virtual Task<Person> GetSinglePersonAsync(Person person)
         {
             var bolt_Params = new TestService.Core.Parameters.GetSinglePersonParameters();
             bolt_Params.Person = person;
-            return Channel.SendAsync<Person, TestService.Core.Parameters.GetSinglePersonParameters>(bolt_Params, Descriptor.GetSinglePerson, GetCancellationToken(Descriptor.GetSinglePerson));
+            return SendAsync<Person, TestService.Core.Parameters.GetSinglePersonParameters>(bolt_Params, Descriptor.GetSinglePerson, CancellationToken.None);
         }
 
         public virtual Task<Person> GetSinglePersonAsAsync(Person person)
         {
             var bolt_Params = new TestService.Core.Parameters.GetSinglePersonAsAsyncParameters();
             bolt_Params.Person = person;
-            return Channel.SendAsync<Person, TestService.Core.Parameters.GetSinglePersonAsAsyncParameters>(bolt_Params, Descriptor.GetSinglePersonAsAsync, GetCancellationToken(Descriptor.GetSinglePersonAsAsync));
+            return SendAsync<Person, TestService.Core.Parameters.GetSinglePersonAsAsyncParameters>(bolt_Params, Descriptor.GetSinglePersonAsAsync, CancellationToken.None);
         }
 
         public virtual List<Person> GetManyPersons()
         {
-            return Channel.Send<List<Person>, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.GetManyPersons, GetCancellationToken(Descriptor.GetManyPersons));
+            return Send<List<Person>, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.GetManyPersons, CancellationToken.None);
         }
 
         public virtual Task<List<Person>> GetManyPersonsAsync()
         {
-            return Channel.SendAsync<List<Person>, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.GetManyPersons, GetCancellationToken(Descriptor.GetManyPersons));
+            return SendAsync<List<Person>, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.GetManyPersons, CancellationToken.None);
         }
 
         public virtual Task<List<Person>> GetManyPersonsAsAsync(Person person)
         {
             var bolt_Params = new TestService.Core.Parameters.GetManyPersonsAsAsyncParameters();
             bolt_Params.Person = person;
-            return Channel.SendAsync<List<Person>, TestService.Core.Parameters.GetManyPersonsAsAsyncParameters>(bolt_Params, Descriptor.GetManyPersonsAsAsync, GetCancellationToken(Descriptor.GetManyPersonsAsAsync));
+            return SendAsync<List<Person>, TestService.Core.Parameters.GetManyPersonsAsAsyncParameters>(bolt_Params, Descriptor.GetManyPersonsAsAsync, CancellationToken.None);
         }
 
         public virtual void Throws()
         {
-            Channel.Send(Bolt.Empty.Instance, Descriptor.Throws, GetCancellationToken(Descriptor.Throws));
+            Send(Bolt.Empty.Instance, Descriptor.Throws, CancellationToken.None);
         }
 
         public virtual Task ThrowsAsync()
         {
-            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.Throws, GetCancellationToken(Descriptor.Throws));
+            return SendAsync(Bolt.Empty.Instance, Descriptor.Throws, CancellationToken.None);
         }
 
         public virtual void ThrowsCustom()
         {
-            Channel.Send(Bolt.Empty.Instance, Descriptor.ThrowsCustom, GetCancellationToken(Descriptor.ThrowsCustom));
+            Send(Bolt.Empty.Instance, Descriptor.ThrowsCustom, CancellationToken.None);
         }
 
         public virtual Task ThrowsCustomAsync()
         {
-            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.ThrowsCustom, GetCancellationToken(Descriptor.ThrowsCustom));
+            return SendAsync(Bolt.Empty.Instance, Descriptor.ThrowsCustom, CancellationToken.None);
         }
 
         public virtual void InnerOperation()
         {
-            Channel.Send(Bolt.Empty.Instance, Descriptor.InnerOperation, GetCancellationToken(Descriptor.InnerOperation));
+            Send(Bolt.Empty.Instance, Descriptor.InnerOperation, CancellationToken.None);
         }
 
         public virtual Task InnerOperationAsync()
         {
-            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.InnerOperation, GetCancellationToken(Descriptor.InnerOperation));
+            return SendAsync(Bolt.Empty.Instance, Descriptor.InnerOperation, CancellationToken.None);
         }
 
         public virtual Task<string> InnerOperation3()
         {
-            return Channel.SendAsync<string, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.InnerOperation3, GetCancellationToken(Descriptor.InnerOperation3));
+            return SendAsync<string, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.InnerOperation3, CancellationToken.None);
         }
 
         public virtual Task InnerOperationExAsync()
         {
-            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.InnerOperationExAsync, GetCancellationToken(Descriptor.InnerOperationExAsync));
+            return SendAsync(Bolt.Empty.Instance, Descriptor.InnerOperationExAsync, CancellationToken.None);
         }
         public virtual void InnerOperation2()
         {
-            Channel.Send(Bolt.Empty.Instance, Descriptor.InnerOperation2, GetCancellationToken(Descriptor.InnerOperation2));
+            Send(Bolt.Empty.Instance, Descriptor.InnerOperation2, CancellationToken.None);
         }
 
         public virtual Task InnerOperation2Async()
         {
-            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.InnerOperation2, GetCancellationToken(Descriptor.InnerOperation2));
+            return SendAsync(Bolt.Empty.Instance, Descriptor.InnerOperation2, CancellationToken.None);
         }
 
         public virtual Task InnerOperationExAsync2()
         {
-            return Channel.SendAsync(Bolt.Empty.Instance, Descriptor.InnerOperationExAsync2, GetCancellationToken(Descriptor.InnerOperationExAsync2));
+            return SendAsync(Bolt.Empty.Instance, Descriptor.InnerOperationExAsync2, CancellationToken.None);
         }
     }
 }
