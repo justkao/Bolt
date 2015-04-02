@@ -6,7 +6,7 @@ namespace Bolt.Server
     {
         public Task<BindingResult<T>> BindParametersAsync<T>(ServerActionContext context)
         {
-            return Task.FromResult(BindingResult<T>.Error);
+            return Task.FromResult(BindingResult<T>.Empty);
         }
     }
 }
