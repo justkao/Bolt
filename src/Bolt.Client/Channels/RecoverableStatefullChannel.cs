@@ -16,11 +16,11 @@ namespace Bolt.Client.Channels
         private readonly string _sessionHeaderName;
         private readonly AwaitableCriticalSection _syncRoot = new AwaitableCriticalSection();
 
-        private Uri _activeConnection;
+        private ConnectionDescriptor _activeConnection;
         private string _sessionId;
 
         protected RecoverableStatefullChannel(Uri server, ClientConfiguration clientConfiguration)
-            : base(new UriServerProvider(server), clientConfiguration)
+            : base(new SingleServerProvider(server), clientConfiguration)
         {
             _sessionHeaderName = clientConfiguration.Options.SessionHeader;
         }
@@ -84,7 +84,7 @@ namespace Bolt.Client.Channels
                         string sessionId = _sessionId;
 
                         DelegatedChannel channel = new DelegatedChannel(
-                            _activeConnection,
+                            _activeConnection.Server,
                             RequestHandler,
                             EndpointProvider,
                             (c) =>
@@ -148,15 +148,15 @@ namespace Bolt.Client.Channels
             base.BeforeSending(context);
         }
 
-        protected override async Task<Uri> GetRemoteConnectionAsync()
+        protected override async Task<ConnectionDescriptor> GetConnectionAsync()
         {
             EnsureNotClosed();
-            Uri uri = await EnsureConnectionAsync();
+            ConnectionDescriptor uri = await EnsureConnectionAsync();
             IsOpened = true;
             return uri;
         }
 
-        protected virtual void OnConnectionOpened(Uri activeConnection, string sessionId)
+        protected virtual void OnConnectionOpened(ConnectionDescriptor activeConnection, string sessionId)
         {
         }
 
@@ -174,7 +174,7 @@ namespace Bolt.Client.Channels
             return CreateContract(new DelegatedChannel(server, RequestHandler, EndpointProvider, BeforeSending, AfterReceived));
         }
 
-        private async Task<Uri> EnsureConnectionAsync()
+        private async Task<ConnectionDescriptor> EnsureConnectionAsync()
         {
             EnsureNotClosed();
 
@@ -189,14 +189,15 @@ namespace Bolt.Client.Channels
                 {
                     return _activeConnection;
                 }
-                Uri connection = ServerProvider.GetServer();
+
+                var connection = ServerProvider.GetServer();
                 string sessionId = null;
                 ActionDescriptor action = null;
 
                 TContract contract =
                     CreateContract(
                         new DelegatedChannel(
-                            connection,
+                            connection.Server,
                             RequestHandler,
                             EndpointProvider,
                             (c) =>

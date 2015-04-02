@@ -6,18 +6,7 @@ namespace Bolt.Server
 {
     public class ServerActionContext : ActionContextBase
     {
-        public ServerActionContext(HttpContext context, ActionDescriptor descriptor)
-            : base(descriptor)
-        {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            Context = context;
-        }
-
-        public HttpContext Context { get; }
+        public HttpContext Context { get; set; }
 
         public CancellationToken RequestAborted => Context.RequestAborted;
     }

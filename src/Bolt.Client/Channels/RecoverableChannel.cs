@@ -21,7 +21,7 @@ namespace Bolt.Client.Channels
         public RecoverableChannel(Uri server, ClientConfiguration clientConfiguration)
             : base(clientConfiguration)
         {
-            ServerProvider = new UriServerProvider(server);
+            ServerProvider = new SingleServerProvider(server);
         }
 
         public RecoverableChannel(IServerProvider serverProvider, ClientConfiguration clientConfiguration)
@@ -51,10 +51,10 @@ namespace Bolt.Client.Channels
             while (true)
             {
                 Exception error = null;
-                Uri connection = null;
+                ConnectionDescriptor connection = null;
                 try
                 {
-                    connection = await GetRemoteConnectionAsync();
+                    connection = await GetConnectionAsync();
                 }
                 catch (Exception e)
                 {
@@ -107,7 +107,7 @@ namespace Bolt.Client.Channels
         {
             if (error is HttpRequestException)
             {
-                ServerProvider.OnServerUnavailable(context.Server);
+                ServerProvider.OnServerUnavailable(context.Connection.Server);
             }
 
             return HandleErrorCore(error);
@@ -118,7 +118,7 @@ namespace Bolt.Client.Channels
             return HandleErrorCore(error);
         }
 
-        protected override async Task<Uri> GetRemoteConnectionAsync()
+        protected override async Task<ConnectionDescriptor> GetConnectionAsync()
         {
             await OpenAsync();
             return ServerProvider.GetServer();

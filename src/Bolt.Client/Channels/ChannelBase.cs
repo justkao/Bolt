@@ -58,7 +58,14 @@ namespace Bolt.Client.Channels
 
         public virtual void Open()
         {
-            TaskExtensions.Execute(() => OpenAsync());
+            EnsureNotClosed();
+
+            if (IsOpened)
+            {
+                return;
+            }
+
+            IsOpened = true;
         }
 
         public virtual Task OpenAsync()
@@ -76,7 +83,13 @@ namespace Bolt.Client.Channels
 
         public virtual void Close()
         {
-            TaskExtensions.Execute(() => CloseAsync());
+            if (IsClosed)
+            {
+                return;
+            }
+
+            IsClosed = true;
+            OnClosed();
         }
 
         public virtual Task CloseAsync()
@@ -91,16 +104,20 @@ namespace Bolt.Client.Channels
             return CompletedTask.Done;
         }
 
-        protected abstract Task<Uri> GetRemoteConnectionAsync();
+        protected abstract Task<ConnectionDescriptor> GetConnectionAsync();
 
         protected virtual ClientActionContext CreateContext(
-            Uri server,
+            ConnectionDescriptor connection,
             ActionDescriptor actionDescriptor,
             CancellationToken cancellation,
             object parameters)
         {
-            return new ClientActionContext(actionDescriptor, CreateRequest(server, actionDescriptor), server, cancellation)
+            return new ClientActionContext()
             {
+                Action = actionDescriptor,
+                Cancellation = cancellation,
+                Connection = connection,
+                Request = CreateRequest(connection, actionDescriptor),
                 ResponseTimeout = DefaultResponseTimeout
             };
         }
@@ -113,9 +130,9 @@ namespace Bolt.Client.Channels
             EnsureNotClosed();
             ValidateParameters(parameters, descriptor);
 
-            Uri server = await GetRemoteConnectionAsync();
+            var connection = await GetConnectionAsync();
 
-            using (ClientActionContext ctxt = CreateContext(server, descriptor, cancellation, parameters))
+            using (ClientActionContext ctxt = CreateContext(connection, descriptor, cancellation, parameters))
             {
                 BeforeSending(ctxt);
                 ResponseDescriptor<T> result = await RequestHandler.GetResponseAsync<T, TParameters>(ctxt, parameters);
@@ -132,9 +149,9 @@ namespace Bolt.Client.Channels
         {
         }
 
-        protected virtual HttpRequestMessage CreateRequest(Uri server, ActionDescriptor descriptor)
+        protected virtual HttpRequestMessage CreateRequest(ConnectionDescriptor connection, ActionDescriptor descriptor)
         {
-            Uri uri = EndpointProvider.GetEndpoint(server, descriptor);
+            Uri uri = EndpointProvider.GetEndpoint(connection.Server, descriptor);
 
             return new HttpRequestMessage()
             {

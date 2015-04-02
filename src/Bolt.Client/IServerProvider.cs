@@ -13,9 +13,9 @@ namespace Bolt.Client
         /// <summary>
         /// Gets the Bolt server that will be used by <see cref="IChannel"/> to send the Bolt request. 
         /// </summary>
-        /// <returns>Uri of Bolt server.</returns>
+        /// <returns>Connection descriptor to Bolt server.</returns>
         /// <exception cref="NoServersAvailableException">Thrown if there are no more available servers.</exception>
-        Uri GetServer();
+        ConnectionDescriptor GetServer();
 
         /// <summary>
         /// Used by <see cref="IChannel"/> to mark the server as unavailable.

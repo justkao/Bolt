@@ -159,7 +159,12 @@ namespace Bolt.Server
                 return;
             }
 
-            var ctxt = new ServerActionContext(context.HttpContext, actionDescriptor);
+            var ctxt = new ServerActionContext()
+            {
+                Context = context.HttpContext,
+                Action = actionDescriptor
+            };
+
             await Execute(ctxt, found);
         }
 

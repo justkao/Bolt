@@ -24,7 +24,7 @@ namespace Bolt.Client.Channels
 
         public static RecoverableChannel CreateRecoverable(this ClientConfiguration configuration, Uri server)
         {
-            return configuration.CreateRecoverable(new UriServerProvider(server));
+            return configuration.CreateRecoverable(new SingleServerProvider(server));
         }
 
         public static RecoverableChannel CreateRecoverable(this ClientConfiguration configuration, IServerProvider serverProvider)

@@ -14,6 +14,8 @@ namespace Bolt.Client
         private readonly List<Uri> _servers;
         private int _server;
         private Uri _lastServer;
+        private ConnectionDescriptor _lastConnection;
+
         private Uri _lastUnavailableServer;
 
         public MultipleServersProvider()
@@ -25,18 +27,20 @@ namespace Bolt.Client
             _servers = servers.EmptyIfNull().ToList();
         }
 
-        public Uri GetServer()
+        public ConnectionDescriptor GetServer()
         {
-            Uri server = _lastServer;
+            ConnectionDescriptor connection = _lastConnection;
 
-            if (server != null)
+            if (connection != null)
             {
-                return server;
+                return connection;
             }
 
-            server = PickNewServer(_lastUnavailableServer, GetAvailableServers().ToList());
-            _lastServer = server;
-            return server;
+            connection = new ConnectionDescriptor(PickNewServer(_lastUnavailableServer, GetAvailableServers().ToList())) { KeepAlive = true };
+            _lastServer = connection.Server;
+            _lastConnection = connection;
+
+            return connection;
         }
 
         public void OnServerUnavailable(Uri server)

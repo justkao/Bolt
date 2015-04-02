@@ -10,7 +10,7 @@ namespace Bolt.Client
     /// <typeparam name="TResponse">The type of response.</typeparam>
     public struct ResponseDescriptor<TResponse>
     {
-        public ResponseDescriptor(HttpResponseMessage response, ClientActionContext context, Exception error, ResponseErrorType errorType)
+        public ResponseDescriptor(HttpResponseMessage response, ClientActionContext context, Exception error, ResponseError errorType)
             : this()
         {
             Context = context;
@@ -25,7 +25,7 @@ namespace Bolt.Client
             Response = response;
             Result = result;
             Context = context;
-            ErrorType = ResponseErrorType.None;
+            ErrorType = ResponseError.None;
             Error = null;
         }
 
@@ -47,14 +47,14 @@ namespace Bolt.Client
         /// <summary>
         /// The type of error that occurred.
         /// </summary>
-        public ResponseErrorType ErrorType { get; private set; }
+        public ResponseError ErrorType { get; private set; }
 
         /// <summary>
         /// Determines whether request was successful.
         /// </summary>
         public bool IsSuccess
         {
-            get { return ErrorType == ResponseErrorType.None; }
+            get { return ErrorType == ResponseError.None; }
         }
 
         /// <summary>

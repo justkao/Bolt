@@ -109,7 +109,7 @@ namespace Bolt.Client.Channels
             TaskExtensions.Execute(() => SendAsync<Empty, TRequestParameters>(parameters, descriptor, cancellation));
         }
 
-        public TResult Send<TResult, TRequestParameters>(
+        protected TResult Send<TResult, TRequestParameters>(
             TRequestParameters parameters,
             ActionDescriptor descriptor,
             CancellationToken cancellation)

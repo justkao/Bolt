@@ -42,9 +42,9 @@ namespace Bolt.Client.Channels
             base.AfterReceived(context);
         }
 
-        protected override Task<Uri> GetRemoteConnectionAsync()
+        protected override Task<ConnectionDescriptor> GetConnectionAsync()
         {
-            return Task.FromResult(_server);
+            return Task.FromResult(new ConnectionDescriptor(_server));
         }
     }
 }
