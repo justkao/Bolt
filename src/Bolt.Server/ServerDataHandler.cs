@@ -46,9 +46,10 @@ namespace Bolt.Server
                 return (T)(object)Empty.Instance;
             }
 
-            if (context.Context.Request.Method == "GET")
+            var result =  await ParameterBinder.BindParametersAsync<T>(context);
+            if (result != BindingResult<T>.Empty)
             {
-                return await ParameterBinder.BindParametersAsync<T>(context);
+                return result.Parameters;
             }
 
             return Serializer.DeserializeParameters<T>(await context.Context.Request.Body.CopyAsync(context.RequestAborted), context.Action);
