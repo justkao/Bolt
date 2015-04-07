@@ -24,7 +24,6 @@ namespace Bolt.Console
             app.VersionOption("--version", GetVersion());
             app.OnExecute(() =>
             {
-                _cache.Dispose();
                 app.ShowHelp();
                 return 2;
             });

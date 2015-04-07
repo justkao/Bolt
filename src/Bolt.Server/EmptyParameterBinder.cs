@@ -6,7 +6,12 @@ namespace Bolt.Server
     {
         public Task<BindingResult<T>> BindParametersAsync<T>(ServerActionContext context)
         {
-            return Task.FromResult(BindingResult<T>.Empty);
+            return CachedBindingResult<T>.Instance;
+        }
+
+        private static class CachedBindingResult<T>
+        {
+            public static readonly Task<BindingResult<T>> Instance = Task.FromResult(BindingResult<T>.Empty);
         }
     }
 }
