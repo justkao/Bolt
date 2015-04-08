@@ -12,8 +12,9 @@ namespace Microsoft.AspNet.Builder
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
         /// <param name="registerContracts">Register Bolt contracts.</param>
-        /// <returns>The <paramref name="app"/>.</returns>
-        public static IApplicationBuilder UseBolt(this IApplicationBuilder app, Action<IBoltRouteHandler> registerContracts)
+        /// <param name="options">The options for this route handler, if specified the default options will be overwritten.</param>
+        /// <returns>The <paramref name="app"/>THe builder instance.</returns>
+        public static IApplicationBuilder UseBolt(this IApplicationBuilder app, Action<IBoltRouteHandler> registerContracts, BoltServerOptions options= null)
         {
             if (app == null)
             {
@@ -26,7 +27,14 @@ namespace Microsoft.AspNet.Builder
             }
 
             var bolt = app.ApplicationServices.GetRequiredService<IBoltRouteHandler>();
-            app.ApplicationServices.GetRequiredService<ILoggerFactory>().Create("Bolt").WriteInformation("Registering Bolt middleware. Prefix: {0}", bolt.Options.Prefix);
+            if (options != null)
+            {
+                bolt.Options = options;
+            }
+
+            var logger = app.ApplicationServices.GetRequiredService<ILoggerFactory>().Create("Bolt");
+
+            logger.WriteInformation(BoltLogId.BoltRegistration, "Registering Bolt middleware. Prefix: {0}", bolt.Options.Prefix);
             registerContracts(bolt);
 
             return app.UseRouter(bolt);

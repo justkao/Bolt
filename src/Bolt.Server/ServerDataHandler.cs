@@ -6,36 +6,6 @@ namespace Bolt.Server
 {
     public class ServerDataHandler : IServerDataHandler
     {
-        private readonly IExceptionWrapper _exceptionWrapper;
-
-        public ServerDataHandler(ISerializer serializer, IExceptionWrapper exceptionWrapper, IParameterBinder parameterBinder)
-        {
-            if (serializer == null)
-            {
-                throw new ArgumentNullException(nameof(serializer));
-            }
-
-            if (exceptionWrapper == null)
-            {
-                throw new ArgumentNullException(nameof(exceptionWrapper));
-            }
-
-            if (parameterBinder == null)
-            {
-                throw new ArgumentNullException(nameof(parameterBinder));
-            }
-
-            Serializer = serializer;
-            ParameterBinder = parameterBinder;
-            _exceptionWrapper = exceptionWrapper;
-        }
-
-        public virtual string ContentType => Serializer.ContentType;
-
-        public ISerializer Serializer { get; }
-
-        public IParameterBinder ParameterBinder { get; }
-
         public virtual async Task<T> ReadParametersAsync<T>(ServerActionContext context)
         {
             context.RequestAborted.ThrowIfCancellationRequested();
@@ -45,19 +15,22 @@ namespace Bolt.Server
                 return (T)(object)Empty.Instance;
             }
 
-            var result =  await ParameterBinder.BindParametersAsync<T>(context);
-            if (result != BindingResult<T>.Empty)
+            if (context.ParameterBinder != null)
             {
-                return result.Parameters;
+                var result = await context.ParameterBinder.BindParametersAsync<T>(context);
+                if (result != BindingResult<T>.Empty)
+                {
+                    return result.Parameters;
+                }
             }
 
-            return Serializer.DeserializeParameters<T>(await context.Context.Request.Body.CopyAsync(context.RequestAborted), context.Action);
+            return context.Serializer.DeserializeParameters<T>(await context.Context.Request.Body.CopyAsync(context.RequestAborted), context.Action);
         }
 
         public virtual Task WriteResponseAsync<T>(ServerActionContext context, T data)
         {
             context.RequestAborted.ThrowIfCancellationRequested();
-            byte[] raw = Serializer.SerializeResponse(data, context.Action);
+            byte[] raw = context.Serializer.SerializeResponse(data, context.Action);
             if (raw == null || raw.Length == 0)
             {
                 context.Context.Response.Body.Dispose();
@@ -65,7 +38,7 @@ namespace Bolt.Server
             }
 
             context.Context.Response.ContentLength = raw.Length;
-            context.Context.Response.ContentType = Serializer.ContentType;
+            context.Context.Response.ContentType = context.Serializer.ContentType;
 
             return context.Context.Response.Body.WriteAsync(raw, 0, raw.Length, context.RequestAborted);
         }
@@ -74,14 +47,14 @@ namespace Bolt.Server
         {
             context.RequestAborted.ThrowIfCancellationRequested();
 
-            var wrappedException = _exceptionWrapper.Wrap(exception);
+            var wrappedException = context.ExceptionWrapper.Wrap(exception);
             if (wrappedException == null)
             {
                 context.Context.Response.Body.Dispose();
                 return Task.FromResult(0);
             }
 
-            byte[] raw = Serializer.SerializeResponse(wrappedException, context.Action);
+            byte[] raw = context.Serializer.SerializeResponse(wrappedException, context.Action);
             if (raw == null || raw.Length == 0)
             {
                 context.Context.Response.Body.Dispose();
@@ -89,7 +62,7 @@ namespace Bolt.Server
             }
 
             context.Context.Response.ContentLength = raw.Length;
-            context.Context.Response.ContentType = Serializer.ContentType;
+            context.Context.Response.ContentType = context.Serializer.ContentType;
 
             return context.Context.Response.Body.WriteAsync(raw, 0, raw.Length, context.RequestAborted);
         }

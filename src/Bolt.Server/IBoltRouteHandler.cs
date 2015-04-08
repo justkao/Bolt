@@ -1,17 +1,10 @@
-using Bolt.Server.Metadata;
 using Microsoft.AspNet.Routing;
 
 namespace Bolt.Server
 {
     public interface IBoltRouteHandler : IRouter
     {
-        IServerDataHandler DataHandler { get; }
-
-        IResponseHandler ResponseHandler { get; }
-
-        IBoltMetadataHandler MetadataHandler{ get; set; }
-
-        BoltServerOptions Options { get; }
+        BoltServerOptions Options { get; set; }
 
         void Add(IContractInvoker contractInvoker);
 

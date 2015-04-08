@@ -125,11 +125,11 @@ namespace Bolt.Generators
             if (methodDescriptor.HasParameterClass())
             {
                 AddUsings(methodDescriptor.Parameters.Namespace);
-                WriteLine("var parameters = await DataHandler.ReadParametersAsync<{0}>(context);", methodDescriptor.Parameters.FullName);
+                WriteLine("var parameters = await context.DataHandler.ReadParametersAsync<{0}>(context);", methodDescriptor.Parameters.FullName);
             }
 
             string instanceType = FormatType(methodDescriptor.Method.DeclaringType);
-            WriteLine("var instance = InstanceProvider.GetInstance<{0}>(context);", instanceType);
+            WriteLine("var instance = context.InstanceProvider.GetInstance<{0}>(context);", instanceType);
 
             if (HasReturnValue(methodDescriptor.Method))
             {
@@ -141,12 +141,12 @@ namespace Bolt.Generators
             using (WithBlock())
             {
                 GenerateInvocationCode("instance", "parameters", "result", methodDescriptor);
-                WriteLine("InstanceProvider.ReleaseInstance(context, instance, null);", instanceType);
+                WriteLine("context.InstanceProvider.ReleaseInstance(context, instance, null);", instanceType);
             }
             WriteLine("catch (Exception e)");
             using (WithBlock())
             {
-                WriteLine("InstanceProvider.ReleaseInstance(context, instance, e);", instanceType);
+                WriteLine("context.InstanceProvider.ReleaseInstance(context, instance, e);", instanceType);
                 WriteLine("throw;");
             }
 
@@ -154,8 +154,8 @@ namespace Bolt.Generators
 
             WriteLine(
                 HasReturnValue(methodDescriptor.Method)
-                    ? "await ResponseHandler.Handle(context, result);"
-                    : "await ResponseHandler.Handle(context);");
+                    ? "await context.ResponseHandler.Handle(context, result);"
+                    : "await context.ResponseHandler.Handle(context);");
         }
 
         public virtual string GenerateInvocationCode(string instanceName, string parametersInstance, string resultVariable, MethodDescriptor method)

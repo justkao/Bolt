@@ -13,5 +13,6 @@
         public const int RequestCancelled = BaseError + 7;
         public const int ContractNotFound = BaseError + 8;
         public const int ContractAdded = BaseError + 9;
+        public const int BoltRegistration = BaseError + 10;
     }
 }

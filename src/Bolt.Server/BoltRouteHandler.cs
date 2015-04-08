@@ -15,8 +15,11 @@ namespace Bolt.Server
     public class BoltRouteHandler : IBoltRouteHandler, IEnumerable<IContractInvoker>
     {
         private readonly List<IContractInvoker> _invokers = new List<IContractInvoker>();
+        private BoltServerOptions _options;
 
-        public BoltRouteHandler(ILoggerFactory factory, IResponseHandler responseHandler, IServerDataHandler dataHandler, IServerErrorHandler errorHandler, IOptions<BoltServerOptions> options, IBoltMetadataHandler metadataHandler)
+        public BoltRouteHandler(ILoggerFactory factory, IResponseHandler responseHandler, IServerDataHandler dataHandler,
+            IServerErrorHandler errorHandler, IOptions<BoltServerOptions> options, IBoltMetadataHandler metadataHandler,
+            ISerializer serializer, IParameterBinder parametersBinder, IExceptionWrapper exceptionWrapper)
         {
             if (factory == null)
             {
@@ -38,6 +41,21 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(options));
             }
 
+            if (serializer == null)
+            {
+                throw new ArgumentNullException(nameof(serializer));
+            }
+
+            if (parametersBinder == null)
+            {
+                throw new ArgumentNullException(nameof(parametersBinder));
+            }
+
+            if (exceptionWrapper == null)
+            {
+                throw new ArgumentNullException(nameof(exceptionWrapper));
+            }
+
             if (errorHandler == null)
             {
                 throw new ArgumentNullException(nameof(errorHandler));
@@ -49,6 +67,9 @@ namespace Bolt.Server
             Logger = factory.Create<BoltRouteHandler>();
             ErrorHandler = errorHandler;
             MetadataHandler = metadataHandler;
+            Serializer = serializer;
+            ParametersBinder = parametersBinder;
+            ExceptionWrapper = exceptionWrapper;
         }
 
         public IResponseHandler ResponseHandler { get; }
@@ -57,7 +78,25 @@ namespace Bolt.Server
 
         public IServerErrorHandler ErrorHandler { get; }
 
-        public BoltServerOptions Options { get; }
+        public ISerializer Serializer { get; }
+
+        public IParameterBinder ParametersBinder { get; }
+
+        public IExceptionWrapper ExceptionWrapper { get; }
+
+        public BoltServerOptions Options
+        {
+            get { return _options; }
+            set
+            {
+                if (value == null)
+                {
+                    throw new ArgumentNullException(nameof(value), "Options must be specified.");
+                }
+
+                _options = value;
+            }
+        }
 
         public ILogger Logger { get; }
 
@@ -158,12 +197,7 @@ namespace Bolt.Server
                 return;
             }
 
-            var ctxt = new ServerActionContext
-            {
-                Context = context.HttpContext,
-                Action = actionDescriptor
-            };
-
+            var ctxt = CreateContext(context, actionDescriptor, found);
             await Execute(ctxt, found);
         }
 
@@ -192,14 +226,7 @@ namespace Bolt.Server
                 }
                 catch (Exception e)
                 {
-                    var responseHandler = ResponseHandler;
-                    var contractInvoker = invoker as ContractInvoker;
-                    if (contractInvoker != null)
-                    {
-                        responseHandler = contractInvoker.ResponseHandler;
-                    }
-
-                    await responseHandler.HandleError(ctxt, e);
+                    await ctxt.ResponseHandler.HandleError(ctxt, e);
                     Logger.WriteError(BoltLogId.RequestExecutionError, "Execution of '{0}' failed with error '{1}'", ctxt.Action, e);
                 }
                 finally
@@ -210,6 +237,25 @@ namespace Bolt.Server
                     }
                 }
             }
+        }
+
+        protected virtual ServerActionContext CreateContext(RouteContext context, ActionDescriptor descriptor, IContractInvoker contractInvoker)
+        {
+            return new ServerActionContext
+            {
+                Options = Options,
+                ErrorHandler = ErrorHandler,
+                DataHandler = DataHandler,
+                Action = descriptor,
+                ContractInvoker = contractInvoker,
+                ResponseHandler = ResponseHandler,
+                Serializer = Serializer,
+                Context = context.HttpContext,
+                ExceptionWrapper = ExceptionWrapper,
+                ParameterBinder = ParametersBinder,
+                RouteContext = context,
+                RouteHandler = this
+            };
         }
 
         protected virtual IContractInvoker FindContract(IEnumerable<IContractInvoker> registeredContracts, string contractName)

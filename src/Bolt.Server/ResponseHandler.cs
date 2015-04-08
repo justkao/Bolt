@@ -9,29 +9,13 @@ namespace Bolt.Server
 {
     public class ResponseHandler : IResponseHandler
     {
-        private readonly IServerDataHandler _dataHandler;
-
         private readonly ILogger _logger;
 
-        private readonly IServerErrorHandler _errorHandler;
-
-        private readonly BoltServerOptions _options;
-
-        public ResponseHandler(ILoggerFactory factory, IServerDataHandler dataHandler, IServerErrorHandler errorHandler, IOptions<BoltServerOptions> options)
+        public ResponseHandler(ILoggerFactory factory,  IOptions<BoltServerOptions> options)
         {
-            if (dataHandler == null)
-            {
-                throw new ArgumentNullException(nameof(dataHandler));
-            }
-
             if (factory == null)
             {
                 throw new ArgumentNullException(nameof(factory));
-            }
-
-            if (errorHandler == null)
-            {
-                throw new ArgumentNullException(nameof(errorHandler));
             }
 
             if (options == null)
@@ -39,10 +23,7 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(options));
             }
 
-            _dataHandler = dataHandler;
             _logger = factory.Create<ResponseHandler>();
-            _errorHandler = errorHandler;
-            _options = options.Options;
         }
 
         public virtual Task Handle(ServerActionContext context)
@@ -56,7 +37,7 @@ namespace Bolt.Server
         public virtual async Task Handle<TResult>(ServerActionContext context, TResult result)
         {
             context.Context.Response.StatusCode = 200;
-            await _dataHandler.WriteResponseAsync(context, result);
+            await context.DataHandler.WriteResponseAsync(context, result);
             context.Context.Response.Body.Dispose();
         }
 
@@ -64,13 +45,13 @@ namespace Bolt.Server
         {
             context.Context.Response.StatusCode = 500;
 
-            if (_errorHandler.HandleError(context, error))
+            if (context.ErrorHandler.HandleError(context, error))
             {
-                if (_options.DetailedServerErrors)
+                if (context.Options.DetailedServerErrors)
                 {
                     try
                     {
-                        await _dataHandler.WriteResponseAsync(context, error.GetAll().Select(e => e.Message));
+                        await context.DataHandler.WriteResponseAsync(context, error.GetAll().Select(e => e.Message));
                     }
                     catch (Exception e)
                     {
@@ -85,19 +66,19 @@ namespace Bolt.Server
 
             try
             {
-                await _dataHandler.WriteExceptionAsync(context, error);
+                await context.DataHandler.WriteExceptionAsync(context, error);
             }
             catch (BoltSerializationException e)
             {
                 _logger.WriteError(BoltLogId.ExceptionSerializationError,
                     "Failed to serialize exception that occured during execution of '{0}' action. \nExecution Error: '{1}'\nSerializationError: '{2}'",
                     context.Action, error, e);
-                _errorHandler.HandleBoltError(context.Context, ServerErrorCode.Serialization);
+                context.ErrorHandler.HandleBoltError(context.Context, ServerErrorCode.Serialization);
                 return;
             }
             catch (Exception e)
             {
-                _errorHandler.HandleError(context, e);
+                context.ErrorHandler.HandleError(context, e);
                 return;
             }
 

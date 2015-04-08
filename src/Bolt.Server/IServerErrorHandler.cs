@@ -5,6 +5,8 @@ namespace Bolt.Server
 {
     public interface IServerErrorHandler
     {
+        BoltServerOptions Options { get; }
+
         /// <summary>
         /// Determines whether error is handled prematurely. Most common scenario is to write specialized error code into the response headers to avoid exception serialization into response body by <see cref="IServerDataHandler"/>.
         /// </summary>

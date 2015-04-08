@@ -107,7 +107,7 @@ namespace Bolt.Server.Metadata
             }
 
             m.ErrorHeader = (invoker.Parent as BoltRouteHandler)?.Options.ServerErrorHeader;
-            m.ContentType = invoker.DataHandler.Serializer.ContentType;
+            m.ContentType = "application/json";
             var statefullProvder = invoker.InstanceProvider as StateFullInstanceProvider;
             if (statefullProvder != null)
             {
