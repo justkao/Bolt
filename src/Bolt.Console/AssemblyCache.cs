@@ -1,11 +1,10 @@
-using Microsoft.Framework.Runtime.Common.CommandLine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Framework.Runtime.Common.CommandLine;
 
 namespace Bolt.Console
 {
@@ -31,10 +30,7 @@ namespace Bolt.Console
             _loaderRegistration = _container.AddLoader(this);
             _libraryManager = ((Microsoft.Framework.Runtime.ILibraryManager)serviceProvider.GetService(typeof(Microsoft.Framework.Runtime.ILibraryManager)));
 #else
-            AppDomain.CurrentDomain.AssemblyResolve += (s, e) =>
-            {
-                return Load(e.Name.Split(new[]{','}, StringSplitOptions.RemoveEmptyEntries).First().Trim());
-            };
+            AppDomain.CurrentDomain.AssemblyResolve += (s, e) => Load(e.Name.Split(new[]{','}, StringSplitOptions.RemoveEmptyEntries).First().Trim());
 #endif
         }
 
@@ -98,7 +94,7 @@ namespace Bolt.Console
                 }
             }
 
-            throw new InvalidOperationException(string.Format("Type '{0}' could not be loaded.", fullName));
+            throw new InvalidOperationException($"Type '{fullName}' could not be loaded.");
         }
 
         public IEnumerator<Assembly> GetEnumerator()

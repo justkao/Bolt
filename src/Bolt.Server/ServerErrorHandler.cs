@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNet.Http;
-using Microsoft.Framework.OptionsModel;
-using System;
+﻿using System;
 using System.Globalization;
+using Microsoft.AspNet.Http;
+using Microsoft.Framework.OptionsModel;
 
 namespace Bolt.Server
 {

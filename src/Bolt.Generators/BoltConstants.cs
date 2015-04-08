@@ -23,6 +23,8 @@
         {
             public const string Namespace = "Bolt.Server";
 
+            public const string InstanceProvidersNamespace = "Bolt.Server.InstanceProviders";
+
             public static readonly ClassDescriptor ContractInvoker = new ClassDescriptor("ContractInvoker", Namespace);
 
             public static readonly ClassDescriptor ServerActionContext = new ClassDescriptor("ServerActionContext", Namespace);

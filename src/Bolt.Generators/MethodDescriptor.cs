@@ -17,11 +17,11 @@ namespace Bolt.Generators
 
         public ContractDefinition Contract { get; private set; }
 
-        public MethodInfo Method { get; private set; }
+        public MethodInfo Method { get; }
 
         public string Name { get; private set; }
 
-        public ClassDescriptor Parameters { get; private set; }
+        public ClassDescriptor Parameters { get; }
 
         public bool HasParameterClass()
         {

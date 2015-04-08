@@ -33,12 +33,12 @@ namespace Bolt.Generators
 
         public T Create<T>() where T : GeneratorBase, new()
         {
-            T res = new T();
-            res.Output = Output;
-            res.Formatter = Formatter;
-            res.IntendProvider = IntendProvider;
-
-            return res;
+            return new T
+            {
+                Output = Output,
+                Formatter = Formatter,
+                IntendProvider = IntendProvider
+            };
         }
 
         public virtual void Generate(object context)
@@ -114,7 +114,7 @@ namespace Bolt.Generators
 
         public virtual string FormatPublicProperty(Type type, string name)
         {
-            return string.Format("public {0} {1} {{ get; set; }}", FormatType(type), name);
+            return $"public {FormatType(type)} {name} {{ get; set; }}";
         }
 
         public virtual string FormatMethodParameters(bool includeTypes, params KeyValuePair<string, Type>[] arguments)
@@ -153,10 +153,10 @@ namespace Bolt.Generators
         {
             if (info.ReturnType == typeof(void))
             {
-                return string.Format("{0}({1})", info.Name, FormatMethodParameters(info, false));
+                return $"{info.Name}({FormatMethodParameters(info, false)})";
             }
 
-            return string.Format("{0}({1})", info.Name, FormatMethodParameters(info, false));
+            return $"{info.Name}({FormatMethodParameters(info, false)})";
         }
 
         public virtual string FormatMethodDeclaration(MethodInfo info, bool forceAsync = false)
@@ -165,18 +165,18 @@ namespace Bolt.Generators
             {
                 if (forceAsync)
                 {
-                    return string.Format("{2} {0}({1})", info.GetAsyncName(), FormatMethodParameters(info, true), FormatType<Task>());
+                    return $"{FormatType<Task>()} {info.GetAsyncName()}({FormatMethodParameters(info, true)})";
                 }
 
-                return string.Format("void {0}({1})", info.Name, FormatMethodParameters(info, true));
+                return $"void {info.Name}({FormatMethodParameters(info, true)})";
             }
-
+            
             if (forceAsync && !info.IsAsync())
             {
-                return string.Format("{3}<{0}> {1}({2})", FormatType(info.ReturnType), info.GetAsyncName(), FormatMethodParameters(info, true), FormatType<Task>());
+                return $"{FormatType<Task>()}<{FormatType(info.ReturnType)}> {info.GetAsyncName()}({FormatMethodParameters(info, true)})";
             }
 
-            return string.Format("{0} {1}({2})", FormatType(info.ReturnType), info.Name, FormatMethodParameters(info, true));
+            return $"{FormatType(info.ReturnType)} {info.Name}({FormatMethodParameters(info, true)})";
         }
 
         public virtual string FormatType<T>()

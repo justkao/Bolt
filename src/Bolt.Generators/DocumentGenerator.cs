@@ -31,7 +31,7 @@ namespace Bolt.Generators
 
         public static DocumentGenerator Create(ContractDefinition contract = null)
         {
-            return new DocumentGenerator()
+            return new DocumentGenerator
             {
                 ContractDefinition = contract
             };
@@ -135,16 +135,17 @@ namespace Bolt.Generators
             {
                 ContractDefinition = definition ?? ContractDefinition,
                 ContractDescriptor = descriptor,
-                ForceAsync = forceAsync,
+                ForceAsync = forceAsync
             });
         }
 
         public void Add(GeneratorBase generator)
         {
-            if (generator is ContractGeneratorBase)
+            var generatorBase = generator as ContractGeneratorBase;
+            if (generatorBase != null)
             {
-                (generator as ContractGeneratorBase).MetadataProvider = MetadataProvider;
-                Formatter.AddNamespace((generator as ContractGeneratorBase).ContractDefinition.Namespace);
+                generatorBase.MetadataProvider = MetadataProvider;
+                Formatter.AddNamespace(generatorBase.ContractDefinition.Namespace);
             }
 
             generator.Output = Output;

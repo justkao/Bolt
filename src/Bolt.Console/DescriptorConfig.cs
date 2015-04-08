@@ -9,10 +9,10 @@ namespace Bolt.Console
             generator.Add(new ContractGenerator
             {
                 ContractDefinition = definition,
-                Modifier = GetModifier(),
+                Modifier = GetModifier()
             });
 
-            generator.Add(new ContractDescriptorGenerator()
+            generator.Add(new ContractDescriptorGenerator
             {
                 ContractDefinition = definition,
                 Modifier = GetModifier()
@@ -21,7 +21,7 @@ namespace Bolt.Console
 
         public override string GetFileName(ContractDefinition definition)
         {
-            return string.Format("{0}.Contract.Designer.cs", definition.Name);
+            return $"{definition.Name}.Contract.Designer.cs";
         }
     }
 }

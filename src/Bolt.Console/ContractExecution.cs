@@ -9,7 +9,7 @@ namespace Bolt.Console
             Definition = definition;
         }
 
-        public ContractDefinition Definition { get; private set; }
+        public ContractDefinition Definition { get; }
 
         public string GetOutput(ConfigBase config)
         {

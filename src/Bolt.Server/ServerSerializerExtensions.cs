@@ -14,11 +14,7 @@ namespace Bolt.Server
 
             if (stream == null || stream.Length == 0)
             {
-                throw new DeserializeParametersException(
-                    string.Format(
-                        "The data required to deserialize '{0}' parameters for action '{1}' are not available in request.",
-                        typeof(TParameters).Name,
-                        actionDescriptor));
+                throw new DeserializeParametersException($"The data required to deserialize '{typeof (TParameters).Name}' parameters for action '{actionDescriptor}' are not available in request.");
             }
 
             try
@@ -37,12 +33,7 @@ namespace Bolt.Server
             {
                 e.EnsureNotCancelled();
 
-                throw new DeserializeParametersException(
-                    string.Format(
-                        "Failed to deserialize parameters for action '{0}'. Parameters type - '{1}'",
-                        actionDescriptor,
-                        typeof(TParameters).FullName),
-                    e);
+                throw new DeserializeParametersException($"Failed to deserialize parameters for action '{actionDescriptor}'. Parameters type - '{typeof (TParameters).FullName}'",e);
             }
         }
 
@@ -68,8 +59,7 @@ namespace Bolt.Server
             catch (Exception e)
             {
                 e.EnsureNotCancelled();
-
-                throw new SerializeResponseException(string.Format("Failed to serialize response data for action '{0}'.", actionDescriptor), e);
+                throw new SerializeResponseException($"Failed to serialize response data for action '{actionDescriptor}'.", e);
             }
         }
     }

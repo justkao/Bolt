@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Bolt.Server;
+using Bolt.Server.InstanceProviders;
 using TestService.Core;
 using TestService.Core.Parameters;
 
@@ -456,10 +457,10 @@ File name: 'Bolt.Core, Version=0.11.0.0, Culture=neutral, PublicKeyToken=null' -
    at Bolt.Generators.ContractDefinition.<>c__DisplayClass3.<GetInitSessionMethod>b__4(MethodInfo m) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ContractDefinition.cs:line 90
    at System.Linq.Enumerable.FirstOrDefault[TSource](IEnumerable`1 source, Func`2 predicate)
    at Bolt.Generators.ContractDefinition.GetInitSessionMethod() in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ContractDefinition.cs:line 90
-   at Bolt.Generators.ContractInvokerExtensionGenerator.GenerateBody(ClassGenerator g) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ContractInvokerExtensionGenerator.cs:line 36
-   at Bolt.Generators.ClassGenerator.Generate(Object context) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ClassGenerator.cs:line 119
-   at Bolt.Generators.ContractInvokerExtensionGenerator.Generate(Object context) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ContractInvokerExtensionGenerator.cs:line 29
-   at Bolt.Generators.ServerGenerator.Generate(Object context) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ServerGenerator.cs:line 84
+   at Bolt.Generators.ContractInvokerExtensionGenerator.GenerateBody(ClassGenerator g) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ContractInvokerExtensionGenerator.cs:line 37
+   at Bolt.Generators.ClassGenerator.Generate(Object context) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ClassGenerator.cs:line 111
+   at Bolt.Generators.ContractInvokerExtensionGenerator.Generate(Object context) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ContractInvokerExtensionGenerator.cs:line 30
+   at Bolt.Generators.ServerGenerator.Generate(Object context) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\ServerGenerator.cs:line 80
    at Bolt.Generators.DocumentGenerator.Generate(Object context) in F:\Projects\GitHub\Bolt\Bolt\src\Bolt.Generators\DocumentGenerator.cs:line 56
 
 '

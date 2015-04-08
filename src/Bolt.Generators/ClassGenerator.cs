@@ -1,10 +1,10 @@
-using Bolt.Common;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using Bolt.Common;
 
 namespace Bolt.Generators
 {
@@ -18,7 +18,7 @@ namespace Bolt.Generators
             AddNamespace = true;
         }
 
-        public ClassDescriptor Descriptor { get; private set; }
+        public ClassDescriptor Descriptor { get; }
 
         public string Modifier { get; set; }
 
@@ -75,10 +75,7 @@ namespace Bolt.Generators
 
             using (AddNamespace ? WithNamespace(Descriptor.Namespace) : new EasyDispose(() => { }))
             {
-                if (AnnotateClassAction != null)
-                {
-                    AnnotateClassAction(this);
-                }
+                AnnotateClassAction?.Invoke(this);
 
                 string type = Descriptor.IsInterface ? "interface" : "class";
 
@@ -104,20 +101,14 @@ namespace Bolt.Generators
 
                 using (WithBlock())
                 {
-                    if (UserGenerator != null)
-                    {
-                        UserGenerator.Generate(this, context);
-                    }
+                    UserGenerator?.Generate(this, context);
 
                     if (!Descriptor.IsInterface)
                     {
                         GenerateConstructors();
                     }
 
-                    if (GenerateBodyAction != null)
-                    {
-                        GenerateBodyAction(this);
-                    }
+                    GenerateBodyAction?.Invoke(this);
                 }
             }
 

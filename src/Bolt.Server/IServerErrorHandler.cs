@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNet.Http;
-using System;
+﻿using System;
+using Microsoft.AspNet.Http;
 
 namespace Bolt.Server
 {

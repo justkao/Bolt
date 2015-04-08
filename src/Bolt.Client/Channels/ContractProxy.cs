@@ -50,7 +50,7 @@ namespace Bolt.Client.Channels
         /// <summary>
         /// The channel used to communicate with Bolt server.
         /// </summary>
-        public IChannel Channel { get; private set; }
+        public IChannel Channel { get; }
 
         #region IChannel Implementation
 
@@ -69,10 +69,7 @@ namespace Bolt.Client.Channels
             return Channel.OpenAsync();
         }
 
-        bool IChannel.IsOpened
-        {
-            get { return Channel.IsOpened; }
-        }
+        bool IChannel.IsOpened => Channel.IsOpened;
 
         void ICloseable.Close()
         {
@@ -84,10 +81,7 @@ namespace Bolt.Client.Channels
             return Channel.CloseAsync();
         }
 
-        bool ICloseable.IsClosed
-        {
-            get { return Channel.IsClosed; }
-        }
+        bool ICloseable.IsClosed => Channel.IsClosed;
 
         Task<TResult> IChannel.SendAsync<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
@@ -106,7 +100,7 @@ namespace Bolt.Client.Channels
 
         protected void Send<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
-            TaskExtensions.Execute(() => SendAsync<Empty, TRequestParameters>(parameters, descriptor, cancellation));
+            TaskHelpers.Execute(() => SendAsync<Empty, TRequestParameters>(parameters, descriptor, cancellation));
         }
 
         protected TResult Send<TResult, TRequestParameters>(
@@ -114,7 +108,7 @@ namespace Bolt.Client.Channels
             ActionDescriptor descriptor,
             CancellationToken cancellation)
         {
-            return TaskExtensions.Execute(() => SendAsync<TResult, TRequestParameters>(parameters, descriptor, cancellation));
+            return TaskHelpers.Execute(() => SendAsync<TResult, TRequestParameters>(parameters, descriptor, cancellation));
         }
 
         #endregion

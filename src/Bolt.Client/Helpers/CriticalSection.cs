@@ -13,25 +13,13 @@ namespace Bolt.Client.Helpers
             private readonly ManualResetEvent _event = new ManualResetEvent(false);
             private bool _synchronous;
 
-            public object AsyncState
-            {
-                get { return null; }
-            }
+            public object AsyncState => null;
 
-            public WaitHandle AsyncWaitHandle
-            {
-                get { return _event; }
-            }
+            public WaitHandle AsyncWaitHandle => _event;
 
-            public bool CompletedSynchronously
-            {
-                get { return _synchronous; }
-            }
+            public bool CompletedSynchronously => _synchronous;
 
-            public bool IsCompleted
-            {
-                get { return _event.WaitOne(TimeSpan.Zero); }
-            }
+            public bool IsCompleted => _event.WaitOne(TimeSpan.Zero);
 
             public void Signal(bool synchronous)
             {

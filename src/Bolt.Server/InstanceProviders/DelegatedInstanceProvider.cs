@@ -1,6 +1,6 @@
 using System;
 
-namespace Bolt.Server
+namespace Bolt.Server.InstanceProviders
 {
     public sealed class DelegatedInstanceProvider<TImplementation> : IInstanceProvider
     {
@@ -10,7 +10,7 @@ namespace Bolt.Server
         {
             if (factory == null)
             {
-                throw new ArgumentNullException("factory");
+                throw new ArgumentNullException(nameof(factory));
             }
 
             _factory = factory;
@@ -23,10 +23,7 @@ namespace Bolt.Server
 
         public void ReleaseInstance(ServerActionContext context, object obj, Exception error)
         {
-            if (obj is IDisposable)
-            {
-                (obj as IDisposable).Dispose();
-            }
+            (obj as IDisposable)?.Dispose();
         }
     }
 }

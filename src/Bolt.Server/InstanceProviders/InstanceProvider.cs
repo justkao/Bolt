@@ -1,8 +1,8 @@
-﻿using Microsoft.Framework.DependencyInjection;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
+using Microsoft.Framework.DependencyInjection;
 
-namespace Bolt.Server
+namespace Bolt.Server.InstanceProviders
 {
     public class InstanceProvider : IInstanceProvider
     {
@@ -16,15 +16,12 @@ namespace Bolt.Server
 
         public virtual void ReleaseInstance(ServerActionContext context, object obj, Exception error)
         {
-            if (obj is IDisposable)
-            {
-                (obj as IDisposable).Dispose();
-            }
+            (obj as IDisposable)?.Dispose();
         }
 
         protected virtual object CreateInstance(ServerActionContext context, Type type)
         {
-            var createFactory = _typeActivatorCache.GetOrAdd(type, (t) => ActivatorUtilities.CreateFactory(type, Type.EmptyTypes));
+            var createFactory = _typeActivatorCache.GetOrAdd(type, t => ActivatorUtilities.CreateFactory(type, Type.EmptyTypes));
             return createFactory(context.Context.ApplicationServices, null);
         }
     }

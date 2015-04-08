@@ -33,11 +33,7 @@ namespace Bolt.Generators
             {
                 if (_baseClass == null)
                 {
-                    return string.Format(
-                        "{0}.{1}<{2}>",
-                        BoltConstants.Server.Namespace,
-                        FormatType(BoltConstants.Server.ContractInvoker),
-                        MetadataProvider.GetContractDescriptor(ContractDefinition).FullName);
+                    return $"{BoltConstants.Server.Namespace}.{FormatType(BoltConstants.Server.ContractInvoker)}<{MetadataProvider.GetContractDescriptor(ContractDefinition).FullName}>";
                 }
 
                 return _baseClass;
@@ -190,11 +186,11 @@ namespace Bolt.Generators
             {
                 if (IsAsync(method.Method))
                 {
-                    WriteLine("{3} = await {0}.{1}({2});", instanceName, method.Name, parametersBody, resultVariable);
+                    WriteLine("{0} = await {1}.{2}({3});", resultVariable, instanceName, method.Name, parametersBody);
                 }
                 else
                 {
-                    WriteLine("{3} = {0}.{1}({2});", instanceName, method.Name, parametersBody, resultVariable);
+                    WriteLine("{0} = {1}.{2}({3});", resultVariable, instanceName, method.Name, parametersBody);
                 }
 
                 return "result";
@@ -216,10 +212,10 @@ namespace Bolt.Generators
         {
             if (HasParameters(info))
             {
-                return string.Format("{0}_{1}", info.DeclaringType.StripInterfaceName(), info.Name);
+                return $"{info.DeclaringType.StripInterfaceName()}_{info.Name}";
             }
 
-            return string.Format("{0}_{1}", info.DeclaringType.StripInterfaceName(), info.Name);
+            return $"{info.DeclaringType.StripInterfaceName()}_{info.Name}";
         }
     }
 }

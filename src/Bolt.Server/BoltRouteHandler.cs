@@ -4,12 +4,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Bolt.Server.Metadata;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;
-using Bolt.Server.Metadata;
 
 namespace Bolt.Server
 {
@@ -73,10 +72,10 @@ namespace Bolt.Server
 
             if (_invokers.FirstOrDefault(i => i.Descriptor.Name == invoker.Descriptor.Name) != null)
             {
-                throw new InvalidOperationException( string.Format("Invoker for contract '{0}' already registered.", invoker.Descriptor.Name));
+                throw new InvalidOperationException($"Invoker for contract '{invoker.Descriptor.Name}' already registered.");
             }
 
-            Logger.WriteInformation("Adding contract: {0}", invoker.Descriptor.Name);
+            Logger.WriteInformation(BoltLogId.ContractAdded, "Adding contract: {0}", invoker.Descriptor.Name);
             _invokers.Add(invoker);
             foreach (ActionDescriptor descriptor in invoker.Descriptor)
             {
@@ -128,7 +127,7 @@ namespace Bolt.Server
             {
                 if (!string.IsNullOrEmpty(Options.Prefix))
                 {
-                    Logger.WriteWarning("Contract with name '{0}' not found in registered contracts at '{1}'", result[0], path);
+                    Logger.WriteWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", result[0], path);
 
                     // we have defined bolt prefix, report error about contract not found
                     ErrorHandler.HandleBoltError(context.HttpContext, ServerErrorCode.ContractNotFound);
@@ -159,7 +158,7 @@ namespace Bolt.Server
                 return;
             }
 
-            var ctxt = new ServerActionContext()
+            var ctxt = new ServerActionContext
             {
                 Context = context.HttpContext,
                 Action = actionDescriptor
@@ -186,33 +185,28 @@ namespace Bolt.Server
                 {
                     if (!ctxt.RequestAborted.IsCancellationRequested)
                     {
-                        var responseHandler = ResponseHandler;
-                        if (invoker is ContractInvoker)
-                        {
-                            responseHandler = (invoker as ContractInvoker).ResponseHandler;
-                        }
-
                         // TODO: is this ok ? 
                         ctxt.Context.Response.Body.Dispose();
-                        Logger.WriteError("Action '{0}' was cancelled.", ctxt.Action);
+                        Logger.WriteError(BoltLogId.RequestCancelled, "Action '{0}' was cancelled.", ctxt.Action);
                     }
                 }
                 catch (Exception e)
                 {
                     var responseHandler = ResponseHandler;
-                    if (invoker is ContractInvoker)
+                    var contractInvoker = invoker as ContractInvoker;
+                    if (contractInvoker != null)
                     {
-                        responseHandler = (invoker as ContractInvoker).ResponseHandler;
+                        responseHandler = contractInvoker.ResponseHandler;
                     }
 
                     await responseHandler.HandleError(ctxt, e);
-                    Logger.WriteError("Execution of '{0}' failed with error '{1}'", ctxt.Action, e);
+                    Logger.WriteError(BoltLogId.RequestExecutionError, "Execution of '{0}' failed with error '{1}'", ctxt.Action, e);
                 }
                 finally
                 {
                     if (watch != null)
                     {
-                        Logger.WriteVerbose("Execution of '{0}' has taken '{1}ms'", ctxt.Action, watch.ElapsedMilliseconds);
+                        Logger.WriteVerbose(BoltLogId.RequestExecutionTime, "Execution of '{0}' has taken '{1}ms'", ctxt.Action, watch.ElapsedMilliseconds);
                     }
                 }
             }
@@ -231,33 +225,43 @@ namespace Bolt.Server
 
         protected virtual async Task HandleContractRootAsync(RouteContext context, IContractInvoker descriptor)
         {
+            if (MetadataHandler == null)
+            {
+                return;
+            }
+
             try
             {
-                var handled = await MetadataHandler?.HandleContractMetadataAsync(context.HttpContext, descriptor);
+                var handled = await MetadataHandler.HandleContractMetadataAsync(context.HttpContext, descriptor);
                 if (handled)
                 {
                     context.IsHandled = true;
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return;
+                Logger.WriteError(BoltLogId.HandleContractMetadataError, $"Failed to handle metadata for contract {descriptor.Descriptor}.", e);
             }
         }
 
         protected virtual async Task HandleBoltRootAsync(RouteContext context)
         {
+            if (MetadataHandler == null)
+            {
+                return;
+            }
+
             try
             {
-                var handled = await MetadataHandler?.HandleBoltMetadataAsync(context.HttpContext, _invokers);
+                var handled = await MetadataHandler.HandleBoltMetadataAsync(context.HttpContext, _invokers);
                 if (handled)
                 {
                     context.IsHandled = true;
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return;
+                Logger.WriteError(BoltLogId.HandleBoltRootError, "Failed to handle root metadata.", e);
             }
         }
 

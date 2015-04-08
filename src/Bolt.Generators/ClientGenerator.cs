@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading;
 
 namespace Bolt.Generators
 {
@@ -29,7 +28,7 @@ namespace Bolt.Generators
             {
                 if (_contractDescriptorProperty == null)
                 {
-                    return string.Format("{0}Descriptor", ContractDefinition.Name);
+                    return $"{ContractDefinition.Name}Descriptor";
                 }
 
                 return _contractDescriptorProperty;
@@ -62,7 +61,7 @@ namespace Bolt.Generators
             generator.GenerateBodyAction = g =>
                 {
                     g.GenerateConstructor(g.Descriptor.FullName + " proxy", "proxy");
-                    g.GenerateConstructor(string.Format("{0} channel", FormatType(BoltConstants.Client.Channel)), "channel");
+                    g.GenerateConstructor($"{FormatType(BoltConstants.Client.Channel)} channel", "channel");
 
                     List<Type> contracts = ContractDefinition.GetEffectiveContracts().ToList();
                     foreach (Type type in contracts)
@@ -172,7 +171,7 @@ namespace Bolt.Generators
         {
             if (!methodDescriptor.HasParameterClass())
             {
-                return new GenerateRequestCodeResult()
+                return new GenerateRequestCodeResult
                 {
                     VariableName = FormatType(BoltConstants.Core.Empty) + ".Instance",
                     TypeName = FormatType(BoltConstants.Core.Empty)
@@ -187,7 +186,7 @@ namespace Bolt.Generators
                 WriteLine("bolt_Params.{0} = {1};", info.Name.CapitalizeFirstLetter(), variables[info]);
             }
 
-            return new GenerateRequestCodeResult()
+            return new GenerateRequestCodeResult
             {
                 VariableName = "bolt_Params",
                 TypeName = methodDescriptor.Parameters.FullName
@@ -203,21 +202,21 @@ namespace Bolt.Generators
 
         private string DeclareEndpoint(MethodDescriptor action, ParameterInfo cancellationTokenParameter)
         {
-            string descriptorReference = string.Format("Descriptor.{0}", action.Name);
+            string descriptorReference = $"Descriptor.{action.Name}";
 
             if (cancellationTokenParameter == null)
             {
-                return string.Format("{0}, CancellationToken.None", descriptorReference, descriptorReference);
+                return $"{descriptorReference}, CancellationToken.None";
             }
 
-            return string.Format("{0}, {1}", descriptorReference, cancellationTokenParameter.Name);
+            return $"{descriptorReference}, {cancellationTokenParameter.Name}";
         }
 
         protected override ClassDescriptor CreateDefaultDescriptor()
         {
             ClassDescriptor contractDescriptor = MetadataProvider.GetContractDescriptor(ContractDefinition);
             List<string> baseClasses = new List<string>();
-            string baseClass = string.Format("ContractProxy<{0}>", contractDescriptor.FullName);
+            string baseClass = $"ContractProxy<{contractDescriptor.FullName}>";
             baseClasses.Add(baseClass);
             baseClasses.Add(ContractDefinition.Root.FullName);
 

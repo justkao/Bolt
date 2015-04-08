@@ -36,9 +36,9 @@ namespace Bolt.Generators
                         ParametersGenerator parametersGenerator = new ParametersGenerator(method, Output, Formatter, IntendProvider)
                         {
                             AddNamespace = false,
+                            Modifier = Modifier
                         };
 
-                        parametersGenerator.Modifier = Modifier;
                         if (!method.HasParameterClass())
                         {
                             continue;

@@ -59,15 +59,12 @@ namespace Bolt.Common
                 {
                     throw ex;
                 }
-                else
-                {
-                    // TypeConverter throws System.Exception wrapping the FormatException,
-                    // so we throw the inner exception.
-                    ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
+                // TypeConverter throws System.Exception wrapping the FormatException,
+                // so we throw the inner exception.
+                ExceptionDispatchInfo.Capture(ex.InnerException).Throw();
 
-                    // this code is never reached because the previous line is throwing;
-                    throw;
-                }
+                // this code is never reached because the previous line is throwing;
+                throw;
             }
         }
 

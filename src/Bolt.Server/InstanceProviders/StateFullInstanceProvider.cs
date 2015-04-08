@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 
-namespace Bolt.Server
+namespace Bolt.Server.InstanceProviders
 {
     public class StateFullInstanceProvider : InstanceProvider, IDisposable
     {
@@ -134,11 +134,7 @@ namespace Bolt.Server
             InstanceMetadata instance;
             if (_instances.TryRemove(sessionId, out instance))
             {
-                if (instance.Instance is IDisposable)
-                {
-                    (instance.Instance as IDisposable).Dispose();
-                }
-
+                (instance.Instance as IDisposable)?.Dispose();
                 return true;
             }
 
@@ -156,10 +152,7 @@ namespace Bolt.Server
 
         public virtual void Dispose()
         {
-            if (_timer != null)
-            {
-                _timer.Dispose();
-            }
+            _timer?.Dispose();
         }
 
         protected virtual void OnInstanceCreated(ServerActionContext context, string sessionId)
@@ -215,7 +208,7 @@ namespace Bolt.Server
 
             public DateTime Timestamp { get; set; }
 
-            public object Instance { get; private set; }
+            public object Instance { get; }
         }
     }
 }

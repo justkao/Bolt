@@ -1,8 +1,8 @@
-using Bolt.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
+using Bolt.Common;
 
 namespace Bolt.Service.Test.Core
 {
@@ -16,7 +16,7 @@ namespace Bolt.Service.Test.Core
             type.Int = rnd.Next();
             type.Double = rnd.NextDouble();
             type.Bool = rnd.Next(0, 10) % 2 == 0;
-            type.DateTime = System.DateTime.UtcNow;
+            type.DateTime = DateTime.UtcNow;
             type.List = new List<string>();
 
             for (int i = 0; i < rnd.Next(0, 20); i++)

@@ -1,9 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Bolt.Generators;
 using Bolt.Server.Metadata;
 using Microsoft.AspNet.Http;
 using Microsoft.Framework.Logging;
-using Bolt.Generators;
-using System.Linq;
 
 namespace Bolt.Server.Generator
 {
@@ -18,9 +18,9 @@ namespace Bolt.Server.Generator
             DocumentGenerator generator = new DocumentGenerator();
             var definition = new ContractDefinition(descriptor.Descriptor.Type);
 
-            var contractGen = new ContractDescriptorGenerator() { ContractDefinition = definition };
-            var interfaceGen = new InterfaceGenerator() { ContractDefinition = definition, ForceAsync=true };
-            var clientGen = new ClientGenerator() { ContractDefinition = definition, ForceAsync = true };
+            var contractGen = new ContractDescriptorGenerator { ContractDefinition = definition };
+            var interfaceGen = new InterfaceGenerator { ContractDefinition = definition, ForceAsync=true };
+            var clientGen = new ClientGenerator { ContractDefinition = definition, ForceAsync = true };
 
             generator.Add(contractGen);
             generator.Add(interfaceGen);

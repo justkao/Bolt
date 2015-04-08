@@ -23,10 +23,7 @@ namespace Bolt.Generators
 
         public event EventHandler Generated;
 
-        public IEnumerable<string> GeneratedAsyncInterfaces
-        {
-            get { return _generatedAsyncInterfaces; }
-        }
+        public IEnumerable<string> GeneratedAsyncInterfaces => _generatedAsyncInterfaces;
 
         public bool ForceAsync { get; set; }
 
@@ -45,11 +42,7 @@ namespace Bolt.Generators
             }
 
             GenerateAsyncInterface(ContractDefinition.Root, context);
-
-            if (Generated != null)
-            {
-                Generated(this, EventArgs.Empty);
-            }
+            Generated?.Invoke(this, EventArgs.Empty);
         }
 
         private void GenerateAsyncInterface(Type iface, object context)

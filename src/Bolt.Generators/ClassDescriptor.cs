@@ -37,13 +37,7 @@ namespace Bolt.Generators
 
         public string Namespace { get; set; }
 
-        public string FullName
-        {
-            get
-            {
-                return string.Format("{0}.{1}", Namespace, Name);
-            }
-        }
+        public string FullName => $"{Namespace}.{Name}";
 
         public IEnumerable<string> BaseClasses { get; set; }
 

@@ -1,5 +1,4 @@
 using System;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
@@ -29,7 +28,7 @@ namespace Bolt.Client
 
         public virtual ResponseDescriptor<T> GetResponse<T, TParameters>(ClientActionContext context, TParameters parameters)
         {
-            return TaskExtensions.Execute(() => GetResponseAsync<T, TParameters>(context, parameters));
+            return TaskHelpers.Execute(() => GetResponseAsync<T, TParameters>(context, parameters));
         }
 
         public virtual async Task<ResponseDescriptor<T>> GetResponseAsync<T, TParameters>(
@@ -45,10 +44,6 @@ namespace Bolt.Client
             try
             {
                 _dataHandler.WriteParameters(context, parameters);
-            }
-            catch (OperationCanceledException)
-            {
-                throw;
             }
             catch (BoltSerializationException e)
             {

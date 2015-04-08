@@ -9,14 +9,14 @@ namespace Bolt
     public class BoltServerException : Exception
     {
         public BoltServerException(int errorCode, ActionDescriptor action, string url)
-            : base(string.Format("Execution of action '{0}' failed on server with error code '{1}'. Url - '{2}'", action, errorCode, url))
+            : base($"Execution of action '{action}' failed on server with error code '{errorCode}'. Url - '{url}'")
         {
             ErrorCode = errorCode;
             Action = action;
         }
 
         public BoltServerException(ServerErrorCode error, ActionDescriptor action, string url)
-            : base(string.Format("Execution of action '{0}' failed on server with error '{1}'. Url - '{2}'", action, error, url))
+            : base($"Execution of action '{action}' failed on server with error '{error}'. Url - '{url}'")
         {
             Error = error;
             Action = action;

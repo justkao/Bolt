@@ -20,7 +20,7 @@ namespace Bolt
             _id = method.DeclaringType.Name + name;
         }
 
-        public string Name { get; private set; }
+        public string Name { get; }
 
         /// <summary>
         /// The parameters object used to hold all the data the action requires to be executed on server.
@@ -30,7 +30,7 @@ namespace Bolt
         /// <summary>
         /// Owner of this action descriptor.
         /// </summary>
-        public ContractDescriptor Contract { get; private set; }
+        public ContractDescriptor Contract { get; }
 
         /// <summary>
         /// The method this descriptor refers to.
@@ -57,7 +57,7 @@ namespace Bolt
             {
                 return true;
             }
-            if (obj.GetType() != this.GetType())
+            if (obj.GetType() != GetType())
             {
                 return false;
             }
@@ -66,7 +66,7 @@ namespace Bolt
 
         public override int GetHashCode()
         {
-            return _id != null ? _id.GetHashCode() : 0;
+            return _id?.GetHashCode() ?? 0;
         }
 
         public static bool operator ==(ActionDescriptor left, ActionDescriptor right)
@@ -81,7 +81,7 @@ namespace Bolt
 
         public override string ToString()
         {
-            return string.Format("{0}/{1}", Contract.Name, Name);
+            return $"{Contract.Name}/{Name}";
         }
     }
 }

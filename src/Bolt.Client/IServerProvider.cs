@@ -6,7 +6,7 @@ namespace Bolt.Client
     /// Used to provide multiple Bolt in case one of them goes down. Useful for failover support.
     /// </summary>
     /// <remarks>
-    /// If failover support is not required use <see cref="UriServerProvider"/> instance.
+    /// If failover support is not required use <see cref="SingleServerProvider"/> instance.
     /// </remarks>
     public interface IServerProvider
     {

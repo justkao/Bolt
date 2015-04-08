@@ -23,10 +23,10 @@ namespace TestService.Core
 
         public static Person Create(int id)
         {
-            return new Person()
+            return new Person
             {
                 Name = "Name" + id,
-                Address = new Address() { City = "Address" + id },
+                Address = new Address { City = "Address" + id },
                 BornDate = DateTime.UtcNow,
                 Id = id,
                 Surname = "Surname" + id

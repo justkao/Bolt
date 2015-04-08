@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNet.Http;
-using Microsoft.Framework.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Schema;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Bolt.Server.InstanceProviders;
+using Microsoft.AspNet.Http;
+using Microsoft.Framework.Logging;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Schema;
 
 namespace Bolt.Server.Metadata
 {
@@ -14,22 +15,28 @@ namespace Bolt.Server.Metadata
     {
         public BoltMetadataHandler(ILoggerFactory factory)
         {
+            if (factory == null)
+            {
+                throw new ArgumentNullException(nameof(factory));
+            }
+
             Logger = factory.Create<BoltMetadataHandler>();
         }
 
-        public ILogger Logger { get; private set; }
+        public ILogger Logger { get; }
 
         public virtual async Task<bool> HandleBoltMetadataAsync(HttpContext context, IEnumerable<IContractInvoker> contracts)
         {
             try
             {
-                var result = JsonConvert.SerializeObject(contracts.Select(c => c.Descriptor.Name).ToList(), Newtonsoft.Json.Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
+                var result = JsonConvert.SerializeObject(contracts.Select(c => c.Descriptor.Name).ToList(),
+                    Formatting.Indented, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore});
                 await context.Response.SendAsync(result);
                 return true;
             }
             catch (Exception e)
             {
-                Logger.WriteWarning("Failed to generate Bolt root metadata. Error: {0}", e);
+                Logger.WriteWarning(BoltLogId.HandleBoltRootError, "Failed to generate Bolt root metadata. Error: {0}", e);
                 return false;
             }
         }
@@ -40,7 +47,7 @@ namespace Bolt.Server.Metadata
             {
                 string result = string.Empty;
                 string actionName = context.Request.Query["action"]?.Trim();
-                ActionDescriptor action = null; ;
+                ActionDescriptor action = null;
 
                 if (!string.IsNullOrEmpty(actionName))
                 {
@@ -50,7 +57,8 @@ namespace Bolt.Server.Metadata
                 if (action == null)
                 {
                     var contractMetadata = CrateContractMetadata(descriptor);
-                    result = JsonConvert.SerializeObject(contractMetadata, Formatting.Indented, new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore });
+                    result = JsonConvert.SerializeObject(contractMetadata, Formatting.Indented,
+                        new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore});
                 }
                 else
                 {
@@ -79,16 +87,17 @@ namespace Bolt.Server.Metadata
             }
             catch (Exception e)
             {
-                Logger.WriteWarning("Failed to generate Bolt metadata for contract '{0}'. Error: {1}", descriptor, e);
+                Logger.WriteWarning(BoltLogId.HandleContractMetadataError,
+                    "Failed to generate Bolt metadata for contract '{0}'. Error: {1}", descriptor, e);
                 return false;
             }
         }
 
         private ContractMetadata CrateContractMetadata(IContractInvoker descriptor)
         {
-            var m = new ContractMetadata()
+            var m = new ContractMetadata
             {
-                Actions = descriptor.Descriptor.Select(a => a.Name).ToList(),
+                Actions = descriptor.Descriptor.Select(a => a.Name).ToList()
             };
 
             var invoker = descriptor as ContractInvoker;

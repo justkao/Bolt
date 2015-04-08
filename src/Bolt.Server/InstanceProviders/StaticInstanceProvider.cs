@@ -1,6 +1,6 @@
 using System;
 
-namespace Bolt.Server
+namespace Bolt.Server.InstanceProviders
 {
     public sealed class StaticInstanceProvider : IInstanceProvider
     {
@@ -10,7 +10,7 @@ namespace Bolt.Server
         {
             if (instance == null)
             {
-                throw new ArgumentNullException("instance");
+                throw new ArgumentNullException(nameof(instance));
             }
 
             _instance = instance;

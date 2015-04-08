@@ -1,8 +1,9 @@
 ﻿using System;
-using Microsoft.Framework.DependencyInjection;
+using Bolt;
+using Bolt.Server;
 using Bolt.Server.Metadata;
 
-namespace Bolt.Server
+namespace Microsoft.Framework.DependencyInjection
 {
     public static class BoltServiceCollectionExtensions
     {

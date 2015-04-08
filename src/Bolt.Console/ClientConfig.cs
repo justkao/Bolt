@@ -33,11 +33,11 @@ namespace Bolt.Console
                 clientGenerator.UserGenerator = Parent.Parent.GetGenerator(Generator);
             }
 
-            InterfaceGenerator interfaceGenerator = new InterfaceGenerator()
+            InterfaceGenerator interfaceGenerator = new InterfaceGenerator
             {
                 ContractDefinition = definition,
                 ForceAsync = ForceAsync,
-                ExcludedInterfaces = ExcludedInterfaces,
+                ExcludedInterfaces = ExcludedInterfaces
             };
 
             generator.Add(interfaceGenerator);
@@ -56,7 +56,7 @@ namespace Bolt.Console
 
         public override string GetFileName(ContractDefinition definition)
         {
-            return string.Format("{0}.Client.Designer.cs", definition.Name);
+            return $"{definition.Name}.Client.Designer.cs";
         }
     }
 }

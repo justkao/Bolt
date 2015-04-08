@@ -1,7 +1,7 @@
-﻿using Microsoft.Framework.DependencyInjection;
-using System;
+﻿using System;
+using Microsoft.Framework.DependencyInjection;
 
-namespace Bolt.Server
+namespace Bolt.Server.InstanceProviders
 {
     public class StateFullInstanceProvider<T> : StateFullInstanceProvider
     {

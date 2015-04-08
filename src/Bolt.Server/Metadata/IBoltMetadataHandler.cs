@@ -1,10 +1,6 @@
-﻿using Microsoft.AspNet.Http;
-using Microsoft.Framework.Logging;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNet.Http;
 
 namespace Bolt.Server.Metadata
 {

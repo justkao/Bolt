@@ -1,10 +1,9 @@
-﻿using Bolt.Common;
-using Microsoft.AspNet.Http;
-using Microsoft.Framework.Logging;
-using Microsoft.Framework.OptionsModel;
-using System;
+﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Bolt.Common;
+using Microsoft.Framework.Logging;
+using Microsoft.Framework.OptionsModel;
 
 namespace Bolt.Server
 {
@@ -72,11 +71,10 @@ namespace Bolt.Server
                     try
                     {
                         await _dataHandler.WriteResponseAsync(context, error.GetAll().Select(e => e.Message));
-                        // await _dataHandler.WriteExceptionAsync(context, error);
                     }
                     catch (Exception e)
                     {
-                        _logger.WriteError("Failed to serialize exception that occured during execution of '{0}' action. \nExecution Error: '{1}'\nSerializationError: '{2}'", context.Action, error, e);
+                        _logger.WriteError(BoltLogId.DetailedServerErrorProcessingFailed, "Failed to serialize exception that occured during execution of '{0}' action. \nExecution Error: '{1}'\nSerializationError: '{2}'", context.Action, error, e);
                         return;
                     }
                 }
@@ -89,10 +87,17 @@ namespace Bolt.Server
             {
                 await _dataHandler.WriteExceptionAsync(context, error);
             }
+            catch (BoltSerializationException e)
+            {
+                _logger.WriteError(BoltLogId.ExceptionSerializationError,
+                    "Failed to serialize exception that occured during execution of '{0}' action. \nExecution Error: '{1}'\nSerializationError: '{2}'",
+                    context.Action, error, e);
+                _errorHandler.HandleBoltError(context.Context, ServerErrorCode.Serialization);
+                return;
+            }
             catch (Exception e)
             {
-                _logger.WriteError("Failed to serialize exception that occured during execution of '{0}' action. \nExecution Error: '{1}'\nSerializationError: '{2}'", context.Action, error, e);
-                _errorHandler.HandleBoltError(context.Context, ServerErrorCode.Serialization);
+                _errorHandler.HandleError(context, e);
                 return;
             }
 

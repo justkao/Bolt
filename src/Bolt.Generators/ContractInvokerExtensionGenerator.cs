@@ -21,6 +21,7 @@ namespace Bolt.Generators
         public override void Generate(object context)
         {
             AddUsings(BoltConstants.Server.Namespace);
+            AddUsings(BoltConstants.Server.InstanceProvidersNamespace);
 
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
             generator.Modifier = Modifier + " static";
@@ -123,12 +124,6 @@ namespace Bolt.Generators
             return new ClassDescriptor(ContractInvoker.Name + "Extensions", BoltConstants.Server.Namespace);
         }
 
-        private string BoltRouteHandler
-        {
-            get
-            {
-                return FormatType(BoltConstants.Server.BoltRouteHandlerInterface);
-            }
-        }
+        private string BoltRouteHandler => FormatType(BoltConstants.Server.BoltRouteHandlerInterface);
     }
 }

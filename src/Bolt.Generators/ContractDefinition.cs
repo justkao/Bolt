@@ -13,7 +13,7 @@ namespace Bolt.Generators
         {
             if (root == null)
             {
-                throw new ArgumentNullException("root");
+                throw new ArgumentNullException(nameof(root));
             }
 
             if (!root.GetTypeInfo().IsInterface)
@@ -24,12 +24,12 @@ namespace Bolt.Generators
             Root = root;
             Name = Root.Name[0] == 'I' ? Root.Name.Substring(1) : Root.Name;
             Namespace = root.Namespace;
-            _excludedContracts = excludedContracts != null ? excludedContracts.ToList() : new List<Type>();
+            _excludedContracts = excludedContracts?.ToList() ?? new List<Type>();
 
             Validate();
         }
 
-        public Type Root { get; private set; }
+        public Type Root { get; }
 
         public Type ParametersBase { get; set; }
 
@@ -58,7 +58,7 @@ namespace Bolt.Generators
 
         public virtual IReadOnlyCollection<Type> GetEffectiveContracts()
         {
-            List<Type> contracts = new List<Type>()
+            List<Type> contracts = new List<Type>
             {
                 Root
             };
@@ -118,7 +118,8 @@ namespace Bolt.Generators
         {
             if (!IsValid())
             {
-                throw new InvalidOperationException(string.Format("Contract {0} contains multiple methods with the same name.", Root.FullName));
+                throw new InvalidOperationException(
+                    $"Contract {Root.FullName} contains multiple methods with the same name.");
             }
         }
     }

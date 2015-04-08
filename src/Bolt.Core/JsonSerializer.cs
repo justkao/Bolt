@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-
 using Newtonsoft.Json;
 
 namespace Bolt
@@ -10,8 +9,8 @@ namespace Bolt
     {
         public JsonSerializer()
         {
-            Serializer = new Newtonsoft.Json.JsonSerializer()
-                             {
+            Serializer = new Newtonsoft.Json.JsonSerializer
+            {
                                  NullValueHandling = NullValueHandling.Ignore,
                                  TypeNameHandling = TypeNameHandling.Auto,
                                  Formatting = Formatting.None,
@@ -19,18 +18,15 @@ namespace Bolt
                              };
         }
 
-        public string ContentType
-        {
-            get { return "application/json"; }
-        }
+        public string ContentType => "application/json";
 
-        public Newtonsoft.Json.JsonSerializer Serializer { get; private set; }
+        public Newtonsoft.Json.JsonSerializer Serializer { get; }
 
         public virtual void Write<T>(Stream stream, T data)
         {
             if (stream == null)
             {
-                throw new ArgumentNullException("stream");
+                throw new ArgumentNullException(nameof(stream));
             }
 
             using (TextWriter writer = new StreamWriter(stream, Encoding.UTF8, 4096, true))
@@ -43,7 +39,7 @@ namespace Bolt
         {
             if (stream == null)
             {
-                throw new ArgumentNullException("stream");
+                throw new ArgumentNullException(nameof(stream));
             }
 
             using (TextReader reader = new StreamReader(stream, Encoding.UTF8, true, 4096, true))
@@ -59,7 +55,7 @@ namespace Bolt
         {
             if (stream == null)
             {
-                throw new ArgumentNullException("stream");
+                throw new ArgumentNullException(nameof(stream));
             }
 
             using (TextWriter writer = new StreamWriter(stream, Encoding.UTF8, 4096, true))
@@ -72,7 +68,7 @@ namespace Bolt
         {
             if (stream == null)
             {
-                throw new ArgumentNullException("stream");
+                throw new ArgumentNullException(nameof(stream));
             }
 
             using (TextReader reader = new StreamReader(stream, Encoding.UTF8, true, 4096, true))

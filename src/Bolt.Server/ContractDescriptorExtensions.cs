@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace Bolt.Server
 {
@@ -14,7 +15,7 @@ namespace Bolt.Server
                 return found;
             }
 
-            var index = actionName.IndexOf("async");
+            var index = actionName.IndexOf("async", StringComparison.Ordinal);
             if (index == -1)
             {
                 actionName += "async";

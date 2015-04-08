@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Framework.DependencyInjection;
 
-namespace Bolt.Server
+namespace Bolt.Server.InstanceProviders
 {
     public class InstanceProvider<T> : InstanceProvider
     {

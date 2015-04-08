@@ -25,10 +25,7 @@ namespace Bolt.Client
             _exceptionWrapper = exceptionWrapper;
         }
 
-        public virtual string ContentType
-        {
-            get { return _serializer.ContentType; }
-        }
+        public virtual string ContentType => _serializer.ContentType;
 
         public virtual void WriteParameters<T>(ClientActionContext context, T parameters)
         {

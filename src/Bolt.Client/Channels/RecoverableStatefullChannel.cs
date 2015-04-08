@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-
 using Bolt.Client.Helpers;
 
 namespace Bolt.Client.Channels
@@ -47,15 +46,9 @@ namespace Bolt.Client.Channels
             _sessionHeaderName = sessionHeaderName;
         }
 
-        public string SessionId
-        {
-            get { return _sessionId; }
-        }
+        public string SessionId => _sessionId;
 
-        public virtual bool IsRecoverable
-        {
-            get { return true; }
-        }
+        public virtual bool IsRecoverable => true;
 
         public override async Task OpenAsync()
         {
@@ -87,7 +80,7 @@ namespace Bolt.Client.Channels
                             _activeConnection.Server,
                             RequestHandler,
                             EndpointProvider,
-                            (c) =>
+                            c =>
                             {
                                 BeforeSending(c);
                                 WriteSessionHeader(c, sessionId);
@@ -102,7 +95,7 @@ namespace Bolt.Client.Channels
                 {
                     _activeConnection = null;
                     _sessionId = null;
-                    base.Close();
+                    Close();
                 }
             }
         }
@@ -113,7 +106,8 @@ namespace Bolt.Client.Channels
 
         protected override bool HandleError(ClientActionContext context, Exception error)
         {
-            if (error is BoltServerException && (error as BoltServerException).Error == ServerErrorCode.SessionNotFound)
+            var exception = error as BoltServerException;
+            if (exception != null && exception.Error == ServerErrorCode.SessionNotFound)
             {
                 if (!IsRecoverable)
                 {
@@ -200,12 +194,12 @@ namespace Bolt.Client.Channels
                             connection.Server,
                             RequestHandler,
                             EndpointProvider,
-                            (c) =>
+                            c =>
                             {
                                 WriteSessionHeader(c, sessionId);
                                 BeforeSending(c);
                             },
-                            (ctxt) =>
+                            ctxt =>
                             {
                                 if (sessionId == null)
                                 {

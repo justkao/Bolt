@@ -52,7 +52,7 @@ namespace Bolt.Client
                 e.EnsureNotCancelled();
 
                 throw new SerializeParametersException(
-                    string.Format("Failed to serialize parameters for action '{0}'. Parameters type - '{1}'", actionDescriptor, typeof(TParameters).FullName),
+                    $"Failed to serialize parameters for action '{actionDescriptor}'. Parameters type - '{typeof (TParameters).FullName}'",
                     e);
             }
         }
@@ -94,15 +94,15 @@ namespace Bolt.Client
             catch (Exception e)
             {
                 e.EnsureNotCancelled();
-                throw new DeserializeResponseException(string.Format("Failed to deserialize response data for action '{0}'.", actionDescriptor), e);
+                throw new DeserializeResponseException($"Failed to deserialize response data for action '{actionDescriptor}'.", e);
             }
         }
 
         /// <summary>
         /// Deserialize the server response into the concrete type.
         /// </summary>
-        /// <typeparam name="T">The type of data to deserialize.</typeparam>
         /// <param name="serializer">The data serializer instance.</param>
+        /// <param name="type">The type of data to deserialize.</param>
         /// <param name="stream">The stream used to deserialize the data.</param>
         /// <param name="actionDescriptor">The action context of deserialize operation.</param>
         /// <returns>The deserialized data or default(T) if stream is null or empty.</returns>
@@ -135,7 +135,7 @@ namespace Bolt.Client
             catch (Exception e)
             {
                 e.EnsureNotCancelled();
-                throw new DeserializeResponseException(string.Format("Failed to deserialize exception response data for action '{0}'.", actionDescriptor), e);
+                throw new DeserializeResponseException($"Failed to deserialize exception response data for action '{actionDescriptor}'.", e);
             }
         }
     }

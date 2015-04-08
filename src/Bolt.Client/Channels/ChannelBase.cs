@@ -1,9 +1,8 @@
-﻿using Bolt.Common;
-using System;
-using System.Net;
+﻿using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Bolt.Common;
 
 namespace Bolt.Client.Channels
 {
@@ -46,9 +45,9 @@ namespace Bolt.Client.Channels
             EndpointProvider = endpointProvider;
         }
 
-        public IRequestHandler RequestHandler { get; private set; }
+        public IRequestHandler RequestHandler { get; }
 
-        public IEndpointProvider EndpointProvider { get; private set; }
+        public IEndpointProvider EndpointProvider { get; }
 
         public bool IsClosed { get; protected set; }
 
@@ -112,7 +111,7 @@ namespace Bolt.Client.Channels
             CancellationToken cancellation,
             object parameters)
         {
-            return new ClientActionContext()
+            return new ClientActionContext
             {
                 Action = actionDescriptor,
                 Cancellation = cancellation,
@@ -153,7 +152,7 @@ namespace Bolt.Client.Channels
         {
             Uri uri = EndpointProvider.GetEndpoint(connection.Server, descriptor);
 
-            return new HttpRequestMessage()
+            return new HttpRequestMessage
             {
                 RequestUri = uri,
                 Method = HttpMethod.Post
@@ -178,29 +177,19 @@ namespace Bolt.Client.Channels
             {
                 if (action.Parameters != typeof(Empty))
                 {
-                    throw new InvalidOperationException(
-                        string.Format(
-                            "Invalid parameters type provided for action '{0}'. Expected parameter type object should be '{1}', but was '{2}' instead.",
-                            action.Name,
-                            typeof(Empty).FullName,
-                            typeof(TParams).FullName));
+                    throw new InvalidOperationException($"Invalid parameters type provided for action '{action.Name}'. Expected parameter type object should be '{typeof (Empty).FullName}', but was '{typeof (TParams).FullName}' instead.");
                 }
             }
             else
             {
                 if (Equals(parameters, default(TParams)))
                 {
-                    throw new InvalidOperationException(string.Format("Parameters must not be null. Action '{0}'.", action.Name));
+                    throw new InvalidOperationException($"Parameters must not be null. Action '{action.Name}'.");
                 }
 
                 if (action.Parameters != typeof(TParams))
                 {
-                    throw new InvalidOperationException(
-                        string.Format(
-                            "Invalid parameters type provided for action '{0}'. Expected parameter type object should be '{1}', but was '{2}' instead.",
-                            action.Name,
-                            typeof(TParams).FullName,
-                            typeof(TParams).FullName));
+                    throw new InvalidOperationException($"Invalid parameters type provided for action '{action.Name}'. Expected parameter type object should be '{typeof (TParams).FullName}', but was '{typeof (TParams).FullName}' instead.");
                 }
             }
         }

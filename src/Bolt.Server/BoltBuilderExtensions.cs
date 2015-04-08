@@ -1,8 +1,7 @@
-﻿using Bolt.Server;
-using Microsoft.AspNet.Builder;
+﻿using System;
+using Bolt.Server;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
-using System;
 
 namespace Microsoft.AspNet.Builder
 {

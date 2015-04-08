@@ -62,11 +62,10 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(action));
             }
 
-            _actions[descriptor] = new ActionMetadata()
-                                           {
-                                               Descriptor = descriptor,
-                                               Action = action
-                                           };
+            _actions[descriptor] = new ActionMetadata
+            {
+                Action = action
+            };
         }
 
         public virtual async Task Execute(ServerActionContext context)
@@ -90,8 +89,6 @@ namespace Bolt.Server
         private class ActionMetadata
         {
             public Func<ServerActionContext, Task> Action { get; set; }
-
-            public ActionDescriptor Descriptor { get; set; }
         }
     }
 }

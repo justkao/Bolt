@@ -11,7 +11,7 @@ namespace Bolt.Client
         {
             if (errorCodeHeader == null)
             {
-                throw new ArgumentNullException("errorCodeHeader");
+                throw new ArgumentNullException(nameof(errorCodeHeader));
             }
 
             _errorCodeHeader = errorCodeHeader;
@@ -31,15 +31,12 @@ namespace Bolt.Client
                 return new BoltServerException(code.Value, context.Action, context.Request.RequestUri.ToString());
             }
 
-            if (context.Response != null)
+            if (context.Response?.StatusCode == HttpStatusCode.NotFound)
             {
-                if (context.Response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    return new BoltServerException(
-                        ServerErrorCode.BoltUnavailable,
-                        context.Action,
-                        context.Request.RequestUri.ToString());
-                }
+                return new BoltServerException(
+                    ServerErrorCode.BoltUnavailable,
+                    context.Action,
+                    context.Request.RequestUri.ToString());
             }
 
             return null;

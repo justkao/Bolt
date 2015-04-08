@@ -33,7 +33,7 @@ namespace Bolt.Generators
 
             foreach (ParameterInfo info in parameters)
             {
-                WriteAttribute(string.Format("{0}(Order = {1})", FormatType<DataMemberAttribute>(), order));
+                WriteAttribute($"{FormatType<DataMemberAttribute>()}(Order = {order})");
 
                 g.FormatPublicProperty(info.ParameterType, info.Name.CapitalizeFirstLetter());
                 WriteLine(FormatPublicProperty(info.ParameterType, info.Name.CapitalizeFirstLetter()));

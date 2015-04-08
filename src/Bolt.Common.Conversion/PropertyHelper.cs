@@ -41,7 +41,7 @@ namespace Bolt.Common
             _valueGetter = MakeFastPropertyGetter(property);
         }
 
-        public PropertyInfo Property { get; private set; }
+        public PropertyInfo Property { get; }
 
         public virtual string Name { get; protected set; }
 

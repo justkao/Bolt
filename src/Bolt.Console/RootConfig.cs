@@ -1,14 +1,14 @@
-using Bolt.Common;
-using Bolt.Generators;
-using Microsoft.Framework.Runtime.Common.CommandLine;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Bolt.Common;
+using Bolt.Generators;
+using Microsoft.Framework.Runtime.Common.CommandLine;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace Bolt.Console
 {
@@ -31,7 +31,7 @@ namespace Bolt.Console
 
         public static RootConfig CreateFromConfig(AssemblyCache cache, string outputDirectory, string content)
         {
-            var settings = new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Include, Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
+            var settings = new JsonSerializerSettings { NullValueHandling = NullValueHandling.Include, Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() };
 
             RootConfig config = JsonConvert.DeserializeObject<RootConfig>(content, settings);
             config.OutputDirectory = outputDirectory;
@@ -55,10 +55,12 @@ namespace Bolt.Console
 
         public static RootConfig CreateFromAssembly(AssemblyCache cache, string assembly)
         {
-            RootConfig root = new RootConfig(cache);
-            root.Assemblies = new List<string>() { Path.GetFullPath(assembly) };
-            root.Contracts = new List<ContractConfig>();
-            
+            RootConfig root = new RootConfig(cache)
+            {
+                Assemblies = new List<string> {Path.GetFullPath(assembly)},
+                Contracts = new List<ContractConfig>()
+            };
+
             foreach (TypeInfo type in root.AssemblyCache.GetTypes(root.AssemblyCache.Load(assembly)))
             {
                 if (!type.IsInterface)
@@ -66,29 +68,29 @@ namespace Bolt.Console
                     continue;
                 }
 
-                ContractConfig c = new ContractConfig();
-                c.Parent = root;
-                c.Contract = type.FullName;
-                c.Client = new ClientConfig()
+                ContractConfig c = new ContractConfig
                 {
-                    ForceAsync = false,
-                    Modifier = "public",
-                    Suffix = "Proxy",
-                    Namespace = type.Namespace
-                };
-
-                c.Descriptor = new DescriptorConfig()
-                {
-                    Modifier = "public",
-                    Suffix = "Invoker",
-                    Namespace = type.Namespace
-                };
-
-                c.Server = new ServerConfig()
-                {
-                    Modifier = "public",
-                    Suffix = "Invoker",
-                    Namespace = type.Namespace
+                    Parent = root,
+                    Contract = type.FullName,
+                    Client = new ClientConfig
+                    {
+                        ForceAsync = false,
+                        Modifier = "public",
+                        Suffix = "Proxy",
+                        Namespace = type.Namespace
+                    },
+                    Descriptor = new DescriptorConfig
+                    {
+                        Modifier = "public",
+                        Suffix = "Invoker",
+                        Namespace = type.Namespace
+                    },
+                    Server = new ServerConfig
+                    {
+                        Modifier = "public",
+                        Suffix = "Invoker",
+                        Namespace = type.Namespace
+                    }
                 };
 
                 root.Contracts.Add(c);
@@ -122,7 +124,7 @@ namespace Bolt.Console
         {
             return JsonConvert.SerializeObject(
                 this,
-                new JsonSerializerSettings() { NullValueHandling = NullValueHandling.Ignore, Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() });
+                new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() });
         }
 
         public int Generate()
@@ -163,7 +165,7 @@ namespace Bolt.Console
             }
 
             AnsiConsole.Output.WriteLine(Environment.NewLine);
-            AnsiConsole.Output.WriteLine($"Generating files ... ");
+            AnsiConsole.Output.WriteLine("Generating files ... ");
 
             foreach (var filesInDirectory in _documents.GroupBy(f=>Path.GetDirectoryName(f.Key)))
             {
@@ -224,7 +226,7 @@ namespace Bolt.Console
         {
             if (output == null)
             {
-                throw new ArgumentNullException("output");
+                throw new ArgumentNullException(nameof(output));
             }
 
             if (!_documents.ContainsKey(output))
@@ -247,7 +249,7 @@ namespace Bolt.Console
 
             if (found == null)
             {
-                throw new InvalidOperationException(string.Format("GeneratorEx '{0}' is not registered.", generatorName));
+                throw new InvalidOperationException($"GeneratorEx '{generatorName}' is not registered.");
             }
 
             return found.GetGenerator();

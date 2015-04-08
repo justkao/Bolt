@@ -40,7 +40,7 @@ namespace Bolt.Client.Channels
 
         public TimeSpan RetryDelay { get; set; }
 
-        public IServerProvider ServerProvider { get; private set; }
+        public IServerProvider ServerProvider { get; }
 
         public sealed override async Task<T> SendAsync<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
         {
@@ -136,24 +136,20 @@ namespace Bolt.Client.Channels
                 throw error;
             }
 
-            if (error is BoltServerException)
+            var exception = error as BoltServerException;
+            if (exception == null)
             {
-                switch (((BoltServerException)error).Error)
-                {
-                    case ServerErrorCode.ContractNotFound:
-                        IsClosed = true;
-                        throw error;
-                    default:
-                        throw error;
-                }
+                return error is HttpRequestException;
             }
 
-            if (error is HttpRequestException)
+            switch (exception.Error)
             {
-                return true;
+                case ServerErrorCode.ContractNotFound:
+                    IsClosed = true;
+                    throw error;
+                default:
+                    throw error;
             }
-
-            return false;
         }
     }
 }

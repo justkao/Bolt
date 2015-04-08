@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using Bolt.Generators;
-
 using Newtonsoft.Json;
 
 namespace Bolt.Console
@@ -47,18 +45,7 @@ namespace Bolt.Console
         public RootConfig Parent { get; set; }
 
         [JsonIgnore]
-        public ContractDefinition ContractDefinition
-        {
-            get
-            {
-                if (_contractDefinition == null)
-                {
-                    _contractDefinition = GetContractDefinition();
-                }
-
-                return _contractDefinition;
-            }
-        }
+        public ContractDefinition ContractDefinition => _contractDefinition ?? (_contractDefinition = GetContractDefinition());
 
         public void Generate()
         {
@@ -78,18 +65,9 @@ namespace Bolt.Console
             }
 
             ContractExecution execution = new ContractExecution(ContractDefinition);
-            if (Descriptor != null)
-            {
-                Descriptor.Execute(execution);
-            }
-            if (Client != null)
-            {
-                Client.Execute(execution);
-            }
-            if (Server != null)
-            {
-                Server.Execute(execution);
-            }
+            Descriptor?.Execute(execution);
+            Client?.Execute(execution);
+            Server?.Execute(execution);
         }
 
         private ContractDefinition GetContractDefinition()

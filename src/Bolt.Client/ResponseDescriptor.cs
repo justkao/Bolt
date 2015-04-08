@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Net;
 using System.Net.Http;
 
 namespace Bolt.Client
@@ -42,20 +41,17 @@ namespace Bolt.Client
         /// <summary>
         /// Error that occurred durring processing of action.
         /// </summary>
-        public Exception Error { get; private set; }
+        public Exception Error { get; }
 
         /// <summary>
         /// The type of error that occurred.
         /// </summary>
-        public ResponseError ErrorType { get; private set; }
+        public ResponseError ErrorType { get; }
 
         /// <summary>
         /// Determines whether request was successful.
         /// </summary>
-        public bool IsSuccess
-        {
-            get { return ErrorType == ResponseError.None; }
-        }
+        public bool IsSuccess => ErrorType == ResponseError.None;
 
         /// <summary>
         /// Gets the deserialized server result. 
@@ -63,7 +59,7 @@ namespace Bolt.Client
         /// <remarks>
         /// <see cref="Empty.Instance"/> is returned if client do not expect any data.
         /// </remarks>
-        public TResponse Result { get; private set; }
+        public TResponse Result { get; }
 
         public TResponse GetResultOrThrow()
         {

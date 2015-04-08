@@ -13,11 +13,11 @@ namespace Bolt
                                                   TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
                                                   TypeNameHandling = TypeNameHandling.All,
                                                   Formatting = Formatting.None,
-                                                  ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                                                  ReferenceLoopHandling = ReferenceLoopHandling.Ignore
                                               };
         }
 
-        public JsonSerializerSettings ExceptionSerializerSettings { get; private set; }
+        public JsonSerializerSettings ExceptionSerializerSettings { get; }
 
         protected override Exception UnwrapCore(string wrappedException)
         {

@@ -1,15 +1,15 @@
-﻿using Microsoft.Framework.Runtime.Common.CommandLine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using Microsoft.Framework.Runtime.Common.CommandLine;
 
 namespace Bolt.Console
 {
     public class Program
     {
         private readonly IServiceProvider _hostServices;
-        private AssemblyCache _cache;
+        private readonly AssemblyCache _cache;
 
         public Program(IServiceProvider services)
         {
@@ -198,43 +198,43 @@ namespace Bolt.Console
         {
             RootConfig rootConfig = new RootConfig(cache);
             rootConfig.Modifier = "<public|internal>";
-            rootConfig.Assemblies = new List<string>() { "<AssemblyPath>", "<AssemblyPath>", "<AssemblyPath>" };
-            rootConfig.Generators = new List<GeneratorConfig>()
-                                        {
-                                            new GeneratorConfig()
-                                                {
+            rootConfig.Assemblies = new List<string> { "<AssemblyPath>", "<AssemblyPath>", "<AssemblyPath>" };
+            rootConfig.Generators = new List<GeneratorConfig>
+            {
+                                            new GeneratorConfig
+                                            {
                                                     Name = "<GeneratorName>",
                                                     Type = "<FullTypeName>",
-                                                    Properties = new Dictionary<string, string>()
-                                                                     {
+                                                    Properties = new Dictionary<string, string>
+                                                    {
                                                                          { "<Name>", "<Value>" }
                                                                      }
                                                 }
                                         };
 
             rootConfig.Contracts = new List<ContractConfig>();
-            rootConfig.Contracts.Add(new ContractConfig()
+            rootConfig.Contracts.Add(new ContractConfig
             {
                 Contract = "<Type>",
                 Modifier = "<public|internal>",
                 Context = "<Context> // passed to user code generators",
                 Excluded = new List<string> { "<FullTypeName>", "<FullTypeName>" },
-                Client = new ClientConfig()
+                Client = new ClientConfig
                 {
                     ForceAsync = true,
                     Generator = "<GeneratorName>",
                     Output = "<Path>",
-                    Excluded = new List<string>() { "<FullTypeName>", "<FullTypeName>" },
+                    Excluded = new List<string> { "<FullTypeName>", "<FullTypeName>" },
                     Suffix = "<Suffix> // suffix for generated client proxy, defaults to 'Proxy'",
                     Modifier = "<public|internal>",
                     Namespace = "<Namespace> // namespace of generated proxy, defaults to contract namespace if null",
                     Name = "<ProxyName> // name of generated proxy, defaults to 'ContractName + Suffix' if null",
-                    ExcludedInterfaces = new List<string>() { "<FullTypeName>", "<FullTypeName>" }
+                    ExcludedInterfaces = new List<string> { "<FullTypeName>", "<FullTypeName>" }
                 },
-                Server = new ServerConfig()
+                Server = new ServerConfig
                 {
                     Output = "<Path>",
-                    Excluded = new List<string>() { "<FullTypeName>" },
+                    Excluded = new List<string> { "<FullTypeName>" },
                     Suffix = "<Suffix> // suffix for generated server invokers, defaults to 'Invoker'",
                     Modifier = "<public|internal>",
                     Namespace = "<Namespace> // namespace of generated server invoker, defaults to contract namespace if null",
@@ -243,10 +243,10 @@ namespace Bolt.Console
                     GeneratorEx = "<GeneratorName> // user defined generator for invoker extensions",
                     StateFullBase = "<FullTypeName> // base class used for statefull invokers"
                 },
-                Descriptor = new DescriptorConfig()
+                Descriptor = new DescriptorConfig
                 {
                     Modifier = "<public|internal>",
-                    Output = "<Path>",
+                    Output = "<Path>"
                 }
             });
 

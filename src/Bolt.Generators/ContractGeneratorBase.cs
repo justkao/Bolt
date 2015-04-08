@@ -107,13 +107,14 @@ namespace Bolt.Generators
 
         public T CreateEx<T>() where T : ContractGeneratorBase, new()
         {
-            T res = new T();
-            res.Output = Output;
-            res.Formatter = Formatter;
-            res.IntendProvider = IntendProvider;
-            res.MetadataProvider = MetadataProvider;
-            res.ContractDefinition = ContractDefinition;
-            return res;
+            return new T
+            {
+                Output = Output,
+                Formatter = Formatter,
+                IntendProvider = IntendProvider,
+                MetadataProvider = MetadataProvider,
+                ContractDefinition = ContractDefinition
+            };
         }
     }
 }

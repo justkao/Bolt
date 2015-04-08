@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNet.Builder;
-using Microsoft.Framework.DependencyInjection;
-using Bolt.Server;
-using TestService.Core;
-using System;
+﻿using System;
 using System.Linq;
+using System.Threading;
+using Bolt.Server;
+using Bolt.Server.InstanceProviders;
+using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.Server.WebListener;
+using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
-using System.Threading;
+using TestService.Core;
 
 namespace TestService.Server.Bolt
 {
@@ -32,7 +34,7 @@ namespace TestService.Server.Bolt
                 b.Use<TestContractInvoker>(new InstanceProvider<TestContractImplementation>());
             });
 
-            var server = app.Server as Microsoft.AspNet.Server.WebListener.ServerInformation;
+            var server = app.Server as ServerInformation;
 
             Console.WriteLine("Url: {0}", server.Listener.UrlPrefixes.First());
         }

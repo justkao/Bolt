@@ -1,8 +1,8 @@
-﻿using Bolt.Generators;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Bolt.Generators;
+using Newtonsoft.Json;
 
 namespace Bolt.Console
 {
@@ -79,9 +79,12 @@ namespace Bolt.Console
 
         protected void IncludeDescriptors(DocumentGenerator generator, ContractDefinition definition)
         {
-            DescriptorConfig config = new DescriptorConfig();
-            config.Parent = Parent;
-            config.Modifier = "internal";
+            DescriptorConfig config = new DescriptorConfig
+            {
+                Parent = Parent,
+                Modifier = "internal"
+            };
+
             config.DoExecute(generator, definition);
         }
     }

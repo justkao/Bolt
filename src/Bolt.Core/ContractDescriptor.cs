@@ -17,12 +17,12 @@ namespace Bolt
         {
             if (type == null)
             {
-                throw new ArgumentNullException("type");
+                throw new ArgumentNullException(nameof(type));
             }
 
             if (name == null)
             {
-                throw new ArgumentNullException("name");
+                throw new ArgumentNullException(nameof(name));
             }
 
             Type = type;
@@ -31,7 +31,7 @@ namespace Bolt
 
         public Type Type { get; private set; }
 
-        public string Name { get; private set; }
+        public string Name { get; }
 
         public ActionDescriptor Find(MethodInfo info)
         {

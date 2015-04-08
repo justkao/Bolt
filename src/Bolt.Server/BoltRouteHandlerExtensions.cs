@@ -1,4 +1,5 @@
 using System;
+using Bolt.Server.InstanceProviders;
 
 namespace Bolt.Server
 {

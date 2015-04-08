@@ -13,15 +13,7 @@ namespace Bolt
 
         public IDictionary<object, object> Items
         {
-            get
-            {
-                if (_items == null)
-                {
-                    _items = new Dictionary<object, object>();
-                }
-                return _items;
-            }
-
+            get { return _items ?? (_items = new Dictionary<object, object>()); }
             set { _items = value; }
         }
     }

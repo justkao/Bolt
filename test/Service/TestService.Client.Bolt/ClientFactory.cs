@@ -1,5 +1,4 @@
-﻿using Bolt.Client;
-using System.ServiceModel;
+﻿using System.ServiceModel;
 using TestService.Core;
 
 namespace TestService.Client

@@ -7,7 +7,6 @@ namespace Bolt.Server
     public class ServerDataHandler : IServerDataHandler
     {
         private readonly IExceptionWrapper _exceptionWrapper;
-        private static readonly Task<Empty> EmptyParametersTask = Task.FromResult(Empty.Instance);
 
         public ServerDataHandler(ISerializer serializer, IExceptionWrapper exceptionWrapper, IParameterBinder parameterBinder)
         {

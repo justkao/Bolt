@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Bolt.Console
+﻿namespace Bolt.Console
 {
     public static class Colors
     {

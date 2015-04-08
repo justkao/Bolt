@@ -46,7 +46,7 @@ namespace Bolt.Console
 
         public override string GetFileName(ContractDefinition definition)
         {
-            return string.Format("{0}.Server.Designer.cs", definition.Name);
+            return $"{definition.Name}.Server.Designer.cs";
         }
     }
 }
