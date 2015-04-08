@@ -25,13 +25,13 @@ namespace Bolt.Server.Metadata
 
         public ILogger Logger { get; }
 
-        public virtual async Task<bool> HandleBoltMetadataAsync(HttpContext context, IEnumerable<IContractInvoker> contracts)
+        public virtual async Task<bool> HandleBoltMetadataAsync(ServerActionContext context, IEnumerable<IContractInvoker> contracts)
         {
             try
             {
                 var result = JsonConvert.SerializeObject(contracts.Select(c => c.Descriptor.Name).ToList(),
                     Formatting.Indented, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore});
-                await context.Response.SendAsync(result);
+                await context.Context.Response.SendAsync(result);
                 return true;
             }
             catch (Exception e)
@@ -41,22 +41,22 @@ namespace Bolt.Server.Metadata
             }
         }
 
-        public virtual async Task<bool> HandleContractMetadataAsync(HttpContext context, IContractInvoker descriptor)
+        public virtual async Task<bool> HandleContractMetadataAsync(ServerActionContext context)
         {
             try
             {
                 string result = string.Empty;
-                string actionName = context.Request.Query["action"]?.Trim();
+                string actionName = context.Context.Request.Query["action"]?.Trim();
                 ActionDescriptor action = null;
 
                 if (!string.IsNullOrEmpty(actionName))
                 {
-                    action = descriptor.Descriptor.Find(actionName);
+                    action = context.ContractInvoker.Descriptor.Find(actionName);
                 }
 
                 if (action == null)
                 {
-                    var contractMetadata = CrateContractMetadata(descriptor);
+                    var contractMetadata = CrateContractMetadata(context);
                     result = JsonConvert.SerializeObject(contractMetadata, Formatting.Indented,
                         new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore});
                 }
@@ -80,35 +80,29 @@ namespace Bolt.Server.Metadata
                     }
                 }
 
-                context.Response.ContentType = "application/json";
-                context.Response.StatusCode = 200;
-                await context.Response.SendAsync(result);
+                context.Context.Response.ContentType = "application/json";
+                context.Context.Response.StatusCode = 200;
+                await context.Context.Response.SendAsync(result);
                 return true;
             }
             catch (Exception e)
             {
                 Logger.WriteWarning(BoltLogId.HandleContractMetadataError,
-                    "Failed to generate Bolt metadata for contract '{0}'. Error: {1}", descriptor, e);
+                    "Failed to generate Bolt metadata for contract '{0}'. Error: {1}", context.ContractInvoker.Descriptor, e);
                 return false;
             }
         }
 
-        private ContractMetadata CrateContractMetadata(IContractInvoker descriptor)
+        private ContractMetadata CrateContractMetadata(ServerActionContext context)
         {
             var m = new ContractMetadata
             {
-                Actions = descriptor.Descriptor.Select(a => a.Name).ToList()
+                Actions = context.ContractInvoker.Descriptor.Select(a => a.Name).ToList(),
+                ErrorHeader = context.Options.ServerErrorHeader,
+                ContentType = context.Serializer.ContentType
             };
 
-            var invoker = descriptor as ContractInvoker;
-            if (invoker == null)
-            {
-                return m;
-            }
-
-            m.ErrorHeader = (invoker.Parent as BoltRouteHandler)?.Options.ServerErrorHeader;
-            m.ContentType = "application/json";
-            var statefullProvder = invoker.InstanceProvider as StateFullInstanceProvider;
+            var statefullProvder = context.InstanceProvider as StateFullInstanceProvider;
             if (statefullProvder != null)
             {
                 m.SessionInit = statefullProvder.InitSession.Name;

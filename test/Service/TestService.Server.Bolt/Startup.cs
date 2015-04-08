@@ -1,6 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
+using Bolt;
 using Bolt.Server;
 using Bolt.Server.InstanceProviders;
 using Microsoft.AspNet.Builder;
@@ -31,12 +34,31 @@ namespace TestService.Server.Bolt
 
             app.UseBolt(b =>
             {
-                b.Use<TestContractInvoker>(new InstanceProvider<TestContractImplementation>());
+                b.Use<TestContractInvoker>(new InstanceProvider<TestContractImplementation>(), (c) =>
+                {
+                    c.Options = new BoltServerOptions() {ServerErrorHeader = "Customized-TestContractImplementation"};
+                });
             });
 
             var server = app.Server as ServerInformation;
 
             Console.WriteLine("Url: {0}", server.Listener.UrlPrefixes.First());
+        }
+
+        private class TextSerializer : ISerializer
+        {
+            public void Write(Stream stream, object data)
+            {
+                var buffer = Encoding.UTF8.GetBytes(data.ToString());
+                stream.Write(buffer, 0, buffer.Length);
+            }
+
+            public object Read(Type type, Stream stream)
+            {
+                throw new NotImplementedException();
+            }
+
+            public string ContentType => "application/json";
         }
     }
 }

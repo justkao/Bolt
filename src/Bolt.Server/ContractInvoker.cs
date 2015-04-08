@@ -99,7 +99,7 @@ namespace Bolt.Server
             }
         }
 
-        private void UpdateContext(ServerActionContext context)
+        public virtual void UpdateContext(ServerActionContext context)
         {
             context.InstanceProvider = InstanceProvider;
 

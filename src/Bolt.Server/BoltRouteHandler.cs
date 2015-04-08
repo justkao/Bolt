@@ -241,7 +241,7 @@ namespace Bolt.Server
 
         protected virtual ServerActionContext CreateContext(RouteContext context, ActionDescriptor descriptor, IContractInvoker contractInvoker)
         {
-            return new ServerActionContext
+            var ctxt = new ServerActionContext
             {
                 Options = Options,
                 ErrorHandler = ErrorHandler,
@@ -256,6 +256,9 @@ namespace Bolt.Server
                 RouteContext = context,
                 RouteHandler = this
             };
+
+            contractInvoker?.UpdateContext(ctxt);
+            return ctxt;
         }
 
         protected virtual IContractInvoker FindContract(IEnumerable<IContractInvoker> registeredContracts, string contractName)
@@ -278,7 +281,7 @@ namespace Bolt.Server
 
             try
             {
-                var handled = await MetadataHandler.HandleContractMetadataAsync(context.HttpContext, descriptor);
+                var handled = await MetadataHandler.HandleContractMetadataAsync(CreateContext(context, null, descriptor));
                 if (handled)
                 {
                     context.IsHandled = true;
@@ -299,7 +302,7 @@ namespace Bolt.Server
 
             try
             {
-                var handled = await MetadataHandler.HandleBoltMetadataAsync(context.HttpContext, _invokers);
+                var handled = await MetadataHandler.HandleBoltMetadataAsync(CreateContext(context, null, null), _invokers);
                 if (handled)
                 {
                     context.IsHandled = true;
