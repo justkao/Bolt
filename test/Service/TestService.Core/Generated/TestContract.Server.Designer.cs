@@ -47,363 +47,138 @@ namespace TestService.Core
             AddAction(Descriptor.InnerOperationExAsync2, InnerTestContract2_InnerOperationExAsync2);
         }
 
-        protected virtual async Task TestContract_UpdatePerson(ServerActionContext context)
+        protected virtual Task TestContract_UpdatePerson(ServerActionContext context)
         {
-            var parameters = await context.DataHandler.ReadParametersAsync<TestService.Core.Parameters.UpdatePersonParameters>(context);
-            var instance = context.InstanceProvider.GetInstance<ITestContract>(context);
-            Person result;
-
-            try
-            {
-                result = instance.UpdatePerson(parameters.Person, context.RequestAborted);
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context, result);
+            var parameters = context.Parameters as TestService.Core.Parameters.UpdatePersonParameters;
+            var instance = context.ContractInstance as ITestContract;
+            context.Result = instance.UpdatePerson(parameters.Person, context.RequestAborted);
+            return Task.FromResult(true);
         }
 
-        protected virtual async Task TestContract_UpdatePersonThatThrowsInvalidOperationException(ServerActionContext context)
+        protected virtual Task TestContract_UpdatePersonThatThrowsInvalidOperationException(ServerActionContext context)
         {
-            var parameters = await context.DataHandler.ReadParametersAsync<TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters>(context);
-            var instance = context.InstanceProvider.GetInstance<ITestContract>(context);
-            Person result;
-
-            try
-            {
-                result = instance.UpdatePersonThatThrowsInvalidOperationException(parameters.Person);
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context, result);
+            var parameters = context.Parameters as TestService.Core.Parameters.UpdatePersonThatThrowsInvalidOperationExceptionParameters;
+            var instance = context.ContractInstance as ITestContract;
+            context.Result = instance.UpdatePersonThatThrowsInvalidOperationException(parameters.Person);
+            return Task.FromResult(true);
         }
 
         protected virtual async Task TestContract_DoNothingAsAsync(ServerActionContext context)
         {
-            var instance = context.InstanceProvider.GetInstance<ITestContract>(context);
-
-            try
-            {
-                await instance.DoNothingAsAsync();
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context);
+            var instance = context.ContractInstance as ITestContract;
+            await instance.DoNothingAsAsync();
         }
 
-        protected virtual async Task TestContract_DoNothing(ServerActionContext context)
+        protected virtual Task TestContract_DoNothing(ServerActionContext context)
         {
-            var instance = context.InstanceProvider.GetInstance<ITestContract>(context);
-
-            try
-            {
-                instance.DoNothing();
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context);
+            var instance = context.ContractInstance as ITestContract;
+            instance.DoNothing();
+            return Task.FromResult(true);
         }
 
         protected virtual async Task TestContract_DoNothingWithComplexParameterAsAsync(ServerActionContext context)
         {
-            var parameters = await context.DataHandler.ReadParametersAsync<TestService.Core.Parameters.DoNothingWithComplexParameterAsAsyncParameters>(context);
-            var instance = context.InstanceProvider.GetInstance<ITestContract>(context);
-
-            try
-            {
-                await instance.DoNothingWithComplexParameterAsAsync(parameters.Person);
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context);
+            var parameters = context.Parameters as TestService.Core.Parameters.DoNothingWithComplexParameterAsAsyncParameters;
+            var instance = context.ContractInstance as ITestContract;
+            await instance.DoNothingWithComplexParameterAsAsync(parameters.Person);
         }
 
-        protected virtual async Task TestContract_DoNothingWithComplexParameter(ServerActionContext context)
+        protected virtual Task TestContract_DoNothingWithComplexParameter(ServerActionContext context)
         {
-            var parameters = await context.DataHandler.ReadParametersAsync<TestService.Core.Parameters.DoNothingWithComplexParameterParameters>(context);
-            var instance = context.InstanceProvider.GetInstance<ITestContract>(context);
-
-            try
-            {
-                instance.DoNothingWithComplexParameter(parameters.Person);
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context);
+            var parameters = context.Parameters as TestService.Core.Parameters.DoNothingWithComplexParameterParameters;
+            var instance = context.ContractInstance as ITestContract;
+            instance.DoNothingWithComplexParameter(parameters.Person);
+            return Task.FromResult(true);
         }
 
-        protected virtual async Task TestContract_GetSimpleType(ServerActionContext context)
+        protected virtual Task TestContract_GetSimpleType(ServerActionContext context)
         {
-            var parameters = await context.DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetSimpleTypeParameters>(context);
-            var instance = context.InstanceProvider.GetInstance<ITestContract>(context);
-            int result;
-
-            try
-            {
-                result = instance.GetSimpleType(parameters.Arg);
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context, result);
+            var parameters = context.Parameters as TestService.Core.Parameters.GetSimpleTypeParameters;
+            var instance = context.ContractInstance as ITestContract;
+            context.Result = instance.GetSimpleType(parameters.Arg);
+            return Task.FromResult(true);
         }
 
         protected virtual async Task TestContract_GetSimpleTypeAsAsync(ServerActionContext context)
         {
-            var parameters = await context.DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetSimpleTypeAsAsyncParameters>(context);
-            var instance = context.InstanceProvider.GetInstance<ITestContract>(context);
-
-            try
-            {
-                await instance.GetSimpleTypeAsAsync(parameters.Arg);
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context);
+            var parameters = context.Parameters as TestService.Core.Parameters.GetSimpleTypeAsAsyncParameters;
+            var instance = context.ContractInstance as ITestContract;
+            await instance.GetSimpleTypeAsAsync(parameters.Arg);
         }
 
-        protected virtual async Task TestContract_GetSinglePerson(ServerActionContext context)
+        protected virtual Task TestContract_GetSinglePerson(ServerActionContext context)
         {
-            var parameters = await context.DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetSinglePersonParameters>(context);
-            var instance = context.InstanceProvider.GetInstance<ITestContract>(context);
-            Person result;
-
-            try
-            {
-                result = instance.GetSinglePerson(parameters.Person);
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context, result);
+            var parameters = context.Parameters as TestService.Core.Parameters.GetSinglePersonParameters;
+            var instance = context.ContractInstance as ITestContract;
+            context.Result = instance.GetSinglePerson(parameters.Person);
+            return Task.FromResult(true);
         }
 
         protected virtual async Task TestContract_GetSinglePersonAsAsync(ServerActionContext context)
         {
-            var parameters = await context.DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetSinglePersonAsAsyncParameters>(context);
-            var instance = context.InstanceProvider.GetInstance<ITestContract>(context);
-            Person result;
-
-            try
-            {
-                result = await instance.GetSinglePersonAsAsync(parameters.Person);
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context, result);
+            var parameters = context.Parameters as TestService.Core.Parameters.GetSinglePersonAsAsyncParameters;
+            var instance = context.ContractInstance as ITestContract;
+            context.Result = await instance.GetSinglePersonAsAsync(parameters.Person);
         }
 
-        protected virtual async Task TestContract_GetManyPersons(ServerActionContext context)
+        protected virtual Task TestContract_GetManyPersons(ServerActionContext context)
         {
-            var instance = context.InstanceProvider.GetInstance<ITestContract>(context);
-            List<Person> result;
-
-            try
-            {
-                result = instance.GetManyPersons();
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context, result);
+            var instance = context.ContractInstance as ITestContract;
+            context.Result = instance.GetManyPersons();
+            return Task.FromResult(true);
         }
 
         protected virtual async Task TestContract_GetManyPersonsAsAsync(ServerActionContext context)
         {
-            var parameters = await context.DataHandler.ReadParametersAsync<TestService.Core.Parameters.GetManyPersonsAsAsyncParameters>(context);
-            var instance = context.InstanceProvider.GetInstance<ITestContract>(context);
-            List<Person> result;
-
-            try
-            {
-                result = await instance.GetManyPersonsAsAsync(parameters.Person);
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context, result);
+            var parameters = context.Parameters as TestService.Core.Parameters.GetManyPersonsAsAsyncParameters;
+            var instance = context.ContractInstance as ITestContract;
+            context.Result = await instance.GetManyPersonsAsAsync(parameters.Person);
         }
 
-        protected virtual async Task TestContract_Throws(ServerActionContext context)
+        protected virtual Task TestContract_Throws(ServerActionContext context)
         {
-            var instance = context.InstanceProvider.GetInstance<ITestContract>(context);
-
-            try
-            {
-                instance.Throws();
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context);
+            var instance = context.ContractInstance as ITestContract;
+            instance.Throws();
+            return Task.FromResult(true);
         }
 
-        protected virtual async Task TestContract_ThrowsCustom(ServerActionContext context)
+        protected virtual Task TestContract_ThrowsCustom(ServerActionContext context)
         {
-            var instance = context.InstanceProvider.GetInstance<ITestContract>(context);
-
-            try
-            {
-                instance.ThrowsCustom();
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context);
+            var instance = context.ContractInstance as ITestContract;
+            instance.ThrowsCustom();
+            return Task.FromResult(true);
         }
 
-        protected virtual async Task InnerTestContract_InnerOperation(ServerActionContext context)
+        protected virtual Task InnerTestContract_InnerOperation(ServerActionContext context)
         {
-            var instance = context.InstanceProvider.GetInstance<IInnerTestContract>(context);
-
-            try
-            {
-                instance.InnerOperation();
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context);
+            var instance = context.ContractInstance as IInnerTestContract;
+            instance.InnerOperation();
+            return Task.FromResult(true);
         }
 
         protected virtual async Task InnerTestContract_InnerOperation3(ServerActionContext context)
         {
-            var instance = context.InstanceProvider.GetInstance<IInnerTestContract>(context);
-            string result;
-
-            try
-            {
-                result = await instance.InnerOperation3();
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context, result);
+            var instance = context.ContractInstance as IInnerTestContract;
+            context.Result = await instance.InnerOperation3();
         }
 
         protected virtual async Task InnerTestContract_InnerOperationExAsync(ServerActionContext context)
         {
-            var instance = context.InstanceProvider.GetInstance<IInnerTestContract>(context);
-
-            try
-            {
-                await instance.InnerOperationExAsync();
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context);
+            var instance = context.ContractInstance as IInnerTestContract;
+            await instance.InnerOperationExAsync();
         }
 
-        protected virtual async Task InnerTestContract2_InnerOperation2(ServerActionContext context)
+        protected virtual Task InnerTestContract2_InnerOperation2(ServerActionContext context)
         {
-            var instance = context.InstanceProvider.GetInstance<IInnerTestContract2>(context);
-
-            try
-            {
-                instance.InnerOperation2();
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context);
+            var instance = context.ContractInstance as IInnerTestContract2;
+            instance.InnerOperation2();
+            return Task.FromResult(true);
         }
 
         protected virtual async Task InnerTestContract2_InnerOperationExAsync2(ServerActionContext context)
         {
-            var instance = context.InstanceProvider.GetInstance<IInnerTestContract2>(context);
-
-            try
-            {
-                await instance.InnerOperationExAsync2();
-                context.InstanceProvider.ReleaseInstance(context, instance, null);
-            }
-            catch (Exception e)
-            {
-                context.InstanceProvider.ReleaseInstance(context, instance, e);
-                throw;
-            }
-
-            await context.ResponseHandler.Handle(context);
+            var instance = context.ContractInstance as IInnerTestContract2;
+            await instance.InnerOperationExAsync2();
         }
     }
 }

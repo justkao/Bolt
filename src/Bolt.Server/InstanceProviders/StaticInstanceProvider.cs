@@ -16,9 +16,9 @@ namespace Bolt.Server.InstanceProviders
             _instance = instance;
         }
 
-        public T GetInstance<T>(ServerActionContext context)
+        public object GetInstance(ServerActionContext context, Type type)
         {
-            return (T)_instance;
+            return _instance;
         }
 
         public void ReleaseInstance(ServerActionContext context, object obj, Exception error)

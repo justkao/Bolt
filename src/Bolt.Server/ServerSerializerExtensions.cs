@@ -5,21 +5,21 @@ namespace Bolt.Server
 {
     public static class ServerSerializerExtensions
     {
-        public static TParameters DeserializeParameters<TParameters>(this ISerializer serializer, Stream stream, ActionDescriptor actionDescriptor)
+        public static object DeserializeParameters(this ISerializer serializer, Stream stream, ActionDescriptor actionDescriptor)
         {
-            if (typeof(TParameters) == typeof(Empty))
+            if (actionDescriptor.Parameters == typeof(Empty))
             {
-                return default(TParameters);
+                return null;
             }
 
             if (stream == null || stream.Length == 0)
             {
-                throw new DeserializeParametersException($"The data required to deserialize '{typeof (TParameters).Name}' parameters for action '{actionDescriptor}' are not available in request.");
+                throw new DeserializeParametersException($"The data required to deserialize '{actionDescriptor.Parameters.Name}' parameters for action '{actionDescriptor}' are not available in request.");
             }
 
             try
             {
-                return serializer.Read<TParameters>(stream);
+                return serializer.Read(actionDescriptor.Parameters, stream);
             }
             catch (OperationCanceledException)
             {
@@ -33,11 +33,11 @@ namespace Bolt.Server
             {
                 e.EnsureNotCancelled();
 
-                throw new DeserializeParametersException($"Failed to deserialize parameters for action '{actionDescriptor}'. Parameters type - '{typeof (TParameters).FullName}'",e);
+                throw new DeserializeParametersException($"Failed to deserialize parameters for action '{actionDescriptor}'. Parameters type - '{actionDescriptor.Parameters.FullName}'",e);
             }
         }
 
-        public static byte[] SerializeResponse<T>(this ISerializer serializer, T data, ActionDescriptor actionDescriptor)
+        public static byte[] SerializeResponse(this ISerializer serializer, object data, ActionDescriptor actionDescriptor)
         {
             if (Equals(data, null))
             {

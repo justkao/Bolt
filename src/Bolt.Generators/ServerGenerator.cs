@@ -88,7 +88,15 @@ namespace Bolt.Generators
         private void WriteInvocationMethod(MethodDescriptor methodDescriptor, ClassGenerator classGenerator)
         {
             string declaration = string.Format("{2} {0}({1} context)", FormatMethodName(methodDescriptor.Method), FormatType(BoltConstants.Server.ServerActionContext), FormatType<Task>());
-            classGenerator.WriteMethod(declaration, g => WriteInvocationMethodBody(methodDescriptor), "protected virtual async");
+
+            if (IsAsync(methodDescriptor.Method))
+            {
+                classGenerator.WriteMethod(declaration, g => WriteInvocationMethodBody(methodDescriptor), "protected virtual async");
+            }
+            else
+            {
+                classGenerator.WriteMethod(declaration, g => WriteInvocationMethodBody(methodDescriptor), "protected virtual");
+            }
         }
 
         private void GenerateInvocatorBody(ClassGenerator g)
@@ -125,40 +133,15 @@ namespace Bolt.Generators
             if (methodDescriptor.HasParameterClass())
             {
                 AddUsings(methodDescriptor.Parameters.Namespace);
-                WriteLine("var parameters = await context.DataHandler.ReadParametersAsync<{0}>(context);", methodDescriptor.Parameters.FullName);
+                WriteLine("var parameters = context.Parameters as {0};", methodDescriptor.Parameters.FullName);
             }
 
             string instanceType = FormatType(methodDescriptor.Method.DeclaringType);
-            WriteLine("var instance = context.InstanceProvider.GetInstance<{0}>(context);", instanceType);
-
-            if (HasReturnValue(methodDescriptor.Method))
-            {
-                WriteLine("{0} result;", FormatType(GetReturnType(methodDescriptor.Method)));
-            }
-
-            WriteLine();
-            WriteLine("try");
-            using (WithBlock())
-            {
-                GenerateInvocationCode("instance", "parameters", "result", methodDescriptor);
-                WriteLine("context.InstanceProvider.ReleaseInstance(context, instance, null);", instanceType);
-            }
-            WriteLine("catch (Exception e)");
-            using (WithBlock())
-            {
-                WriteLine("context.InstanceProvider.ReleaseInstance(context, instance, e);", instanceType);
-                WriteLine("throw;");
-            }
-
-            WriteLine();
-
-            WriteLine(
-                HasReturnValue(methodDescriptor.Method)
-                    ? "await context.ResponseHandler.Handle(context, result);"
-                    : "await context.ResponseHandler.Handle(context);");
+            WriteLine("var instance = context.ContractInstance as {0};", instanceType);
+            GenerateInvocationCode("instance", "parameters", "result", methodDescriptor);
         }
 
-        public virtual string GenerateInvocationCode(string instanceName, string parametersInstance, string resultVariable, MethodDescriptor method)
+        public virtual void GenerateInvocationCode(string instanceName, string parametersInstance, string resultVariable, MethodDescriptor method)
         {
             string parametersBody = string.Empty;
 
@@ -186,14 +169,15 @@ namespace Bolt.Generators
             {
                 if (IsAsync(method.Method))
                 {
-                    WriteLine("{0} = await {1}.{2}({3});", resultVariable, instanceName, method.Name, parametersBody);
+                    WriteLine("context.Result = await {1}.{2}({3});", resultVariable, instanceName, method.Name, parametersBody);
                 }
                 else
                 {
-                    WriteLine("{0} = {1}.{2}({3});", resultVariable, instanceName, method.Name, parametersBody);
+                    WriteLine("context.Result = {1}.{2}({3});", resultVariable, instanceName, method.Name, parametersBody);
+                    WriteLine("return Task.FromResult(true);");
                 }
 
-                return "result";
+                return;
             }
 
             if (IsAsync(method.Method))
@@ -203,9 +187,8 @@ namespace Bolt.Generators
             else
             {
                 WriteLine("{0}.{1}({2});", instanceName, method.Name, parametersBody);
+                WriteLine("return Task.FromResult(true);");
             }
-
-            return null;
         }
 
         protected virtual string FormatMethodName(MethodInfo info)

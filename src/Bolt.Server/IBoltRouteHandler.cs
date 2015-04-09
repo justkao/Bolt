@@ -9,5 +9,7 @@ namespace Bolt.Server
         void Add(IContractInvoker contractInvoker);
 
         IContractInvoker Get(ContractDescriptor descriptor);
+
+        IActionExecutionFilter ActionExecutionFilter { get; set; }
     }
 }

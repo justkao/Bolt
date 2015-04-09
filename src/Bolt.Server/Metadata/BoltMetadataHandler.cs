@@ -95,11 +95,13 @@ namespace Bolt.Server.Metadata
 
         private ContractMetadata CrateContractMetadata(ServerActionContext context)
         {
+            var feature = context.Context.GetFeature<IBoltFeature>();
+
             var m = new ContractMetadata
             {
                 Actions = context.ContractInvoker.Descriptor.Select(a => a.Name).ToList(),
-                ErrorHeader = context.Options.ServerErrorHeader,
-                ContentType = context.Serializer.ContentType
+                ErrorHeader = feature.Options.ServerErrorHeader,
+                ContentType = feature.Serializer.ContentType
             };
 
             var statefullProvder = context.InstanceProvider as StateFullInstanceProvider;

@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Bolt;
 using Bolt.Server;
 using Bolt.Server.InstanceProviders;
@@ -34,6 +35,7 @@ namespace TestService.Server.Bolt
 
             app.UseBolt(b =>
             {
+                b.ActionExecutionFilter = new DiagnosticsActionExecutor();
                 b.Use<TestContractInvoker>(new InstanceProvider<TestContractImplementation>(), (c) =>
                 {
                     c.Options = new BoltServerOptions() {ServerErrorHeader = "Customized-TestContractImplementation"};
@@ -43,6 +45,16 @@ namespace TestService.Server.Bolt
             var server = app.Server as ServerInformation;
 
             Console.WriteLine("Url: {0}", server.Listener.UrlPrefixes.First());
+        }
+
+
+        private class DiagnosticsActionExecutor : IActionExecutionFilter
+        {
+            public async Task ExecuteAsync(ServerActionContext context, Func<ServerActionContext, Task> next)
+            {
+                Console.WriteLine("Executing action: {0}", context.Action);
+                await next(context);
+            }
         }
 
         private class TextSerializer : ISerializer

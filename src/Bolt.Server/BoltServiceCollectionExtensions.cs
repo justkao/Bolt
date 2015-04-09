@@ -18,7 +18,6 @@ namespace Microsoft.Framework.DependencyInjection
             services.AddTransient<ISerializer, JsonSerializer>();
             services.AddTransient<IExceptionWrapper, JsonExceptionWrapper>();
             services.AddTransient<IResponseHandler, ResponseHandler>();
-            services.AddTransient<IServerDataHandler, ServerDataHandler>();
             services.AddTransient<IBoltRouteHandler, BoltRouteHandler>();
             services.AddTransient<IServerErrorHandler, ServerErrorHandler>();
             services.AddTransient<IBoltMetadataHandler, BoltMetadataHandler>();

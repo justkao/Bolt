@@ -54,7 +54,7 @@ namespace Bolt.Server.InstanceProviders
 
         public ActionDescriptor CloseSession { get; }
 
-        public override TInstance GetInstance<TInstance>(ServerActionContext context)
+        public override object GetInstance(ServerActionContext context, Type type)
         {
             InstanceMetadata instance;
             string sessionId = GetSession(context);
@@ -64,16 +64,16 @@ namespace Bolt.Server.InstanceProviders
                 if (sessionId != null && _instances.TryGetValue(sessionId, out instance))
                 {
                     instance.Timestamp = DateTime.UtcNow;
-                    return (TInstance)instance.Instance;
+                    return instance.Instance;
                 }
 
-                instance = new InstanceMetadata(base.GetInstance<TInstance>(context));
+                instance = new InstanceMetadata(base.GetInstance(context, type));
                 string newSession = CreateNewSession();
                 OnInstanceCreated(context, newSession);
 
                 _instances[newSession] = instance;
                 context.Context.Response.Headers[SessionHeader] = newSession;
-                return (TInstance)instance.Instance;
+                return instance.Instance;
             }
 
             if (string.IsNullOrEmpty(sessionId))
@@ -84,7 +84,7 @@ namespace Bolt.Server.InstanceProviders
             if (_instances.TryGetValue(sessionId, out instance))
             {
                 instance.Timestamp = DateTime.UtcNow;
-                return (TInstance)instance.Instance;
+                return instance.Instance;
             }
 
             throw new SessionNotFoundException(sessionId);

@@ -4,14 +4,14 @@ namespace Bolt.Server
 {
     public class EmptyParameterBinder : IParameterBinder
     {
-        public Task<BindingResult<T>> BindParametersAsync<T>(ServerActionContext context)
+        public Task<BindingResult> BindParametersAsync(ServerActionContext context)
         {
-            return CachedBindingResult<T>.Instance;
+            return CachedBindingResult.Instance;
         }
 
-        private static class CachedBindingResult<T>
+        private static class CachedBindingResult
         {
-            public static readonly Task<BindingResult<T>> Instance = Task.FromResult(BindingResult<T>.Empty);
+            public static readonly Task<BindingResult> Instance = Task.FromResult(BindingResult.Empty);
         }
     }
 }

@@ -9,9 +9,9 @@ namespace Bolt.Server.InstanceProviders
         private readonly ConcurrentDictionary<Type, Func<IServiceProvider, object[], object>> _typeActivatorCache =
                new ConcurrentDictionary<Type, Func<IServiceProvider, object[], object>>();
 
-        public virtual T GetInstance<T>(ServerActionContext context)
+        public virtual object GetInstance(ServerActionContext context, Type type)
         {
-            return (T)CreateInstance(context, typeof(T));
+            return CreateInstance(context, type);
         }
 
         public virtual void ReleaseInstance(ServerActionContext context, object obj, Exception error)
