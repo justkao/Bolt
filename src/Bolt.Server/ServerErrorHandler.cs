@@ -3,74 +3,76 @@ using System.Globalization;
 using System.Threading.Tasks;
 using Bolt.Common;
 using Microsoft.AspNet.Http;
-using Microsoft.Framework.OptionsModel;
 
 namespace Bolt.Server
 {
     public class ServerErrorHandler : IServerErrorHandler
     {
-        public ServerErrorHandler(IOptions<BoltServerOptions> options)
+        public virtual Task HandleErrorAsync(HandlerErrorContext context)
         {
-            if (options == null)
+            if (context == null)
             {
-                throw new ArgumentNullException(nameof(options));
+                throw new ArgumentNullException(nameof(context));
             }
 
-            Options = options.Options;
+            if (context.ErrorCode != null)
+            {
+                CloseWithError(context.ActionContext.HttpContext, context.ErrorCode.Value, context.Options.ServerErrorHeader);
+                return CompletedTask.Done;
+            }
+
+            if (HandleAsErrorCode(context))
+            {
+                return CompletedTask.Done;
+            }
+
+            return WriteExceptionAsync(context);
         }
 
-        public virtual void HandleBoltError(HttpContext context, ServerErrorCode code)
+        protected virtual bool HandleAsErrorCode(HandlerErrorContext context)
         {
-            CloseWithError(context, code, Options.ServerErrorHeader);
-        }
+            var httpContext = context.ActionContext.HttpContext;
+            var errorHeader = context.Options.ServerErrorHeader;
 
-        public BoltServerOptions Options { get; }
-
-        public virtual Task HandleErrorAsync(ServerActionContext context, Exception error)
-        {
-            string serverErrorHeader = context.Context.GetFeature<IBoltFeature>().Options.ServerErrorHeader;
-
-            var boltError = error as BoltServerException;
+            var boltError = context.Error as BoltServerException;
             if (boltError != null)
             {
                 if (boltError.Error != null)
                 {
-                    CloseWithError(context.Context, boltError.Error.Value, serverErrorHeader);
-                    return CompletedTask.Done;
+                    CloseWithError(httpContext, boltError.Error.Value, errorHeader);
                 }
 
                 if (boltError.ErrorCode != null)
                 {
-                    CloseWithError(context.Context, boltError.ErrorCode.Value, serverErrorHeader);
-                    return CompletedTask.Done;
+                    CloseWithError(httpContext, boltError.ErrorCode.Value, errorHeader);
+                    return true;
                 }
             }
 
-            if (error is DeserializeParametersException)
+            if (context.Error is DeserializeParametersException)
             {
-                CloseWithError(context.Context, ServerErrorCode.Deserialization, serverErrorHeader);
-                return CompletedTask.Done;
+                CloseWithError(httpContext, ServerErrorCode.Deserialization, errorHeader);
+                return true;
             }
 
-            if (error is SerializeResponseException)
+            if (context.Error is SerializeResponseException)
             {
-                CloseWithError(context.Context, ServerErrorCode.Serialization, serverErrorHeader);
-                return CompletedTask.Done;
+                CloseWithError(httpContext, ServerErrorCode.Serialization, errorHeader);
+                return true;
             }
 
-            if (error is SessionHeaderNotFoundException)
+            if (context.Error is SessionHeaderNotFoundException)
             {
-                CloseWithError(context.Context, ServerErrorCode.NoSessionHeader, serverErrorHeader);
-                return CompletedTask.Done;
+                CloseWithError(httpContext, ServerErrorCode.NoSessionHeader, errorHeader);
+                return true;
             }
 
-            if (error is SessionNotFoundException)
+            if (context.Error is SessionNotFoundException)
             {
-                CloseWithError(context.Context, ServerErrorCode.SessionNotFound, serverErrorHeader);
-                return CompletedTask.Done;
+                CloseWithError(httpContext, ServerErrorCode.SessionNotFound, errorHeader);
+                return true;
             }
-
-            return WriteExceptionAsync(context, error);
+            return false;
         }
 
         protected virtual void CloseWithError(HttpContext context, ServerErrorCode code, string errorHeader)
@@ -95,30 +97,30 @@ namespace Bolt.Server
             context.Response.Headers[errorHeader] = code.ToString(CultureInfo.InvariantCulture);
         }
 
-        protected virtual Task WriteExceptionAsync(ServerActionContext context, Exception exception)
+        protected virtual Task WriteExceptionAsync(HandlerErrorContext context)
         {
-            context.RequestAborted.ThrowIfCancellationRequested();
-            IBoltFeature boltFeature = context.Context.GetFeature<IBoltFeature>();
+            context.ActionContext.RequestAborted.ThrowIfCancellationRequested();
+            var httpContext = context.ActionContext.HttpContext;
+            httpContext.Response.StatusCode = 500;
 
-
-            var wrappedException = boltFeature.ExceptionWrapper.Wrap(exception);
+            var wrappedException = context.ExceptionWrapper.Wrap(context.Error);
             if (wrappedException == null)
             {
-                context.Context.Response.Body.Dispose();
+                httpContext.Response.Body.Dispose();
                 return Task.FromResult(0);
             }
 
-            byte[] raw = boltFeature.Serializer.SerializeResponse(wrappedException, context.Action);
+            byte[] raw = context.Serializer.SerializeResponse(wrappedException, context.ActionContext.Action);
             if (raw == null || raw.Length == 0)
             {
-                context.Context.Response.Body.Dispose();
+                httpContext.Response.Body.Dispose();
                 return Task.FromResult(0);
             }
 
-            context.Context.Response.ContentLength = raw.Length;
-            context.Context.Response.ContentType = boltFeature.Serializer.ContentType;
+            httpContext.Response.ContentLength = raw.Length;
+            httpContext.Response.ContentType = context.Serializer.ContentType;
 
-            return context.Context.Response.Body.WriteAsync(raw, 0, raw.Length, context.RequestAborted);
+            return httpContext.Response.Body.WriteAsync(raw, 0, raw.Length, httpContext.RequestAborted);
         }
     }
 }

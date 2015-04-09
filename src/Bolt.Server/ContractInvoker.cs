@@ -87,8 +87,7 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(context));
             }
 
-            var feature = context.Context.GetFeature<IBoltFeature>();
-            context.InstanceProvider = InstanceProvider;
+            var feature = context.HttpContext.GetFeature<IBoltFeature>();
             OverrideFeature(feature);
 
             ActionMetadata metadata;
@@ -109,7 +108,7 @@ namespace Bolt.Server
                     {
                         context.Parameters =
                             feature.Serializer.DeserializeParameters(
-                                await context.Context.Request.Body.CopyAsync(context.RequestAborted), context.Action);
+                                await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted), context.Action);
                     }
                 }
 
@@ -135,7 +134,7 @@ namespace Bolt.Server
             }
             else
             {
-                throw new BoltServerException(ServerErrorCode.ActionNotImplemented, context.Action, context.Context.Request.Path.ToString());
+                throw new BoltServerException(ServerErrorCode.ActionNotImplemented, context.Action, context.HttpContext.Request.Path.ToString());
             }
         }
 
@@ -185,7 +184,11 @@ namespace Bolt.Server
             }
             catch (Exception)
             {
-                //TODO: log ? 
+                // TODO: log ? 
+            }
+            finally
+            {
+                context.ContractInstance = null;
             }
         }
 

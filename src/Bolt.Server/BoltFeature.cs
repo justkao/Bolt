@@ -2,7 +2,7 @@
 {
     public class BoltFeature : IBoltFeature
     {
-        public ServerActionContext Context { get; set; }
+        public ServerActionContext ActionContext { get; set; }
 
         public ISerializer Serializer { get; set; }
 

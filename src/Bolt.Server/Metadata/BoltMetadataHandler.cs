@@ -31,7 +31,7 @@ namespace Bolt.Server.Metadata
             {
                 var result = JsonConvert.SerializeObject(contracts.Select(c => c.Descriptor.Name).ToList(),
                     Formatting.Indented, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore});
-                await context.Context.Response.SendAsync(result);
+                await context.HttpContext.Response.SendAsync(result);
                 return true;
             }
             catch (Exception e)
@@ -46,7 +46,7 @@ namespace Bolt.Server.Metadata
             try
             {
                 string result = string.Empty;
-                string actionName = context.Context.Request.Query["action"]?.Trim();
+                string actionName = context.HttpContext.Request.Query["action"]?.Trim();
                 ActionDescriptor action = null;
 
                 if (!string.IsNullOrEmpty(actionName))
@@ -80,9 +80,9 @@ namespace Bolt.Server.Metadata
                     }
                 }
 
-                context.Context.Response.ContentType = "application/json";
-                context.Context.Response.StatusCode = 200;
-                await context.Context.Response.SendAsync(result);
+                context.HttpContext.Response.ContentType = "application/json";
+                context.HttpContext.Response.StatusCode = 200;
+                await context.HttpContext.Response.SendAsync(result);
                 return true;
             }
             catch (Exception e)
@@ -95,7 +95,7 @@ namespace Bolt.Server.Metadata
 
         private ContractMetadata CrateContractMetadata(ServerActionContext context)
         {
-            var feature = context.Context.GetFeature<IBoltFeature>();
+            var feature = context.HttpContext.GetFeature<IBoltFeature>();
 
             var m = new ContractMetadata
             {
@@ -104,7 +104,7 @@ namespace Bolt.Server.Metadata
                 ContentType = feature.Serializer.ContentType
             };
 
-            var statefullProvder = context.InstanceProvider as StateFullInstanceProvider;
+            var statefullProvder = context.ContractInvoker.InstanceProvider as StateFullInstanceProvider;
             if (statefullProvder != null)
             {
                 m.SessionInit = statefullProvder.InitSession.Name;

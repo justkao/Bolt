@@ -2,7 +2,7 @@
 {
     public interface IBoltFeature
     {
-        ServerActionContext Context { get; set; }
+        ServerActionContext ActionContext { get; set; }
 
         /// <summary>
         /// Gets or sets <see cref="ISerializer"/> assigned to current context.

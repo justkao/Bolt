@@ -72,7 +72,7 @@ namespace Bolt.Server.InstanceProviders
                 OnInstanceCreated(context, newSession);
 
                 _instances[newSession] = instance;
-                context.Context.Response.Headers[SessionHeader] = newSession;
+                context.HttpContext.Response.Headers[SessionHeader] = newSession;
                 return instance.Instance;
             }
 
@@ -98,7 +98,7 @@ namespace Bolt.Server.InstanceProviders
                 {
                     // session initialization failed, cleanup the stack
                     string session = GetSession(context);
-                    context.Context.Response.Headers.Remove(SessionHeader);
+                    context.HttpContext.Response.Headers.Remove(SessionHeader);
 
                     try
                     {
@@ -178,10 +178,10 @@ namespace Bolt.Server.InstanceProviders
 
         protected string GetSession(ServerActionContext context)
         {
-            string sessionId = context.Context.Request.Headers[SessionHeader];
+            string sessionId = context.HttpContext.Request.Headers[SessionHeader];
             if (string.IsNullOrEmpty(sessionId))
             {
-                sessionId = context.Context.Response.Headers[SessionHeader];
+                sessionId = context.HttpContext.Response.Headers[SessionHeader];
             }
 
             return sessionId;

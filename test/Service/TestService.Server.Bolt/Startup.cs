@@ -38,6 +38,7 @@ namespace TestService.Server.Bolt
                 b.ActionExecutionFilter = new DiagnosticsActionExecutor();
                 b.Use<TestContractInvoker>(new InstanceProvider<TestContractImplementation>(), (c) =>
                 {
+                    c.ExceptionWrapper = new TextExceptionWrapper();
                     c.Options = new BoltServerOptions() {ServerErrorHeader = "Customized-TestContractImplementation"};
                 });
             });
@@ -54,6 +55,19 @@ namespace TestService.Server.Bolt
             {
                 Console.WriteLine("Executing action: {0}", context.Action);
                 await next(context);
+            }
+        }
+
+        private class TextExceptionWrapper : ExceptionWrapper<string>
+        {
+            protected override Exception UnwrapCore(string wrappedException)
+            {
+                return new Exception(wrappedException);
+            }
+
+            protected override string WrapCore(Exception exception)
+            {
+                return exception.Message;
             }
         }
 

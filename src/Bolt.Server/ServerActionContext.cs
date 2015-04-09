@@ -10,11 +10,11 @@ namespace Bolt.Server
     /// </summary>
     public class ServerActionContext : ActionContextBase
     {
-        public HttpContext Context { get; set; }
+        public HttpContext HttpContext { get; set; }
 
         public RouteContext RouteContext { get; set; }
 
-        public CancellationToken RequestAborted => Context.RequestAborted;
+        public CancellationToken RequestAborted => HttpContext.RequestAborted;
 
         public object ContractInstance { get; set; }
 
@@ -23,7 +23,5 @@ namespace Bolt.Server
         public object Result { get; set; }
 
         public IContractInvoker ContractInvoker { get; set; }
-
-        public IInstanceProvider InstanceProvider { get; set; }
     }
 }

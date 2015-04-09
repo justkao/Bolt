@@ -16,7 +16,7 @@ namespace Bolt.Server.InstanceProviders
                 _factory = factory;
             }
 
-            return factory(context.Context.ApplicationServices, null);
+            return factory(context.HttpContext.ApplicationServices, null);
         }
     }
 }
