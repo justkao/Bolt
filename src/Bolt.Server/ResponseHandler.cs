@@ -6,6 +6,8 @@ namespace Bolt.Server
     {
         public virtual async Task HandleAsync(ServerActionContext context)
         {
+            context.EnsureNotHandled();
+
             context.RequestAborted.ThrowIfCancellationRequested();
             var feature = context.HttpContext.GetFeature<IBoltFeature>();
             context.HttpContext.Response.StatusCode = 200;
@@ -31,6 +33,7 @@ namespace Bolt.Server
             }
 
             context.HttpContext.Response.Body.Dispose();
+            context.IsHandled = true;
         }
     }
 }

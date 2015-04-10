@@ -15,14 +15,18 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(context));
             }
 
+            context.ActionContext.EnsureNotHandled();
+
             if (context.ErrorCode != null)
             {
                 CloseWithError(context.ActionContext.HttpContext, context.ErrorCode.Value, context.Options.ServerErrorHeader);
+                context.ActionContext.IsHandled = true;
                 return CompletedTask.Done;
             }
 
             if (HandleAsErrorCode(context))
             {
+                context.ActionContext.IsHandled = true;
                 return CompletedTask.Done;
             }
 
@@ -99,6 +103,8 @@ namespace Bolt.Server
 
         protected virtual Task WriteExceptionAsync(HandlerErrorContext context)
         {
+            context.ActionContext.IsHandled = true;
+
             context.ActionContext.RequestAborted.ThrowIfCancellationRequested();
             var httpContext = context.ActionContext.HttpContext;
             httpContext.Response.StatusCode = 500;

@@ -21,7 +21,7 @@ namespace Bolt.Server
 
         public BoltRouteHandler(ILoggerFactory factory, IResponseHandler responseHandler,
             IServerErrorHandler errorHandler, IOptions<BoltServerOptions> options, IBoltMetadataHandler metadataHandler,
-            ISerializer serializer, IParameterBinder parametersBinder, IExceptionWrapper exceptionWrapper)
+            ISerializer serializer, IExceptionWrapper exceptionWrapper)
         {
             if (factory == null)
             {
@@ -43,11 +43,6 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(serializer));
             }
 
-            if (parametersBinder == null)
-            {
-                throw new ArgumentNullException(nameof(parametersBinder));
-            }
-
             if (exceptionWrapper == null)
             {
                 throw new ArgumentNullException(nameof(exceptionWrapper));
@@ -64,7 +59,6 @@ namespace Bolt.Server
             ErrorHandler = errorHandler;
             MetadataHandler = metadataHandler;
             Serializer = serializer;
-            ParametersBinder = parametersBinder;
             ExceptionWrapper = exceptionWrapper;
             Filters = new List<IActionExecutionFilter>();
         }
@@ -74,8 +68,6 @@ namespace Bolt.Server
         public IServerErrorHandler ErrorHandler { get; }
 
         public ISerializer Serializer { get; }
-
-        public IParameterBinder ParametersBinder { get; }
 
         public IExceptionWrapper ExceptionWrapper { get; }
 
@@ -235,13 +227,13 @@ namespace Bolt.Server
                     watch = Stopwatch.StartNew();
                 }
 
-                ctxt.FilterProviders =
-                    ctxt.HttpContext.ApplicationServices.GetService<IEnumerable<IFilterProvider>>().ToList();
+                feature.FilterProviders = ctxt.HttpContext.ApplicationServices.GetService<IEnumerable<IFilterProvider>>().ToList();
 
                 try
                 {
+                    feature.CoreAction = ctxt.HttpContext.ApplicationServices.GetRequiredService<IActionExecutionFilter>();
                     await invoker.Execute(ctxt);
-                    if (ctxt.Result != null)
+                    if (ctxt.Result != null && !ctxt.IsHandled)
                     {
                         await feature.ResponseHandler.HandleAsync(ctxt);
                     }
@@ -258,14 +250,17 @@ namespace Bolt.Server
                 }
                 catch (Exception e)
                 {
-                    await ErrorHandler.HandleErrorAsync(new HandlerErrorContext
+                    if (!ctxt.IsHandled)
                     {
-                        Options = feature.Options,
-                        ExceptionWrapper = feature.ExceptionWrapper,
-                        ActionContext = feature.ActionContext,
-                        Serializer = feature.Serializer,
-                        Error = e
-                    });
+                        await ErrorHandler.HandleErrorAsync(new HandlerErrorContext
+                        {
+                            Options = feature.Options,
+                            ExceptionWrapper = feature.ExceptionWrapper,
+                            ActionContext = feature.ActionContext,
+                            Serializer = feature.Serializer,
+                            Error = e
+                        });
+                    }
 
                     Logger.WriteError(BoltLogId.RequestExecutionError, "Execution of '{0}' failed with error '{1}'", ctxt.Action, e);
                 }
@@ -288,7 +283,6 @@ namespace Bolt.Server
                 Options = Options,
                 Serializer = Serializer,
                 ExceptionWrapper = ExceptionWrapper,
-                ParameterBinder = ParametersBinder,
                 ResponseHandler = ResponseHandler
             };
 

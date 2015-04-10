@@ -1,4 +1,7 @@
-﻿namespace Bolt.Server
+﻿using Bolt.Server.Filters;
+using System.Collections.Generic;
+
+namespace Bolt.Server
 {
     public interface IBoltFeature
     {
@@ -25,13 +28,12 @@
         IServerErrorHandler ErrorHandler{ get; set; }
 
         /// <summary>
-        /// Gets or sets <see cref="IParameterBinder"/> assigned to current context.
-        /// </summary>
-        IParameterBinder ParameterBinder { get; set; }
-
-        /// <summary>
         /// Gets or sets <see cref="IResponseHandler"/> assigned to current context.
         /// </summary>
         IResponseHandler ResponseHandler { get; set; }
+
+        IList<IFilterProvider> FilterProviders { get; set; }
+
+        IActionExecutionFilter CoreAction { get; set; }
     }
 }

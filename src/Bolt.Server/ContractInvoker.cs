@@ -39,8 +39,6 @@ namespace Bolt.Server
 
         public ISerializer Serializer { get; set; }
 
-        public IParameterBinder ParameterBinder { get; set; }
-
         public IExceptionWrapper ExceptionWrapper { get; set; }
 
         public IResponseHandler ResponseHandler { get; set; }
@@ -93,10 +91,7 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (context.Executed)
-            {
-                return;
-            }
+            context.EnsureNotHandled();
 
             var feature = context.HttpContext.GetFeature<IBoltFeature>();
             OverrideFeature(feature);
@@ -104,44 +99,7 @@ namespace Bolt.Server
             ActionMetadata metadata;
             if (_actions.TryGetValue(context.Action, out metadata))
             {
-                if (context.Action.HasParameters && context.Parameters == null)
-                {
-                    if (feature.ParameterBinder != null)
-                    {
-                        BindingResult result = await feature.ParameterBinder.BindParametersAsync(context);
-                        if (result.Success)
-                        {
-                            context.Parameters = result.Parameters;
-                        }
-                    }
-
-                    if (context.Parameters == null)
-                    {
-                        context.Parameters =
-                            feature.Serializer.DeserializeParameters(
-                                await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted), context.Action);
-                    }
-                }
-
-                context.ContractInstance = InstanceProvider.GetInstance(context, context.Action.Contract.Type);
-
-                FilterExecutor executor =
-                    new FilterExecutor(
-                        context.FilterProviders.EmptyIfNull()
-                            .SelectMany(f => f.GetFilters(context))
-                            .OrderBy(f => f.Order)
-                            .ToList(), context,
-                        metadata.Action);
-                try
-                {
-                    await executor.ExecuteAsync();
-                    ReleaseInstanceSafe(context, null);
-                }
-                catch (Exception e)
-                {
-                    ReleaseInstanceSafe(context, e);
-                    throw;
-                }
+                await feature.CoreAction.ExecuteAsync(context, metadata.Action);
             }
             else
             {
@@ -171,30 +129,9 @@ namespace Bolt.Server
                 feature.Serializer = Serializer;
             }
 
-            if (ParameterBinder != null)
-            {
-                feature.ParameterBinder = ParameterBinder;
-            }
-
             if (ResponseHandler != null)
             {
                 feature.ResponseHandler = ResponseHandler;
-            }
-        }
-
-        private void ReleaseInstanceSafe(ServerActionContext context, Exception exception)
-        {
-            try
-            {
-                InstanceProvider.ReleaseInstance(context, context.ContractInstance, exception);
-            }
-            catch (Exception)
-            {
-                // TODO: log ? 
-            }
-            finally
-            {
-                context.ContractInstance = null;
             }
         }
 

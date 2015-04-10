@@ -1,4 +1,5 @@
-﻿using Bolt.Server.Filters;
+﻿using System.Collections.Generic;
+using Bolt.Server.Filters;
 
 namespace Bolt.Server
 {
@@ -16,8 +17,10 @@ namespace Bolt.Server
 
         public IActionExecutionFilter ActionExecutionFilter { get; set; }
 
-        public IParameterBinder ParameterBinder { get; set; }
-
         public IResponseHandler ResponseHandler { get; set; }
+
+        public IList<IFilterProvider> FilterProviders { get; set; }
+
+        public IActionExecutionFilter CoreAction { get; set; }
     }
 }

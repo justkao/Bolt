@@ -1,9 +1,7 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.Threading;
-using Bolt.Server.Filters;
+﻿using System.Threading;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
+using System;
 
 namespace Bolt.Server
 {
@@ -25,10 +23,16 @@ namespace Bolt.Server
 
         public object Result { get; set; }
 
-        public bool Executed { get; set; }
+        public bool IsHandled { get; set; }
 
         public IContractInvoker ContractInvoker { get; set; }
 
-        public IList<IFilterProvider> FilterProviders { get; set; }
+        public void EnsureNotHandled()
+        {
+            if (IsHandled)
+            {
+                throw new InvalidOperationException("Request is already handled.");
+            }
+        }
     }
 }

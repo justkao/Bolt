@@ -22,8 +22,8 @@ namespace Microsoft.Framework.DependencyInjection
             services.AddTransient<IBoltRouteHandler, BoltRouteHandler>();
             services.AddTransient<IServerErrorHandler, ServerErrorHandler>();
             services.AddTransient<IBoltMetadataHandler, BoltMetadataHandler>();
-            services.AddTransient<IParameterBinder, EmptyParameterBinder>();
             services.AddTransient<IFilterProvider, DefaultFilterProvider>();
+            services.AddTransient<IActionExecutionFilter, CoreAction>();
 
             return services;
         }
