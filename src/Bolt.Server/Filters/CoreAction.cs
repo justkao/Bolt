@@ -14,19 +14,9 @@ namespace Bolt.Server.Filters
         private Func<ServerActionContext, Task> _coreAction;
         private IEnumerator<IActionExecutionFilter> _currentFilter;
 
-        public CoreAction()
-        {
-        }
+        public int Order => int.MaxValue;
 
-        public int Order
-        {
-            get
-            {
-                return int.MaxValue;
-            }
-        }
-
-        public async Task ExecuteAsync(ServerActionContext context, Func<ServerActionContext, Task>  coreAction)
+        public async Task ExecuteAsync(ServerActionContext context, Func<ServerActionContext, Task> coreAction)
         {
             _context = context;
             _coreAction = coreAction;
@@ -46,10 +36,10 @@ namespace Bolt.Server.Filters
         protected virtual IEnumerable<IActionExecutionFilter> GetFilters(ServerActionContext context)
         {
             return
-           context.HttpContext.GetFeature<IBoltFeature>().FilterProviders.EmptyIfNull()
-               .SelectMany(f => f.GetFilters(context))
-               .OrderBy(f => f.Order)
-               .ToList();
+                context.HttpContext.GetFeature<IBoltFeature>().FilterProviders.EmptyIfNull()
+                    .SelectMany(f => f.GetFilters(context))
+                    .OrderBy(f => f.Order)
+                    .ToList();
         }
 
         protected virtual async Task ExecuteCore(ServerActionContext context)
@@ -58,12 +48,9 @@ namespace Bolt.Server.Filters
 
             if (context.Action.HasParameters && context.Parameters == null)
             {
-                if (context.Parameters == null)
-                {
-                    context.Parameters =
-                        feature.Serializer.DeserializeParameters(
-                            await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted), context.Action);
-                }
+                context.Parameters =
+                    feature.Serializer.DeserializeParameters(
+                        await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted), context.Action);
             }
 
             bool instanceCreated = false;
