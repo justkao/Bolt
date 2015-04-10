@@ -13,6 +13,7 @@ using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
 using TestService.Core;
+using Bolt.Server.Filters;
 
 namespace TestService.Server.Bolt
 {
@@ -35,7 +36,9 @@ namespace TestService.Server.Bolt
 
             app.UseBolt(b =>
             {
-                b.ActionExecutionFilter = new DiagnosticsActionExecutor();
+                b.Filters.Add(new DiagnosticsActionExecutor());
+                b.Filters.Add(new DiagnosticsActionExecutor2());
+
                 b.Use<TestContractInvoker>(new InstanceProvider<TestContractImplementation>(), (c) =>
                 {
                     c.ExceptionWrapper = new TextExceptionWrapper();
@@ -48,12 +51,36 @@ namespace TestService.Server.Bolt
             Console.WriteLine("Url: {0}", server.Listener.UrlPrefixes.First());
         }
 
-
         private class DiagnosticsActionExecutor : IActionExecutionFilter
         {
+            public int Order
+            {
+                get
+                {
+                    return 1;
+                }
+            }
+
             public async Task ExecuteAsync(ServerActionContext context, Func<ServerActionContext, Task> next)
             {
-                Console.WriteLine("Executing action: {0}", context.Action);
+                Console.WriteLine(GetType().FullName);
+                await next(context);
+            }
+        }
+
+        private class DiagnosticsActionExecutor2 : IActionExecutionFilter
+        {
+            public int Order
+            {
+                get
+                {
+                    return 0;
+                }
+            }
+
+            public async Task ExecuteAsync(ServerActionContext context, Func<ServerActionContext, Task> next)
+            { 
+                Console.WriteLine(GetType().FullName);
                 await next(context);
             }
         }

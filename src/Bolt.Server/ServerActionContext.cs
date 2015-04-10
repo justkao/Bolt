@@ -1,4 +1,7 @@
-﻿using System.Threading;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Threading;
+using Bolt.Server.Filters;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
 
@@ -22,6 +25,10 @@ namespace Bolt.Server
 
         public object Result { get; set; }
 
+        public bool Executed { get; set; }
+
         public IContractInvoker ContractInvoker { get; set; }
+
+        public IList<IFilterProvider> FilterProviders { get; set; }
     }
 }

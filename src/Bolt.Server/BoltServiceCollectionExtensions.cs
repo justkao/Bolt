@@ -1,6 +1,7 @@
 ﻿using System;
 using Bolt;
 using Bolt.Server;
+using Bolt.Server.Filters;
 using Bolt.Server.Metadata;
 
 namespace Microsoft.Framework.DependencyInjection
@@ -22,6 +23,7 @@ namespace Microsoft.Framework.DependencyInjection
             services.AddTransient<IServerErrorHandler, ServerErrorHandler>();
             services.AddTransient<IBoltMetadataHandler, BoltMetadataHandler>();
             services.AddTransient<IParameterBinder, EmptyParameterBinder>();
+            services.AddTransient<IFilterProvider, DefaultFilterProvider>();
 
             return services;
         }

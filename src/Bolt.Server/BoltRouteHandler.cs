@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Bolt.Server.Filters;
 using Bolt.Server.Metadata;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
+using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;
 
@@ -64,6 +66,7 @@ namespace Bolt.Server
             Serializer = serializer;
             ParametersBinder = parametersBinder;
             ExceptionWrapper = exceptionWrapper;
+            Filters = new List<IActionExecutionFilter>();
         }
 
         public IResponseHandler ResponseHandler { get; }
@@ -119,7 +122,7 @@ namespace Bolt.Server
             return _invokers.FirstOrDefault(i => i.Descriptor == descriptor);
         }
 
-        public IActionExecutionFilter ActionExecutionFilter { get; set; }
+        public IList<IActionExecutionFilter> Filters { get; }
 
         public IEnumerator<IContractInvoker> GetEnumerator()
         {
@@ -232,6 +235,9 @@ namespace Bolt.Server
                     watch = Stopwatch.StartNew();
                 }
 
+                ctxt.FilterProviders =
+                    ctxt.HttpContext.ApplicationServices.GetService<IEnumerable<IFilterProvider>>().ToList();
+
                 try
                 {
                     await invoker.Execute(ctxt);
@@ -282,7 +288,6 @@ namespace Bolt.Server
                 Options = Options,
                 Serializer = Serializer,
                 ExceptionWrapper = ExceptionWrapper,
-                ActionExecutionFilter = ActionExecutionFilter,
                 ParameterBinder = ParametersBinder,
                 ResponseHandler = ResponseHandler
             };

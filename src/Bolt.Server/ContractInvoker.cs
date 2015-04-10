@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
+using Bolt.Common;
+using Bolt.Server.Filters;
 
 namespace Bolt.Server
 {
@@ -17,11 +20,14 @@ namespace Bolt.Server
             }
 
             Descriptor = descriptor;
+            Filters = new List<IActionExecutionFilter>();
         }
 
         public ContractDescriptor Descriptor { get; internal set; }
 
         public IInstanceProvider InstanceProvider { get; private set; }
+
+        public IList<IActionExecutionFilter> Filters { get; }
 
         public IBoltRouteHandler Parent { get; private set; }
 
@@ -87,6 +93,11 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(context));
             }
 
+            if (context.Executed)
+            {
+                return;
+            }
+
             var feature = context.HttpContext.GetFeature<IBoltFeature>();
             OverrideFeature(feature);
 
@@ -114,16 +125,16 @@ namespace Bolt.Server
 
                 context.ContractInstance = InstanceProvider.GetInstance(context, context.Action.Contract.Type);
 
+                FilterExecutor executor =
+                    new FilterExecutor(
+                        context.FilterProviders.EmptyIfNull()
+                            .SelectMany(f => f.GetFilters(context))
+                            .OrderBy(f => f.Order)
+                            .ToList(), context,
+                        metadata.Action);
                 try
                 {
-                    if (feature.ActionExecutionFilter != null)
-                    {
-                        await feature.ActionExecutionFilter.ExecuteAsync(context, metadata.Action);
-                    }
-                    else
-                    {
-                        await metadata.Action(context);
-                    }
+                    await executor.ExecuteAsync();
                     ReleaseInstanceSafe(context, null);
                 }
                 catch (Exception e)
@@ -168,11 +179,6 @@ namespace Bolt.Server
             if (ResponseHandler != null)
             {
                 feature.ResponseHandler = ResponseHandler;
-            }
-
-            if (ActionExecutionFilter != null)
-            {
-                feature.ActionExecutionFilter = ActionExecutionFilter;
             }
         }
 

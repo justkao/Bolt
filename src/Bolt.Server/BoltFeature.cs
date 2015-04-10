@@ -1,4 +1,6 @@
-﻿namespace Bolt.Server
+﻿using Bolt.Server.Filters;
+
+namespace Bolt.Server
 {
     public class BoltFeature : IBoltFeature
     {

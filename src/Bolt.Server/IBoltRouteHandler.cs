@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Collections.Generic;
+using Bolt.Server.Filters;
 using Microsoft.AspNet.Routing;
 
 namespace Bolt.Server
@@ -10,6 +13,6 @@ namespace Bolt.Server
 
         IContractInvoker Get(ContractDescriptor descriptor);
 
-        IActionExecutionFilter ActionExecutionFilter { get; set; }
+        IList<IActionExecutionFilter> Filters { get; }
     }
 }

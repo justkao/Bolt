@@ -25,11 +25,6 @@
         IServerErrorHandler ErrorHandler{ get; set; }
 
         /// <summary>
-        /// Gets or sets <see cref="IActionExecutionFilter"/> assigned to current context.
-        /// </summary>
-        IActionExecutionFilter ActionExecutionFilter { get; set; }
-
-        /// <summary>
         /// Gets or sets <see cref="IParameterBinder"/> assigned to current context.
         /// </summary>
         IParameterBinder ParameterBinder { get; set; }
