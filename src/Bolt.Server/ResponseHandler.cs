@@ -6,7 +6,7 @@ namespace Bolt.Server
     {
         public virtual async Task HandleAsync(ServerActionContext context)
         {
-            context.EnsureNotHandled();
+            context.EnsureNotSend();
 
             context.RequestAborted.ThrowIfCancellationRequested();
             var feature = context.HttpContext.GetFeature<IBoltFeature>();
@@ -14,11 +14,11 @@ namespace Bolt.Server
 
             if (context.Result != null)
             {
-                byte[] raw = feature.Serializer.SerializeResponse(context.Result, context.Action);
+                byte[] raw = feature.Configuration.Serializer.SerializeResponse(context.Result, context.Action);
                 if (raw != null && raw.Length > 0)
                 {
                     context.HttpContext.Response.ContentLength = raw.Length;
-                    context.HttpContext.Response.ContentType = feature.Serializer.ContentType;
+                    context.HttpContext.Response.ContentType = feature.Configuration.Serializer.ContentType;
 
                     await context.HttpContext.Response.Body.WriteAsync(raw, 0, raw.Length, context.RequestAborted);
                 }
@@ -33,7 +33,7 @@ namespace Bolt.Server
             }
 
             context.HttpContext.Response.Body.Dispose();
-            context.IsHandled = true;
+            context.IsResponseSend = true;
         }
     }
 }

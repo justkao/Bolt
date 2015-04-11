@@ -29,7 +29,7 @@ namespace Microsoft.AspNet.Builder
             var bolt = app.ApplicationServices.GetRequiredService<IBoltRouteHandler>();
             var logger = app.ApplicationServices.GetRequiredService<ILoggerFactory>().Create("Bolt");
 
-            logger.WriteInformation(BoltLogId.BoltRegistration, "Registering Bolt middleware. Prefix: {0}", bolt.Options.Prefix);
+            logger.WriteInformation(BoltLogId.BoltRegistration, "Registering Bolt middleware. Prefix: {0}", bolt.Configuration.Options.Prefix);
             configure(bolt);
 
             return app.UseRouter(bolt);

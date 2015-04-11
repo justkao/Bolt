@@ -17,11 +17,10 @@ namespace Bolt.Server
     public class BoltRouteHandler : IBoltRouteHandler, IEnumerable<IContractInvoker>
     {
         private readonly List<IContractInvoker> _invokers = new List<IContractInvoker>();
-        private BoltServerOptions _options;
 
         public BoltRouteHandler(ILoggerFactory factory, IResponseHandler responseHandler,
             IServerErrorHandler errorHandler, IOptions<BoltServerOptions> options, IBoltMetadataHandler metadataHandler,
-            ISerializer serializer, IExceptionWrapper exceptionWrapper)
+            ISerializer serializer, IExceptionWrapper exceptionWrapper, IServiceProvider applicationServices)
         {
             if (factory == null)
             {
@@ -48,46 +47,42 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(exceptionWrapper));
             }
 
+            if (applicationServices == null)
+            {
+                throw new ArgumentNullException(nameof(applicationServices));
+            }
+
             if (errorHandler == null)
             {
                 throw new ArgumentNullException(nameof(errorHandler));
             }
 
-            ResponseHandler = responseHandler;
-            Options = options.Options;
             Logger = factory.Create<BoltRouteHandler>();
-            ErrorHandler = errorHandler;
             MetadataHandler = metadataHandler;
-            Serializer = serializer;
-            ExceptionWrapper = exceptionWrapper;
             Filters = new List<IActionExecutionFilter>();
-        }
+            ApplicationServices = applicationServices;
 
-        public IResponseHandler ResponseHandler { get; }
-
-        public IServerErrorHandler ErrorHandler { get; }
-
-        public ISerializer Serializer { get; }
-
-        public IExceptionWrapper ExceptionWrapper { get; }
-
-        public BoltServerOptions Options
-        {
-            get { return _options; }
-            set
+            Configuration = new ServerRuntimeConfiguration
             {
-                if (value == null)
-                {
-                    throw new ArgumentNullException(nameof(value), "Options must be specified.");
-                }
-
-                _options = value;
-            }
+                Options = options.Options,
+                ExceptionWrapper = exceptionWrapper,
+                Serializer = serializer,
+                ResponseHandler = responseHandler,
+                ErrorHandler = errorHandler
+            };
         }
+
+        public IList<IActionExecutionFilter> Filters { get; }
+
+        public IServiceProvider ApplicationServices { get; }
+
+        public ServerRuntimeConfiguration Configuration { get; set; }
 
         public ILogger Logger { get; }
 
         public IBoltMetadataHandler MetadataHandler { get; set; }
+
+        private BoltServerOptions Options => Configuration.Options;
 
         public virtual void Add(IContractInvoker invoker)
         {
@@ -113,8 +108,6 @@ namespace Bolt.Server
         {
             return _invokers.FirstOrDefault(i => i.Descriptor == descriptor);
         }
-
-        public IList<IActionExecutionFilter> Filters { get; }
 
         public IEnumerator<IContractInvoker> GetEnumerator()
         {
@@ -165,12 +158,12 @@ namespace Bolt.Server
                     Logger.WriteWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", result[0], path);
 
                     // we have defined bolt prefix, report error about contract not found
-                    await ErrorHandler.HandleErrorAsync(new HandlerErrorContext
+                    await feature.Configuration.ErrorHandler.HandleErrorAsync(new HandlerErrorContext
                     {
-                        Options = feature.Options,
-                        ExceptionWrapper = feature.ExceptionWrapper,
+                        Options = feature.Configuration.Options,
+                        ExceptionWrapper = feature.Configuration.ExceptionWrapper,
                         ActionContext = feature.ActionContext,
-                        Serializer = feature.Serializer,
+                        Serializer = feature.Configuration.Serializer,
                         ErrorCode = ServerErrorCode.ContractNotFound
                     });
 
@@ -199,12 +192,12 @@ namespace Bolt.Server
             var actionDescriptor = FindAction(found.Descriptor, actionName);
             if (actionDescriptor == null)
             {
-                await ErrorHandler.HandleErrorAsync(new HandlerErrorContext
+                await feature.Configuration.ErrorHandler.HandleErrorAsync(new HandlerErrorContext
                 {
-                    Options = feature.Options,
-                    ExceptionWrapper = feature.ExceptionWrapper,
+                    Options = feature.Configuration.Options,
+                    ExceptionWrapper = feature.Configuration.ExceptionWrapper,
                     ActionContext = feature.ActionContext,
-                    Serializer = feature.Serializer,
+                    Serializer = feature.Configuration.Serializer,
                     ErrorCode = ServerErrorCode.ActionNotFound
                 });
 
@@ -233,9 +226,9 @@ namespace Bolt.Server
                 {
                     feature.CoreAction = ctxt.HttpContext.ApplicationServices.GetRequiredService<IActionExecutionFilter>();
                     await invoker.Execute(ctxt);
-                    if (ctxt.Result != null && !ctxt.IsHandled)
+                    if (!ctxt.IsResponseSend)
                     {
-                        await feature.ResponseHandler.HandleAsync(ctxt);
+                        await feature.Configuration.ResponseHandler.HandleAsync(ctxt);
                     }
 
                 }
@@ -250,14 +243,14 @@ namespace Bolt.Server
                 }
                 catch (Exception e)
                 {
-                    if (!ctxt.IsHandled)
+                    if (!ctxt.IsResponseSend)
                     {
-                        await ErrorHandler.HandleErrorAsync(new HandlerErrorContext
+                        await feature.Configuration.ErrorHandler.HandleErrorAsync(new HandlerErrorContext
                         {
-                            Options = feature.Options,
-                            ExceptionWrapper = feature.ExceptionWrapper,
+                            Options = feature.Configuration.Options,
+                            ExceptionWrapper = feature.Configuration.ExceptionWrapper,
                             ActionContext = feature.ActionContext,
-                            Serializer = feature.Serializer,
+                            Serializer = feature.Configuration.Serializer,
                             Error = e
                         });
                     }
@@ -279,11 +272,7 @@ namespace Bolt.Server
             var boltFeature = new BoltFeature
             {
                 ActionContext = actionContext,
-                ErrorHandler = ErrorHandler,
-                Options = Options,
-                Serializer = Serializer,
-                ExceptionWrapper = ExceptionWrapper,
-                ResponseHandler = ResponseHandler
+                Configuration = Configuration
             };
 
             context.SetFeature<IBoltFeature>(boltFeature);

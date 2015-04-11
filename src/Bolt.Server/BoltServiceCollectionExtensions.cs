@@ -24,6 +24,7 @@ namespace Microsoft.Framework.DependencyInjection
             services.AddTransient<IBoltMetadataHandler, BoltMetadataHandler>();
             services.AddTransient<IFilterProvider, DefaultFilterProvider>();
             services.AddTransient<IActionExecutionFilter, CoreAction>();
+            services.AddTransient<IContractInvoker, ContractInvoker>();
 
             return services;
         }

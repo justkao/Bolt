@@ -23,15 +23,60 @@ namespace Bolt.Server
 
         public object Result { get; set; }
 
-        public bool IsHandled { get; set; }
+        public bool IsExecuted { get; set; }
+
+        public bool IsResponseSend { get; set; }
 
         public IContractInvoker ContractInvoker { get; set; }
 
-        public void EnsureNotHandled()
+        public T GetRequiredInstance<T>()
         {
-            if (IsHandled)
+            if (ContractInstance == null)
+            {
+                throw new InvalidOperationException("There is no contract instance assigned to current context.");
+            }
+
+            if (!(ContractInstance is T))
+            {
+                throw new InvalidOperationException($"Contract instance of type {typeof(T).Name} is expected but {ContractInstance.GetType().Name} was provided.");
+            }
+
+            return (T) ContractInstance;
+        }
+
+        public T GetRequiredParameters<T>()
+        {
+            if (typeof (T) == typeof (Empty))
+            {
+                return default(T);
+            }
+
+            if (Parameters == null)
+            {
+                throw new InvalidOperationException("There is no paramters instance assigned to current context.");
+            }
+
+            if (!(Parameters is T))
+            {
+                throw new InvalidOperationException($"Parameters instance of type {typeof(T).Name} is expected but {Parameters.GetType().Name} was provided.");
+            }
+
+            return (T)Parameters;
+        }
+
+        public void EnsureNotExecuted()
+        {
+            if (IsExecuted)
             {
                 throw new InvalidOperationException("Request is already handled.");
+            }
+        }
+
+        public void EnsureNotSend()
+        {
+            if (IsResponseSend)
+            {
+                throw new InvalidOperationException("Response has already been send to client.");
             }
         }
     }

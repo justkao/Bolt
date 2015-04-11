@@ -122,7 +122,7 @@ namespace Bolt.Generators
         {
             return
                 AddContractGenerator(
-                    new ServerGenerator(Output, Formatter, IntendProvider)
+                    new ContractActionsGenerator(Output, Formatter, IntendProvider)
                         {
                             ContractDefinition = definition ?? ContractDefinition,
                             ContractDescriptor = descriptor

@@ -1,30 +1,33 @@
 using System;
 using Bolt.Server.InstanceProviders;
+using Microsoft.Framework.DependencyInjection;
 
 namespace Bolt.Server
 {
     public static class BoltRouteHandlerExtensions
     {
-        public static TInvoker UseStateLess<TInvoker, TContractImplementation>(this IBoltRouteHandler bolt, Action<TInvoker> configure = null)
-            where TInvoker : ContractInvoker, new()
+        public static IContractInvoker UseStateLess<TContractImplementation>(this IBoltRouteHandler bolt, IContractActions actions, Action<IContractInvoker> configure = null)
             where TContractImplementation : new()
         {
-            return bolt.Use(new InstanceProvider<TContractImplementation>(), configure);
+            return bolt.Use(actions, new InstanceProvider<TContractImplementation>(), configure);
         }
 
-        public static TInvoker UseStateFull<TInvoker, TContractImplementation>(this IBoltRouteHandler bolt, ActionDescriptor init, ActionDescriptor release, BoltServerOptions options = null, Action<TInvoker> configure = null)
-            where TInvoker : ContractInvoker, new()
+        public static IContractInvoker UseStateFull<TContractImplementation>(this IBoltRouteHandler bolt, IContractActions actions, ActionDescriptor init, ActionDescriptor release, BoltServerOptions options = null, Action<IContractInvoker> configure = null)
             where TContractImplementation : new()
         {
-            return bolt.Use(new StateFullInstanceProvider<TContractImplementation>(init, release, options ?? bolt.Options), configure);
+            return bolt.Use(actions, new StateFullInstanceProvider<TContractImplementation>(init, release, options ?? bolt.Configuration.Options), configure);
         }
 
-        public static TInvoker Use<TInvoker>(this IBoltRouteHandler bolt, IInstanceProvider instanceProvider, Action<TInvoker> configure = null)
-            where TInvoker : ContractInvoker, new()
+        public static IContractInvoker Use(this IBoltRouteHandler bolt, IContractActions actions, IInstanceProvider instanceProvider, Action<IContractInvoker> configure = null)
         {
             if (bolt == null)
             {
                 throw new ArgumentNullException(nameof(bolt));
+            }
+
+            if (actions == null)
+            {
+                throw new ArgumentNullException(nameof(actions));
             }
 
             if (instanceProvider == null)
@@ -32,12 +35,15 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(instanceProvider));
             }
 
-            TInvoker contractInvoker = new TInvoker();
-            contractInvoker.Init(bolt, instanceProvider);
-            bolt.Add(contractInvoker);
-            configure?.Invoke(contractInvoker);
+            var invoker = bolt.ApplicationServices.GetRequiredService<IContractInvoker>();
+            invoker.Actions = actions;
+            invoker.Configuration.Merge(bolt.Configuration);
+            invoker.InstanceProvider = instanceProvider;
+            invoker.Parent = bolt;
+            configure?.Invoke(invoker);
+            bolt.Add(invoker);
 
-            return contractInvoker;
+            return invoker;
         }
     }
 }

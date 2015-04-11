@@ -14,6 +14,7 @@ using Microsoft.Framework.Logging;
 using Microsoft.Framework.Logging.Console;
 using TestService.Core;
 using Bolt.Server.Filters;
+using Microsoft.AspNet.Http;
 
 namespace TestService.Server.Bolt
 {
@@ -39,10 +40,10 @@ namespace TestService.Server.Bolt
                 b.Filters.Add(new DiagnosticsActionExecutor());
                 b.Filters.Add(new DiagnosticsActionExecutor2());
 
-                b.Use<TestContractInvoker>(new InstanceProvider<TestContractImplementation>(), (c) =>
+                b.Use(new TestContractActions(), new InstanceProvider<TestContractImplementation>(), (c) =>
                 {
-                    c.ExceptionWrapper = new TextExceptionWrapper();
-                    c.Options = new BoltServerOptions() {ServerErrorHeader = "Customized-TestContractImplementation"};
+                    c.Configuration.ExceptionWrapper = new TextExceptionWrapper();
+                    c.Configuration.Options = new BoltServerOptions() {ServerErrorHeader = "Customized-TestContractImplementation"};
                 });
             });
 
@@ -70,17 +71,12 @@ namespace TestService.Server.Bolt
 
         private class DiagnosticsActionExecutor2 : IActionExecutionFilter
         {
-            public int Order
-            {
-                get
-                {
-                    return 0;
-                }
-            }
+            public int Order => 0;
 
             public async Task ExecuteAsync(ServerActionContext context, Func<ServerActionContext, Task> next)
             { 
                 Console.WriteLine(GetType().FullName);
+                context.IsResponseSend = true;
                 await next(context);
             }
         }

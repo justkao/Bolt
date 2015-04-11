@@ -6,12 +6,16 @@ namespace Bolt.Server
 {
     public interface IContractInvoker : IContractDescriptorProvider
     {
+        IInstanceProvider InstanceProvider { get; set; }
+
+        IList<IActionExecutionFilter> Filters { get; set; }
+
+        IBoltRouteHandler Parent { get; set; }
+
+        IContractActions Actions { get; set; }
+
         Task Execute(ServerActionContext context);
 
-        IInstanceProvider InstanceProvider { get; }
-
-        IList<IActionExecutionFilter> Filters { get; }
-
-        IBoltRouteHandler Parent { get; }
+        ServerRuntimeConfiguration Configuration { get; }
     }
 }

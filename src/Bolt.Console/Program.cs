@@ -241,7 +241,8 @@ namespace Bolt.Console
                     Name = "<ProxyName> // name of generated server invoker, defaults to 'ContractName + Suffix' if null",
                     Generator = "<GeneratorName> // user defined generator for server invokers",
                     GeneratorEx = "<GeneratorName> // user defined generator for invoker extensions",
-                    StateFullBase = "<FullTypeName> // base class used for statefull invokers"
+                    StateFullBase = "<FullTypeName> // base class used for statefull invokers",
+                    GenerateExtensions = true
                 },
                 Descriptor = new DescriptorConfig
                 {

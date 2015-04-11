@@ -49,7 +49,7 @@ namespace Bolt.Server.Filters
             if (context.Action.HasParameters && context.Parameters == null)
             {
                 context.Parameters =
-                    feature.Serializer.DeserializeParameters(
+                    feature.Configuration.Serializer.DeserializeParameters(
                         await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted), context.Action);
             }
 
@@ -63,7 +63,7 @@ namespace Bolt.Server.Filters
             try
             {
                 await _coreAction(context);
-                context.IsHandled = true;
+                context.IsExecuted = true;
 
                 if (instanceCreated)
                 {
@@ -98,7 +98,7 @@ namespace Bolt.Server.Filters
 
         private async Task ExecuteAsync(ServerActionContext context)
         {
-            if (context.IsHandled)
+            if (context.IsExecuted)
             {
                 return;
             }

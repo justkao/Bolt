@@ -1,88 +1,29 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
-using Bolt.Common;
 using Bolt.Server.Filters;
 
 namespace Bolt.Server
 {
-    public abstract class ContractInvoker : IContractInvoker
+    public class ContractInvoker : IContractInvoker
     {
-        private readonly IDictionary<ActionDescriptor, ActionMetadata> _actions = new Dictionary<ActionDescriptor, ActionMetadata>();
-
-        protected ContractInvoker(ContractDescriptor descriptor)
+        public ContractInvoker()
         {
-            if (descriptor == null)
-            {
-                throw new ArgumentNullException(nameof(descriptor));
-            }
-
-            Descriptor = descriptor;
             Filters = new List<IActionExecutionFilter>();
+            Configuration = new ServerRuntimeConfiguration();
         }
 
-        public ContractDescriptor Descriptor { get; internal set; }
+        public IContractActions Actions { get; set; }
 
-        public IInstanceProvider InstanceProvider { get; private set; }
+        public ContractDescriptor Descriptor => Actions.Descriptor;
 
-        public IList<IActionExecutionFilter> Filters { get; }
+        public IInstanceProvider InstanceProvider { get; set; }
 
-        public IBoltRouteHandler Parent { get; private set; }
+        public IList<IActionExecutionFilter> Filters { get; set; }
 
-        #region Optional Members
+        public IBoltRouteHandler Parent { get;  set; }
 
-        public BoltServerOptions Options { get; set; }
-
-        public IServerErrorHandler ErrorHandler { get; set; }
-
-        public ISerializer Serializer { get; set; }
-
-        public IExceptionWrapper ExceptionWrapper { get; set; }
-
-        public IResponseHandler ResponseHandler { get; set; }
-
-        public IActionExecutionFilter ActionExecutionFilter { get; set; }
-
-        #endregion
-
-        public virtual void Init(IBoltRouteHandler parent, IInstanceProvider instanceProvider)
-        {
-            if (parent == null)
-            {
-                throw new ArgumentNullException(nameof(parent));
-            }
-
-            if (instanceProvider == null)
-            {
-                throw new ArgumentNullException(nameof(instanceProvider));
-            }
-
-            Parent = parent;
-            InstanceProvider = instanceProvider;
-            InitActions();
-        }
-
-        protected abstract void InitActions();
-
-        protected virtual void AddAction(ActionDescriptor descriptor, Func<ServerActionContext, Task> action)
-        {
-            if (descriptor == null)
-            {
-                throw new ArgumentNullException(nameof(descriptor));
-            }
-
-            if (action == null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
-
-            _actions[descriptor] = new ActionMetadata
-            {
-                Action = action
-            };
-        }
+        public ServerRuntimeConfiguration Configuration { get; }
 
         public virtual async Task Execute(ServerActionContext context)
         {
@@ -91,15 +32,15 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(context));
             }
 
-            context.EnsureNotHandled();
+            context.EnsureNotExecuted();
 
             var feature = context.HttpContext.GetFeature<IBoltFeature>();
             OverrideFeature(feature);
 
-            ActionMetadata metadata;
-            if (_actions.TryGetValue(context.Action, out metadata))
+            Func<ServerActionContext, Task> actionImplementation;
+            if (Actions.TryGetValue(context.Action, out actionImplementation))
             {
-                await feature.CoreAction.ExecuteAsync(context, metadata.Action);
+                await feature.CoreAction.ExecuteAsync(context, actionImplementation);
             }
             else
             {
@@ -109,35 +50,14 @@ namespace Bolt.Server
 
         protected virtual void OverrideFeature(IBoltFeature feature)
         {
-            if (ExceptionWrapper != null)
+            if (feature.Configuration == null)
             {
-                feature.ExceptionWrapper = ExceptionWrapper;
+                feature.Configuration = Configuration;
             }
-
-            if (Options != null)
+            else
             {
-                feature.Options = Options;
+                feature.Configuration.Merge(Configuration);
             }
-
-            if (ErrorHandler != null)
-            {
-                feature.ErrorHandler = ErrorHandler;
-            }
-
-            if (Serializer != null)
-            {
-                feature.Serializer = Serializer;
-            }
-
-            if (ResponseHandler != null)
-            {
-                feature.ResponseHandler = ResponseHandler;
-            }
-        }
-
-        private class ActionMetadata
-        {
-            public Func<ServerActionContext, Task> Action { get; set; }
         }
     }
 }

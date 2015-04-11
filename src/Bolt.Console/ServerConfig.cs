@@ -10,6 +10,8 @@ namespace Bolt.Console
 
         public bool Descriptor { get; set; }
 
+        public bool GenerateExtensions { get; set; }
+
         protected internal override void DoExecute(DocumentGenerator generator, ContractDefinition definition)
         {
             if (Descriptor)
@@ -17,31 +19,32 @@ namespace Bolt.Console
                 IncludeDescriptors(generator, definition);
             }
 
-            ServerGenerator serverGenerator = new ServerGenerator
+            ContractActionsGenerator contractActionsGenerator = new ContractActionsGenerator
                                                   {
                                                       ContractDefinition = definition,
                                                       Namespace = Namespace,
                                                       Name = Name,
                                                       StateFullInstanceProviderBase = StateFullBase,
-                                                      Modifier = GetModifier()
+                                                      Modifier = GetModifier(),
+                                                      GenerateExtensions = GenerateExtensions
                                                   };
 
             if (!string.IsNullOrEmpty(Suffix))
             {
-                serverGenerator.Suffix = Suffix;
+                contractActionsGenerator.Suffix = Suffix;
             }
 
             if (!string.IsNullOrEmpty(Generator))
             {
-                serverGenerator.InvocatorUserGenerator = Parent.Parent.GetGenerator(Generator);
+                contractActionsGenerator.InvocatorUserGenerator = Parent.Parent.GetGenerator(Generator);
             }
 
             if (!string.IsNullOrEmpty(GeneratorEx))
             {
-                serverGenerator.ExtensionCodeGenerator = Parent.Parent.GetGenerator(GeneratorEx);
+                contractActionsGenerator.ExtensionCodeGenerator = Parent.Parent.GetGenerator(GeneratorEx);
             }
 
-            generator.Add(serverGenerator);
+            generator.Add(contractActionsGenerator);
         }
 
         public override string GetFileName(ContractDefinition definition)

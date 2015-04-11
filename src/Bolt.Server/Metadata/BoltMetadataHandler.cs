@@ -100,8 +100,8 @@ namespace Bolt.Server.Metadata
             var m = new ContractMetadata
             {
                 Actions = context.ContractInvoker.Descriptor.Select(a => a.Name).ToList(),
-                ErrorHeader = feature.Options.ServerErrorHeader,
-                ContentType = feature.Serializer.ContentType
+                ErrorHeader = feature.Configuration.Options.ServerErrorHeader,
+                ContentType = feature.Configuration.Serializer.ContentType
             };
 
             var statefullProvder = context.ContractInvoker.InstanceProvider as StateFullInstanceProvider;
