@@ -14,5 +14,6 @@
         public const int ContractNotFound = BaseError + 8;
         public const int ContractAdded = BaseError + 9;
         public const int BoltRegistration = BaseError + 10;
+        public const int ConfigureDefaultServerRuntimeConfiguration = BaseError + 11;
     }
 }

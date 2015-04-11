@@ -76,7 +76,6 @@ namespace TestService.Server.Bolt
             public async Task ExecuteAsync(ServerActionContext context, Func<ServerActionContext, Task> next)
             { 
                 Console.WriteLine(GetType().FullName);
-                context.IsResponseSend = true;
                 await next(context);
             }
         }

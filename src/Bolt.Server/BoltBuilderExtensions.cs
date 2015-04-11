@@ -12,7 +12,6 @@ namespace Microsoft.AspNet.Builder
         /// </summary>
         /// <param name="app">The <see cref="IApplicationBuilder"/>.</param>
         /// <param name="configure">Register Bolt contracts.</param>
-        /// <param name="options">The options for this route handler, if specified the default options will be overwritten.</param>
         /// <returns>The <paramref name="app"/>THe builder instance.</returns>
         public static IApplicationBuilder UseBolt(this IApplicationBuilder app, Action<IBoltRouteHandler> configure)
         {

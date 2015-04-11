@@ -18,58 +18,30 @@ namespace Bolt.Server
     {
         private readonly List<IContractInvoker> _invokers = new List<IContractInvoker>();
 
-        public BoltRouteHandler(ILoggerFactory factory, IResponseHandler responseHandler,
-            IServerErrorHandler errorHandler, IOptions<BoltServerOptions> options, IBoltMetadataHandler metadataHandler,
-            ISerializer serializer, IExceptionWrapper exceptionWrapper, IServiceProvider applicationServices)
+        public BoltRouteHandler(ILoggerFactory factory, IOptions<ServerRuntimeConfiguration> defaultConfiguration, IBoltMetadataHandler metadataHandler,
+             IServiceProvider applicationServices)
         {
             if (factory == null)
             {
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            if (responseHandler == null)
+            if (defaultConfiguration == null)
             {
-                throw new ArgumentNullException(nameof(responseHandler));
-            }
-
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            if (serializer == null)
-            {
-                throw new ArgumentNullException(nameof(serializer));
-            }
-
-            if (exceptionWrapper == null)
-            {
-                throw new ArgumentNullException(nameof(exceptionWrapper));
+                throw new ArgumentNullException(nameof(defaultConfiguration));
             }
 
             if (applicationServices == null)
             {
                 throw new ArgumentNullException(nameof(applicationServices));
             }
-
-            if (errorHandler == null)
-            {
-                throw new ArgumentNullException(nameof(errorHandler));
-            }
+    
 
             Logger = factory.Create<BoltRouteHandler>();
             MetadataHandler = metadataHandler;
             Filters = new List<IActionExecutionFilter>();
             ApplicationServices = applicationServices;
-
-            Configuration = new ServerRuntimeConfiguration
-            {
-                Options = options.Options,
-                ExceptionWrapper = exceptionWrapper,
-                Serializer = serializer,
-                ResponseHandler = responseHandler,
-                ErrorHandler = errorHandler
-            };
+            Configuration = defaultConfiguration.Options;
         }
 
         public IList<IActionExecutionFilter> Filters { get; }
@@ -100,7 +72,7 @@ namespace Bolt.Server
             _invokers.Add(invoker);
             foreach (ActionDescriptor descriptor in invoker.Descriptor)
             {
-                Logger.WriteInformation("Action: {0}", descriptor.Name);
+                Logger.WriteVerbose("Action: {0}", descriptor.Name);
             }
         }
 

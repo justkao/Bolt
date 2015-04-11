@@ -11,11 +11,14 @@ namespace Microsoft.Framework.DependencyInjection
         public static IServiceCollection ConfigureBolt(this IServiceCollection services, Action<BoltServerOptions> configure)
         {
             services.Configure(configure);
+
             return services;
         }
 
         public static IServiceCollection AddBolt(this IServiceCollection services)
         {
+            services.ConfigureOptions<ConfigureServerRuntimeConfiguration>();
+
             services.AddTransient<ISerializer, JsonSerializer>();
             services.AddTransient<IExceptionWrapper, JsonExceptionWrapper>();
             services.AddTransient<IResponseHandler, ResponseHandler>();
