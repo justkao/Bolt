@@ -37,9 +37,10 @@ namespace TestService.Server.Bolt
 
             app.UseBolt(b =>
             {
-
-
-                b.Use(new TestContractActions(), new InstanceProvider<TestContractImplementation>());
+                b.Use(new TestContractActions(), new InstanceProvider<TestContractImplementation>(), c =>
+                {
+                    c.Filters.Add(new DiagnosticsActionExecutor());
+                });
             });
 
             var server = app.Server as ServerInformation;
@@ -49,13 +50,7 @@ namespace TestService.Server.Bolt
 
         private class DiagnosticsActionExecutor : IActionExecutionFilter
         {
-            public int Order
-            {
-                get
-                {
-                    return 1;
-                }
-            }
+            public int Order => 1;
 
             public async Task ExecuteAsync(ServerActionContext context, Func<ServerActionContext, Task> next)
             {

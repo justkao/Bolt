@@ -26,7 +26,6 @@ namespace Microsoft.Framework.DependencyInjection
             services.AddTransient<IServerErrorHandler, ServerErrorHandler>();
             services.AddTransient<IBoltMetadataHandler, BoltMetadataHandler>();
             services.AddTransient<IFilterProvider, DefaultFilterProvider>();
-            services.AddTransient<IActionExecutionFilter, CoreAction>();
             services.AddTransient<IContractInvoker, ContractInvoker>();
             services.AddTransient<IActionPicker, ActionPicker>();
 

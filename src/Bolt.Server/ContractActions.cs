@@ -24,6 +24,18 @@ namespace Bolt.Server
 
         public T Descriptor { get; }
 
+        public Func<ServerActionContext, Task> GetAction(ActionDescriptor descriptor)
+        {
+            if (descriptor == null)
+            {
+                throw new ArgumentNullException(nameof(descriptor));
+            }
+
+            Func<ServerActionContext, Task> action;
+            TryGetValue(descriptor, out action);
+            return action;
+        }
+
         ContractDescriptor IContractDescriptorProvider.Descriptor => Descriptor;
     }
 }

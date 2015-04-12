@@ -37,8 +37,8 @@ namespace Bolt.Server
             var feature = context.HttpContext.GetFeature<IBoltFeature>();
             OverrideFeature(feature);
 
-            Func<ServerActionContext, Task> actionImplementation;
-            if (Actions.TryGetValue(context.Action, out actionImplementation))
+            Func<ServerActionContext, Task> actionImplementation = Actions.GetAction(context.Action);
+            if (actionImplementation != null)
             {
                 await ExecuteActionAsync(context, actionImplementation);
             }
