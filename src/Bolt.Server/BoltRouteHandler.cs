@@ -16,11 +16,13 @@ namespace Bolt.Server
 {
     public class BoltRouteHandler : IBoltRouteHandler, IEnumerable<IContractInvoker>
     {
+        private readonly IActionPicker _actionPicker;
         private readonly List<IContractInvoker> _invokers = new List<IContractInvoker>();
 
         public BoltRouteHandler(ILoggerFactory factory, IOptions<ServerRuntimeConfiguration> defaultConfiguration, IBoltMetadataHandler metadataHandler,
-             IServiceProvider applicationServices)
+             IServiceProvider applicationServices, IActionPicker actionPicker)
         {
+            _actionPicker = actionPicker;
             if (factory == null)
             {
                 throw new ArgumentNullException(nameof(factory));
@@ -35,7 +37,11 @@ namespace Bolt.Server
             {
                 throw new ArgumentNullException(nameof(applicationServices));
             }
-    
+
+            if (actionPicker == null)
+            {
+                throw new ArgumentNullException(nameof(actionPicker));
+            }
 
             Logger = factory.Create<BoltRouteHandler>();
             MetadataHandler = metadataHandler;
@@ -130,7 +136,7 @@ namespace Bolt.Server
                     Logger.WriteWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", result[0], path);
 
                     // we have defined bolt prefix, report error about contract not found
-                    await feature.Configuration.ErrorHandler.HandleErrorAsync(new HandlerErrorContext
+                    await feature.Configuration.ErrorHandler.HandleErrorAsync(new HandleErrorContext
                     {
                         Options = feature.Configuration.Options,
                         ExceptionWrapper = feature.Configuration.ExceptionWrapper,
@@ -161,10 +167,10 @@ namespace Bolt.Server
             // at this point Bolt will handle the request
             context.IsHandled = true;
             var actionName = result[1];
-            var actionDescriptor = FindAction(found.Descriptor, actionName);
+            var actionDescriptor = FindAction(feature.ActionContext, actionName);
             if (actionDescriptor == null)
             {
-                await feature.Configuration.ErrorHandler.HandleErrorAsync(new HandlerErrorContext
+                await feature.Configuration.ErrorHandler.HandleErrorAsync(new HandleErrorContext
                 {
                     Options = feature.Configuration.Options,
                     ExceptionWrapper = feature.Configuration.ExceptionWrapper,
@@ -196,8 +202,7 @@ namespace Bolt.Server
 
                 try
                 {
-                    feature.CoreAction = ctxt.HttpContext.ApplicationServices.GetRequiredService<IActionExecutionFilter>();
-                    await invoker.Execute(ctxt);
+                    await invoker.ExecuteAsync(ctxt);
                     if (!ctxt.IsResponseSend)
                     {
                         await feature.Configuration.ResponseHandler.HandleAsync(ctxt);
@@ -217,7 +222,7 @@ namespace Bolt.Server
                 {
                     if (!ctxt.IsResponseSend)
                     {
-                        await feature.Configuration.ErrorHandler.HandleErrorAsync(new HandlerErrorContext
+                        await feature.Configuration.ErrorHandler.HandleErrorAsync(new HandleErrorContext
                         {
                             Options = feature.Configuration.Options,
                             ExceptionWrapper = feature.Configuration.ExceptionWrapper,
@@ -257,9 +262,9 @@ namespace Bolt.Server
             return registeredContracts.FirstOrDefault(i => string.CompareOrdinal(i.Descriptor.Name.ToLowerInvariant(), contractName) == 0);
         }
 
-        protected virtual ActionDescriptor FindAction(ContractDescriptor descriptor, string actionName)
+        protected virtual ActionDescriptor FindAction(ServerActionContext context, string actionName)
         {
-            return descriptor.Find(actionName);
+            return _actionPicker.PickAction(context, actionName);
         }
 
         protected virtual async Task HandleContractRootAsync(RouteContext context, IContractInvoker descriptor)

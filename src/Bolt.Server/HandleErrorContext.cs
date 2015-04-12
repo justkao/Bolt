@@ -2,7 +2,7 @@ using System;
 
 namespace Bolt.Server
 {
-    public class HandlerErrorContext
+    public class HandleErrorContext
     {
         public ISerializer Serializer { get; set; }
 

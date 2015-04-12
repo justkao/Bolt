@@ -37,14 +37,9 @@ namespace TestService.Server.Bolt
 
             app.UseBolt(b =>
             {
-                b.Filters.Add(new DiagnosticsActionExecutor());
-                b.Filters.Add(new DiagnosticsActionExecutor2());
 
-                b.Use(new TestContractActions(), new InstanceProvider<TestContractImplementation>(), (c) =>
-                {
-                    c.Configuration.ExceptionWrapper = new TextExceptionWrapper();
-                    c.Configuration.Options = new BoltServerOptions() {ServerErrorHeader = "Customized-TestContractImplementation"};
-                });
+
+                b.Use(new TestContractActions(), new InstanceProvider<TestContractImplementation>());
             });
 
             var server = app.Server as ServerInformation;

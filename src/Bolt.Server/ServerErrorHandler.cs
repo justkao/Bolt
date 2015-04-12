@@ -8,7 +8,7 @@ namespace Bolt.Server
 {
     public class ServerErrorHandler : IServerErrorHandler
     {
-        public virtual Task HandleErrorAsync(HandlerErrorContext context)
+        public virtual Task HandleErrorAsync(HandleErrorContext context)
         {
             if (context == null)
             {
@@ -33,7 +33,7 @@ namespace Bolt.Server
             return WriteExceptionAsync(context);
         }
 
-        protected virtual bool HandleAsErrorCode(HandlerErrorContext context)
+        protected virtual bool HandleAsErrorCode(HandleErrorContext context)
         {
             var httpContext = context.ActionContext.HttpContext;
             var errorHeader = context.Options.ServerErrorHeader;
@@ -101,7 +101,7 @@ namespace Bolt.Server
             context.Response.Headers[errorHeader] = code.ToString(CultureInfo.InvariantCulture);
         }
 
-        protected virtual Task WriteExceptionAsync(HandlerErrorContext context)
+        protected virtual Task WriteExceptionAsync(HandleErrorContext context)
         {
             context.ActionContext.IsResponseSend = true;
 

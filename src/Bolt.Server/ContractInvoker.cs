@@ -25,7 +25,7 @@ namespace Bolt.Server
 
         public ServerRuntimeConfiguration Configuration { get; }
 
-        public virtual async Task Execute(ServerActionContext context)
+        public virtual async Task ExecuteAsync(ServerActionContext context)
         {
             if (context == null)
             {
@@ -40,12 +40,17 @@ namespace Bolt.Server
             Func<ServerActionContext, Task> actionImplementation;
             if (Actions.TryGetValue(context.Action, out actionImplementation))
             {
-                await feature.CoreAction.ExecuteAsync(context, actionImplementation);
+                await ExecuteActionAsync(context, actionImplementation);
             }
             else
             {
                 throw new BoltServerException(ServerErrorCode.ActionNotImplemented, context.Action, context.HttpContext.Request.Path.ToString());
             }
+        }
+
+        protected virtual Task ExecuteActionAsync(ServerActionContext context, Func<ServerActionContext, Task> actionImplementation)
+        {
+            return new CoreAction().ExecuteAsync(context, actionImplementation);
         }
 
         protected virtual void OverrideFeature(IBoltFeature feature)

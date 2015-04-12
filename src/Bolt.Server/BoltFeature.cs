@@ -10,7 +10,5 @@ namespace Bolt.Server
         public ServerRuntimeConfiguration Configuration { get; set; }
 
         public IList<IFilterProvider> FilterProviders { get; set; }
-
-        public IActionExecutionFilter CoreAction { get; set; }
     }
 }

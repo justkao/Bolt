@@ -28,6 +28,7 @@ namespace Microsoft.Framework.DependencyInjection
             services.AddTransient<IFilterProvider, DefaultFilterProvider>();
             services.AddTransient<IActionExecutionFilter, CoreAction>();
             services.AddTransient<IContractInvoker, ContractInvoker>();
+            services.AddTransient<IActionPicker, ActionPicker>();
 
             return services;
         }

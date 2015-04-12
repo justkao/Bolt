@@ -14,7 +14,7 @@ namespace Bolt.Server
 
         IContractActions Actions { get; set; }
 
-        Task Execute(ServerActionContext context);
+        Task ExecuteAsync(ServerActionContext context);
 
         ServerRuntimeConfiguration Configuration { get; }
     }
