@@ -1,7 +1,28 @@
-﻿namespace Bolt.Server
+﻿using System;
+
+namespace Bolt.Server
 {
     public class ServerRuntimeConfiguration
     {
+        public ServerRuntimeConfiguration()
+        {
+        }
+
+        public ServerRuntimeConfiguration(ServerRuntimeConfiguration other)
+        {
+            if (other == null)
+            {
+                throw new ArgumentNullException(nameof(other));
+            }
+
+            Serializer = other.Serializer;
+            ExceptionWrapper = other.ExceptionWrapper;
+            Options = other.Options;
+            ErrorHandler = other.ErrorHandler;
+            ResponseHandler = other.ResponseHandler;
+            ParemterHandler = other.ParemterHandler;
+        }
+
         /// <summary>
         /// Gets or sets <see cref="ISerializer"/> assigned to current context.
         /// </summary>

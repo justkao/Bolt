@@ -61,7 +61,12 @@ namespace Bolt.Server
             }
             else
             {
-                feature.Configuration.Merge(Configuration);
+                if (Configuration != null)
+                {
+                    ServerRuntimeConfiguration copy = new ServerRuntimeConfiguration(feature.Configuration);
+                    copy.Merge(Configuration);
+                    feature.Configuration.Merge(copy);
+                }
             }
         }
     }
