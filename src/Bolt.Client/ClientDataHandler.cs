@@ -7,9 +7,6 @@ namespace Bolt.Client
 {
     public class ClientDataHandler : IClientDataHandler
     {
-        private readonly ISerializer _serializer;
-        private readonly IExceptionWrapper _exceptionWrapper;
-
         public ClientDataHandler(ISerializer serializer, IExceptionWrapper exceptionWrapper)
         {
             if (serializer == null)
@@ -21,11 +18,15 @@ namespace Bolt.Client
                 throw new ArgumentNullException(nameof(exceptionWrapper));
             }
 
-            _serializer = serializer;
-            _exceptionWrapper = exceptionWrapper;
+            Serializer = serializer;
+            ExceptionWrapper = exceptionWrapper;
         }
 
-        public virtual string ContentType => _serializer.ContentType;
+        public virtual string ContentType => Serializer.ContentType;
+
+        public ISerializer Serializer { get; }
+
+        public IExceptionWrapper ExceptionWrapper { get; }
 
         public virtual void WriteParameters<T>(ClientActionContext context, T parameters)
         {
@@ -35,7 +36,7 @@ namespace Bolt.Client
                 return;
             }
 
-            byte[] raw = _serializer.SerializeParameters(parameters, context.Action);
+            byte[] raw = Serializer.SerializeParameters(parameters, context.Action);
             context.Request.Content = new ByteArrayContent(raw);
         }
 
@@ -53,7 +54,7 @@ namespace Bolt.Client
                     return default(T);
                 }
 
-                return _serializer.DeserializeResponse<T>(stream, context.Action);
+                return Serializer.DeserializeResponse<T>(stream, context.Action);
             }
         }
 
@@ -66,13 +67,13 @@ namespace Bolt.Client
                     return null;
                 }
 
-                object result = _serializer.DeserializeExceptionResponse(_exceptionWrapper.Type, stream, context.Action);
+                object result = Serializer.DeserializeExceptionResponse(ExceptionWrapper.Type, stream, context.Action);
                 if (result == null)
                 {
                     return null;
                 }
 
-                return _exceptionWrapper.Unwrap(result);
+                return ExceptionWrapper.Unwrap(result);
             }
         }
     }

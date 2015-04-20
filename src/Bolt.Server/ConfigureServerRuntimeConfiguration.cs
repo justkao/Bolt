@@ -35,6 +35,7 @@ namespace Bolt.Server
             options.ResponseHandler = _provider.GetRequiredService<IResponseHandler>();
             options.Serializer = _provider.GetRequiredService<ISerializer>();
             options.ExceptionWrapper = _provider.GetRequiredService<IExceptionWrapper>();
+            options.ParemterHandler = _provider.GetRequiredService<IParameterHandler>();
         }
     }
 }

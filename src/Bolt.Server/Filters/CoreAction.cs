@@ -48,9 +48,12 @@ namespace Bolt.Server.Filters
 
             if (context.Action.HasParameters && context.Parameters == null)
             {
-                context.Parameters =
-                    feature.Configuration.Serializer.DeserializeParameters(
-                        await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted), context.Action);
+                await feature.Configuration.ParemterHandler.HandleAsync(context);
+
+                if (context.Parameters == null)
+                {
+                    throw new InvalidOperationException( $"Action {context.Action} requires parameters to execute. Make sure that parameter handler assign parameters to context properly.");
+                }
             }
 
             bool instanceCreated = false;

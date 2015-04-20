@@ -27,6 +27,11 @@
         /// </summary>
         public IResponseHandler ResponseHandler { get; set; }
 
+        /// <summary>
+        /// Gets or sets <see cref="IParameterHandler"/> assigned to current context.
+        /// </summary>
+        public IParameterHandler ParemterHandler { get; set; }
+
         public void Merge(ServerRuntimeConfiguration other)
         {
             if (other == null)
@@ -54,10 +59,13 @@
             {
                 Serializer = other.Serializer;
             }
-
             if (other.ResponseHandler != null)
             {
                 ResponseHandler = other.ResponseHandler;
+            }
+            if (other.ParemterHandler != null)
+            {
+                ParemterHandler = other.ParemterHandler;
             }
         }
     }
