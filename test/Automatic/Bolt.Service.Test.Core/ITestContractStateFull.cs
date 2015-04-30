@@ -3,15 +3,9 @@ using System.Runtime.Serialization;
 
 namespace Bolt.Service.Test.Core
 {
-    [Serializable]
     public class TestContractProxyFailedException : Exception
     {
         public TestContractProxyFailedException()
-        {
-        }
-
-        protected TestContractProxyFailedException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         {
         }
     }

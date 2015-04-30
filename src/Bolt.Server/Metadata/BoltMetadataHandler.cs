@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Bolt.Server.InstanceProviders;
 using Microsoft.AspNet.Http;
 using Microsoft.Framework.Logging;
+using Microsoft.Framework.Logging.Internal;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema;
 
@@ -20,7 +22,7 @@ namespace Bolt.Server.Metadata
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            Logger = factory.Create<BoltMetadataHandler>();
+            Logger = factory.CreateLogger<BoltMetadataHandler>();
         }
 
         public ILogger Logger { get; }
@@ -36,7 +38,7 @@ namespace Bolt.Server.Metadata
             }
             catch (Exception e)
             {
-                Logger.WriteWarning(BoltLogId.HandleBoltRootError, "Failed to generate Bolt root metadata. Error: {0}", e);
+                Logger.LogWarning(BoltLogId.HandleBoltRootError, "Failed to generate Bolt root metadata. Error: {0}", e);
                 return false;
             }
         }
@@ -87,7 +89,7 @@ namespace Bolt.Server.Metadata
             }
             catch (Exception e)
             {
-                Logger.WriteWarning(BoltLogId.HandleContractMetadataError,
+                Logger.LogWarning(BoltLogId.HandleContractMetadataError,
                     "Failed to generate Bolt metadata for contract '{0}'. Error: {1}", context.ContractInvoker.Descriptor, e);
                 return false;
             }

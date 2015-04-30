@@ -43,7 +43,7 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(actionPicker));
             }
 
-            Logger = factory.Create<BoltRouteHandler>();
+            Logger = factory.CreateLogger<BoltRouteHandler>();
             MetadataHandler = metadataHandler;
             Filters = new List<IActionExecutionFilter>();
             ApplicationServices = applicationServices;
@@ -74,11 +74,11 @@ namespace Bolt.Server
                 throw new InvalidOperationException($"Invoker for contract '{invoker.Descriptor.Name}' already registered.");
             }
 
-            Logger.WriteInformation(BoltLogId.ContractAdded, "Adding contract: {0}", invoker.Descriptor.Name);
+            Logger.LogInformation(BoltLogId.ContractAdded, "Adding contract: {0}", invoker.Descriptor.Name);
             _invokers.Add(invoker);
             foreach (ActionDescriptor descriptor in invoker.Descriptor)
             {
-                Logger.WriteVerbose("Action: {0}", descriptor.Name);
+                Logger.LogVerbose("Action: {0}", descriptor.Name);
             }
         }
 
@@ -133,7 +133,7 @@ namespace Bolt.Server
             {
                 if (!string.IsNullOrEmpty(Options.Prefix))
                 {
-                    Logger.WriteWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", result[0], path);
+                    Logger.LogWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", result[0], path);
 
                     // we have defined bolt prefix, report error about contract not found
                     await feature.Configuration.ErrorHandler.HandleErrorAsync(new HandleErrorContext
@@ -215,7 +215,7 @@ namespace Bolt.Server
                     {
                         // TODO: is this ok ? 
                         ctxt.HttpContext.Response.Body.Dispose();
-                        Logger.WriteError(BoltLogId.RequestCancelled, "Action '{0}' was cancelled.", ctxt.Action);
+                        Logger.LogError(BoltLogId.RequestCancelled, "Action '{0}' was cancelled.", ctxt.Action);
                     }
                 }
                 catch (Exception e)
@@ -232,13 +232,13 @@ namespace Bolt.Server
                         });
                     }
 
-                    Logger.WriteError(BoltLogId.RequestExecutionError, "Execution of '{0}' failed with error '{1}'", ctxt.Action, e);
+                    Logger.LogError(BoltLogId.RequestExecutionError, "Execution of '{0}' failed with error '{1}'", ctxt.Action, e);
                 }
                 finally
                 {
                     if (watch != null)
                     {
-                        Logger.WriteVerbose(BoltLogId.RequestExecutionTime, "Execution of '{0}' has taken '{1}ms'", ctxt.Action, watch.ElapsedMilliseconds);
+                        Logger.LogVerbose(BoltLogId.RequestExecutionTime, "Execution of '{0}' has taken '{1}ms'", ctxt.Action, watch.ElapsedMilliseconds);
                     }
                 }
             }
@@ -286,7 +286,7 @@ namespace Bolt.Server
             }
             catch (Exception e)
             {
-                Logger.WriteError(BoltLogId.HandleContractMetadataError, $"Failed to handle metadata for contract {descriptor.Descriptor}.", e);
+                Logger.LogError(BoltLogId.HandleContractMetadataError, $"Failed to handle metadata for contract {descriptor.Descriptor}.", e);
             }
         }
 
@@ -309,13 +309,13 @@ namespace Bolt.Server
             }
             catch (Exception e)
             {
-                Logger.WriteError(BoltLogId.HandleBoltRootError, "Failed to handle root metadata.", e);
+                Logger.LogError(BoltLogId.HandleBoltRootError, "Failed to handle root metadata.", e);
             }
         }
 
-        public virtual string GetVirtualPath(VirtualPathContext context)
+        public virtual VirtualPathData GetVirtualPath(VirtualPathContext context)
         {
-            return string.Empty;
+            return null;
         }
     }
 }

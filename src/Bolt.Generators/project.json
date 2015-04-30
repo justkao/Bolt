@@ -1,38 +1,38 @@
 ﻿{
-    "version": "0.11.0-alpha",
-    "authors": [ "Martin Tomka" ],
-    "description": "Bolt library containing helper classes for code generation.",
-    "dependencies": {
-        "Bolt.Common": { "type": "build" },
-        "Bolt.Common.Conversion": { "type": "build" }
-
+  "version": "0.11.0-alpha",
+  "authors": [ "Martin Tomka" ],
+  "description": "Bolt library containing helper classes for code generation.",
+  "dependencies": {
+    "Bolt.Common": { "type": "build" },
+    "Bolt.Common.AssemblyInfo": { "type": "build" },
+    "Bolt.Common.Conversion": { "type": "build" }
+  },
+  "frameworks": {
+    "net45": {
+      "frameworkAssemblies": {
+        "System.Collections": { "version": "", "type": "build" },
+        "System.Runtime": { "version": "", "type": "build" },
+        "System.Runtime.Serialization": { "version": "", "type": "build" }
+      }
     },
-    "frameworks": {
-        "net45": {
-            "frameworkAssemblies": {
-                "System.Collections": { "version": "", "type": "build" },
-                "System.Runtime": { "version": "", "type": "build" },
-                "System.Runtime.Serialization": { "version": "", "type": "build" }
-            }
-        },
-        "aspnet50": {
-            "frameworkAssemblies": {
-                "System.Runtime": "",
-                "System.Collections": "",
-                "System.Runtime.Serialization": ""
-            }
-        },
-        "aspnetcore50": {
-            "dependencies": {
-                "System.Runtime": "4.0.20-beta-22523",
-                "System.Linq": "4.0.0-beta-22605",
-                "System.Reflection": "4.0.10-beta-22605",
-                "System.Reflection.Extensions": "4.0.0-beta-22605",
-                "System.Runtime.Serialization.Primitives": "4.0.0-beta-22605",
-                "System.Diagnostics.Debug": "4.0.10-beta-22605",
-                "System.ComponentModel.TypeConverter": "4.0.0-beta-22605",
-                "System.Collections.Concurrent": "4.0.0-beta-22605"
-            }
-        }
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.Runtime": "",
+        "System.Collections": "",
+        "System.Runtime.Serialization": ""
+      }
+    },
+    "dnxcore50": {
+      "dependencies": {
+        "System.Runtime": "4.0.20-*",
+        "System.Linq": "4.0.0-*",
+        "System.Reflection": "4.0.10-*",
+        "System.Reflection.Extensions": "4.0.0-*",
+        "System.Runtime.Serialization.Primitives": "4.0.0-*",
+        "System.Diagnostics.Debug": "4.0.10-*",
+        "System.ComponentModel.TypeConverter": "4.0.0-*",
+        "System.Collections.Concurrent": "4.0.0-*"
+      }
     }
+  }
 }

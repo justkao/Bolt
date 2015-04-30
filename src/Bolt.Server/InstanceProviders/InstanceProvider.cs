@@ -6,8 +6,8 @@ namespace Bolt.Server.InstanceProviders
 {
     public class InstanceProvider : IInstanceProvider
     {
-        private readonly ConcurrentDictionary<Type, Func<IServiceProvider, object[], object>> _typeActivatorCache =
-               new ConcurrentDictionary<Type, Func<IServiceProvider, object[], object>>();
+        private readonly ConcurrentDictionary<Type, ObjectFactory> _typeActivatorCache =
+               new ConcurrentDictionary<Type, ObjectFactory>();
 
         public virtual object GetInstance(ServerActionContext context, Type type)
         {

@@ -1,9 +1,0 @@
-{
-  "profiles": [
-    {
-      "name": "Bolt.Console",
-      "commandName": "Bolt.Console",
-      "commandLineArgs": "code F:\\Projects\\GitHub\\Bolt\\Bolt\\test\\Service\\TestService.Core\\Generated\\Configuration.json --dir F:\\Projects\\GitHub\\Bolt\\Bolt\\test\\Service\\TestService.Core\\bin\\Debug\\ --dir F:\\Projects\\GitHub\\Bolt\\Bolt\\test\\Service\\TestService.Core\\bin\\Debug\\"
-    }
-  ]
-}

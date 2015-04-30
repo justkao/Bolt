@@ -11,7 +11,7 @@ namespace Bolt.Common
     {
         // NOTE: Do not make #105 worse! Do not add new extension methods that conflict w/ .NET 4.5 methods. The
         // exising NETFX_CORE || DNXCORE50 methods should go away (soon).
-#if NETFX_CORE || ASPNETCORE50
+#if DNX451 || DNXCORE50
         private static bool EqualTo(this Type[] t1, Type[] t2)
         {
             if (t1.Length != t2.Length)
@@ -53,7 +53,7 @@ namespace Bolt.Common
                 queryType.GetInterfaces().FirstOrDefault(matchesInterface);
         }
 
-#if NETFX_CORE || ASPNETCORE50
+#if NETFX_CORE || DNXCORE50
         public static Type[] GetGenericArguments(this Type type)
         {
             return type.GetTypeInfo().GenericTypeArguments;

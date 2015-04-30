@@ -5,7 +5,7 @@ namespace Bolt.Server.InstanceProviders
 {
     public class InstanceProvider<T> : InstanceProvider
     {
-        private Func<IServiceProvider, object[], object> _factory;
+        private ObjectFactory _factory;
 
         protected override object CreateInstance(ServerActionContext context, Type type)
         {

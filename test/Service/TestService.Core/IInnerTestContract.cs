@@ -1,9 +1,13 @@
-﻿using System.ServiceModel;
+﻿using System;
+using System.ServiceModel;
 using System.Threading.Tasks;
-using Bolt;
 
 namespace TestService.Core
 {
+    public class AsyncOperationAttribute : Attribute
+    {
+    }
+
     [ServiceContract]
     public interface IInnerTestContract2
     {

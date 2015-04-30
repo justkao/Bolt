@@ -97,7 +97,7 @@ namespace Bolt.Generators
                 return methods.All(m => m.Name != method.Name + "Async");
             }
 
-            return method.CustomAttributes.FirstOrDefault(a => a.GetType().FullName == BoltConstants.Core.AsyncOperationAttribute.FullName) != null && methods.All(m => m.Name != method.Name + "Async");
+            return method.CustomAttributes.FirstOrDefault(a => a.GetType().Name == BoltConstants.Core.AsyncOperationAttribute.Name) != null && methods.All(m => m.Name != method.Name + "Async");
         }
 
         public virtual ClassGenerator CreateClassGenerator(ClassDescriptor descriptor)

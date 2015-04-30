@@ -1,0 +1,17 @@
+﻿{
+  "version": "1.0.0-*",
+  "dependencies": {
+    "Bolt.Core": "",
+    "Bolt.Server": "",
+    "Bolt.Client": "",
+    "Bolt.Common": "",
+    "Bolt.Generators": ""
+  },
+  "compileExclude": "Generated\\*.*",
+  "frameworks": {
+    "dnx451": {
+    },
+        "dnxcore50": {
+    }
+  }
+}

@@ -23,12 +23,12 @@ namespace Bolt.Server
             }
 
             _provider = provider;
-            _logger = loggerFactory.Create<ConfigureServerRuntimeConfiguration>();
+            _logger = loggerFactory.CreateLogger<ConfigureServerRuntimeConfiguration>();
         }
 
         public override void Configure(ServerRuntimeConfiguration options, string name = "")
         {
-            _logger.WriteInformation(BoltLogId.ConfigureDefaultServerRuntimeConfiguration, "Configuring default server runtime configuration.");
+            _logger.LogInformation(BoltLogId.ConfigureDefaultServerRuntimeConfiguration, "Configuring default server runtime configuration.");
 
             options.Options = _provider.GetRequiredService<IOptions<BoltServerOptions>>().Options;
             options.ErrorHandler = _provider.GetRequiredService<IServerErrorHandler>();

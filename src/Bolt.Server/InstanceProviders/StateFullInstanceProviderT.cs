@@ -5,7 +5,7 @@ namespace Bolt.Server.InstanceProviders
 {
     public class StateFullInstanceProvider<T> : StateFullInstanceProvider
     {
-        private Func<IServiceProvider, object[], object> _factory;
+        private ObjectFactory _factory;
 
         public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, BoltServerOptions options)
             : base(initInstanceAction, releaseInstanceAction, options)

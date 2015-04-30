@@ -1,31 +1,39 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.22609.0
+VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Core", "src\Bolt.Core\Bolt.Core.kproj", "{DB896F78-D894-4F17-9805-D9909636C52A}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Core", "src\Bolt.Core\Bolt.Core.xproj", "{DB896F78-D894-4F17-9805-D9909636C52A}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Server", "src\Bolt.Server\Bolt.Server.kproj", "{64C23F4E-4410-49BC-A209-8D28A22A7E68}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Server", "src\Bolt.Server\Bolt.Server.xproj", "{64C23F4E-4410-49BC-A209-8D28A22A7E68}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Client", "src\Bolt.Client\Bolt.Client.kproj", "{4CB65791-1B77-4897-9899-7B3A54AAED10}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Client", "src\Bolt.Client\Bolt.Client.xproj", "{4CB65791-1B77-4897-9899-7B3A54AAED10}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Generators", "src\Bolt.Generators\Bolt.Generators.kproj", "{63FC65FF-FC17-40F7-A83B-04D240A0E934}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Generators", "src\Bolt.Generators\Bolt.Generators.xproj", "{63FC65FF-FC17-40F7-A83B-04D240A0E934}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Console", "src\Bolt.Console\Bolt.Console.kproj", "{114628A3-3C96-44A1-8604-7C7341751C79}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Console", "src\Bolt.Console\Bolt.Console.xproj", "{114628A3-3C96-44A1-8604-7C7341751C79}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Common", "src\Bolt.Common\Bolt.Common.kproj", "{2C3CE2D5-15F2-4819-B5BC-2574BCD04C95}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Common", "src\Bolt.Common\Bolt.Common.xproj", "{2C3CE2D5-15F2-4819-B5BC-2574BCD04C95}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "TestService.Server.Bolt", "test\Service\TestService.Server.Bolt\TestService.Server.Bolt.kproj", "{1E541977-3F26-4159-9C4E-67DD88BAF2C9}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Common.Conversion", "src\Bolt.Common.Conversion\Bolt.Common.Conversion.xproj", "{C675A0AD-1DB6-4685-8D94-946DE1F4A108}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "service", "service", "{9FDE6EDF-148A-44B4-9E0D-DFAA864D4906}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{5D2CA858-5B91-4B30-BB27-274BB66F5C42}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "TestService.Client", "test\Service\TestService.Client.Bolt\TestService.Client.kproj", "{92A516C3-A78C-4E2B-A6E1-18C73BC95AD1}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Service", "Service", "{4DC330AE-9804-49F2-B0FF-E024E8F5C9D3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestService.Core", "test\Service\TestService.Core\TestService.Core.csproj", "{9975CC72-8C2F-4515-B93D-A6A58324087C}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "TestService.Core", "test\Service\TestService.Core\TestService.Core.xproj", "{57E94545-1975-41F8-A3FF-F2A263ED7646}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestService.Server.Wcf", "test\Service\TestService.Server.Wcf\TestService.Server.Wcf.csproj", "{D1C82C58-B3A4-4C18-BDCB-6E1B82D99226}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Automatic", "Automatic", "{F63AC733-201C-43F7-9C13-FFB262BAB3AE}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Common.Conversion", "src\Bolt.Common.Conversion\Bolt.Common.Conversion.kproj", "{C675A0AD-1DB6-4685-8D94-946DE1F4A108}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Service.Test.Core", "test\Automatic\Bolt.Service.Test.Core\Bolt.Service.Test.Core.xproj", "{F56C34FD-5DD2-42E1-A28F-C280A34A9A1C}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Common.AssemblyInfo", "src\Bolt.Common.AssemblyInfo\Bolt.Common.AssemblyInfo.xproj", "{8478DC05-2F04-423D-8519-03D8C8CB1A6A}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Core.Serialization.Test", "test\Automatic\Bolt.Core.Serialization.Test\Bolt.Core.Serialization.Test.xproj", "{55DFDA5F-1669-4982-B8DC-0BA3DD0BCF78}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Core.Test", "Test\Automatic\Bolt.Core.Test\Bolt.Core.Test.xproj", "{18486979-C4ED-4A5E-A16E-403000765774}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Test.Common", "Test\Automatic\Bolt.Test.Common\Bolt.Test.Common.xproj", "{AB3B1324-1F56-4F7A-B266-33D44343216F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -57,34 +65,45 @@ Global
 		{2C3CE2D5-15F2-4819-B5BC-2574BCD04C95}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2C3CE2D5-15F2-4819-B5BC-2574BCD04C95}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2C3CE2D5-15F2-4819-B5BC-2574BCD04C95}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1E541977-3F26-4159-9C4E-67DD88BAF2C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1E541977-3F26-4159-9C4E-67DD88BAF2C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1E541977-3F26-4159-9C4E-67DD88BAF2C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1E541977-3F26-4159-9C4E-67DD88BAF2C9}.Release|Any CPU.Build.0 = Release|Any CPU
-		{92A516C3-A78C-4E2B-A6E1-18C73BC95AD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{92A516C3-A78C-4E2B-A6E1-18C73BC95AD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{92A516C3-A78C-4E2B-A6E1-18C73BC95AD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{92A516C3-A78C-4E2B-A6E1-18C73BC95AD1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9975CC72-8C2F-4515-B93D-A6A58324087C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9975CC72-8C2F-4515-B93D-A6A58324087C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9975CC72-8C2F-4515-B93D-A6A58324087C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9975CC72-8C2F-4515-B93D-A6A58324087C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D1C82C58-B3A4-4C18-BDCB-6E1B82D99226}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D1C82C58-B3A4-4C18-BDCB-6E1B82D99226}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D1C82C58-B3A4-4C18-BDCB-6E1B82D99226}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D1C82C58-B3A4-4C18-BDCB-6E1B82D99226}.Release|Any CPU.Build.0 = Release|Any CPU
 		{C675A0AD-1DB6-4685-8D94-946DE1F4A108}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{C675A0AD-1DB6-4685-8D94-946DE1F4A108}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C675A0AD-1DB6-4685-8D94-946DE1F4A108}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C675A0AD-1DB6-4685-8D94-946DE1F4A108}.Release|Any CPU.Build.0 = Release|Any CPU
+		{57E94545-1975-41F8-A3FF-F2A263ED7646}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{57E94545-1975-41F8-A3FF-F2A263ED7646}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{57E94545-1975-41F8-A3FF-F2A263ED7646}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{57E94545-1975-41F8-A3FF-F2A263ED7646}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F56C34FD-5DD2-42E1-A28F-C280A34A9A1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F56C34FD-5DD2-42E1-A28F-C280A34A9A1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F56C34FD-5DD2-42E1-A28F-C280A34A9A1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F56C34FD-5DD2-42E1-A28F-C280A34A9A1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8478DC05-2F04-423D-8519-03D8C8CB1A6A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8478DC05-2F04-423D-8519-03D8C8CB1A6A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8478DC05-2F04-423D-8519-03D8C8CB1A6A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8478DC05-2F04-423D-8519-03D8C8CB1A6A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{55DFDA5F-1669-4982-B8DC-0BA3DD0BCF78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{55DFDA5F-1669-4982-B8DC-0BA3DD0BCF78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{55DFDA5F-1669-4982-B8DC-0BA3DD0BCF78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{55DFDA5F-1669-4982-B8DC-0BA3DD0BCF78}.Release|Any CPU.Build.0 = Release|Any CPU
+		{18486979-C4ED-4A5E-A16E-403000765774}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{18486979-C4ED-4A5E-A16E-403000765774}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{18486979-C4ED-4A5E-A16E-403000765774}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{18486979-C4ED-4A5E-A16E-403000765774}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AB3B1324-1F56-4F7A-B266-33D44343216F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AB3B1324-1F56-4F7A-B266-33D44343216F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AB3B1324-1F56-4F7A-B266-33D44343216F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AB3B1324-1F56-4F7A-B266-33D44343216F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{1E541977-3F26-4159-9C4E-67DD88BAF2C9} = {9FDE6EDF-148A-44B4-9E0D-DFAA864D4906}
-		{92A516C3-A78C-4E2B-A6E1-18C73BC95AD1} = {9FDE6EDF-148A-44B4-9E0D-DFAA864D4906}
-		{9975CC72-8C2F-4515-B93D-A6A58324087C} = {9FDE6EDF-148A-44B4-9E0D-DFAA864D4906}
-		{D1C82C58-B3A4-4C18-BDCB-6E1B82D99226} = {9FDE6EDF-148A-44B4-9E0D-DFAA864D4906}
+		{4DC330AE-9804-49F2-B0FF-E024E8F5C9D3} = {5D2CA858-5B91-4B30-BB27-274BB66F5C42}
+		{57E94545-1975-41F8-A3FF-F2A263ED7646} = {4DC330AE-9804-49F2-B0FF-E024E8F5C9D3}
+		{F63AC733-201C-43F7-9C13-FFB262BAB3AE} = {5D2CA858-5B91-4B30-BB27-274BB66F5C42}
+		{F56C34FD-5DD2-42E1-A28F-C280A34A9A1C} = {F63AC733-201C-43F7-9C13-FFB262BAB3AE}
+		{55DFDA5F-1669-4982-B8DC-0BA3DD0BCF78} = {F63AC733-201C-43F7-9C13-FFB262BAB3AE}
+		{18486979-C4ED-4A5E-A16E-403000765774} = {F63AC733-201C-43F7-9C13-FFB262BAB3AE}
+		{AB3B1324-1F56-4F7A-B266-33D44343216F} = {F63AC733-201C-43F7-9C13-FFB262BAB3AE}
 	EndGlobalSection
 EndGlobal

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Bolt.Console": {
+      "commandName": "Bolt.Console",
+      "commandLineArgs": "code c:\\Users\\pankrac\\Source\\Repos\\Bolt\\test\\Service\\TestService.Core\\Generated\\Configuration.json  --dir c:\\Users\\pankrac\\Source\\Repos\\Bolt\\test\\Service\\TestService.Core\\bin\\Debug\\dnx451\\"
+    }
+  }
+}

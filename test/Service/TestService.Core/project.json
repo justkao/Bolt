@@ -1,0 +1,15 @@
+﻿{
+  "version": "1.0.0-*",
+  "dependencies": {
+    "System.Runtime": "4.0.20-beta-22816"
+  },
+  "compileExclude": "Generated\\*.*",
+  "frameworks": {
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.ServiceModel": "",
+        "System.Runtime.Serialization": ""
+      }
+    }
+  }
+}

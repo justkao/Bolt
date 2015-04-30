@@ -92,10 +92,6 @@ namespace TestService.Core
 {
     public partial class TestContractDescriptor : Bolt.ContractDescriptor
     {
-        protected TestContractDescriptor(Type type, string name) : base(type, name)
-        {
-        }
-
         public TestContractDescriptor() : base(typeof(TestService.Core.ITestContract), "TestContract")
         {
             UpdatePerson = Add("UpdatePerson", typeof(TestService.Core.Parameters.UpdatePersonParameters), typeof(ITestContract).GetTypeInfo().GetMethod("UpdatePerson"));
