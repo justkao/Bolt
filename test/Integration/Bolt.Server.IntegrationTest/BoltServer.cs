@@ -16,7 +16,10 @@ namespace Bolt.Server.IntegrationTest
 
         public void Start(Action<IApplicationBuilder> action, Action<IServiceCollection> configureServices)
         {
-            _server = TestServer.Create(action, configureServices);
+            if (_server == null)
+            {
+                _server = TestServer.Create(action, configureServices);
+            }
         }
 
         public HttpMessageHandler GetHandler()

@@ -15,6 +15,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 using Bolt.Server;
+using Bolt.Server.InstanceProviders;
 using TestService.Core;
 using TestService.Core.Parameters;
 
@@ -178,6 +179,32 @@ namespace TestService.Core
         {
             var instance = context.GetRequiredInstance<IInnerTestContract2>();
             await instance.InnerOperationExAsync2();
+        }
+    }
+}
+
+namespace Bolt.Server
+{
+    public static partial class TestContractActionsExtensions
+    {
+        public static IContractInvoker UseTestContract(this IBoltRouteHandler bolt, TestService.Core.ITestContract instance)
+        {
+            return bolt.UseTestContract(new StaticInstanceProvider(instance));
+        }
+
+        public static IContractInvoker UseTestContract<TImplementation>(this IBoltRouteHandler bolt) where TImplementation: TestService.Core.ITestContract
+        {
+            return bolt.UseTestContract(new InstanceProvider<TImplementation>());
+        }
+
+        public static IContractInvoker UseStateFullTestContract<TImplementation>(this IBoltRouteHandler bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, Bolt.Server.BoltServerOptions options = null) where TImplementation: TestService.Core.ITestContract
+        {
+            return bolt.UseTestContract(new StateFullInstanceProvider<TImplementation>(initInstanceAction, releaseInstanceAction, options ?? bolt.Configuration.Options));
+        }
+
+        public static IContractInvoker UseTestContract(this IBoltRouteHandler bolt, IInstanceProvider instanceProvider)
+        {
+            return bolt.Use(new TestService.Core.TestContractActions(), instanceProvider);
         }
     }
 }

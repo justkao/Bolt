@@ -1,8 +1,7 @@
 ﻿{
-    "assemblies": [ "TestService.Core.dll" ],
     "contracts": [
         {
-            "contract": "TestService.Core.ITestContract",
+            "contract": "TestService.Core.ITestContract, TestService.Core",
             "descriptor": { },
             "client": { "forceAsync": "true" },
             "server": { }

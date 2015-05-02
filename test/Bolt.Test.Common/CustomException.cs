@@ -24,13 +24,13 @@ namespace Bolt.Test.Common
         }
 
 #if !DNXCORE50
-        protected CustomException(SerializationInfo info, StreamingContext context)
+        protected CustomException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
             : base(info, context)
         {
             CustomData = info.GetInt32("CustomData");
         }
 
-        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        public override void GetObjectData(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
         {
             info.AddValue("CustomData", CustomData);
             base.GetObjectData(info, context);

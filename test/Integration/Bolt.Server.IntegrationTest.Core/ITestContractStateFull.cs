@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Bolt.Service.Test.Core
+namespace Bolt.Server.IntegrationTest.Core
 {
     public class TestContractProxyFailedException : Exception
     {

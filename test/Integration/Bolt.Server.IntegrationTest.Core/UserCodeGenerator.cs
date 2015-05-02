@@ -1,6 +1,6 @@
 ﻿using Bolt.Generators;
 
-namespace Bolt.Service.Test.Core
+namespace Bolt.Server.IntegrationTest.Core
 {
     public class UserCodeGenerator : IUserCodeGenerator
     {

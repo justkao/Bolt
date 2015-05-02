@@ -11,6 +11,7 @@
     "net45": {
       "frameworkAssemblies": {
         "System.Collections": { "version": "", "type": "build" },
+        "System.Collections.Concurrent": { "version": "", "type": "build" },
         "System.Runtime": { "version": "", "type": "build" },
         "System.Runtime.Serialization": { "version": "", "type": "build" }
       }
@@ -19,7 +20,8 @@
       "frameworkAssemblies": {
         "System.Runtime": "",
         "System.Collections": "",
-        "System.Runtime.Serialization": ""
+        "System.Runtime.Serialization": "",
+        "System.Collections.Concurrent": ""
       }
     },
     "dnxcore50": {
@@ -33,9 +35,8 @@
         "System.ComponentModel.TypeConverter": "4.0.0-*",
         "System.Collections": "4.0.0-*",
         "System.IO": "4.0.10",
-        "System.Threading.Tasks": "4.0.10-*"
-
-
+        "System.Threading.Tasks": "4.0.10-*",
+        "System.Collections.Concurrent": "4.0.10-*"
       }
     }
   }

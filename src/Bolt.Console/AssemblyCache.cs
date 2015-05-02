@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Framework.Runtime.Common.CommandLine;
+using System.Diagnostics;
 
 namespace Bolt.Console
 {
@@ -22,17 +23,23 @@ namespace Bolt.Console
         private readonly Dictionary<string, Assembly> _assemblies = new Dictionary<string, Assembly>();
         private readonly HashSet<string> _dirs = new HashSet<string>();
 
-        public AssemblyCache(IServiceProvider serviceProvider)
-        {
 #if !NET45
-            _loadContext = ((Microsoft.Framework.Runtime.IAssemblyLoadContextAccessor)serviceProvider.GetService(typeof(Microsoft.Framework.Runtime.IAssemblyLoadContextAccessor))).GetLoadContext(typeof(Program).GetTypeInfo().Assembly);
-            _container = ((Microsoft.Framework.Runtime.IAssemblyLoaderContainer)serviceProvider.GetService(typeof(Microsoft.Framework.Runtime.IAssemblyLoaderContainer)));
-            _loaderRegistration = _container.AddLoader(this);
-            _libraryManager = ((Microsoft.Framework.Runtime.ILibraryManager)serviceProvider.GetService(typeof(Microsoft.Framework.Runtime.ILibraryManager)));
-#else
-            AppDomain.CurrentDomain.AssemblyResolve += (s, e) => Load(e.Name.Split(new[]{','}, StringSplitOptions.RemoveEmptyEntries).First().Trim());
-#endif
+        public AssemblyCache(Microsoft.Framework.Runtime.ILibraryManager manager, Microsoft.Framework.Runtime.IAssemblyLoadContextAccessor accessor, Microsoft.Framework.Runtime.IAssemblyLoaderContainer container, Microsoft.Framework.Runtime.IApplicationEnvironment environment)
+        {
+            _libraryManager = manager;
+            if (environment?.ApplicationName == "Bolt.Console")
+            {
+                _loadContext = accessor.GetLoadContext(typeof(Program).GetTypeInfo().Assembly);
+                _container = container;
+                _loaderRegistration = _container.AddLoader(this);
+            }
         }
+#else
+        public AssemblyCache()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += (s, e) => Load(e.Name.Split(new[]{','}, StringSplitOptions.RemoveEmptyEntries).First().Trim());
+        }
+#endif
 
         public void AddDirectory(string dir)
         {
@@ -51,6 +58,16 @@ namespace Bolt.Console
 
         public Assembly Load(string assembly)
         {
+#if !NET45
+            if (_loadContext == null)
+            {
+                var libraries = _libraryManager.GetLibraries().SelectMany(l => l.LoadableAssemblies).ToList();
+                foreach (var item in libraries)
+                {
+                    AnsiConsole.Output.WriteLine(item.FullName);
+                }
+            }
+#endif
             var originalName = assembly;
             if (!File.Exists(assembly))
             {
@@ -68,11 +85,11 @@ namespace Bolt.Console
             {
                 return loadedAssembly;
             }
-#if !NET45         
+#if !NET45
             loadedAssembly = _loadContext.LoadFile(assembly);
 #else
             loadedAssembly = Assembly.LoadFrom(assembly);
-#endif 
+#endif
             _assemblies[assemblyName] = loadedAssembly;
             AnsiConsole.Output.WriteLine($"Assembly loaded: {assemblyName.Bold()}");
             return loadedAssembly;
@@ -85,16 +102,23 @@ namespace Bolt.Console
 
         public Type GetType(string fullName)
         {
+            Type type = null;
             foreach (Assembly assembly in _assemblies.Values)
             {
-                Type type = assembly.GetType(fullName);
+                type = assembly.GetType(fullName);
                 if (type != null)
                 {
                     return type;
                 }
             }
 
-            throw new InvalidOperationException($"Type '{fullName}' could not be loaded.");
+            type = Type.GetType(fullName);
+            if (type == null)
+            {
+                throw new InvalidOperationException($"Type '{fullName}' could not be loaded.");
+            }
+
+            return type;
         }
 
         public IEnumerator<Assembly> GetEnumerator()

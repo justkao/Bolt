@@ -1,15 +1,13 @@
 ﻿{
   "version": "1.0.0-*",
   "dependencies": {
-    "Bolt.Core": "",
-    "Bolt.Common": "",
     "Bolt.Server": "",
     "Bolt.Client": "",
     "Bolt.Server.IntegrationTest.Core": "",
     "Bolt.Test.Common": "",
     "xunit": "2.1.0-*",
-    "xunit.runner.aspnet": "2.0.0-aspnet-beta4",
-    "Microsoft.AspNet.TestHost": "1.0.0-beta4",
+    "xunit.runner.aspnet": "2.0.0-*",
+    "Microsoft.AspNet.TestHost": "1.0.0-*",
     "Moq": "4.2.1502.911"
   },
   "frameworks": {

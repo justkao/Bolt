@@ -87,12 +87,12 @@ namespace Bolt.Generators
 
         public MethodInfo GetInitSessionMethod()
         {
-            return GetEffectiveMethods().FirstOrDefault(m => m.CustomAttributes.FirstOrDefault(a => a.GetType().Name == BoltConstants.Core.InitSessionAttribute.Name) != null);
+            return GetEffectiveMethods().FirstOrDefault(m => m.CustomAttributes.FirstOrDefault(a => a.AttributeType.Name == BoltConstants.Core.InitSessionAttribute.Name) != null);
         }
 
         public MethodInfo GetCloseSessionMethod()
         {
-            return GetEffectiveMethods().FirstOrDefault(m => m.CustomAttributes.FirstOrDefault(a => a.GetType().Name == BoltConstants.Core.CloseSessionAttribute.Name) != null);
+            return GetEffectiveMethods().FirstOrDefault(m => m.CustomAttributes.FirstOrDefault(a => a.AttributeType.Name == BoltConstants.Core.CloseSessionAttribute.Name) != null);
         }
 
         public bool IsValid()

@@ -8,15 +8,19 @@ namespace Bolt.Console
 {
     public class Program
     {
-        private readonly IServiceProvider _hostServices;
         private readonly AssemblyCache _cache;
 
-        public Program(IServiceProvider services)
+#if !NET45
+        public Program(IServiceProvider provider, Microsoft.Framework.Runtime.ILibraryManager manager, Microsoft.Framework.Runtime.IAssemblyLoadContextAccessor accessor, Microsoft.Framework.Runtime.IAssemblyLoaderContainer container, Microsoft.Framework.Runtime.IApplicationEnvironment environment)
         {
-            _hostServices = services;
-            _cache = new AssemblyCache(_hostServices);
+            _cache = new AssemblyCache(manager, accessor, container, environment);
         }
-
+#else
+        public Program()
+        {
+            _cache = new AssemblyCache();
+        }
+#endif
         public int Main(string[] args)
         {
             var app = new CommandLineApplication();

@@ -4,6 +4,11 @@ namespace Bolt.Console
 {
     public class ServerConfig : ConfigBase
     {
+        public ServerConfig()
+        {
+            GenerateExtensions = true;
+        }
+
         public string StateFullBase { get; set; }
 
         public string GeneratorEx { get; set; }

@@ -17,11 +17,11 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-using Bolt.Service.Test.Core;
-using Bolt.Service.Test.Core.Parameters;
+using Bolt.Server.IntegrationTest.Core;
+using Bolt.Server.IntegrationTest.Core.Parameters;
 
 
-namespace Bolt.Service.Test.Core.Parameters
+namespace Bolt.Server.IntegrationTest.Core.Parameters
 {
     [DataContract]
     public partial class InitExParameters
@@ -39,15 +39,15 @@ namespace Bolt.Service.Test.Core.Parameters
 
 }
 
-namespace Bolt.Service.Test.Core
+namespace Bolt.Server.IntegrationTest.Core
 {
     public partial class TestContractStateFullDescriptor : Bolt.ContractDescriptor
     {
-        public TestContractStateFullDescriptor() : base(typeof(Bolt.Service.Test.Core.ITestContractStateFull), "TestContractStateFull")
+        public TestContractStateFullDescriptor() : base(typeof(Bolt.Server.IntegrationTest.Core.ITestContractStateFull), "TestContractStateFull")
         {
             Init = Add("Init", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("Init"));
-            InitEx = Add("InitEx", typeof(Bolt.Service.Test.Core.Parameters.InitExParameters), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("InitEx"));
-            SetState = Add("SetState", typeof(Bolt.Service.Test.Core.Parameters.SetStateParameters), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("SetState"));
+            InitEx = Add("InitEx", typeof(Bolt.Server.IntegrationTest.Core.Parameters.InitExParameters), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("InitEx"));
+            SetState = Add("SetState", typeof(Bolt.Server.IntegrationTest.Core.Parameters.SetStateParameters), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("SetState"));
             GetState = Add("GetState", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("GetState"));
             NextCallWillFailProxy = Add("NextCallWillFailProxy", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("NextCallWillFailProxy"));
             Destroy = Add("Destroy", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("Destroy"));

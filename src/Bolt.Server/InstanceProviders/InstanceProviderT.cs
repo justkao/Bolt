@@ -12,7 +12,7 @@ namespace Bolt.Server.InstanceProviders
             var factory = _factory;
             if (factory == null)
             {
-                factory = ActivatorUtilities.CreateFactory(typeof(T), Type.EmptyTypes);
+                factory = ActivatorUtilities.CreateFactory(typeof(T), new Type[] { });
                 _factory = factory;
             }
 

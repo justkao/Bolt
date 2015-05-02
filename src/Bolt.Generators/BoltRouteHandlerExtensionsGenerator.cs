@@ -51,7 +51,7 @@ namespace Bolt.Generators
             WriteLine();
 
             WriteLine(
-                "public static IContractInvoker Use{0}<TImplementation>(this {2} bolt) where TImplementation: {1}, new()",
+                "public static IContractInvoker Use{0}<TImplementation>(this {2} bolt) where TImplementation: {1}",
                 ContractDefinition.Name,
                 ContractDefinition.Root.FullName,
                 BoltRouteHandler);
@@ -66,7 +66,7 @@ namespace Bolt.Generators
             if (initSession != null && closeSession != null)
             {
                 WriteLine(
-                    "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} bolt, {3} options = null) where TImplementation: {1}, new()",
+                    "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} bolt, {3} options = null) where TImplementation: {1}",
                     ContractDefinition.Name,
                     ContractDefinition.Root.FullName,
                     BoltRouteHandler,
@@ -82,7 +82,7 @@ namespace Bolt.Generators
                         MetadataProvider.GetContractDescriptor(ContractDefinition).Name,
                         MetadataProvider.GetMethodDescriptor(ContractDefinition, closeSession).Name);
                     WriteLine(
-                        "return bolt.Use{0}(new {1}<TImplementation>(initSessionAction, closeSessionAction, options ?? bolt.Options));",
+                        "return bolt.Use{0}(new {1}<TImplementation>(initSessionAction, closeSessionAction, options ?? bolt.Configuration.Options));",
                         ContractDefinition.Name,
                         StateFullInstanceProviderBase);
                 }
@@ -90,7 +90,7 @@ namespace Bolt.Generators
             }
 
             WriteLine(
-                "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, {3} options = null) where TImplementation: {1}, new()",
+                "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, {3} options = null) where TImplementation: {1}",
                 ContractDefinition.Name,
                 ContractDefinition.Root.FullName,
                 BoltRouteHandler,
@@ -98,7 +98,7 @@ namespace Bolt.Generators
             using (WithBlock())
             {
                 WriteLine(
-                    "return bolt.Use{0}(new {1}<TImplementation>(initInstanceAction, releaseInstanceAction, options ?? bolt.Options));",
+                    "return bolt.Use{0}(new {1}<TImplementation>(initInstanceAction, releaseInstanceAction, options ?? bolt.Configuration.Options));",
                     ContractDefinition.Name,
                     StateFullInstanceProviderBase);
             }
@@ -111,7 +111,7 @@ namespace Bolt.Generators
                 BoltRouteHandler);
             using (WithBlock())
             {
-                WriteLine("return bolt.Use(new {0}, instanceProvider, configure);", ContractActions.FullName);
+                WriteLine("return bolt.Use(new {0}(), instanceProvider);", ContractActions.FullName);
             }
         }
 

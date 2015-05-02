@@ -17,11 +17,11 @@ using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
-using Bolt.Service.Test.Core;
-using Bolt.Service.Test.Core.Parameters;
+using Bolt.Server.IntegrationTest.Core;
+using Bolt.Server.IntegrationTest.Core.Parameters;
 
 
-namespace Bolt.Service.Test.Core.Parameters
+namespace Bolt.Server.IntegrationTest.Core.Parameters
 {
     [DataContract]
     public partial class SimpleMethodWithSimpleArgumentsParameters
@@ -34,31 +34,31 @@ namespace Bolt.Service.Test.Core.Parameters
     public partial class SimpleMethodWithComplexParameterParameters
     {
         [DataMember(Order = 1)]
-        public CompositeType CompositeType { get; set; }
+        public Bolt.Test.Common.CompositeType CompositeType { get; set; }
     }
 
     [DataContract]
     public partial class MethodTakingHugeDataParameters
     {
         [DataMember(Order = 1)]
-        public List<CompositeType> Arg { get; set; }
+        public List<Bolt.Test.Common.CompositeType> Arg { get; set; }
     }
 
     [DataContract]
     public partial class MethodWithNotSerializableTypeParameters
     {
         [DataMember(Order = 1)]
-        public NotSerializableType Arg { get; set; }
+        public Bolt.Test.Common.NotSerializableType Arg { get; set; }
     }
 
     [DataContract]
     public partial class MethodWithManyArgumentsParameters
     {
         [DataMember(Order = 1)]
-        public CompositeType Arg1 { get; set; }
+        public Bolt.Test.Common.CompositeType Arg1 { get; set; }
 
         [DataMember(Order = 2)]
-        public CompositeType Arg2 { get; set; }
+        public Bolt.Test.Common.CompositeType Arg2 { get; set; }
 
         [DataMember(Order = 3)]
         public DateTime Time { get; set; }
@@ -66,25 +66,25 @@ namespace Bolt.Service.Test.Core.Parameters
 
 }
 
-namespace Bolt.Service.Test.Core
+namespace Bolt.Server.IntegrationTest.Core
 {
     public partial class TestContractDescriptor : Bolt.ContractDescriptor
     {
-        public TestContractDescriptor() : base(typeof(Bolt.Service.Test.Core.ITestContract), "TestContract")
+        public TestContractDescriptor() : base(typeof(Bolt.Server.IntegrationTest.Core.ITestContract), "TestContract")
         {
-            SimpleMethodWithSimpleArguments = Add("SimpleMethodWithSimpleArguments", typeof(Bolt.Service.Test.Core.Parameters.SimpleMethodWithSimpleArgumentsParameters), typeof(ITestContract).GetTypeInfo().GetMethod("SimpleMethodWithSimpleArguments"));
+            SimpleMethodWithSimpleArguments = Add("SimpleMethodWithSimpleArguments", typeof(Bolt.Server.IntegrationTest.Core.Parameters.SimpleMethodWithSimpleArgumentsParameters), typeof(ITestContract).GetTypeInfo().GetMethod("SimpleMethodWithSimpleArguments"));
             SimpleMethod = Add("SimpleMethod", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("SimpleMethod"));
             SimpleMethodExAsync = Add("SimpleMethodExAsync", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("SimpleMethodExAsync"));
             SimpleMethodWithCancellation = Add("SimpleMethodWithCancellation", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("SimpleMethodWithCancellation"));
             ComplexFunction = Add("ComplexFunction", typeof(Bolt.Empty), typeof(ITestContract).GetTypeInfo().GetMethod("ComplexFunction"));
-            SimpleMethodWithComplexParameter = Add("SimpleMethodWithComplexParameter", typeof(Bolt.Service.Test.Core.Parameters.SimpleMethodWithComplexParameterParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleMethodWithComplexParameter"));
+            SimpleMethodWithComplexParameter = Add("SimpleMethodWithComplexParameter", typeof(Bolt.Server.IntegrationTest.Core.Parameters.SimpleMethodWithComplexParameterParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleMethodWithComplexParameter"));
             SimpleFunction = Add("SimpleFunction", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleFunction"));
             FunctionReturningHugeData = Add("FunctionReturningHugeData", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("FunctionReturningHugeData"));
-            MethodTakingHugeData = Add("MethodTakingHugeData", typeof(Bolt.Service.Test.Core.Parameters.MethodTakingHugeDataParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("MethodTakingHugeData"));
-            MethodWithNotSerializableType = Add("MethodWithNotSerializableType", typeof(Bolt.Service.Test.Core.Parameters.MethodWithNotSerializableTypeParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("MethodWithNotSerializableType"));
+            MethodTakingHugeData = Add("MethodTakingHugeData", typeof(Bolt.Server.IntegrationTest.Core.Parameters.MethodTakingHugeDataParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("MethodTakingHugeData"));
+            MethodWithNotSerializableType = Add("MethodWithNotSerializableType", typeof(Bolt.Server.IntegrationTest.Core.Parameters.MethodWithNotSerializableTypeParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("MethodWithNotSerializableType"));
             FunctionWithNotSerializableType = Add("FunctionWithNotSerializableType", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("FunctionWithNotSerializableType"));
             SimpleAsyncFunction = Add("SimpleAsyncFunction", typeof(Bolt.Empty), typeof(ITestContractInner).GetTypeInfo().GetMethod("SimpleAsyncFunction"));
-            MethodWithManyArguments = Add("MethodWithManyArguments", typeof(Bolt.Service.Test.Core.Parameters.MethodWithManyArgumentsParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("MethodWithManyArguments"));
+            MethodWithManyArguments = Add("MethodWithManyArguments", typeof(Bolt.Server.IntegrationTest.Core.Parameters.MethodWithManyArgumentsParameters), typeof(ITestContractInner).GetTypeInfo().GetMethod("MethodWithManyArguments"));
             ThisMethodShouldBeExcluded = Add("ThisMethodShouldBeExcluded", typeof(Bolt.Empty), typeof(IExcludedContract).GetTypeInfo().GetMethod("ThisMethodShouldBeExcluded"));
         }
 

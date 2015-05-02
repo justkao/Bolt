@@ -1,5 +1,6 @@
 ﻿using Bolt.Client;
 using Microsoft.Framework.DependencyInjection;
+using System;
 using Xunit;
 
 namespace Bolt.Server.IntegrationTest
@@ -7,9 +8,11 @@ namespace Bolt.Server.IntegrationTest
     public abstract class IntegrationTestBase : IClassFixture<BoltServer>
     {
         private BoltServer _runningServer;
+        public Uri ServerUrl { get; private set; }
 
         public IntegrationTestBase(BoltServer server)
         {
+            ServerUrl = new Uri("http://localhost");
             _runningServer = server;
             server.Start(Configure,ConfigureServices);
             ClientConfiguration = new ClientConfiguration();

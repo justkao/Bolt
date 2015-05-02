@@ -1,14 +1,13 @@
 ﻿{
-    "assemblies": [ "Bolt.Service.Test.Core.dll" ],
     "generators": [
         {
             "Name": "CustomUserGenerator",
-            "Type": "Bolt.Service.Test.Core.UserCodeGenerator"
+            "Type": "Bolt.Server.IntegrationTest.Core.UserCodeGenerator,Bolt.Server.IntegrationTest.Core"
         }
     ],
     "contracts": [
         {
-            "contract": "Bolt.Service.Test.Core.ITestContract",
+            "contract": "Bolt.Server.IntegrationTest.Core.ITestContract,Bolt.Server.IntegrationTest.Core",
             "context": "generatorContext2",
             "descriptor": {},
             "client": {
@@ -19,7 +18,7 @@
             }
         },
         {
-            "contract": "Bolt.Service.Test.Core.ITestContractStateFull",
+            "contract": "Bolt.Server.IntegrationTest.Core.ITestContractStateFull,Bolt.Server.IntegrationTest.Core",
             "descriptor": {},
             "client": { "Generator": "CustomUserGenerator" },
             "server": { "Generator": "CustomUserGenerator" }

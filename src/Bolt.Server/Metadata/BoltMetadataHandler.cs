@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Bolt.Server.InstanceProviders;
 using Microsoft.AspNet.Http;
 using Microsoft.Framework.Logging;
-using Microsoft.Framework.Logging.Internal;
 
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema;
@@ -33,7 +32,7 @@ namespace Bolt.Server.Metadata
             {
                 var result = JsonConvert.SerializeObject(contracts.Select(c => c.Descriptor.Name).ToList(),
                     Formatting.Indented, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore});
-                await context.HttpContext.Response.SendAsync(result);
+                await context.HttpContext.Response.WriteAsync(result);
                 return true;
             }
             catch (Exception e)
@@ -84,7 +83,7 @@ namespace Bolt.Server.Metadata
 
                 context.HttpContext.Response.ContentType = "application/json";
                 context.HttpContext.Response.StatusCode = 200;
-                await context.HttpContext.Response.SendAsync(result);
+                await context.HttpContext.Response.WriteAsync(result);
                 return true;
             }
             catch (Exception e)

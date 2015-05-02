@@ -1,7 +1,6 @@
 ﻿using Bolt.Client;
 using Bolt.Client.Channels;
-using Bolt.Server.IntegrationTest;
-using Bolt.Service.Test.Core;
+using Bolt.Server.IntegrationTest.Core;
 using Bolt.Test.Common;
 using Microsoft.AspNet.Builder;
 using Moq;
@@ -22,12 +21,6 @@ namespace Bolt.Server.IntegrationTest
         {
         }
 
-        [Fact]
-        public void Fact_Dummy()
-        {
-        }
-
-        /*
         [Fact]
         public void ClientCallsAsyncMethod_AsyncOnClientAndServer_EnsureExecutedOnServer()
         {
@@ -139,9 +132,8 @@ namespace Bolt.Server.IntegrationTest
             Mock<ITestContract> server = Server();
 
             server.Setup(v => v.SimpleMethod()).Throws<CustomException>();
-            Assert.Throws<CustomException>(client.SimpleMethod);
+            Assert.Throws<CustomException>(()=> { client.SimpleMethod(); });
         }
-
 
         [Fact]
         public void Client_NotSerializableReturnValue_EnsureBoltServerException()
@@ -257,17 +249,17 @@ namespace Bolt.Server.IntegrationTest
                 }
             }
 
-            Console.WriteLine("Creating {0} proxies by helpers has taken {1}ms", 10000, watch.ElapsedMilliseconds);
+            System.Console.WriteLine("Creating {0} proxies by helpers has taken {1}ms", 10000, watch.ElapsedMilliseconds);
 
             watch.Restart();
             for (int i = 0; i < cnt; i++)
             {
-                using (new TestContractProxy(new RecoverableChannel(new UriServerProvider(ServerUrl), ClientConfiguration)))
+                using (new TestContractProxy(new RecoverableChannel(new SingleServerProvider(ServerUrl), ClientConfiguration)))
                 {
                 }
             }
 
-            Console.WriteLine("Creating {0} proxies manually has taken {1}ms", 10000, watch.ElapsedMilliseconds);
+            System.Console.WriteLine("Creating {0} proxies manually has taken {1}ms", 10000, watch.ElapsedMilliseconds);
         }
 
         [Fact]
@@ -284,7 +276,7 @@ namespace Bolt.Server.IntegrationTest
             }
             catch (CustomException e)
             {
-                Assert.IsNotNull(e.InnerException as CustomException);
+                Assert.NotNull(e.InnerException as CustomException);
             }
         }
 
@@ -294,7 +286,7 @@ namespace Bolt.Server.IntegrationTest
             ITestContract client = CreateChannel();
             Mock<ITestContract> server = Server();
             server.Setup(v => v.ComplexFunction()).Returns<CompositeType>(null);
-            Assert.IsNull(client.ComplexFunction());
+            Assert.Null(client.ComplexFunction());
         }
 
         [Fact]
@@ -311,7 +303,7 @@ namespace Bolt.Server.IntegrationTest
             }
             catch (CustomException e)
             {
-                Assert.IsNotNull(e.InnerException as CustomException);
+                Assert.NotNull(e.InnerException as CustomException);
                 Assert.Equal("inner message", e.InnerException.Message);
             }
         }
@@ -328,6 +320,7 @@ namespace Bolt.Server.IntegrationTest
             Assert.Throws<TimeoutException>(() => client.SimpleMethodWithComplexParameter(arg));
         }
 
+        /*
         [Fact]
         public void Request_Recoverable_EnsureExecuted()
         {
@@ -344,7 +337,7 @@ namespace Bolt.Server.IntegrationTest
             ongoing.GetAwaiter().GetResult();
             running.Dispose();
         }
-
+        */
 
         [Fact]
         public void ServerReturnsBigData_EnsureReceivedOnClient()
@@ -374,7 +367,6 @@ namespace Bolt.Server.IntegrationTest
             server.Verify(v => v.MethodTakingHugeData(It.IsAny<List<CompositeType>>()));
         }
 
-        public MockInstanceProvider InstanceProvider = new MockInstanceProvider();
 
         public Mock<ITestContract> Server()
         {
@@ -394,11 +386,12 @@ namespace Bolt.Server.IntegrationTest
             proxy.WithRetries(retries, retryDelay);
             return proxy;
         }
-        */
+
+        public MockInstanceProvider InstanceProvider = new MockInstanceProvider();
 
         protected override void Configure(IApplicationBuilder appBuilder)
         {
-            appBuilder.UseBolt((h) => { });
+            appBuilder.UseBolt((h) => h.UseTestContract(InstanceProvider));
         }
     }
 }

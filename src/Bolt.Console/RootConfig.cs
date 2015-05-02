@@ -102,7 +102,6 @@ namespace Bolt.Console
         [JsonIgnore]
         public AssemblyCache AssemblyCache { get; set; }
 
-        [JsonProperty(Required = Required.Always)]
         public List<string> Assemblies { get; set; }
 
         public List<GeneratorConfig> Generators { get; set; }
@@ -129,20 +128,23 @@ namespace Bolt.Console
 
         public int Generate()
         {
-            List<string> directories =
-                Assemblies.Select(Path.GetDirectoryName)
-                    .Concat(new[] { Directory.GetCurrentDirectory() })
-                    .Distinct()
-                    .ToList();
-
-            foreach (string dir in directories)
+            if (Assemblies != null)
             {
-                AssemblyCache.AddDirectory(dir);
-            }
+                List<string> directories =
+                    Assemblies.Select(Path.GetDirectoryName)
+                        .Concat(new[] { Directory.GetCurrentDirectory() })
+                        .Distinct()
+                        .ToList();
 
-            foreach (string assembly in Assemblies)
-            {
-                AssemblyCache.Load(assembly);
+                foreach (string dir in directories)
+                {
+                    AssemblyCache.AddDirectory(dir);
+                }
+
+                foreach (string assembly in Assemblies)
+                {
+                    AssemblyCache.Load(assembly);
+                }
             }
 
             Stopwatch watch = Stopwatch.StartNew();

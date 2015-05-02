@@ -1,15 +1,17 @@
 ﻿{
   "version": "1.0.0-*",
   "dependencies": {
-    "System.Runtime": "4.0.20-beta-22816"
+    "Bolt.Core": "",
+    "Bolt.Test.Common": "",
+    "Bolt.Console": ""
   },
   "compileExclude": "Generated\\*.*",
   "frameworks": {
     "dnx451": {
-      "frameworkAssemblies": {
-        "System.ServiceModel": "",
-        "System.Runtime.Serialization": ""
-      }
+      "frameworkAssemblies": {"System.ServiceModel": ""}
     }
+  },
+  "commands": {
+    "gen": "Bolt.Console code Generated/Configuration.json"
   }
 }
