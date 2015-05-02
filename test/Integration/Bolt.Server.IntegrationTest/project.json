@@ -13,14 +13,7 @@
     "Moq": "4.2.1502.911"
   },
   "frameworks": {
-    "dnx451": { },
-    "dnxcore50": {
-      "dependencies": {
-        "System.Collections": "4.0.10-*",
-        "System.Linq": "4.0.0-*",
-        "System.IO": "4.0.10-*"
-      }
-    }
+    "dnx451": { }
   },
   "commands": {
     "test": "xunit.runner.aspnet"

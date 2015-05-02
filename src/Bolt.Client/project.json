@@ -1,49 +1,46 @@
 {
-    "version": "0.11.0-alpha",
-    "authors": [ "Martin Tomka" ],
-    "description": "Bolt portable client library used to access Bolt based services.",
-    "dependencies": {
-        "Bolt.Common": { "type": "build" },
-        "Bolt.Common.AssemblyInfo": { "type": "build" },
-        "Bolt.Core": "1.0.0-*"
+  "version": "0.11.0-alpha",
+  "authors": [ "Martin Tomka" ],
+  "description": "Bolt portable client library used to access Bolt based services.",
+  "dependencies": {
+    "Bolt.Common": { "type": "build" },
+    "Bolt.Common.AssemblyInfo": { "type": "build" },
+    "Bolt.Core": "1.0.0-*"
+  },
+  "frameworks": {
+    "net45": {
+      "frameworkAssemblies": {
+        "System.Collections": { "version": "", "type": "build" },
+        "System.Diagnostics.Debug": { "version": "", "type": "build" },
+        "System.Linq": { "version": "", "type": "build" },
+        "System.Reflection": { "version": "", "type": "build" },
+        "System.Reflection.Extensions": { "version": "", "type": "build" },
+        "System.Runtime": { "version": "", "type": "build" },
+        "System.Runtime.Serialization": { "version": "", "type": "build" },
+        "System.Threading": { "version": "", "type": "build" },
+        "System.Net.Http": { "version": "", "type": "build" }
+      }
     },
-    "frameworks": {
-        "net45": {
-            "frameworkAssemblies": {
-                "System.Collections": { "version": "", "type": "build" },
-                "System.Diagnostics.Debug": { "version": "", "type": "build" },
-                "System.Linq": { "version": "", "type": "build" },
-                "System.Reflection": { "version": "", "type": "build" },
-                "System.Reflection.Extensions": { "version": "", "type": "build" },
-                "System.Runtime": { "version": "", "type": "build" },
-                "System.Runtime.Serialization": { "version": "", "type": "build" },
-                "System.Threading": { "version": "", "type": "build" },
-                "System.Net.Http": { "version": "", "type": "build" }
-            },
-            "dependencies": {
-                "System.Net.Primitives": "4.0.10-beta-22830"
-            }
-        },
-        "dnx451": {
-            "frameworkAssemblies": {
-                "System.Runtime": "",
-                "System.Collections": "",
-                "System.Runtime.Serialization": "",
-                "System.Xml": "",
-                "System.Net.Http": ""
-            },
-            "dependencies": {
-            }
-        },
-        "dnxcore50": {
-            "dependencies": {
-                "System.Runtime": "4.0.20-*",
-                "System.Collections": "4.0.10-*",
-                "System.Linq": "4.0.0-beta-22605",
-                "System.Threading.Timer": "4.0.0-*",
-                "System.Diagnostics.Debug": "4.0.10-*",
-                "System.Threading": "4.0.10-*"
-            }
-        }
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.Runtime": "",
+        "System.Collections": "",
+        "System.Runtime.Serialization": "",
+        "System.Xml": "",
+        "System.Net.Http": ""
+      }
+    },
+    "dnxcore50": {
+      "dependencies": {
+        "System.Runtime": "4.0.20-*",
+        "System.Collections": "4.0.10-*",
+        "System.Linq": "4.0.0-beta-22605",
+        "System.Threading.Timer": "4.0.0-*",
+        "System.Diagnostics.Debug": "4.0.10-*",
+        "System.Threading": "4.0.10-*",
+        "System.Net.Primitives": "4.0.10-*",
+        "System.Net.Http": "4.0.0-*"
+      }
     }
+  }
 }

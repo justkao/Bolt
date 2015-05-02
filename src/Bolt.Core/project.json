@@ -6,7 +6,7 @@
     "Newtonsoft.Json": "6.0.7",
     "Bolt.Common.AssemblyInfo": { "type": "build" },
     "Bolt.Common": { "type": "build" },
-"System.IO": "4.0.10.0"
+    "System.IO": "4.0.10.0"
   },
   "frameworks": {
     "net45": {
@@ -29,8 +29,6 @@
         "System.Runtime.Serialization": "",
         "System.Net": "",
         "System.Net.Http": ""
-      },
-      "dependencies": {
       }
     },
     "dnxcore50": {

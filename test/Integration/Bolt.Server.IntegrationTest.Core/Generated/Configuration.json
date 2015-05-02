@@ -12,10 +12,10 @@
             "context": "generatorContext2",
             "descriptor": {},
             "client": {
-                "Generator": "CustomUserGenerator",
+                "Generator": "CustomUserGenerator"
             },
             "server": {
-                "Generator": "CustomUserGenerator",
+                "Generator": "CustomUserGenerator"
             }
         },
         {
