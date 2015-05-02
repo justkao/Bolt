@@ -44,7 +44,7 @@ namespace TestService.Client
 
             if (IsPortUsed(Servers.IISBoltServer.Port))
             {
-                yield return new Tuple<string, ITestContract>("Bolt - IIS", ClientFactory.CreateIISBolt());
+                yield return new Tuple<string, ITestContract>("Bolt(IIS)", ClientFactory.CreateIISBolt());
             }
 
             if (IsPortUsed(Servers.WcfServer.Port))
@@ -55,7 +55,7 @@ namespace TestService.Client
 
         private static void Execute(IEnumerable<Tuple<string, ITestContract>> contracts, Action<ITestContract> action, int count, string actionName)
         {
-            AnsiConsole.Output.WriteLine($"Executing '{actionName.White().Bold()}', Repeats = '{count.ToString().Bold()}'");
+            AnsiConsole.Output.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}");
 
             foreach (var item in contracts)
             {
@@ -65,7 +65,7 @@ namespace TestService.Client
                 }
                 catch (Exception e)
                 {
-                    AnsiConsole.Output.WriteLine($"Error: '{e.Message.Red()}'");
+                    AnsiConsole.Output.WriteLine($"{e.Message.Red()}");
                 }
             }
 
@@ -74,6 +74,8 @@ namespace TestService.Client
 
         private static void Execute(Action<ITestContract> action, int count, ITestContract channel, string type, string actionName)
         {
+            AnsiConsole.Output.Writer.Write($"{type,-10}");
+
             // warmup
             for (int i = 0; i < 10; i++)
             {
@@ -88,7 +90,7 @@ namespace TestService.Client
             }
 
             long elapsed = watch.ElapsedMilliseconds;
-            AnsiConsole.Output.WriteLine($"{type, -10} {(elapsed + "ms").Green().Bold()}");
+            AnsiConsole.Output.WriteLine($"{(elapsed + "ms").Green().Bold()}");
         }
 
         private bool IsPortUsed(int port)
