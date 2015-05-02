@@ -1,5 +1,6 @@
 ﻿{
   "version": "1.0.0-*",
+  "webroot": "wwwroot",
   "dependencies": {
     "TestService.Core": "",
     "Bolt.Server": "",
@@ -12,7 +13,7 @@
   "code": [
     "*.cs",
     "../TestService.Core/Generated/TestContract.Contract.Designer.cs",
-    "../TestService.Core/Generated/TestContract.Server.Designer.cs",
+    "../TestService.Core/Generated/TestContract.Server.Designer.cs"
   ],
   "frameworks": {
     "dnx451": {
