@@ -5,7 +5,8 @@
   "dependencies": {
     "Newtonsoft.Json": "6.0.7",
     "Bolt.Common.AssemblyInfo": { "type": "build" },
-    "Bolt.Common": { "type": "build" }
+    "Bolt.Common": { "type": "build" },
+"System.IO": "4.0.10.0"
   },
   "frameworks": {
     "net45": {
@@ -42,7 +43,8 @@
         "System.Reflection": "4.0.10-*",
         "System.Runtime.Serialization.Primitives": "4.0.0-*",
         "System.Diagnostics.Debug": "4.0.10-*",
-        "System.Threading": "4.0.10-*"
+        "System.Threading": "4.0.10-*",
+        "System.IO": "4.0.10-*"
       }
     }
   }

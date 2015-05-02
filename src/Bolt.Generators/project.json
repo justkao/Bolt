@@ -31,7 +31,11 @@
         "System.Runtime.Serialization.Primitives": "4.0.0-*",
         "System.Diagnostics.Debug": "4.0.10-*",
         "System.ComponentModel.TypeConverter": "4.0.0-*",
-        "System.Collections.Concurrent": "4.0.0-*"
+        "System.Collections": "4.0.0-*",
+        "System.IO": "4.0.10",
+        "System.Threading.Tasks": "4.0.10-*"
+
+
       }
     }
   }

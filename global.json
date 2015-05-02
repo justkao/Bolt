@@ -1,10 +1,12 @@
 {
-    "sources": [
-        "src",
-        "test",
-        "test/Service",
-        "test/Automatic",
-        "wrap",
-        "."
-    ]
+  
+  "projects": [
+    "src",
+    "test",
+    "test/Service",
+    "test/Automatic",
+	"test/Integration",
+    "wrap",
+    "."
+  ]
 }

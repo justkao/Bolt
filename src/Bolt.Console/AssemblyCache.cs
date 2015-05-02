@@ -58,7 +58,7 @@ namespace Bolt.Console
                 if (string.IsNullOrEmpty(assembly))
                 {
                     AnsiConsole.Output.WriteLine($"Assembly {originalName} could not be located.".Yellow());
-                    throw new FileNotFoundException($"Assembly {originalName} not found.");
+                    throw new InvalidOperationException($"Assembly {originalName} not found.");
                 }
             }
 

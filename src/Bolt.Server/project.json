@@ -34,7 +34,9 @@
         "System.Threading.Timer": "4.0.0-*",
         "System.Diagnostics.Debug": "4.0.10-*",
         "System.Threading": "4.0.10-*",
-        "System.ComponentModel.TypeConverter": "4.0.0-*"
+        "System.ComponentModel.TypeConverter": "4.0.0-*",
+        "System.Net.Primitives": "4.0.0-*",
+        "System.IO": "4.0.0-*"
       }
     }
   }

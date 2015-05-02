@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Bolt.Core.Serialization.Test
+namespace Bolt.Core.Test
 {
     public class CustomException : Exception
     {
@@ -24,18 +24,19 @@ namespace Bolt.Core.Serialization.Test
         {
         }
 
+#if !DNXCORE50
         protected CustomException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             CustomData = info.GetInt32("CustomData");
         }
 
-        public int CustomData { get; private set; }
-
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("CustomData", CustomData);
             base.GetObjectData(info, context);
         }
+#endif
+        public int CustomData { get; private set; }
     }
 }
