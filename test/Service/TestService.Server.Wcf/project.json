@@ -1,0 +1,17 @@
+﻿{
+  "version": "1.0.0-*",
+  "dependencies": {
+    "Bolt.Core": "",
+    "Bolt.Test.Common": "",
+    "TestService.Core": "",
+    "Bolt.Console": ""
+  },
+  "frameworks": {
+    "dnx451": {
+      "frameworkAssemblies": { "System.ServiceModel": "" }
+    }
+  },
+  "commands": {
+    "run": "TestService.Server.Wcf"
+  }
+}

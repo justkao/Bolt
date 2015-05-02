@@ -24,12 +24,5 @@ namespace TestService.Client
             ITestContract channel = respository.CreateChannel(new EndpointAddress(Servers.WcfServer));
             return channel;
         }
-
-        public static ITestContract CreateIISWcf()
-        {
-            ChannelFactory<ITestContract> respository = new ChannelFactory<ITestContract>(new BasicHttpBinding());
-            ITestContract channel = respository.CreateChannel(new EndpointAddress(Servers.IISWcfServer));
-            return channel;
-        }
     }
 }

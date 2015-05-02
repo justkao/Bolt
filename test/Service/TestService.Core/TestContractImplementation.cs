@@ -8,7 +8,7 @@ namespace TestService.Core
 {
     public class TestContractImplementation : ITestContract
     {
-        public TestContractImplementation(IServiceProvider provider)
+        public TestContractImplementation()
         {
         }
 

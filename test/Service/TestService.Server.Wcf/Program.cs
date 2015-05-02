@@ -11,7 +11,7 @@ namespace TestService.Server.Wcf
             ServiceHost host = new ServiceHost(typeof(TestContractImplementation), Servers.WcfServer);
             host.Open();
 
-            Console.WriteLine("Host running ... ");
+            Console.WriteLine($"WCF Host running at {Servers.WcfServer} ... ");
             Console.ReadLine();
         }
     }

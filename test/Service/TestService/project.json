@@ -1,0 +1,27 @@
+﻿{
+  "dependencies": {
+    "Microsoft.Framework.CommandLineUtils": { "version": "1.0.0-*", "type": "build" },
+    "Newtonsoft.Json": "6.0.7",
+    "Bolt.Common": { "type": "build" },
+    "Bolt.Generators": "",
+    "Bolt.Client": "",
+    "TestService.Core": ""
+  },
+  "compile": [ "**/*.cs", "../TestService.Core/Generated/TestContract.Client.Designer.cs", "../TestService.Core/Generated/TestContract.Contract.Designer.cs" ],
+  "frameworks": {
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.Runtime": "",
+        "System.Collections": "",
+        "System.Runtime.Serialization": "",
+        "System.ServiceModel": ""
+      },
+      "dependencies": {
+        "Microsoft.Framework.Runtime": "1.0.0-*"
+      }
+    }
+  },
+  "commands": {
+    "TestService": "run"
+  }
+}
