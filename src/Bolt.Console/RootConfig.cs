@@ -134,21 +134,15 @@ namespace Bolt.Console
                 Contract = type.AssemblyQualifiedName,
                 Client = new ClientConfig
                 {
-                    ForceAsync = false,
-                    Modifier = "public",
-                    Suffix = "Proxy",
+                    ForceAsync = true,
                     Namespace = type.Namespace
                 },
                 Descriptor = new DescriptorConfig
                 {
-                    Modifier = "public",
-                    Suffix = "Invoker",
                     Namespace = type.Namespace
                 },
                 Server = new ServerConfig
                 {
-                    Modifier = "public",
-                    Suffix = "Invoker",
                     Namespace = type.Namespace
                 }
             };
