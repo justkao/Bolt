@@ -15,6 +15,7 @@ namespace Bolt.Console
         private readonly Microsoft.Framework.Runtime.IAssemblyLoadContext _loadContext;
         private readonly Microsoft.Framework.Runtime.IAssemblyLoaderContainer _container;
         private readonly Microsoft.Framework.Runtime.ILibraryManager _libraryManager;
+        private readonly Microsoft.Framework.Runtime.IApplicationEnvironment _environment;
         private readonly IDisposable _loaderRegistration = null;
 #else
     public class AssemblyCache : IEnumerable<Assembly>, IDisposable
@@ -27,6 +28,7 @@ namespace Bolt.Console
         public AssemblyCache(Microsoft.Framework.Runtime.ILibraryManager manager, Microsoft.Framework.Runtime.IAssemblyLoadContextAccessor accessor, Microsoft.Framework.Runtime.IAssemblyLoaderContainer container, Microsoft.Framework.Runtime.IApplicationEnvironment environment)
         {
             _libraryManager = manager;
+            _environment = environment;
             if (environment?.ApplicationName == "Bolt.Console")
             {
                 _loadContext = accessor.GetLoadContext(typeof(Program).GetTypeInfo().Assembly);
@@ -40,6 +42,18 @@ namespace Bolt.Console
             AppDomain.CurrentDomain.AssemblyResolve += (s, e) => Load(e.Name.Split(new[]{','}, StringSplitOptions.RemoveEmptyEntries).First().Trim());
         }
 #endif
+
+        public Assembly CurrentAssembly
+        {
+            get
+            {
+#if !NET45
+                AnsiConsole.Output.WriteLine(_environment.ApplicationName);
+#endifs
+                // TODO:
+                return null;
+            }
+        }
 
         public void AddDirectory(string dir)
         {
@@ -102,6 +116,11 @@ namespace Bolt.Console
 
         public Type GetType(string fullName)
         {
+            return GetType(fullName, true);
+        }
+
+        public Type GetType(string fullName, bool throwError)
+        {
             Type type = null;
             foreach (Assembly assembly in _assemblies.Values)
             {
@@ -113,7 +132,7 @@ namespace Bolt.Console
             }
 
             type = Type.GetType(fullName);
-            if (type == null)
+            if (type == null && throwError)
             {
                 throw new InvalidOperationException($"Type '{fullName}' could not be loaded.");
             }

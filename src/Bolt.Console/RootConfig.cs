@@ -57,43 +57,18 @@ namespace Bolt.Console
         {
             RootConfig root = new RootConfig(cache)
             {
-                Assemblies = new List<string> { Path.GetFullPath(assembly) },
+                Assemblies = new List<string>(),
                 Contracts = new List<ContractConfig>()
             };
 
-            foreach (TypeInfo type in root.AssemblyCache.GetTypes(root.AssemblyCache.Load(assembly)))
+            if (File.Exists(assembly))
             {
-                if (!type.IsInterface)
+                root.Assemblies.Add(Path.GetFullPath(assembly));
+
+                foreach (TypeInfo type in root.AssemblyCache.GetTypes(root.AssemblyCache.Load(assembly)))
                 {
-                    continue;
+                    root.AddContract(type);
                 }
-
-                ContractConfig c = new ContractConfig
-                {
-                    Parent = root,
-                    Contract = type.FullName,
-                    Client = new ClientConfig
-                    {
-                        ForceAsync = false,
-                        Modifier = "public",
-                        Suffix = "Proxy",
-                        Namespace = type.Namespace
-                    },
-                    Descriptor = new DescriptorConfig
-                    {
-                        Modifier = "public",
-                        Suffix = "Invoker",
-                        Namespace = type.Namespace
-                    },
-                    Server = new ServerConfig
-                    {
-                        Modifier = "public",
-                        Suffix = "Invoker",
-                        Namespace = type.Namespace
-                    }
-                };
-
-                root.Contracts.Add(c);
             }
 
             return root;
@@ -124,6 +99,73 @@ namespace Bolt.Console
             return JsonConvert.SerializeObject(
                 this,
                 new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() });
+        }
+
+        public void AddContract(string name)
+        {
+            var type = AssemblyCache.GetType(name, false);
+            if (type == null)
+            {
+                var assembly = AssemblyCache.CurrentAssembly;
+                if (assembly == null)
+                {
+                    AssemblyCache.GetType(name);
+                }
+
+                // TOOD: try resolve contract by simple name from assembly
+            }
+
+            var addedContract = AddContract(type.GetTypeInfo());
+            if (addedContract != null)
+            {
+                AnsiConsole.Output.WriteLine($"Contract '{type.Name.Bold()}' added.");
+            }
+        }
+
+        public ContractConfig AddContract(TypeInfo type)
+        {
+            if (type == null)
+            {
+                return null;
+            }
+
+            if (!type.IsInterface)
+            {
+                return null;
+            }
+
+            if (Contracts.FirstOrDefault(existing => existing.Contract == type.FullName) != null)
+            {
+                return null;
+            }
+
+            ContractConfig c = new ContractConfig
+            {
+                Parent = this,
+                Contract = type.AssemblyQualifiedName,
+                Client = new ClientConfig
+                {
+                    ForceAsync = false,
+                    Modifier = "public",
+                    Suffix = "Proxy",
+                    Namespace = type.Namespace
+                },
+                Descriptor = new DescriptorConfig
+                {
+                    Modifier = "public",
+                    Suffix = "Invoker",
+                    Namespace = type.Namespace
+                },
+                Server = new ServerConfig
+                {
+                    Modifier = "public",
+                    Suffix = "Invoker",
+                    Namespace = type.Namespace
+                }
+            };
+
+            Contracts.Add(c);
+            return c;
         }
 
         public int Generate()

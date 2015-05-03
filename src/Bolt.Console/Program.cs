@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Framework.Runtime.Common.CommandLine;
 
@@ -116,26 +117,34 @@ namespace Bolt.Console
                 var input = c.Argument("[input]", "Path to the assembly or configuration file.");
                 var output = c.Option("--output <DIRECTORY>", "Directory where the Bolt code will be generated. If directory is not specified then the input path directory will be used instead.", CommandOptionType.SingleValue);
                 var dirOption = c.Option("--dir <PATH>", "Directories where contract assemblies are located.", CommandOptionType.MultipleValue);
+                var contractOption = c.Option("--contract <NAME>", "Additional contracts to generate, if not included in config file or assembly.", CommandOptionType.MultipleValue);
 
                 c.HelpOption("-?|-h|--help");
 
                 c.OnExecute(() =>
                 {
-                    if (string.IsNullOrEmpty(input.Value))
+                    bool inputMustExist = !contractOption.Values.Any();
+                    bool inputExists = !string.IsNullOrEmpty(input.Value);
+
+                    if (inputMustExist && !inputExists)
                     {
                         AnsiConsole.Output.WriteLine("Input path must be specified.".Yellow());
                         return 1;
                     }
 
-                    var extension = Path.GetExtension(input.Value);
+                    var extension = inputExists ? Path.GetExtension(input.Value) : null;
 
-                    if (!File.Exists(input.Value))
+                    if (inputMustExist && !File.Exists(input.Value))
                     {
                         AnsiConsole.Output.WriteLine($"File not found: {input.Value.White().Bold()}".Yellow());
                         return 1;
                     }
 
-                    _cache.AddDirectory(Path.GetDirectoryName(Path.GetFullPath(input.Value)));
+                    if (inputExists)
+                    {
+                        _cache.AddDirectory(Path.GetDirectoryName(Path.GetFullPath(input.Value)));
+                    }
+
                     foreach (var dir in dirOption.Values)
                     {
                         if (Directory.Exists(dir))
@@ -146,11 +155,11 @@ namespace Bolt.Console
 
                     RootConfig rootConfig;
 
-                    if (extension == ".exe" || extension == ".dll")
+                    if (extension == ".exe" || extension == ".dll" || !inputExists)
                     {
                         try
                         {
-                            rootConfig = RootConfig.CreateFromAssembly(_cache, input.Value);
+                            rootConfig = RootConfig.CreateFromAssembly(_cache, inputExists ? input.Value : null);
                             rootConfig.IgnoreGeneratorErrors = true;
                         }
                         catch(Exception e)
@@ -177,6 +186,11 @@ namespace Bolt.Console
                     else
                     {
                         rootConfig.OutputDirectory = Path.GetDirectoryName(input.Value);
+                    }
+
+                    foreach (var contract in contractOption.Values)
+                    {
+                        rootConfig.AddContract(contract);
                     }
 
                     return rootConfig.Generate();
