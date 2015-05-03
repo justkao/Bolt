@@ -29,31 +29,17 @@ namespace Bolt.Console
         {
             _libraryManager = manager;
             _environment = environment;
-            if (environment?.ApplicationName == "Bolt.Console")
-            {
-                _loadContext = accessor.GetLoadContext(typeof(Program).GetTypeInfo().Assembly);
-                _container = container;
-                _loaderRegistration = _container.AddLoader(this);
-            }
+            _loadContext = accessor.GetLoadContext(typeof(Program).GetTypeInfo().Assembly);
+            _container = container;
+            _loaderRegistration = _container.AddLoader(this);
         }
+
 #else
         public AssemblyCache()
         {
             AppDomain.CurrentDomain.AssemblyResolve += (s, e) => Load(e.Name.Split(new[]{','}, StringSplitOptions.RemoveEmptyEntries).First().Trim());
         }
 #endif
-
-        public Assembly CurrentAssembly
-        {
-            get
-            {
-#if !NET45
-                AnsiConsole.Output.WriteLine(_environment.ApplicationName);
-#endifs
-                // TODO:
-                return null;
-            }
-        }
 
         public void AddDirectory(string dir)
         {
@@ -72,16 +58,6 @@ namespace Bolt.Console
 
         public Assembly Load(string assembly)
         {
-#if !NET45
-            if (_loadContext == null)
-            {
-                var libraries = _libraryManager.GetLibraries().SelectMany(l => l.LoadableAssemblies).ToList();
-                foreach (var item in libraries)
-                {
-                    AnsiConsole.Output.WriteLine(item.FullName);
-                }
-            }
-#endif
             var originalName = assembly;
             if (!File.Exists(assembly))
             {
@@ -116,11 +92,6 @@ namespace Bolt.Console
 
         public Type GetType(string fullName)
         {
-            return GetType(fullName, true);
-        }
-
-        public Type GetType(string fullName, bool throwError)
-        {
             Type type = null;
             foreach (Assembly assembly in _assemblies.Values)
             {
@@ -132,12 +103,77 @@ namespace Bolt.Console
             }
 
             type = Type.GetType(fullName);
-            if (type == null && throwError)
+            if (type == null)
+            {
+                type = ResolveTypeEx(fullName);
+            }
+
+            if (type == null)
             {
                 throw new InvalidOperationException($"Type '{fullName}' could not be loaded.");
             }
 
             return type;
+        }
+
+        private Type ResolveTypeEx(string fullName)
+        {
+#if NET45
+            return null;
+#else
+            if (!IsHosted())
+            {
+                return null;
+            }
+
+            fullName = fullName.Trim();
+            try
+            {
+                var assembly = _loadContext.Load(_environment.ApplicationName);
+                if (assembly != null)
+                {
+                    var type = FindType(assembly, fullName);
+                    if (type != null)
+                    {
+                        return type;
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                // OK, continue with full scan
+            }
+
+            var assemblies = _libraryManager.GetLibraries().SelectMany(l => l.LoadableAssemblies).ToList();
+            foreach (var item in assemblies)
+            {
+                var assembly = _loadContext.Load(item.FullName);
+                var type = FindType(assembly, fullName);
+                if (type != null)
+                {
+                    return type;
+                }
+            }
+
+            return null;
+#endif
+        }
+
+        private static Type FindType(Assembly assembly, string fullName)
+        {
+            var found = assembly.ExportedTypes.FirstOrDefault(t => t.FullName == fullName);
+            if (found != null)
+            {
+                return found;
+            }
+
+            found = assembly.ExportedTypes.FirstOrDefault(t => t.Name == fullName);
+            if (found != null)
+            {
+                return found;
+            }
+
+            return null;
         }
 
         public IEnumerator<Assembly> GetEnumerator()
@@ -148,6 +184,14 @@ namespace Bolt.Console
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        private bool IsHosted()
+        {
+#if !NET45
+            return _environment?.ApplicationName != "Bolt.Console";
+#endif
+            return false;
         }
 
         private string FindAssembly(string name)

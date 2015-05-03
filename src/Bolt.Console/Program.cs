@@ -190,16 +190,30 @@ namespace Bolt.Console
 
                     foreach (var contract in contractOption.Values)
                     {
-                        rootConfig.AddContract(contract);
+                        try
+                        {
+                            rootConfig.AddContract(contract);
+                        }
+                        catch (Exception e)
+                        {
+                            return HandleError($"Failed to resolve contract: {contract.White().Bold()}", e);
+                        }
                     }
 
                     return rootConfig.Generate();
                 });
             });
 
-            var code = app.Execute(args);
-            _cache.Dispose();
-            return code;
+
+            try
+            {
+                var code = app.Execute(args);
+                return code;
+            }
+            finally
+            {
+                _cache.Dispose();
+            }
         }
 
         internal static int HandleError(string message, Exception e)
