@@ -22,6 +22,7 @@
     }
   },
   "commands": {
-    "run": "TestService"
+    "run": "TestService",
+    "test": "TestService test"
   }
 }

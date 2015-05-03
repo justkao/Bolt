@@ -42,6 +42,7 @@
         "stateFullBase": "<FullTypeName> // base class used for statefull invokers",
         "generatorEx": "<GeneratorName> // user defined generator for invoker extensions",
         "descriptor": false,
+        "generateExtensions": true,
         "output": "<Path>",
         "excluded": [
           "<FullTypeName>"

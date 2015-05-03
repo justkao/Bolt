@@ -5,13 +5,14 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Threading.Tasks;
 using TestService.Core;
 
 namespace TestService.Client
 {
     public class Program
     {
-        public void Main(params string[] args)
+        public int Main(params string[] args)
         {
             ServicePointManager.DefaultConnectionLimit = 1000;
             ServicePointManager.MaxServicePoints = 1000;
@@ -19,20 +20,64 @@ namespace TestService.Client
             if (!proxies.Any())
             {
                 AnsiConsole.Output.WriteLine("No Bolt servers running ...".Red());
-                return;
+                return 1;
             }
 
-            int cnt = 10000;
+            var app = new CommandLineApplication();
+            app.Name = "bolt";
+            app.OnExecute(() =>
+            {
+                app.ShowHelp();
+                return 2;
+            });
 
-            Execute(proxies, c => c.DoNothing(), cnt, "DoNothing");
-            Execute(proxies, c => c.GetSimpleType(new Random().Next()), cnt, "GetSimpleType");
-            Execute(proxies, c => c.GetSinglePerson(Person.Create(10)), cnt, "GetSinglePerson");
-            Execute(proxies, c => c.GetManyPersons(), cnt, "GetManyPersons");
+            app.Command("test", c =>
+            {
+                c.Description = "Tests the Bolt performance.";
+
+                var output = c.Option("--output <PATH>", "Directory or configuration file path. If no path is specified then the 'bolt.configuration.json' configuration file will be generated in current directory.", CommandOptionType.SingleValue);
+
+                var argRepeats = c.Option("-r <NUMBER>", "Number of repeats for each action.", CommandOptionType.SingleValue);
+                var argConcurrency = c.Option("-c <NUMBER>", "Concurrency of each action.", CommandOptionType.SingleValue);
+
+                c.HelpOption("-?|-h|--help");
+
+                int cnt = 100;
+                int degree = 1;
+
+                c.OnExecute(() =>
+                {
+                    if ( argRepeats.HasValue())
+                    {
+                        cnt = int.Parse(argRepeats.Value());
+                    }
+
+                    if (argConcurrency.HasValue())
+                    {
+                        degree = int.Parse(argConcurrency.Value());
+                    }
+
+                    ExecuteActions(proxies, cnt, degree);
+                    Console.WriteLine("Test finished. Press any key to exit program ... ");
+                    Console.ReadLine();
+                    return 0;
+                });
+            });
+
+            return app.Execute(args);
+        }
+
+        private void ExecuteActions(IEnumerable<Tuple<string, ITestContract>> proxies, int cnt, int degree)
+        {
+            Execute(proxies, c => c.DoNothing(), cnt, degree, "DoNothing");
+            ExecuteAsync(proxies, c => c.DoNothingAsAsync(), cnt, degree, "DoNothingAsync");
+            Execute(proxies, c => c.GetSimpleType(new Random().Next()), cnt, degree, "GetSimpleType");
+            Execute(proxies, c => c.GetSinglePerson(Person.Create(10)), cnt, degree, "GetSinglePerson");
+            ExecuteAsync(proxies, c => c.GetSinglePersonAsAsync(Person.Create(10)), cnt, degree, "GetSinglePersonAsync");
+            Execute(proxies, c => c.GetManyPersons(), cnt, degree, "GetManyPersons");
             List<Person> input = Enumerable.Range(0, 100).Select(Person.Create).ToList();
-            Execute(proxies, c => c.DoNothingWithComplexParameter(input), cnt, "DoNothingWithComplexParameter");
-
-            Console.WriteLine("Test finished. Press any key to exit program ... ");
-            Console.ReadLine();
+            Execute(proxies, c => c.DoNothingWithComplexParameter(input), cnt, degree, "DoNothingWithComplexParameter");
+            ExecuteAsync(proxies, c => c.DoNothingWithComplexParameterAsAsync(input), cnt, degree, "DoNothingWithComplexParameterAsync");
         }
 
         private IEnumerable<Tuple<string, ITestContract>> CreateClients()
@@ -53,15 +98,15 @@ namespace TestService.Client
             }
         }
 
-        private static void Execute(IEnumerable<Tuple<string, ITestContract>> contracts, Action<ITestContract> action, int count, string actionName)
+        private static void ExecuteAsync(IEnumerable<Tuple<string, ITestContract>> contracts, Func<ITestContract, Task> action, int count, int degree, string actionName)
         {
-            AnsiConsole.Output.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}");
+            AnsiConsole.Output.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}, Concurrency = {degree.ToString().Bold()}");
 
             foreach (var item in contracts)
             {
                 try
                 {
-                    Execute(action, count, item.Item2, item.Item1, actionName);
+                    ExecuteAsync(action, count, degree, item.Item2, item.Item1, actionName).GetAwaiter().GetResult();
                 }
                 catch (Exception e)
                 {
@@ -72,7 +117,58 @@ namespace TestService.Client
             AnsiConsole.Output.WriteLine(Environment.NewLine);
         }
 
-        private static void Execute(Action<ITestContract> action, int count, ITestContract channel, string type, string actionName)
+        private static void Execute(IEnumerable<Tuple<string, ITestContract>> contracts, Action<ITestContract> action, int count, int degree, string actionName)
+        {
+            AnsiConsole.Output.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}, Concurrency = {degree.ToString().Bold()}");
+
+            foreach (var item in contracts)
+            {
+                try
+                {
+                    Execute(action, count, degree, item.Item2, item.Item1, actionName);
+                }
+                catch (Exception e)
+                {
+                    AnsiConsole.Output.WriteLine($"{e.Message.Red()}");
+                }
+            }
+
+            AnsiConsole.Output.WriteLine(Environment.NewLine);
+        }
+
+        private static async Task ExecuteAsync(Func<ITestContract, Task> action, int count, int degree, ITestContract channel, string type, string actionName)
+        {
+            AnsiConsole.Output.Writer.Write($"{type,-10}");
+
+            // warmup
+            for (int i = 0; i < 10; i++)
+            {
+                await action(channel);
+            }
+
+            Stopwatch watch = Stopwatch.StartNew();
+
+            if (degree == 1)
+            {
+                for (int i = 0; i < count; i++)
+                {
+                    await action(channel);
+                }
+            }
+            else
+            {
+                while (count > 0)
+                {
+                    await Task.WhenAll(Enumerable.Repeat(0, count % degree == 0 ? degree : count % degree).Select(_ => action(channel)));
+                    count -= degree;
+                }
+            }
+
+            long elapsed = watch.ElapsedMilliseconds;
+            AnsiConsole.Output.WriteLine($"{(elapsed + "ms").Green().Bold()}");
+        }
+
+        private static void Execute(Action<ITestContract> action, int count, int degree, ITestContract channel, string type, string actionName)
         {
             AnsiConsole.Output.Writer.Write($"{type,-10}");
 
@@ -84,9 +180,24 @@ namespace TestService.Client
 
             Stopwatch watch = Stopwatch.StartNew();
 
-            for (int i = 0; i < count; i++)
+            if ( degree == 1)
             {
-                action(channel);
+                for (int i = 0; i < count; i++)
+                {
+                    action(channel);
+                }
+            }
+            else
+            {
+                while (count > 0)
+                {
+                    Parallel.ForEach(Enumerable.Repeat(channel, count % degree == 0 ? degree : count % degree), new ParallelOptions() { MaxDegreeOfParallelism = degree }, (c) =>
+                    {
+                        action(c);
+                    });
+
+                    count -= degree;
+                }
             }
 
             long elapsed = watch.ElapsedMilliseconds;

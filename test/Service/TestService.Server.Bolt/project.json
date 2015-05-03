@@ -10,7 +10,7 @@
     "Microsoft.AspNet.Server.IIS": "1.0.0-*",
     "Microsoft.AspNet.Hosting": "1.0.0-*"
   },
-  "code": [
+  "compile": [
     "*.cs",
     "../TestService.Core/Generated/TestContract.Contract.Designer.cs",
     "../TestService.Core/Generated/TestContract.Server.Designer.cs"

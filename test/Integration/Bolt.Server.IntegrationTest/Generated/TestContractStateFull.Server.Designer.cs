@@ -91,19 +91,19 @@ namespace Bolt.Server
             return bolt.UseTestContractStateFull(new StaticInstanceProvider(instance));
         }
 
-        public static IContractInvoker UseTestContractStateFull<TImplementation>(this IBoltRouteHandler bolt) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContractStateFull, new()
+        public static IContractInvoker UseTestContractStateFull<TImplementation>(this IBoltRouteHandler bolt) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContractStateFull
         {
             return bolt.UseTestContractStateFull(new InstanceProvider<TImplementation>());
         }
 
-        public static IContractInvoker UseStateFullTestContractStateFull<TImplementation>(this IBoltRouteHandler bolt, Bolt.Server.BoltServerOptions options = null) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContractStateFull, new()
+        public static IContractInvoker UseStateFullTestContractStateFull<TImplementation>(this IBoltRouteHandler bolt, Bolt.Server.BoltServerOptions options = null) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContractStateFull
         {
             var initSessionAction = TestContractStateFullDescriptor.Default.Init;
             var closeSessionAction = TestContractStateFullDescriptor.Default.Destroy;
             return bolt.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(initSessionAction, closeSessionAction, options ?? bolt.Configuration.Options));
         }
 
-        public static IContractInvoker UseStateFullTestContractStateFull<TImplementation>(this IBoltRouteHandler bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, Bolt.Server.BoltServerOptions options = null) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContractStateFull, new()
+        public static IContractInvoker UseStateFullTestContractStateFull<TImplementation>(this IBoltRouteHandler bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, Bolt.Server.BoltServerOptions options = null) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContractStateFull
         {
             return bolt.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(initInstanceAction, releaseInstanceAction, options ?? bolt.Configuration.Options));
         }

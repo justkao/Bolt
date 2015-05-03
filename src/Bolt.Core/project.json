@@ -41,7 +41,6 @@
         "System.Threading": "4.0.10-*",
         "System.IO": "4.0.10-*",
         "System.Text.Encoding": "4.0.10-*"
-
       }
     }
   }

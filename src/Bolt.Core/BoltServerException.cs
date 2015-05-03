@@ -2,7 +2,6 @@
 
 namespace Bolt
 {
-
     /// <summary>
     /// Exception indicating that special Bolt error occurred on server.
     /// </summary>

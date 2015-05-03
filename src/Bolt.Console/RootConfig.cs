@@ -57,7 +57,7 @@ namespace Bolt.Console
         {
             RootConfig root = new RootConfig(cache)
             {
-                Assemblies = new List<string> {Path.GetFullPath(assembly)},
+                Assemblies = new List<string> { Path.GetFullPath(assembly) },
                 Contracts = new List<ContractConfig>()
             };
 

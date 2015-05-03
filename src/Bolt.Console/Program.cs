@@ -127,10 +127,10 @@ namespace Bolt.Console
                         return 1;
                     }
 
+                    var extension = Path.GetExtension(input.Value);
+
                     if (!File.Exists(input.Value))
                     {
-
-
                         AnsiConsole.Output.WriteLine($"File not found: {input.Value.White().Bold()}".Yellow());
                         return 1;
                     }
@@ -146,7 +146,7 @@ namespace Bolt.Console
 
                     RootConfig rootConfig;
 
-                    if (Path.GetExtension(input.Value) == ".exe" || Path.GetExtension(input.Value) == ".dll")
+                    if (extension == ".exe" || extension == ".dll")
                     {
                         try
                         {

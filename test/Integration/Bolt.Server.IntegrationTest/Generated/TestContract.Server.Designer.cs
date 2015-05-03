@@ -156,12 +156,12 @@ namespace Bolt.Server
             return bolt.UseTestContract(new StaticInstanceProvider(instance));
         }
 
-        public static IContractInvoker UseTestContract<TImplementation>(this IBoltRouteHandler bolt) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContract, new()
+        public static IContractInvoker UseTestContract<TImplementation>(this IBoltRouteHandler bolt) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContract
         {
             return bolt.UseTestContract(new InstanceProvider<TImplementation>());
         }
 
-        public static IContractInvoker UseStateFullTestContract<TImplementation>(this IBoltRouteHandler bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, Bolt.Server.BoltServerOptions options = null) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContract, new()
+        public static IContractInvoker UseStateFullTestContract<TImplementation>(this IBoltRouteHandler bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, Bolt.Server.BoltServerOptions options = null) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContract
         {
             return bolt.UseTestContract(new StateFullInstanceProvider<TImplementation>(initInstanceAction, releaseInstanceAction, options ?? bolt.Configuration.Options));
         }

@@ -5,7 +5,7 @@
   "dependencies": {
     "Bolt.Common": { "type": "build" },
     "Bolt.Common.AssemblyInfo": { "type": "build" },
-    "Bolt.Core": "1.0.0-*"
+    "Bolt.Core": ""
   },
   "frameworks": {
     "net45": {
