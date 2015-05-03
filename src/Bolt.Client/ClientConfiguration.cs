@@ -45,7 +45,7 @@ namespace Bolt.Client
         /// <summary>
         /// Gets or sets the endpoint provider.
         /// </summary>
-        public IEndpointProvider EndpointProvider{ get; set; }
+        public IEndpointProvider EndpointProvider { get; set; }
 
         /// <summary>
         /// Gets or sets the Bolt options.

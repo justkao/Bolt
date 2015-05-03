@@ -4,19 +4,18 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.Framework.Runtime;
 using Microsoft.Framework.Runtime.Common.CommandLine;
-using System.Diagnostics;
 
 namespace Bolt.Console
 {
 #if !NET45
-    public class AssemblyCache : IEnumerable<Assembly>, IDisposable, Microsoft.Framework.Runtime.IAssemblyLoader
+    public class AssemblyCache : IEnumerable<Assembly>, IDisposable, IAssemblyLoader
     {
-        private readonly Microsoft.Framework.Runtime.IAssemblyLoadContext _loadContext;
-        private readonly Microsoft.Framework.Runtime.IAssemblyLoaderContainer _container;
-        private readonly Microsoft.Framework.Runtime.ILibraryManager _libraryManager;
-        private readonly Microsoft.Framework.Runtime.IApplicationEnvironment _environment;
-        private readonly IDisposable _loaderRegistration = null;
+        private readonly IAssemblyLoadContext _loadContext;
+        private readonly ILibraryManager _libraryManager;
+        private readonly IApplicationEnvironment _environment;
+        private readonly IDisposable _loaderRegistration;
 #else
     public class AssemblyCache : IEnumerable<Assembly>, IDisposable
     {
@@ -25,19 +24,22 @@ namespace Bolt.Console
         private readonly HashSet<string> _dirs = new HashSet<string>();
 
 #if !NET45
-        public AssemblyCache(Microsoft.Framework.Runtime.ILibraryManager manager, Microsoft.Framework.Runtime.IAssemblyLoadContextAccessor accessor, Microsoft.Framework.Runtime.IAssemblyLoaderContainer container, Microsoft.Framework.Runtime.IApplicationEnvironment environment)
+        public AssemblyCache(ILibraryManager manager,
+            IAssemblyLoadContextAccessor accessor,
+            IAssemblyLoaderContainer container,
+            IApplicationEnvironment environment)
         {
             _libraryManager = manager;
             _environment = environment;
-            _loadContext = accessor.GetLoadContext(typeof(Program).GetTypeInfo().Assembly);
-            _container = container;
-            _loaderRegistration = _container.AddLoader(this);
+            _loadContext = accessor.GetLoadContext(typeof (Program).GetTypeInfo().Assembly);
+            _loaderRegistration = container.AddLoader(this);
         }
 
 #else
         public AssemblyCache()
         {
-            AppDomain.CurrentDomain.AssemblyResolve += (s, e) => Load(e.Name.Split(new[]{','}, StringSplitOptions.RemoveEmptyEntries).First().Trim());
+            AppDomain.CurrentDomain.AssemblyResolve +=
+                (s, e) => Load(e.Name.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).First().Trim());
         }
 #endif
 
@@ -69,7 +71,7 @@ namespace Bolt.Console
                 }
             }
 
-            string assemblyName = Path.GetFileName(assembly);
+            string assemblyName = Path.GetFileName(assembly) ?? assembly;
             Assembly loadedAssembly;
             if (_assemblies.TryGetValue(assemblyName, out loadedAssembly))
             {
@@ -92,7 +94,7 @@ namespace Bolt.Console
 
         public Type GetType(string fullName)
         {
-            Type type = null;
+            Type type;
             foreach (Assembly assembly in _assemblies.Values)
             {
                 type = assembly.GetType(fullName);
@@ -102,11 +104,7 @@ namespace Bolt.Console
                 }
             }
 
-            type = Type.GetType(fullName);
-            if (type == null)
-            {
-                type = ResolveTypeEx(fullName);
-            }
+            type = Type.GetType(fullName) ?? ResolveTypeEx(fullName);
 
             if (type == null)
             {
@@ -145,35 +143,17 @@ namespace Bolt.Console
             }
 
             var assemblies = _libraryManager.GetLibraries().SelectMany(l => l.LoadableAssemblies).ToList();
-            foreach (var item in assemblies)
-            {
-                var assembly = _loadContext.Load(item.FullName);
-                var type = FindType(assembly, fullName);
-                if (type != null)
-                {
-                    return type;
-                }
-            }
-
-            return null;
+            return
+                assemblies.Select(item => _loadContext.Load(item.FullName))
+                    .Select(assembly => FindType(assembly, fullName))
+                    .FirstOrDefault(type => type != null);
 #endif
         }
 
         private static Type FindType(Assembly assembly, string fullName)
         {
             var found = assembly.ExportedTypes.FirstOrDefault(t => t.FullName == fullName);
-            if (found != null)
-            {
-                return found;
-            }
-
-            found = assembly.ExportedTypes.FirstOrDefault(t => t.Name == fullName);
-            if (found != null)
-            {
-                return found;
-            }
-
-            return null;
+            return found ?? assembly.ExportedTypes.FirstOrDefault(t => t.Name == fullName);
         }
 
         public IEnumerator<Assembly> GetEnumerator()
@@ -202,7 +182,8 @@ namespace Bolt.Console
 
             if (!string.IsNullOrEmpty(extension))
             {
-                hasExtension = new[] { ".exe", ".dll" }.Any(ext => string.CompareOrdinal(extension.ToLowerInvariant(), ext) == 0);
+                hasExtension =
+                    new[] {".exe", ".dll"}.Any(ext => string.CompareOrdinal(extension.ToLowerInvariant(), ext) == 0);
             }
 
             foreach (var dir in _dirs)

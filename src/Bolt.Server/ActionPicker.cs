@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Bolt.Server
+﻿namespace Bolt.Server
 {
     public class ActionPicker : IActionPicker
     {

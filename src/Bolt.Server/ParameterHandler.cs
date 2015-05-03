@@ -13,7 +13,8 @@ namespace Bolt.Server
 
                 context.Parameters =
                     feature.Configuration.Serializer.DeserializeParameters(
-                        await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted), context.Action);
+                        await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted),
+                        context.Action);
             }
         }
     }

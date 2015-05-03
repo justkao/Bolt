@@ -81,7 +81,7 @@ namespace Bolt.Client
                 try
                 {
                     Exception error = await _dataHandler.ReadExceptionAsync(context);
-                    if ( error != null)
+                    if (error != null)
                     {
                         return new ResponseDescriptor<T>(context.Response, context, error, ResponseError.Client);
                     }

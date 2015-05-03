@@ -15,6 +15,7 @@ namespace Bolt.Core.Test
         }
 
         [Fact]
+        [InlineData()]
         public void Wrap_NullArgument_ReturnsNull()
         {
             Assert.Null(_serializer.Wrap(null));

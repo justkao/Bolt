@@ -367,7 +367,6 @@ namespace Bolt.Server.IntegrationTest
             server.Verify(v => v.MethodTakingHugeData(It.IsAny<List<CompositeType>>()));
         }
 
-
         public Mock<ITestContract> Server()
         {
             Mock<ITestContract> mock = new Mock<ITestContract>(MockBehavior.Strict);

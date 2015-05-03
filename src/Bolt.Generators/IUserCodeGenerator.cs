@@ -22,12 +22,14 @@ namespace Bolt.Generators
 
             foreach (var prop in PropertyHelper.GetProperties(generator))
             {
-                if(!properties.ContainsKey(prop.Name))
+                if (!properties.ContainsKey(prop.Name))
                 {
                     continue;
                 }
 
-                prop.SetValue(generator, Conversion.ConvertSimpleType(properties[prop.Name], prop.Property.PropertyType));        
+                prop.SetValue(
+                    generator,
+                    Conversion.ConvertSimpleType(properties[prop.Name], prop.Property.PropertyType));
             }
 
             return generator;

@@ -10,7 +10,11 @@ namespace Bolt.Generators
 {
     public class ClassGenerator : GeneratorBase
     {
-        public ClassGenerator(ClassDescriptor descriptor, StringWriter output, TypeFormatter formatter, IntendProvider intendProvider)
+        public ClassGenerator(
+            ClassDescriptor descriptor,
+            StringWriter output,
+            TypeFormatter formatter,
+            IntendProvider intendProvider)
             : base(output, formatter, intendProvider)
         {
             Descriptor = descriptor;

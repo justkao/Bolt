@@ -1,5 +1,4 @@
-﻿
-namespace Bolt
+﻿namespace Bolt
 {
     /// <summary>
     /// Indicates that object can provide instance of <see cref="ContractDescriptor"/>

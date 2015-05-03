@@ -83,7 +83,7 @@ namespace Bolt.Server
         {
             int statusCode = 500;
 
-            switch(code)
+            switch (code)
             {
                 case ServerErrorCode.ActionNotFound:
                 case ServerErrorCode.ContractNotFound:

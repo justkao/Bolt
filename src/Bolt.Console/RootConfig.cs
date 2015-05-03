@@ -104,7 +104,7 @@ namespace Bolt.Console
         public void AddContract(string name)
         {
             var type = AssemblyCache.GetType(name);
-            var addedContract = AddContract(type?.GetTypeInfo());
+            var addedContract = AddContract(type.GetTypeInfo());
             if (addedContract != null)
             {
                 AnsiConsole.Output.WriteLine($"Contract '{type.Name.Bold()}' added.");

@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Bolt.Common;
 using System.Threading.Tasks;
+
+using Bolt.Common;
 
 namespace Bolt.Generators
 {

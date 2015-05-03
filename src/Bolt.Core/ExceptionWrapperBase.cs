@@ -44,7 +44,7 @@ namespace Bolt
             }
             catch (Exception e)
             {
-                throw new BoltSerializationException(string.Format("Failed to wrap exception of type '{0}'.", e.GetType().Name), e);
+                throw new BoltSerializationException($"Failed to wrap exception of type '{e.GetType().Name}'.", e);
             }
         }
 
