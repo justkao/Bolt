@@ -26,7 +26,6 @@
         "System.Runtime": "",
         "System.Collections": "",
         "System.Runtime.Serialization": "",
-        "System.Net": ""
       }
     },
     "dnxcore50": {

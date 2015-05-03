@@ -8,10 +8,11 @@
   "compileExclude": "Generated\\*.*",
   "frameworks": {
     "dnx451": {
-      "frameworkAssemblies": {"System.ServiceModel": ""}
+      "frameworkAssemblies": { "System.ServiceModel": "" }
     }
   },
   "commands": {
-    "gen": "Bolt.Console code Generated/Configuration.json"
+    "gen": "Bolt.Console code Generated/Configuration.json",
+    "gen2": "Bolt.Console code --contract ITestContract --output Generated"
   }
 }
