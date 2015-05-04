@@ -4,7 +4,6 @@
   "description": "Bolt portable client library used to access Bolt based services.",
   "dependencies": {
     "Bolt.Common": { "type": "build" },
-    "Bolt.Common.AssemblyInfo": { "type": "build" },
     "Bolt.Core": ""
   },
   "frameworks": {

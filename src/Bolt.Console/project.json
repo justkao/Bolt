@@ -1,6 +1,6 @@
 ﻿{
   "version": "0.11.0-alpha",
-  "description": "Bolt code generation tool used by client and server.",
+  "description": "Bolt code generation tool used to generate client and server code.",
   "authors": [ "Martin Tomka" ],
   "dependencies": {
     "Microsoft.Framework.CommandLineUtils": { "version": "1.0.0-*", "type": "build" },
