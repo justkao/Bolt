@@ -1,10 +1,10 @@
 ﻿using Bolt.Client;
 using Bolt.Client.Channels;
-using Bolt.Service.Test.Core;
+using Bolt.Server.IntegrationTest.Core;
 using System;
 using System.Threading.Tasks;
 
-namespace Bolt.Service.Test
+namespace Bolt.Server.IntegrationTest
 {
     public class TestContractStateFullChannel : RecoverableStatefullChannel<TestContractStateFullProxy>
     {
@@ -46,20 +46,6 @@ namespace Bolt.Service.Test
             {
                 await contract.InitExAsync(FailExtendedInitialization);
             }
-        }
-
-        protected override void OnProxyOpening(TestContractStateFullProxy contract)
-        {
-            contract.Init();
-            if (ExtendedInitialization)
-            {
-                contract.InitEx(FailExtendedInitialization);
-            }
-        }
-
-        protected override void OnProxyClosing(TestContractStateFullProxy contract)
-        {
-            contract.Destroy();
         }
     }
 }
