@@ -345,7 +345,6 @@ namespace Bolt.Server.IntegrationTest
 
             List<CompositeType> result = channel.FunctionReturningHugeData();
             Assert.Equal(1000, result.Count);
-
         }
 
         [Fact]
@@ -355,8 +354,8 @@ namespace Bolt.Server.IntegrationTest
             var data = Enumerable.Repeat(0, 1000).Select(_ => CompositeType.CreateRandom()).ToList();
 
             Mock<ITestContract> server = Server();
-            server.Setup(v => v.MethodTakingHugeData(It.IsAny<List<CompositeType>>())).Callback<List<CompositeType>>(
-                v => Assert.Equal(1000, v.Count));
+            server.Setup(v => v.MethodTakingHugeData(It.IsAny<List<CompositeType>>()))
+                .Callback<List<CompositeType>>(v => Assert.Equal(1000, v.Count));
 
             channel.MethodTakingHugeData(data);
 

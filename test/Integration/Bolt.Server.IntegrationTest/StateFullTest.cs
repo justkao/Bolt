@@ -212,7 +212,7 @@ namespace Bolt.Server.IntegrationTest
         {
             TestContractStateFullProxy channel = GetChannel();
             int before = InstanceProvider.Count;
-            Task.WaitAll(Enumerable.Repeat(0, 100).Select(_ => Task.Run(() => channel.GetState())).ToArray());
+            Task.WaitAll(Enumerable.Repeat(0, 5).Select(_ => Task.Run(() => channel.GetState())).ToArray());
             Assert.Equal(before + 1, InstanceProvider.Count);
             channel.Dispose();
             Assert.Equal(before, InstanceProvider.Count);

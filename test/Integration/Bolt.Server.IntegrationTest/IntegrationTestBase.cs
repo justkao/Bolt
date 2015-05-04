@@ -1,33 +1,34 @@
-﻿using Bolt.Client;
+﻿using System;
+
+using Bolt.Client;
 using Microsoft.Framework.DependencyInjection;
-using System;
-using Xunit;
 
 namespace Bolt.Server.IntegrationTest
 {
+    using Microsoft.AspNet.TestHost;
+
     public abstract class IntegrationTestBase : IDisposable
     {
-        private BoltServer _runningServer;
-        public Uri ServerUrl { get; private set; }
+        private readonly TestServer _runningServer;
 
-        public IntegrationTestBase()
+        protected IntegrationTestBase()
         {
             ServerUrl = new Uri("http://localhost");
-            _runningServer = new BoltServer();
-            _runningServer.Start(Configure,ConfigureServices);
+            _runningServer = TestServer.Create(Configure, ConfigureServices);
             ClientConfiguration = new ClientConfiguration();
-            ClientConfiguration.RequestHandler = new RequestHandler(ClientConfiguration.DataHandler, new ClientErrorProvider(ClientConfiguration.Options.ServerErrorHeader), _runningServer.GetHandler());
+            var handler = _runningServer.CreateHandler();
+
+            ClientConfiguration.RequestHandler = new RequestHandler(
+                ClientConfiguration.DataHandler,
+                new ClientErrorProvider(ClientConfiguration.Options.ServerErrorHeader),
+                handler);
         }
 
-        protected ClientConfiguration ClientConfiguration { get; private set; }
+        public Uri ServerUrl { get; private set; }
+
+        protected ClientConfiguration ClientConfiguration { get; }
 
         protected abstract void Configure(Microsoft.AspNet.Builder.IApplicationBuilder appBuilder);
-
-        [Fact]
-        public void RequestBoltRoot_EnsureOk()
-        {
-            // TODO:
-        }
 
         protected virtual void ConfigureServices(IServiceCollection services)
         {

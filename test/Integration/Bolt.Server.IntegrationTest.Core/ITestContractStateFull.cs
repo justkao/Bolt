@@ -2,9 +2,17 @@
 
 namespace Bolt.Server.IntegrationTest.Core
 {
+    using System.Runtime.Serialization;
+
+    [Serializable]
     public class TestContractProxyFailedException : Exception
     {
         public TestContractProxyFailedException()
+        {
+        }
+
+        protected TestContractProxyFailedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
         {
         }
     }

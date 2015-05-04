@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 
 namespace Bolt.Client
 {
+    using System.Threading;
+
     public class RequestHandler : DelegatingHandler, IRequestHandler
     {
         private readonly IClientDataHandler _dataHandler;
@@ -50,13 +52,29 @@ namespace Bolt.Client
                 return new ResponseDescriptor<T>(null, context, e, ResponseError.Serialization);
             }
 
+            CancellationToken timeoutToken = CancellationToken.None;
+
             try
             {
-                var response = await SendAsync(context.Request, context.Cancellation);
+                CancellationToken token = context.Cancellation;
+                if (context.ResponseTimeout != TimeSpan.Zero)
+                {
+                    timeoutToken = new CancellationTokenSource(context.ResponseTimeout).Token;
+                    token = token != CancellationToken.None
+                                ? CancellationTokenSource.CreateLinkedTokenSource(token, timeoutToken).Token
+                                : timeoutToken;
+                }
+
+                var response = await SendAsync(context.Request, token);
                 context.Response = response;
             }
             catch (OperationCanceledException)
             {
+                if (timeoutToken.IsCancellationRequested)
+                {
+                    throw new TimeoutException();
+                }
+
                 throw;
             }
             catch (Exception e)
