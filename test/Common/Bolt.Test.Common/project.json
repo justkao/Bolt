@@ -1,8 +1,5 @@
 ﻿{
-  "version": "1.0.0-*",
-  "dependencies": {
-    "Bolt.Common": ""
-  },
+  "dependencies": {"Bolt.Common": ""},
   "frameworks": {
     "net45": {
       "frameworkAssemblies": {
@@ -15,8 +12,6 @@
         "System.Runtime.Serialization": { "version": "", "type": "build" },
         "System.Threading": { "version": "", "type": "build" },
         "System.Net.Http": { "version": "", "type": "build" }
-      },
-      "dependencies": {
       }
     },
     "dnx451": {
@@ -39,7 +34,6 @@
         "System.Runtime.Serialization.Primitives": "4.0.0-*",
         "System.Diagnostics.Debug": "4.0.10-*",
         "System.Threading": "4.0.10-*",
-        "System.IO": "4.0.10-*",
         "System.Runtime.Extensions": "4.0.10-*"
       }
     }

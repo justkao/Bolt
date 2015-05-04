@@ -3,10 +3,10 @@
   "projects": [
     "src",
     "test",
+    "test/Common",
     "test/Service",
-    "test/Automatic",
-	"test/Integration",
-    "wrap",
-    "."
+    "test/Automatic", 
+    "test/Integration",
+    "wrap"
   ]
 }

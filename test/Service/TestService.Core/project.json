@@ -12,7 +12,6 @@
     }
   },
   "commands": {
-    "gen": "Bolt.Console code Generated/Configuration.json",
-    "gen2": "Bolt.Console code --contract ITestContract --output Generated"
+    "gen": "Bolt.Console code Generated/Configuration.json"
   }
 }

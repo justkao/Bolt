@@ -89,7 +89,7 @@ namespace Bolt.Console
 
                     try
                     {
-                        string json = RootConfig.CreateFromAssembly(_cache, input.Value).Serialize();
+                        string json = RootConfig.CreateFromAssembly(_cache, input.Value, GenerateContractMode.All, false).Serialize();
                         var outputFile = PathHelpers.GetOutput(Path.GetDirectoryName(input.Value), output.Value(), "bolt.configuration.json");
                         bool exist = File.Exists(outputFile);
                         File.WriteAllText(outputFile, json);
@@ -113,11 +113,16 @@ namespace Bolt.Console
 
             app.Command("code", c =>
             {
+                var values = Enum.GetValues(typeof(GenerateContractMode)).OfType<GenerateContractMode>().Select(v => v.ToString());
+                var rawModeValues = string.Join(",", values);
+
                 c.Description = "Generates code from assembly or from configuration file.";
                 var input = c.Argument("[input]", "Path to the assembly or configuration file.");
                 var output = c.Option("--output <DIRECTORY>", "Directory where the Bolt code will be generated. If directory is not specified then the input path directory will be used instead.", CommandOptionType.SingleValue);
                 var dirOption = c.Option("--dir <PATH>", "Directories where contract assemblies are located.", CommandOptionType.MultipleValue);
                 var contractOption = c.Option("--contract <NAME>", "Additional contracts to generate, if not included in config file or assembly.", CommandOptionType.MultipleValue);
+                var modeOption = c.Option($"--mode <{rawModeValues}>", "Specifies what parts of contracts should be generated. ", CommandOptionType.SingleValue);
+                var internalSwitch = c.Option("--internal", "Generates the contracts with internal visibility.", CommandOptionType.NoValue);
 
                 c.HelpOption("-?|-h|--help");
 
@@ -152,6 +157,19 @@ namespace Bolt.Console
                             _cache.AddDirectory(dir);
                         }
                     }
+                    var mode = GenerateContractMode.All;
+                    try
+                    {
+                        mode = modeOption.HasValue() ? (GenerateContractMode)Enum.Parse(typeof(GenerateContractMode), modeOption.Value(), true) : GenerateContractMode.All;
+                    }
+                    catch (Exception)
+                    {
+                        
+                        AnsiConsole.Output.WriteLine($"Invalid mode option specified: {modeOption.Value().White().Bold()}, Available options: {rawModeValues.Bold()}".Yellow());
+                        return 1;
+                    }
+
+                    bool asInternal = internalSwitch.HasValue() ? true : false;
 
                     RootConfig rootConfig;
 
@@ -159,7 +177,7 @@ namespace Bolt.Console
                     {
                         try
                         {
-                            rootConfig = RootConfig.CreateFromAssembly(_cache, inputExists ? input.Value : null);
+                            rootConfig = RootConfig.CreateFromAssembly(_cache, inputExists ? input.Value : null, mode, asInternal);
                             rootConfig.IgnoreGeneratorErrors = true;
                         }
                         catch(Exception e)
@@ -192,7 +210,7 @@ namespace Bolt.Console
                     {
                         try
                         {
-                            rootConfig.AddContract(contract);
+                            rootConfig.AddContract(contract, mode, asInternal);
                         }
                         catch (Exception e)
                         {

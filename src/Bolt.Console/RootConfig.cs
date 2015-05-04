@@ -53,7 +53,7 @@ namespace Bolt.Console
             return config;
         }
 
-        public static RootConfig CreateFromAssembly(AssemblyCache cache, string assembly)
+        public static RootConfig CreateFromAssembly(AssemblyCache cache, string assembly, GenerateContractMode mode,  bool internalVisibility)
         {
             RootConfig root = new RootConfig(cache)
             {
@@ -67,7 +67,7 @@ namespace Bolt.Console
 
                 foreach (TypeInfo type in root.AssemblyCache.GetTypes(root.AssemblyCache.Load(assembly)))
                 {
-                    root.AddContract(type);
+                    root.AddContract(type, mode, internalVisibility);
                 }
             }
 
@@ -101,17 +101,17 @@ namespace Bolt.Console
                 new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() });
         }
 
-        public void AddContract(string name)
+        public void AddContract(string name, GenerateContractMode mode, bool internalVisibility)
         {
             var type = AssemblyCache.GetType(name);
-            var addedContract = AddContract(type.GetTypeInfo());
+            var addedContract = AddContract(type.GetTypeInfo(), mode, internalVisibility);
             if (addedContract != null)
             {
                 AnsiConsole.Output.WriteLine($"Contract '{type.Name.Bold()}' added.");
             }
         }
 
-        public ContractConfig AddContract(TypeInfo type)
+        public ContractConfig AddContract(TypeInfo type, GenerateContractMode mode, bool internalVisibility)
         {
             if (type == null)
             {
@@ -128,24 +128,39 @@ namespace Bolt.Console
                 return null;
             }
 
+            System.Console.WriteLine(mode);
+
             ContractConfig c = new ContractConfig
             {
                 Parent = this,
                 Contract = type.AssemblyQualifiedName,
-                Client = new ClientConfig
+                Modifier = internalVisibility ? "internal" : "public"
+            };
+
+            if (mode.HasFlag(GenerateContractMode.Client))
+            {
+                c.Client = new ClientConfig
                 {
                     ForceAsync = true,
                     Namespace = type.Namespace
-                },
-                Descriptor = new DescriptorConfig
+                };
+            }
+
+            if (mode.HasFlag(GenerateContractMode.Server))
+            {
+                c.Server = new ServerConfig
                 {
                     Namespace = type.Namespace
-                },
-                Server = new ServerConfig
+                };
+            }
+
+            if (mode.HasFlag(GenerateContractMode.Descriptor))
+            {
+                c.Descriptor = new DescriptorConfig
                 {
                     Namespace = type.Namespace
-                }
-            };
+                };
+            }
 
             Contracts.Add(c);
             return c;
