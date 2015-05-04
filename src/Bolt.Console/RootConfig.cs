@@ -128,8 +128,6 @@ namespace Bolt.Console
                 return null;
             }
 
-            System.Console.WriteLine(mode);
-
             ContractConfig c = new ContractConfig
             {
                 Parent = this,
