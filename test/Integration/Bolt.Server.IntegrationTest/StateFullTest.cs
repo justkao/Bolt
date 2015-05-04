@@ -13,11 +13,6 @@ namespace Bolt.Server.IntegrationTest
 {
     public class StateFullTest : IntegrationTestBase
     {
-        public StateFullTest(BoltServer server)
-            : base(server)
-        {
-        }
-
         [Fact]
         public async Task Async_EnsureStatePersistedBetweenCalls()
         {
@@ -311,7 +306,7 @@ namespace Bolt.Server.IntegrationTest
             {
                 channel.GetState();
             }
-            catch (Exception e)
+            catch (Exception)
             {
             }
 

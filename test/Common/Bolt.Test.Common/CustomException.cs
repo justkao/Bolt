@@ -2,6 +2,9 @@
 
 namespace Bolt.Test.Common
 {
+#if NET45
+    [Serializable]
+#endif
     public class CustomException : Exception
     {
         public CustomException(int customData)
@@ -23,6 +26,12 @@ namespace Bolt.Test.Common
         {
         }
 
+#if NET45
+        public CustomException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+            : base(info, context)
+        {
+        }
+#endif
         public int CustomData { get; private set; }
     }
 }

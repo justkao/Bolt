@@ -16,10 +16,6 @@ namespace Bolt.Server.IntegrationTest
 {
     public class StateLessTest : IntegrationTestBase
     {
-        public StateLessTest(BoltServer server)
-            : base(server)
-        {
-        }
 
         [Fact]
         public void ClientCallsAsyncMethod_AsyncOnClientAndServer_EnsureExecutedOnServer()

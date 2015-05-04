@@ -50,10 +50,20 @@ namespace Bolt.Client.Channels
 
         public virtual bool IsRecoverable => true;
 
+        public override void Open()
+        {
+            TaskHelpers.Execute(() => OpenAsync());
+        }
+
         public override async Task OpenAsync()
         {
             await EnsureConnectionAsync();
             IsOpened = true;
+        }
+
+        public override void Close()
+        {
+            TaskHelpers.Execute(() => CloseAsync());
         }
 
         public override async Task CloseAsync()
@@ -95,7 +105,7 @@ namespace Bolt.Client.Channels
                 {
                     _activeConnection = null;
                     _sessionId = null;
-                    Close();
+                    base.Close();
                 }
             }
         }
@@ -255,7 +265,10 @@ namespace Bolt.Client.Channels
         {
             if (!string.IsNullOrEmpty(sessionId))
             {
-                context.Request.Headers.Add(_sessionHeaderName, sessionId);
+                if (!context.Request.Headers.Contains(_sessionHeaderName))
+                {
+                    context.Request.Headers.Add(_sessionHeaderName, sessionId);
+                }
             }
         }
     }

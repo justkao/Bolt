@@ -12,8 +12,6 @@ namespace Bolt.Server
 
         public TimeSpan SessionTimeout { get; set; }
 
-        public string Prefix { get; set; }
-
         public bool DetailedServerErrors { get; set; }
     }
 }

@@ -12,7 +12,10 @@
         {
             SessionHeader = DefaultSessionHeader;
             ServerErrorHeader = DefaultServerErrorHeader;
+            Prefix = "bolt";
         }
+
+        public string Prefix { get; set; }
 
         /// <summary>
         ///  The header name used to store the session.

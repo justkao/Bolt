@@ -5,18 +5,18 @@ using Xunit;
 
 namespace Bolt.Server.IntegrationTest
 {
-    public abstract class IntegrationTestBase : IClassFixture<BoltServer>
+    public abstract class IntegrationTestBase : IDisposable
     {
         private BoltServer _runningServer;
         public Uri ServerUrl { get; private set; }
 
-        public IntegrationTestBase(BoltServer server)
+        public IntegrationTestBase()
         {
             ServerUrl = new Uri("http://localhost");
-            _runningServer = server;
-            server.Start(Configure,ConfigureServices);
+            _runningServer = new BoltServer();
+            _runningServer.Start(Configure,ConfigureServices);
             ClientConfiguration = new ClientConfiguration();
-            ClientConfiguration.RequestHandler = new RequestHandler(ClientConfiguration.DataHandler, new ClientErrorProvider(ClientConfiguration.Options.ServerErrorHeader), server.GetHandler());
+            ClientConfiguration.RequestHandler = new RequestHandler(ClientConfiguration.DataHandler, new ClientErrorProvider(ClientConfiguration.Options.ServerErrorHeader), _runningServer.GetHandler());
         }
 
         protected ClientConfiguration ClientConfiguration { get; private set; }
@@ -36,6 +36,11 @@ namespace Bolt.Server.IntegrationTest
         }
 
         protected virtual void Destroy()
+        {
+            _runningServer.Dispose();
+        }
+
+        public void Dispose()
         {
             _runningServer.Dispose();
         }
