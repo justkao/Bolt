@@ -18,6 +18,7 @@
     }
   },
   "commands": {
-    "gen": "Bolt.Console code Generated/Configuration.json --output ../Bolt.Server.IntegrationTest/Generated/"
+    "gen": "Bolt.Console code Generated/Configuration.json --output ../Bolt.Server.IntegrationTest/Generated/",
+    "genConfig": "Bolt.Console config"
   }
 }

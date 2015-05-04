@@ -75,13 +75,13 @@ namespace Bolt.Console
 
                 c.OnExecute(() =>
                 {
-                    if (string.IsNullOrEmpty(input.Value))
+                    if (string.IsNullOrEmpty(input.Value) && !_cache.IsHosted())
                     {
                         AnsiConsole.Output.WriteLine("Assembly must be specified.".Yellow());
                         return 1;
                     }
 
-                    if (!File.Exists(input.Value))
+                    if (!_cache.IsHosted() && !File.Exists(input.Value))
                     {
                         AnsiConsole.Output.WriteLine($"Assembly not found: {input.Value.White()}".Yellow());
                         return 1;

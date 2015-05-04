@@ -9,6 +9,8 @@ using Microsoft.Framework.Runtime.Common.CommandLine;
 
 namespace Bolt.Console
 {
+    using Console = System.Console;
+
 #if !NET45
     public class AssemblyCache : IEnumerable<Assembly>, IDisposable, IAssemblyLoader
     {
@@ -131,7 +133,7 @@ namespace Bolt.Console
             fullName = fullName.Trim();
             try
             {
-                var assembly = _loadContext.Load(_environment.ApplicationName);
+                var assembly = HostedAssembly;
                 if (assembly != null)
                 {
                     var type = FindType(assembly, fullName);
@@ -154,6 +156,25 @@ namespace Bolt.Console
 #endif
         }
 
+        public Assembly HostedAssembly
+        {
+            get
+            {
+#if !NET45
+                try
+                {
+                    return _loadContext.Load(_environment.ApplicationName);
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+#else
+                return null;
+#endif
+            }
+        }
+
         private static Type FindType(Assembly assembly, string fullName)
         {
             var found = assembly.ExportedTypes.FirstOrDefault(t => t.FullName == fullName);
@@ -170,7 +191,7 @@ namespace Bolt.Console
             return GetEnumerator();
         }
 
-        private bool IsHosted()
+        public bool IsHosted()
         {
 #if !NET45
             return _environment?.ApplicationName != "Bolt.Console";

@@ -57,17 +57,29 @@ namespace Bolt.Console
         {
             RootConfig root = new RootConfig(cache)
             {
-                Assemblies = new List<string>(),
                 Contracts = new List<ContractConfig>()
             };
 
-            if (File.Exists(assembly))
+            if (!string.IsNullOrEmpty(assembly))
             {
-                root.Assemblies.Add(Path.GetFullPath(assembly));
-
-                foreach (TypeInfo type in root.AssemblyCache.GetTypes(root.AssemblyCache.Load(assembly)))
+                if (File.Exists(assembly))
                 {
-                    root.AddContract(type, mode, internalVisibility);
+                    root.Assemblies = new List<string> { Path.GetFullPath(assembly) };
+                    foreach (TypeInfo type in root.AssemblyCache.GetTypes(root.AssemblyCache.Load(assembly)))
+                    {
+                        root.AddContract(type, mode, internalVisibility);
+                    }
+                }
+            }
+            else
+            {
+                var hostedAssembly = root.AssemblyCache.HostedAssembly;
+                if (hostedAssembly != null)
+                {
+                    foreach (TypeInfo type in root.AssemblyCache.GetTypes(hostedAssembly))
+                    {
+                        root.AddContract(type, mode, internalVisibility);
+                    }
                 }
             }
 
