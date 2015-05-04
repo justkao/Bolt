@@ -36,6 +36,6 @@
     }
   },
   "commands": {
-    "Bolt.Console": "run"
+    "Bolt.Console": "Bolt.Console"
   }
 }

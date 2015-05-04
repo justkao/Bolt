@@ -70,6 +70,10 @@ namespace Bolt.Console
                     throw new InvalidOperationException($"Assembly {originalName} not found.");
                 }
             }
+            else
+            {
+                assembly = Path.GetFullPath(assembly);
+            }
 
             string assemblyName = Path.GetFileName(assembly) ?? assembly;
             Assembly loadedAssembly;
@@ -170,8 +174,9 @@ namespace Bolt.Console
         {
 #if !NET45
             return _environment?.ApplicationName != "Bolt.Console";
-#endif
+#else
             return false;
+#endif
         }
 
         private string FindAssembly(string name)
