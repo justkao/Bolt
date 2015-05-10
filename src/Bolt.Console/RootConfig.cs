@@ -14,6 +14,7 @@ namespace Bolt.Console
 {
     public class RootConfig
     {
+        private static readonly AnsiConsole Console = AnsiConsole.GetOutput(true);
         private readonly Dictionary<string, DocumentGenerator> _documents = new Dictionary<string, DocumentGenerator>();
 
         public RootConfig(AssemblyCache cache)
@@ -119,7 +120,7 @@ namespace Bolt.Console
             var addedContract = AddContract(type.GetTypeInfo(), mode, internalVisibility);
             if (addedContract != null)
             {
-                AnsiConsole.Output.WriteLine($"Contract '{type.Name.Bold()}' added.");
+                Console.WriteLine($"Contract '{type.Name.Bold()}' added.");
             }
         }
 
@@ -216,14 +217,14 @@ namespace Bolt.Console
                 }
             }
 
-            AnsiConsole.Output.WriteLine(Environment.NewLine);
-            AnsiConsole.Output.WriteLine("Generating files ... ");
+            Console.WriteLine(Environment.NewLine);
+            Console.WriteLine("Generating files ... ");
 
             foreach (var filesInDirectory in _documents.GroupBy(f=>Path.GetDirectoryName(f.Key)))
             {
-                AnsiConsole.Output.WriteLine(string.Join(string.Empty, Enumerable.Repeat("-", filesInDirectory.Key.Count() + 12).ToArray()));
-                AnsiConsole.Output.WriteLine($"Directory: {filesInDirectory.Key.Bold().White()}");
-                AnsiConsole.Output.WriteLine(Environment.NewLine);
+                Console.WriteLine(string.Join(string.Empty, Enumerable.Repeat("-", filesInDirectory.Key.Count() + 12).ToArray()));
+                Console.WriteLine($"Directory: {filesInDirectory.Key.Bold().White()}");
+                Console.WriteLine(Environment.NewLine);
 
                 foreach (var documentGenerator in filesInDirectory)
                 {
@@ -257,7 +258,7 @@ namespace Bolt.Console
                             status = "Generated".Green();
                         }
 
-                        AnsiConsole.Output.WriteLine($"{status}: {Path.GetFileName(documentGenerator.Key).White().Bold()}");
+                        Console.WriteLine($"{status}: {Path.GetFileName(documentGenerator.Key).White().Bold()}");
                     }
                     catch (Exception e)
                     {
@@ -266,10 +267,10 @@ namespace Bolt.Console
                 }
             }
 
-            AnsiConsole.Output.WriteLine(Environment.NewLine);
-            AnsiConsole.Output.WriteLine("Status:");
-            AnsiConsole.Output.WriteLine($"{(_documents.Count + " Files Generated,").Green().Bold()}  {watch.ElapsedMilliseconds}ms elapsed");
-            AnsiConsole.Output.WriteLine(Environment.NewLine);
+            Console.WriteLine(Environment.NewLine);
+            Console.WriteLine("Status:");
+            Console.WriteLine($"{(_documents.Count + " Files Generated,").Green().Bold()}  {watch.ElapsedMilliseconds}ms elapsed");
+            Console.WriteLine(Environment.NewLine);
 
             return 0;
         }

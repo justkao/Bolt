@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+#if !NET45
 using Microsoft.Framework.Runtime;
+#endif
 using Microsoft.Framework.Runtime.Common.CommandLine;
 
 namespace Bolt.Console
 {
-    using Console = System.Console;
-
 #if !NET45
     public class AssemblyCache : IEnumerable<Assembly>, IDisposable, IAssemblyLoader
     {
@@ -44,6 +44,7 @@ namespace Bolt.Console
                 (s, e) => Load(e.Name.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).First().Trim());
         }
 #endif
+        private static readonly AnsiConsole Console = AnsiConsole.GetOutput(true);
 
         public void AddDirectory(string dir)
         {
@@ -55,7 +56,7 @@ namespace Bolt.Console
             dir = Path.GetFullPath(dir);
             if (!_dirs.Contains(dir))
             {
-                AnsiConsole.Output.WriteLine($"Directory '{dir.Bold()}' added to assembly search paths.");
+                Console.WriteLine($"Directory '{dir.Bold()}' added to assembly search paths.");
                 _dirs.Add(dir);
             }
         }
@@ -68,7 +69,7 @@ namespace Bolt.Console
                 assembly = FindAssembly(assembly);
                 if (string.IsNullOrEmpty(assembly))
                 {
-                    AnsiConsole.Output.WriteLine($"Assembly {originalName} could not be located.".Yellow());
+                    Console.WriteLine($"Assembly {originalName} could not be located.".Yellow());
                     throw new InvalidOperationException($"Assembly {originalName} not found.");
                 }
             }
@@ -89,7 +90,7 @@ namespace Bolt.Console
             loadedAssembly = Assembly.LoadFrom(assembly);
 #endif
             _assemblies[assemblyName] = loadedAssembly;
-            AnsiConsole.Output.WriteLine($"Assembly loaded: {assemblyName.Bold()}");
+            Console.WriteLine($"Assembly loaded: {assemblyName.Bold()}");
             return loadedAssembly;
         }
 
@@ -214,7 +215,7 @@ namespace Bolt.Console
 
             foreach (var dir in _dirs)
             {
-                AnsiConsole.Output.WriteLine($"Lookup of assembly '{name.Bold()}' in directory '{dir.Bold()}'.");
+                Console.WriteLine($"Lookup of assembly '{name.Bold()}' in directory '{dir.Bold()}'.");
 
                 string file = Path.Combine(dir, name);
 

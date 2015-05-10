@@ -6,7 +6,7 @@ using System.Runtime.ExceptionServices;
 
 namespace Bolt.Common
 {
-    public static class Conversion
+    internal static class Conversion
     {
         public static object ConvertSimpleType( object value, Type destinationType)
         {
