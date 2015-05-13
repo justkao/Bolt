@@ -20,7 +20,7 @@ namespace Bolt.Server
             Options = other.Options;
             ErrorHandler = other.ErrorHandler;
             ResponseHandler = other.ResponseHandler;
-            ParemterHandler = other.ParemterHandler;
+            ParameterHandler = other.ParameterHandler;
         }
 
         /// <summary>
@@ -51,7 +51,7 @@ namespace Bolt.Server
         /// <summary>
         /// Gets or sets <see cref="IParameterHandler"/> assigned to current context.
         /// </summary>
-        public IParameterHandler ParemterHandler { get; set; }
+        public IParameterHandler ParameterHandler { get; set; }
 
         public void Merge(ServerRuntimeConfiguration other)
         {
@@ -84,9 +84,9 @@ namespace Bolt.Server
             {
                 ResponseHandler = other.ResponseHandler;
             }
-            if (other.ParemterHandler != null)
+            if (other.ParameterHandler != null)
             {
-                ParemterHandler = other.ParemterHandler;
+                ParameterHandler = other.ParameterHandler;
             }
         }
     }

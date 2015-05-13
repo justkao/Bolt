@@ -54,7 +54,7 @@ namespace Bolt.Server.InstanceProviders
 
         public ActionDescriptor CloseSession { get; }
 
-        public override object GetInstance(ServerActionContext context, Type type)
+        public sealed override object GetInstance(ServerActionContext context, Type type)
         {
             InstanceMetadata instance;
             string sessionId = GetSession(context);
@@ -90,7 +90,7 @@ namespace Bolt.Server.InstanceProviders
             throw new SessionNotFoundException(sessionId);
         }
 
-        public override void ReleaseInstance(ServerActionContext context, object obj, Exception error)
+        public sealed override void ReleaseInstance(ServerActionContext context, object obj, Exception error)
         {
             if (context.Action == InitSession)
             {
@@ -129,7 +129,7 @@ namespace Bolt.Server.InstanceProviders
             }
         }
 
-        public virtual bool ReleaseInstance(string sessionId)
+        private bool ReleaseInstance(string sessionId)
         {
             InstanceMetadata instance;
             if (_instances.TryRemove(sessionId, out instance))
@@ -141,7 +141,7 @@ namespace Bolt.Server.InstanceProviders
             return false;
         }
 
-        public virtual void KeepAlive(string key)
+        private void KeepAlive(string key)
         {
             InstanceMetadata instance;
             if (_instances.TryGetValue(key, out instance))

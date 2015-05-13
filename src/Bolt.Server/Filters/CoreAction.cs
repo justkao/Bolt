@@ -48,7 +48,7 @@ namespace Bolt.Server.Filters
 
             if (context.Action.HasParameters && context.Parameters == null)
             {
-                await feature.Configuration.ParemterHandler.HandleAsync(context);
+                await feature.Configuration.ParameterHandler.HandleAsync(context);
 
                 if (context.Parameters == null)
                 {
