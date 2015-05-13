@@ -5,9 +5,26 @@ using System.Threading.Tasks;
 using Bolt.Client.Channels;
 using Moq;
 using Xunit;
+using System.Reflection;
+using System.Net.Http;
 
 namespace Bolt.Client.Test
 {
+    public interface ITestContract
+    {
+        string Execute(string param);
+    }
+
+    public class TestContractDescriptor : ContractDescriptor
+    {
+        public TestContractDescriptor():base(typeof(ITestContract), "TestContract")
+        {
+            Execute = Add("Execute", typeof(string), typeof(ITestContract).GetTypeInfo().GetMethod("Execute"));
+        }
+
+        public ActionDescriptor Execute { get; set; }
+    }
+
     public class RecoverabeChannelTest
     {
         [Fact]
@@ -26,7 +43,40 @@ namespace Bolt.Client.Test
             Assert.False(channel.IsClosed);
         }
 
-        private TestRecoverableChannel Create(Uri url = null, Mock<IRequestHandler> requestHandler = null)
+        [Fact]
+        public void ExplicitOpen_EnsureOpened()
+        {
+            var channel = Create();
+            channel.Open();
+
+            Assert.True(channel.IsOpened);
+        }
+
+        [Fact]
+        public void CloseOpened_EnsureClosed()
+        {
+            var channel = Create();
+            channel.Open();
+
+            channel.Close();
+            Assert.True(channel.IsClosed);
+        }
+
+
+        [Fact]
+        public void Execute_EnsureOpened()
+        {
+            Mock<IRequestHandler> mocked = new Mock<IRequestHandler>();
+            mocked.Setup(v => v.GetResponseAsync<string, string>(It.IsAny<ClientActionContext>(), "test")).Returns(Task.FromResult(new ResponseDescriptor<string>(new HttpResponseMessage(), new ClientActionContext(), "test")));
+
+            var channel = Create(requestHandler: mocked);
+
+            channel.SendAsync<string, string>(new cl)
+
+        }
+
+
+        protected virtual TestRecoverableChannel Create(Uri url = null, Mock<IRequestHandler> requestHandler = null)
         {
             url = url ?? new Uri("http://localhost");
 
@@ -39,7 +89,7 @@ namespace Bolt.Client.Test
                 endpointProvider.Object);
         }
 
-        private class TestRecoverableChannel : RecoverableChannel
+        protected class TestRecoverableChannel : RecoverableChannel
         {
             public bool BeforeSendingCalled { get; set; }
 

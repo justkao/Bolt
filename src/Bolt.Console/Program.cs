@@ -178,9 +178,10 @@ namespace Bolt.Console
 
                     if (extension == ".exe" || extension == ".dll" || !inputExists)
                     {
+						Console.WriteLine($"Loading all contracts from assembly: ${input.Value}");
                         try
                         {
-                            rootConfig = RootConfig.CreateFromAssembly(_cache, inputExists ? input.Value : null, mode, asInternal);
+                            rootConfig = RootConfig.CreateFromAssembly(_cache, inputExists ? input.Value : null, mode, asInternal, !contractOption.Values.Any());
                             rootConfig.IgnoreGeneratorErrors = true;
                         }
                         catch(Exception e)

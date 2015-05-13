@@ -54,7 +54,7 @@ namespace Bolt.Console
             return config;
         }
 
-        public static RootConfig CreateFromAssembly(AssemblyCache cache, string assembly, GenerateContractMode mode,  bool internalVisibility)
+        public static RootConfig CreateFromAssembly(AssemblyCache cache, string assembly, GenerateContractMode mode,  bool internalVisibility, bool generateAll = false)
         {
             RootConfig root = new RootConfig(cache)
             {
@@ -72,7 +72,7 @@ namespace Bolt.Console
                     }
                 }
             }
-            else
+            else if (generateAll)
             {
                 var hostedAssembly = root.AssemblyCache.HostedAssembly;
                 if (hostedAssembly != null)
@@ -122,6 +122,10 @@ namespace Bolt.Console
             {
                 Console.WriteLine($"Contract '{type.Name.Bold()}' added.");
             }
+			else
+			{
+				Console.WriteLine($"Contract '{type.Name.Bold()}' not found.");
+			}
         }
 
         public ContractConfig AddContract(TypeInfo type, GenerateContractMode mode, bool internalVisibility)
