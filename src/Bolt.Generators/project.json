@@ -4,7 +4,9 @@
   "description": "Bolt library containing helper classes for code generation.",
   "dependencies": {
     "Bolt.Common": { "type": "build" },
-    "Bolt.Common.Conversion": { "type": "build" }
+    "Microsoft.Framework.PropertyHelper.Sources": { "type": "build", "version": "1.0.0-*" },
+    "Microsoft.Framework.NotNullAttribute.Sources": { "type": "build","version": "1.0.0-*" }
+
   },
   "frameworks": {
     "net45": {

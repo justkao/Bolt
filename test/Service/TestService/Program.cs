@@ -12,6 +12,8 @@ namespace TestService.Client
 {
     public class Program
     {
+        private static AnsiConsole Console = AnsiConsole.GetOutput(true);
+
         public int Main(params string[] args)
         {
             ServicePointManager.DefaultConnectionLimit = 1000;
@@ -19,7 +21,7 @@ namespace TestService.Client
             var proxies = CreateClients().ToList();
             if (!proxies.Any())
             {
-                AnsiConsole.Output.WriteLine("No Bolt servers running ...".Red());
+                Console.WriteLine("No Bolt servers running ...".Red());
                 return 1;
             }
 
@@ -59,7 +61,7 @@ namespace TestService.Client
 
                     ExecuteActions(proxies, cnt, degree);
                     Console.WriteLine("Test finished. Press any key to exit program ... ");
-                    Console.ReadLine();
+                    System.Console.ReadLine();
                     return 0;
                 });
             });
@@ -100,7 +102,7 @@ namespace TestService.Client
 
         private static void ExecuteAsync(IEnumerable<Tuple<string, ITestContract>> contracts, Func<ITestContract, Task> action, int count, int degree, string actionName)
         {
-            AnsiConsole.Output.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}, Concurrency = {degree.ToString().Bold()}");
+            Console.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}, Concurrency = {degree.ToString().Bold()}");
 
             foreach (var item in contracts)
             {
@@ -110,16 +112,16 @@ namespace TestService.Client
                 }
                 catch (Exception e)
                 {
-                    AnsiConsole.Output.WriteLine($"{e.Message.Red()}");
+                    Console.WriteLine($"{e.Message.Red()}");
                 }
             }
 
-            AnsiConsole.Output.WriteLine(Environment.NewLine);
+            Console.WriteLine(Environment.NewLine);
         }
 
         private static void Execute(IEnumerable<Tuple<string, ITestContract>> contracts, Action<ITestContract> action, int count, int degree, string actionName)
         {
-            AnsiConsole.Output.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}, Concurrency = {degree.ToString().Bold()}");
+            Console.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}, Concurrency = {degree.ToString().Bold()}");
 
             foreach (var item in contracts)
             {
@@ -129,16 +131,16 @@ namespace TestService.Client
                 }
                 catch (Exception e)
                 {
-                    AnsiConsole.Output.WriteLine($"{e.Message.Red()}");
+                    Console.WriteLine($"{e.Message.Red()}");
                 }
             }
 
-            AnsiConsole.Output.WriteLine(Environment.NewLine);
+            Console.WriteLine(Environment.NewLine);
         }
 
         private static async Task ExecuteAsync(Func<ITestContract, Task> action, int count, int degree, ITestContract channel, string type, string actionName)
         {
-            AnsiConsole.Output.Writer.Write($"{type,-10}");
+            Console.Writer.Write($"{type,-10}");
 
             // warmup
             for (int i = 0; i < 10; i++)
@@ -165,12 +167,12 @@ namespace TestService.Client
             }
 
             long elapsed = watch.ElapsedMilliseconds;
-            AnsiConsole.Output.WriteLine($"{(elapsed + "ms").Green().Bold()}");
+            Console.WriteLine($"{(elapsed + "ms").Green().Bold()}");
         }
 
         private static void Execute(Action<ITestContract> action, int count, int degree, ITestContract channel, string type, string actionName)
         {
-            AnsiConsole.Output.Writer.Write($"{type,-10}");
+            Console.Writer.Write($"{type,-10}");
 
             // warmup
             for (int i = 0; i < 10; i++)
@@ -201,7 +203,7 @@ namespace TestService.Client
             }
 
             long elapsed = watch.ElapsedMilliseconds;
-            AnsiConsole.Output.WriteLine($"{(elapsed + "ms").Green().Bold()}");
+            Console.WriteLine($"{(elapsed + "ms").Green().Bold()}");
         }
 
         private bool IsPortUsed(int port)

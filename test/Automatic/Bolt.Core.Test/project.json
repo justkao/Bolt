@@ -3,18 +3,11 @@
     "Bolt.Core": "",
     "Bolt.Common": "",
     "Bolt.Test.Common": "",
-    "xunit": "2.1.0-beta1-build2945",
-    "xunit.runner.aspnet": "2.0.0-aspnet-beta5-10345"
+    "xunit": "2.1.0-*",
+    "xunit.runner.aspnet": "2.0.0-aspnet-*"
   },
   "frameworks": {
-    "dnx451": { },
-    "dnxcore50": {
-      "dependencies": {
-        "System.Collections": "4.0.10-*",
-        "System.Linq": "4.0.0-*",
-        "System.IO": "4.0.10-*"
-      }
-    }
+    "dnx451": { }
   },
   "commands": {
     "test": "xunit.runner.aspnet"

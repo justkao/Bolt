@@ -1,6 +1,6 @@
 ﻿{
   "dependencies": {
-    "Microsoft.Framework.CommandLineUtils": { "version": "1.0.0-*", "type": "build" },
+    "Microsoft.Framework.CommandLineUtils.Sources": { "version": "1.0.0-*", "type": "build" },
     "Newtonsoft.Json": "6.0.7",
     "Bolt.Common": { "type": "build" },
     "Bolt.Generators": "",

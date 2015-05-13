@@ -7,7 +7,6 @@
     "Bolt.Common": "",
     "Bolt.Test.Common": "",
     "Bolt.Generators": "",
-    "xunit.runner.aspnet": "2.0.0-aspnet-*",
     "Bolt.Console": ""
   },
   "compileExclude": "Generated\\*.*",
@@ -18,7 +17,6 @@
     }
   },
   "commands": {
-    "gen": "Bolt.Console code Generated/Configuration.json --output ../Bolt.Server.IntegrationTest/Generated/",
-    "genConfig": "Bolt.Console config"
+    "gen": "Bolt.Console code Generated/Configuration.json --output ../Bolt.Server.IntegrationTest/Generated/"
   }
 }

@@ -3,7 +3,7 @@
   "description": "Bolt Server side libraries based on ASP.NET 5. The Bolt is portable and lightweight alternative to WCF library.",
   "authors": [ "Martin Tomka" ],
   "dependencies": {
-    "Newtonsoft.Json": "6.0.7",
+    "Newtonsoft.Json": "6.0.8",
     "Microsoft.Framework.Logging.Abstractions": "1.0.0-*",
     "Microsoft.Framework.DependencyInjection.Abstractions": "1.0.0-*",
     "Microsoft.Framework.ConfigurationModel.Abstractions": "1.0.0-*",

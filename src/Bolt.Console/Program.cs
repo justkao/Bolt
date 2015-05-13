@@ -9,6 +9,9 @@ namespace Bolt.Console
 {
     public class Program
     {
+        private static readonly AnsiConsole Console = AnsiConsole.GetOutput(true);
+        private static readonly AnsiConsole ErrorConsole = AnsiConsole.GetError(true);
+
         private readonly AssemblyCache _cache;
 
 #if !NET45
@@ -49,11 +52,11 @@ namespace Bolt.Console
                         File.WriteAllText(outputFile, result);
                         if (exist)
                         {
-                            AnsiConsole.Output.WriteLine($"Examle overwritten: {outputFile.White().Bold()}".Green().Bold());
+                            Console.WriteLine($"Examle overwritten: {outputFile.White().Bold()}".Green().Bold());
                         }
                         else
                         {
-                            AnsiConsole.Output.WriteLine($"Example created: {outputFile.White().Bold()}".Green());
+                            Console.WriteLine($"Example created: {outputFile.White().Bold()}".Green());
                         }
                     }
                     catch(Exception e)
@@ -77,13 +80,13 @@ namespace Bolt.Console
                 {
                     if (string.IsNullOrEmpty(input.Value) && !_cache.IsHosted())
                     {
-                        AnsiConsole.Output.WriteLine("Assembly must be specified.".Yellow());
+                        Console.WriteLine("Assembly must be specified.".Yellow());
                         return 1;
                     }
 
                     if (!_cache.IsHosted() && !File.Exists(input.Value))
                     {
-                        AnsiConsole.Output.WriteLine($"Assembly not found: {input.Value.White()}".Yellow());
+                        Console.WriteLine($"Assembly not found: {input.Value.White()}".Yellow());
                         return 1;
                     }
 
@@ -95,11 +98,11 @@ namespace Bolt.Console
                         File.WriteAllText(outputFile, json);
                         if (exist)
                         {
-                            AnsiConsole.Output.WriteLine($"Configuration overwritten: {outputFile.White().Bold()}".Green().Bold());
+                            Console.WriteLine($"Configuration overwritten: {outputFile.White().Bold()}".Green().Bold());
                         }
                         else
                         {
-                            AnsiConsole.Output.WriteLine($"Configuration created: {outputFile.White().Bold()}".Green());
+                            Console.WriteLine($"Configuration created: {outputFile.White().Bold()}".Green());
                         }
                     }
                     catch (Exception e)
@@ -133,7 +136,7 @@ namespace Bolt.Console
 
                     if (inputMustExist && !inputExists)
                     {
-                        AnsiConsole.Output.WriteLine("Input path must be specified.".Yellow());
+                        Console.WriteLine("Input path must be specified.".Yellow());
                         return 1;
                     }
 
@@ -141,7 +144,7 @@ namespace Bolt.Console
 
                     if (inputMustExist && !File.Exists(input.Value))
                     {
-                        AnsiConsole.Output.WriteLine($"File not found: {input.Value.White().Bold()}".Yellow());
+                        Console.WriteLine($"File not found: {input.Value.White().Bold()}".Yellow());
                         return 1;
                     }
 
@@ -165,7 +168,7 @@ namespace Bolt.Console
                     catch (Exception)
                     {
                         
-                        AnsiConsole.Output.WriteLine($"Invalid mode option specified: {modeOption.Value().White().Bold()}, Available options: {rawModeValues.Bold()}".Yellow());
+                        Console.WriteLine($"Invalid mode option specified: {modeOption.Value().White().Bold()}, Available options: {rawModeValues.Bold()}".Yellow());
                         return 1;
                     }
 
@@ -236,10 +239,10 @@ namespace Bolt.Console
 
         internal static int HandleError(string message, Exception e)
         {
-            AnsiConsole.Output.WriteLine(Environment.NewLine);
-            AnsiConsole.Error.WriteLine(message.Red().Bold());
-            AnsiConsole.Output.WriteLine(e.ToString());
-            AnsiConsole.Output.WriteLine(Environment.NewLine);
+            Console.WriteLine(Environment.NewLine);
+            ErrorConsole.WriteLine(message.Red().Bold());
+            Console.WriteLine(e.ToString());
+            Console.WriteLine(Environment.NewLine);
 
             return 1;
         }

@@ -28,11 +28,6 @@ namespace Bolt.Client
             _errorProvider = errorProvider;
         }
 
-        public virtual ResponseDescriptor<T> GetResponse<T, TParameters>(ClientActionContext context, TParameters parameters)
-        {
-            return TaskHelpers.Execute(() => GetResponseAsync<T, TParameters>(context, parameters));
-        }
-
         public virtual async Task<ResponseDescriptor<T>> GetResponseAsync<T, TParameters>(
             ClientActionContext context,
             TParameters parameters)

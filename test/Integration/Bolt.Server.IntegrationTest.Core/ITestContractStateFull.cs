@@ -1,20 +1,22 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace Bolt.Server.IntegrationTest.Core
 {
-    using System.Runtime.Serialization;
-
+#if !DNXCORE50
     [Serializable]
+#endif
     public class TestContractProxyFailedException : Exception
     {
         public TestContractProxyFailedException()
         {
         }
-
+#if !DNXCORE50
         protected TestContractProxyFailedException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
         }
+#endif
     }
 
     public interface ITestContractStateFull
