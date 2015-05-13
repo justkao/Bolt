@@ -13,6 +13,10 @@ namespace Bolt
     {
         private readonly List<ActionDescriptor> _actions = new List<ActionDescriptor>();
 
+        protected ContractDescriptor(Type type) : this(type, type.Name)
+        {
+        }
+
         protected ContractDescriptor(Type type, string name)
         {
             if (type == null)

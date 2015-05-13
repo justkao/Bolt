@@ -16,7 +16,7 @@ _ReSharper.*
 nuget.exe
 *net45.csproj
 *k10.csproj
-*project.lock.json
+*.project.lock.json
 *.psess
 *.vsp
 *.pidb
@@ -28,4 +28,3 @@ nuget.exe
 *.pdb
 *.dll
 *.nupkg
-/src/Bolt.Console/tools/
