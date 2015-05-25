@@ -211,22 +211,22 @@ namespace Bolt.Server.IntegrationTest
         public void ExecuteManyRequests_SingleChannel_EnsureOnlyOneSessionCreated()
         {
             TestContractStateFullProxy channel = GetChannel();
-            int before = InstanceProvider.Count;
+            int before = InstanceProvider.LocalCount;
             Task.WaitAll(Enumerable.Repeat(0, 5).Select(_ => Task.Run(() => channel.GetState())).ToArray());
-            Assert.Equal(before + 1, InstanceProvider.Count);
+            Assert.Equal(before + 1, InstanceProvider.LocalCount);
             channel.Dispose();
-            Assert.Equal(before, InstanceProvider.Count);
+            Assert.Equal(before, InstanceProvider.LocalCount);
         }
 
         [Fact]
         public async Task Async_ExecuteManyRequests_SingleChannel_EnsureOnlyOneSessionCreated()
         {
             TestContractStateFullProxy channel = GetChannel();
-            int before = InstanceProvider.Count;
+            int before = InstanceProvider.LocalCount;
             await Task.WhenAll(Enumerable.Repeat(0, 100).Select(_ => channel.GetStateAsync()));
-            Assert.Equal(before + 1, InstanceProvider.Count);
+            Assert.Equal(before + 1, InstanceProvider.LocalCount);
             await (channel as IChannel).CloseAsync();
-            Assert.Equal(before, InstanceProvider.Count);
+            Assert.Equal(before, InstanceProvider.LocalCount);
         }
 
 
@@ -284,12 +284,12 @@ namespace Bolt.Server.IntegrationTest
             TestContractStateFullChannel statefull = channel.Channel as TestContractStateFullChannel;
             statefull.ExtendedInitialization = true;
 
-            int before = InstanceProvider.Count;
+            int before = InstanceProvider.LocalCount;
 
             channel.GetState();
             channel.Dispose();
 
-            Assert.Equal(before, InstanceProvider.Count);
+            Assert.Equal(before, InstanceProvider.LocalCount);
         }
 
         [Fact]
@@ -300,7 +300,7 @@ namespace Bolt.Server.IntegrationTest
             statefull.ExtendedInitialization = true;
             statefull.FailExtendedInitialization = true;
 
-            int before = InstanceProvider.Count;
+            int before = InstanceProvider.LocalCount;
 
             try
             {
@@ -310,7 +310,7 @@ namespace Bolt.Server.IntegrationTest
             {
             }
 
-            Assert.Equal(before, InstanceProvider.Count);
+            Assert.Equal(before, InstanceProvider.LocalCount);
         }
 
         [Fact]

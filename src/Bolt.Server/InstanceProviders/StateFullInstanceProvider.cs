@@ -10,10 +10,13 @@ namespace Bolt.Server.InstanceProviders
     {
         private readonly BoltServerOptions _options;
 
-        private readonly ConcurrentDictionary<string, InstanceMetadata> _instances = new ConcurrentDictionary<string, InstanceMetadata>();
         private readonly Timer _timer;
 
-        public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, BoltServerOptions options)
+        private readonly ISessionStore _store;
+
+        private ConcurrentDictionary<string, DateTime> _timeStamps = new ConcurrentDictionary<string, DateTime>();
+
+        public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, BoltServerOptions options, ISessionStore store = null)
         {
             if (initInstanceAction == null)
             {
@@ -33,6 +36,7 @@ namespace Bolt.Server.InstanceProviders
             _options = options;
             InitSession = initInstanceAction;
             CloseSession = releaseInstanceAction;
+            _store = store ?? new MemorySessionStore();
 
             if (SessionTimeout != TimeSpan.Zero)
             {
@@ -44,8 +48,6 @@ namespace Bolt.Server.InstanceProviders
             }
         }
 
-        public int Count =>_instances.Count;
-
         public string SessionHeader =>_options.SessionHeader;
 
         public TimeSpan SessionTimeout => _options.SessionTimeout;
@@ -54,26 +56,29 @@ namespace Bolt.Server.InstanceProviders
 
         public ActionDescriptor CloseSession { get; }
 
+        public int LocalCount =>_timeStamps.Count;
+
         public sealed override object GetInstance(ServerActionContext context, Type type)
         {
-            InstanceMetadata instance;
+            object instance;
             string sessionId = GetSession(context);
 
             if (context.Action == InitSession)
             {
-                if (sessionId != null && _instances.TryGetValue(sessionId, out instance))
+                instance = _store.Get(sessionId);
+                if (sessionId != null && instance != null)
                 {
-                    instance.Timestamp = DateTime.UtcNow;
-                    return instance.Instance;
+                    _timeStamps[sessionId] = DateTime.UtcNow;
+                    return instance;
                 }
 
-                instance = new InstanceMetadata(base.GetInstance(context, type));
                 string newSession = CreateNewSession();
+                instance = base.GetInstance(context, type);
                 OnInstanceCreated(context, newSession);
 
-                _instances[newSession] = instance;
+                _store.Set(newSession, instance);
                 context.HttpContext.Response.Headers[SessionHeader] = newSession;
-                return instance.Instance;
+                return instance;
             }
 
             if (string.IsNullOrEmpty(sessionId))
@@ -81,10 +86,11 @@ namespace Bolt.Server.InstanceProviders
                 throw new SessionHeaderNotFoundException();
             }
 
-            if (_instances.TryGetValue(sessionId, out instance))
+            instance = _store.Get(sessionId);
+            if (instance != null)
             {
-                instance.Timestamp = DateTime.UtcNow;
-                return instance.Instance;
+                _timeStamps[sessionId] = DateTime.UtcNow;
+                return instance;
             }
 
             throw new SessionNotFoundException(sessionId);
@@ -127,15 +133,24 @@ namespace Bolt.Server.InstanceProviders
                     }
                 }
             }
+            else
+            {
+                UpdateInstance(GetSession(context), context);
+            } 
+        }
+
+        protected virtual void UpdateInstance(string sessionId, ServerActionContext context)
+        {
+            _store.Update(sessionId, context.ContractInstance);
         }
 
         private bool ReleaseInstance(string sessionId)
         {
-            InstanceMetadata instance;
-            if (_instances.TryRemove(sessionId, out instance))
+            object instance = _store.Get(sessionId);
+            if (instance != null)
             {
-                (instance.Instance as IDisposable)?.Dispose();
-                return true;
+                _store.Remove(sessionId);
+                (instance as IDisposable)?.Dispose();
             }
 
             return false;
@@ -143,11 +158,7 @@ namespace Bolt.Server.InstanceProviders
 
         private void KeepAlive(string key)
         {
-            InstanceMetadata instance;
-            if (_instances.TryGetValue(key, out instance))
-            {
-                instance.Timestamp = DateTime.UtcNow;
-            }
+            _timeStamps[key] = DateTime.UtcNow;
         }
 
         public virtual void Dispose()
@@ -157,15 +168,13 @@ namespace Bolt.Server.InstanceProviders
 
         protected virtual void OnInstanceCreated(ServerActionContext context, string sessionId)
         {
-            Debug.WriteLine("New instance created for session '{0}' and contract '{1}'. Initiating action '{2}'", sessionId, context.Action.Contract, context.Action);
         }
 
         protected virtual void OnInstanceReleased(ServerActionContext context, string sessionId)
         {
-            Debug.WriteLine("Instance released for session '{0}' and contract '{1}'. Destroy  action '{2}'", sessionId, context.Action.Contract, context.Action);
         }
 
-        protected virtual bool ShouldTimeoutInstance(object instance, DateTime timestamp)
+        protected virtual bool ShouldTimeout(DateTime timestamp)
         {
             return (DateTime.UtcNow - timestamp) > SessionTimeout;
         }
@@ -189,26 +198,13 @@ namespace Bolt.Server.InstanceProviders
 
         private void OnTimerElapsed(object state)
         {
-            foreach (KeyValuePair<string, InstanceMetadata> pair in _instances)
+            foreach (KeyValuePair<string, DateTime> pair in _timeStamps)
             {
-                if (ShouldTimeoutInstance(pair.Value.Instance, pair.Value.Timestamp))
+                if (ShouldTimeout(pair.Value))
                 {
                     ReleaseInstance(pair.Key);
                 }
             }
-        }
-
-        private class InstanceMetadata
-        {
-            public InstanceMetadata(object instance)
-            {
-                Instance = instance;
-                Timestamp = DateTime.UtcNow;
-            }
-
-            public DateTime Timestamp { get; set; }
-
-            public object Instance { get; }
         }
     }
 }

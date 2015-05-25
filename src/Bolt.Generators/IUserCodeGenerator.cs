@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Bolt.Common;
 
 namespace Bolt.Generators
 {
@@ -29,9 +28,7 @@ namespace Bolt.Generators
                     continue;
                 }
 
-                prop.SetValue(
-                    generator,
-                    Conversion.ConvertSimpleType(properties[prop.Name], prop.Property.PropertyType));
+                prop.SetValue(generator, Convert.ChangeType(properties[prop.Name], prop.Property.PropertyType));
             }
 
             return generator;

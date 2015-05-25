@@ -7,8 +7,8 @@ namespace Bolt.Server.InstanceProviders
     {
         private ObjectFactory _factory;
 
-        public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, BoltServerOptions options)
-            : base(initInstanceAction, releaseInstanceAction, options)
+        public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, BoltServerOptions options, ISessionStore store = null)
+            : base(initInstanceAction, releaseInstanceAction, options, store)
         {
         }
 

@@ -4,6 +4,8 @@ using System.Reflection;
 using Microsoft.AspNet.Http;
 using Xunit;
 using Moq;
+using System.Collections.Generic;
+using Microsoft.AspNet.Http.Internal;
 
 namespace Bolt.Server.Test
 {
@@ -74,7 +76,7 @@ namespace Bolt.Server.Test
 
                 Subject.GetInstance(ctxt, typeof(IMockContract));
 
-                Assert.Equal(1, Subject.Count);
+                Assert.Equal(1, Subject.LocalCount);
             }
 
             [Fact]
@@ -252,7 +254,7 @@ namespace Bolt.Server.Test
 
                 Subject.ReleaseInstance(ctxt, _instance, null);
 
-                Assert.Equal(0, Subject.Count);
+                Assert.Equal(0, Subject.LocalCount);
             }
 
             [Fact]
@@ -276,7 +278,7 @@ namespace Bolt.Server.Test
 
                 Subject.ReleaseInstance(ctxt, _instance, null);
 
-                Assert.Equal(1, Subject.Count);
+                Assert.Equal(1, Subject.LocalCount);
             }
 
             [Fact]
