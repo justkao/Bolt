@@ -1,4 +1,6 @@
-﻿using System.Collections.Concurrent;
+﻿using Bolt.Common;
+using System.Collections.Concurrent;
+using System.Threading.Tasks;
 
 namespace Bolt.Server.InstanceProviders
 {
@@ -6,27 +8,34 @@ namespace Bolt.Server.InstanceProviders
     {
         private readonly ConcurrentDictionary<string, object> _items = new ConcurrentDictionary<string, object>();
 
-        public object Get(string sessionId)
+        public Task<object> GetAsync(string sessionId)
         {
             object instance;
             _items.TryGetValue(sessionId, out instance);
-            return instance;
+            return Task.FromResult(instance);
         }
 
-        public bool Remove(string sessionId)
+        public Task<bool> RemoveAsync(string sessionId)
         {
             object instance;
-            return _items.TryRemove(sessionId, out instance);
+            if (_items.TryRemove(sessionId, out instance))
+            {
+                return CompletedTask.True;
+            }
+
+            return CompletedTask.False;
         }
 
-        public void Set(string sessionId, object sessionObject)
+        public Task SetAsync(string sessionId, object sessionObject)
         {
             _items[sessionId] = sessionObject;
+            return CompletedTask.Done;
         }
 
-        public void Update(string sessionId, object sessionObject)
+        public Task UpdateAsync(string sessionId, object sessionObject)
         {
             // not required, in memory instance is always updated
+            return CompletedTask.Done;
         }
     }
 }

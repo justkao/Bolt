@@ -3,7 +3,6 @@
     "Bolt.Core": "",
     "Bolt.Common": "",
     "Bolt.Test.Common": "",
-    "xunit": "2.1.0-*",
     "xunit.runner.aspnet": "2.0.0-aspnet-*"
   },
   "frameworks": {

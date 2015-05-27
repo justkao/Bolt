@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using Microsoft.Framework.DependencyInjection;
+using System.Threading.Tasks;
+using Bolt.Common;
 
 namespace Bolt.Server.InstanceProviders
 {
@@ -9,14 +11,15 @@ namespace Bolt.Server.InstanceProviders
         private readonly ConcurrentDictionary<Type, ObjectFactory> _typeActivatorCache =
                new ConcurrentDictionary<Type, ObjectFactory>();
 
-        public virtual object GetInstance(ServerActionContext context, Type type)
+        public virtual Task<object> GetInstanceAsync(ServerActionContext context, Type type)
         {
-            return CreateInstance(context, type);
+            return Task.FromResult(CreateInstance(context, type));
         }
 
-        public virtual void ReleaseInstance(ServerActionContext context, object obj, Exception error)
+        public virtual Task ReleaseInstanceAsync(ServerActionContext context, object obj, Exception error)
         {
             (obj as IDisposable)?.Dispose();
+            return CompletedTask.Done;
         }
 
         protected virtual object CreateInstance(ServerActionContext context, Type type)

@@ -70,11 +70,7 @@ namespace Bolt.Client.Test
             mocked.Setup(v => v.GetResponseAsync<string, string>(It.IsAny<ClientActionContext>(), "test")).Returns(Task.FromResult(new ResponseDescriptor<string>(new HttpResponseMessage(), new ClientActionContext(), "test")));
 
             var channel = Create(requestHandler: mocked);
-
-            channel.SendAsync<string, string>(new cl)
-
         }
-
 
         protected virtual TestRecoverableChannel Create(Uri url = null, Mock<IRequestHandler> requestHandler = null)
         {

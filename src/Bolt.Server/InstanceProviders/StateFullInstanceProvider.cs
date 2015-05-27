@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Bolt.Common;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Bolt.Server.InstanceProviders
 {
@@ -58,25 +60,29 @@ namespace Bolt.Server.InstanceProviders
 
         public int LocalCount =>_timeStamps.Count;
 
-        public sealed override object GetInstance(ServerActionContext context, Type type)
+        public sealed override async Task<object> GetInstanceAsync(ServerActionContext context, Type type)
         {
             object instance;
             string sessionId = GetSession(context);
 
             if (context.Action == InitSession)
             {
-                instance = _store.Get(sessionId);
-                if (sessionId != null && instance != null)
+                if (sessionId != null)
                 {
-                    _timeStamps[sessionId] = DateTime.UtcNow;
-                    return instance;
+                    instance = await _store.GetAsync(sessionId);
+                    if (instance != null)
+                    {
+                        _timeStamps[sessionId] = DateTime.UtcNow;
+                        return instance;
+                    }
                 }
 
                 string newSession = CreateNewSession();
-                instance = base.GetInstance(context, type);
-                OnInstanceCreated(context, newSession);
+                instance = await base.GetInstanceAsync(context, type);
+                _timeStamps[newSession] = DateTime.UtcNow;
+                await OnInstanceCreatedAsync(context, newSession);
 
-                _store.Set(newSession, instance);
+                await _store.SetAsync(newSession, instance);
                 context.HttpContext.Response.Headers[SessionHeader] = newSession;
                 return instance;
             }
@@ -86,7 +92,7 @@ namespace Bolt.Server.InstanceProviders
                 throw new SessionHeaderNotFoundException();
             }
 
-            instance = _store.Get(sessionId);
+            instance = await _store.GetAsync(sessionId);
             if (instance != null)
             {
                 _timeStamps[sessionId] = DateTime.UtcNow;
@@ -96,7 +102,7 @@ namespace Bolt.Server.InstanceProviders
             throw new SessionNotFoundException(sessionId);
         }
 
-        public sealed override void ReleaseInstance(ServerActionContext context, object obj, Exception error)
+        public sealed override async Task ReleaseInstanceAsync(ServerActionContext context, object obj, Exception error)
         {
             if (context.Action == InitSession)
             {
@@ -108,9 +114,9 @@ namespace Bolt.Server.InstanceProviders
 
                     try
                     {
-                        if (ReleaseInstance(session))
+                        if (await ReleaseInstanceAsync(session))
                         {
-                            OnInstanceReleased(context, session);
+                            await OnInstanceReleasedAsync(context, session);
                         }
                     }
                     catch (Exception e)
@@ -127,30 +133,33 @@ namespace Bolt.Server.InstanceProviders
                 string sessionId = GetSession(context);
                 if (!string.IsNullOrEmpty(sessionId))
                 {
-                    if (ReleaseInstance(sessionId))
+                    if (await ReleaseInstanceAsync(sessionId))
                     {
-                        OnInstanceReleased(context, sessionId);
+                        await OnInstanceReleasedAsync(context, sessionId);
                     }
                 }
             }
             else
             {
-                UpdateInstance(GetSession(context), context);
+                await UpdateInstanceAsync(GetSession(context), context);
             } 
         }
 
-        protected virtual void UpdateInstance(string sessionId, ServerActionContext context)
+        protected virtual Task UpdateInstanceAsync(string sessionId, ServerActionContext context)
         {
-            _store.Update(sessionId, context.ContractInstance);
+            return _store.UpdateAsync(sessionId, context.ContractInstance);
         }
 
-        private bool ReleaseInstance(string sessionId)
+        private async Task<bool> ReleaseInstanceAsync(string sessionId)
         {
-            object instance = _store.Get(sessionId);
+            object instance = await _store.GetAsync(sessionId);
             if (instance != null)
             {
-                _store.Remove(sessionId);
+                await _store.RemoveAsync(sessionId);
+                DateTime stamp;
+                _timeStamps.TryRemove(sessionId, out stamp);
                 (instance as IDisposable)?.Dispose();
+                return true;
             }
 
             return false;
@@ -166,12 +175,14 @@ namespace Bolt.Server.InstanceProviders
             _timer?.Dispose();
         }
 
-        protected virtual void OnInstanceCreated(ServerActionContext context, string sessionId)
+        protected virtual Task OnInstanceCreatedAsync(ServerActionContext context, string sessionId)
         {
+            return CompletedTask.Done;
         }
 
-        protected virtual void OnInstanceReleased(ServerActionContext context, string sessionId)
+        protected virtual Task OnInstanceReleasedAsync(ServerActionContext context, string sessionId)
         {
+            return CompletedTask.Done;
         }
 
         protected virtual bool ShouldTimeout(DateTime timestamp)
@@ -181,8 +192,12 @@ namespace Bolt.Server.InstanceProviders
 
         protected virtual string CreateNewSession()
         {
-            Debug.WriteLine("Session created ... ");
             return Guid.NewGuid().ToString();
+        }
+
+        protected virtual Task OnInstanceTimeoutedAsync(string session)
+        {
+            return CompletedTask.Done;
         }
 
         protected string GetSession(ServerActionContext context)
@@ -196,15 +211,24 @@ namespace Bolt.Server.InstanceProviders
             return sessionId;
         }
 
-        private void OnTimerElapsed(object state)
+        private async void OnTimerElapsed(object state)
         {
             foreach (KeyValuePair<string, DateTime> pair in _timeStamps)
             {
                 if (ShouldTimeout(pair.Value))
                 {
-                    ReleaseInstance(pair.Key);
+                    try
+                    {
+                        if (await ReleaseInstanceAsync(pair.Key))
+                        {
+                            await OnInstanceTimeoutedAsync(pair.Key);
+                        }
+                    }
+                    catch (Exception)
+                    {
+                    }
                 }
             }
-        }
+        } 
     }
 }

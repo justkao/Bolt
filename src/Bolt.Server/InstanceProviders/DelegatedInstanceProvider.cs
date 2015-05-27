@@ -1,4 +1,6 @@
+using Bolt.Common;
 using System;
+using System.Threading.Tasks;
 
 namespace Bolt.Server.InstanceProviders
 {
@@ -16,14 +18,15 @@ namespace Bolt.Server.InstanceProviders
             _factory = factory;
         }
 
-        public object GetInstance(ServerActionContext context, Type type)
+        public Task<object> GetInstanceAsync(ServerActionContext context, Type type)
         {
-            return _factory(context);
+            return Task.FromResult((object)_factory(context));
         }
 
-        public void ReleaseInstance(ServerActionContext context, object obj, Exception error)
+        public Task ReleaseInstanceAsync(ServerActionContext context, object obj, Exception error)
         {
             (obj as IDisposable)?.Dispose();
+            return CompletedTask.Done;
         }
     }
 }

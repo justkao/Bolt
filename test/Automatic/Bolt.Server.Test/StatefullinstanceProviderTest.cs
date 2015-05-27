@@ -6,6 +6,7 @@ using Xunit;
 using Moq;
 using System.Collections.Generic;
 using Microsoft.AspNet.Http.Internal;
+using System.Threading.Tasks;
 
 namespace Bolt.Server.Test
 {
@@ -39,11 +40,11 @@ namespace Bolt.Server.Test
         public class ReleaseInstanceWithoutSession : StatefullinstanceProviderTestBase
         {
             [Fact]
-            public void Destroy_ShouldNotThrow()
+            public async Task Destroy_ShouldNotThrow()
             {
                 var ctxt = CreateContext(Contract.Destroy);
 
-                Subject.ReleaseInstance(ctxt, It.IsAny<object>(), null);
+                await Subject.ReleaseInstanceAsync(ctxt, It.IsAny<object>(), null);
             }
         }
 
@@ -54,68 +55,68 @@ namespace Bolt.Server.Test
             {
                 var ctxt = CreateContext(Contract.Action);
 
-                Assert.Throws<SessionHeaderNotFoundException>(() => Subject.GetInstance(ctxt, typeof(IMockContract)));
+                Assert.Throws<SessionHeaderNotFoundException>(() => Subject.GetInstanceAsync(ctxt, typeof(IMockContract)).GetAwaiter().GetResult());
             }
 
             [Fact]
-            public void Init_Ok()
+            public async Task Init_Ok()
             {
                 var ctxt = CreateContext(Contract.Init);
                 SetupInit(ctxt);
 
-                Subject.GetInstance(ctxt, typeof(IMockContract));
+                await Subject.GetInstanceAsync(ctxt, typeof(IMockContract));
 
                 Mock.Verify();
             }
 
             [Fact]
-            public void Init_EnsureInstanceCreatedAndCached()
+            public async Task Init_EnsureInstanceCreatedAndCached()
             {
                 var ctxt = CreateContext(Contract.Init);
                 SetupInit(ctxt);
 
-                Subject.GetInstance(ctxt, typeof(IMockContract));
+                await Subject.GetInstanceAsync(ctxt, typeof(IMockContract));
 
                 Assert.Equal(1, Subject.LocalCount);
             }
 
             [Fact]
-            public void Init_EnsureSessionHeaderCreated()
+            public async Task Init_EnsureSessionHeaderCreated()
             {
                 var ctxt = CreateContext(Contract.Init);
                 SetupInit(ctxt);
 
-                Subject.GetInstance(ctxt, typeof(IMockContract));
+                await Subject.GetInstanceAsync(ctxt, typeof(IMockContract));
 
                 Assert.NotNull(ctxt.HttpContext.Response.Headers[SessionHeader]);
             }
 
             [Fact]
-            public void Init_EnsureSessionHeaderValue()
+            public async Task Init_EnsureSessionHeaderValue()
             {
                 var ctxt = CreateContext(Contract.Init);
                 SetupInit(ctxt, "testsession");
 
-                Subject.GetInstance(ctxt, typeof(IMockContract));
+                await Subject.GetInstanceAsync(ctxt, typeof(IMockContract));
 
                 Assert.Equal("testsession", ctxt.HttpContext.Response.Headers[SessionHeader]);
             }
 
             [Fact]
-            public void Init_EnsureInstance()
+            public async Task Init_EnsureInstance()
             {
                 var ctxt = CreateContext(Contract.Init);
                 var instance = new object();
 
                 SetupInit(ctxt, "testsession", instance);
 
-                var result = Subject.GetInstance(ctxt, typeof(IMockContract));
+                var result = await Subject.GetInstanceAsync(ctxt, typeof(IMockContract));
 
                 Assert.Equal(instance, result);
             }
 
             [Fact]
-            public void Init_EnsureOnInstanceCreatedCalled()
+            public async Task Init_EnsureOnInstanceCreatedCalled()
             {
                 var ctxt = CreateContext(Contract.Init);
                 var instance = new object();
@@ -123,26 +124,26 @@ namespace Bolt.Server.Test
                 SetupInit(ctxt, "testsession", instance);
                 Mock.Setup(o => o.OnInstanceCreated(ctxt, "testsession")).Verifiable();
 
-                Subject.GetInstance(ctxt, typeof(IMockContract));
+                await Subject.GetInstanceAsync(ctxt, typeof(IMockContract));
 
                 Mock.Verify();
             }
 
             [Fact]
-            public void Init_EnsureInstanceNotCreated()
+            public async Task Init_EnsureInstanceNotCreated()
             {
                 var ctxt = CreateContext(Contract.Action);
 
-                Assert.Throws<SessionHeaderNotFoundException>(() => Subject.GetInstance(ctxt, typeof(IMockContract)));
+                await Assert.ThrowsAsync<SessionHeaderNotFoundException>(() => Subject.GetInstanceAsync(ctxt, typeof(IMockContract)));
 
                 Mock.Verify(v => v.CreateInstance(ctxt, typeof(IMockContract)), Times.Never);
             }
 
             [Fact]
-            public void Destroy_Throws()
+            public async Task Destroy_Throws()
             {
                 var ctxt = CreateContext(Contract.Destroy);
-                Assert.Throws<SessionHeaderNotFoundException>(() => Subject.GetInstance(ctxt, typeof(IMockContract)));
+                await Assert.ThrowsAsync<SessionHeaderNotFoundException>(() => Subject.GetInstanceAsync(ctxt, typeof(IMockContract)));
             }
 
             private void SetupInit(ServerActionContext ctxt, string session = "testsession", object instance = null)
@@ -166,44 +167,44 @@ namespace Bolt.Server.Test
                 Mock.Setup(o => o.CreateInstance(It.IsAny<ServerActionContext>(), typeof(IMockContract))).Returns(_instance).Verifiable();
                 Mock.Setup(o => o.CreateNewSession()).Returns(SessionHeaderValue).Verifiable();
 
-                Subject.GetInstance(ctxt, typeof(IMockContract));
+                Subject.GetInstanceAsync(ctxt, typeof(IMockContract)).GetAwaiter().GetResult();
             }
 
             [Fact]
-            public void Init_ExistingSession_Ok()
+            public async Task Init_ExistingSession_Ok()
             {
                 var ctxt = CreateContext(Contract.Init);
 
-                var result = Subject.GetInstance(ctxt, typeof(IMockContract));
+                var result = await Subject.GetInstanceAsync(ctxt, typeof(IMockContract));
                 Assert.Equal(_instance, result);
             }
 
             [Fact]
-            public void Action_EnsureCorrectInstance()
+            public async Task Action_EnsureCorrectInstance()
             {
                 var ctxt = CreateContext(Contract.Action);
 
-                var result = Subject.GetInstance(ctxt, typeof(IMockContract));
+                var result = await Subject.GetInstanceAsync(ctxt, typeof(IMockContract));
 
                 Assert.Equal(_instance, result);
             }
 
             [Fact]
-            public void Action_DifferentSession_EnsureThrows()
+            public async Task Action_DifferentSession_EnsureThrows()
             {
                 SessionHeaderValue = "another session";
                 var ctxt = CreateContext(Contract.Action);
 
-                Assert.Throws<SessionNotFoundException>(() => Subject.GetInstance(ctxt, typeof(IMockContract)));
+                await Assert.ThrowsAsync<SessionNotFoundException>(() => Subject.GetInstanceAsync(ctxt, typeof(IMockContract)));
             }
 
             [Fact]
-            public void Destroy_DifferentSession_EnsureThrows()
+            public async Task Destroy_DifferentSession_EnsureThrows()
             {
                 SessionHeaderValue = "another session";
                 var ctxt = CreateContext(Contract.Destroy);
 
-                Assert.Throws<SessionNotFoundException>(() => Subject.GetInstance(ctxt, typeof(IMockContract)));
+                await Assert.ThrowsAsync<SessionNotFoundException>(() => Subject.GetInstanceAsync(ctxt, typeof(IMockContract)));
             }
 
             protected override ServerActionContext CreateContext(ActionDescriptor descriptor)
@@ -230,108 +231,108 @@ namespace Bolt.Server.Test
                 Mock.Setup(o => o.CreateInstance(It.IsAny<ServerActionContext>(), typeof(IMockContract))).Returns(_instance).Verifiable();
                 Mock.Setup(o => o.CreateNewSession()).Returns(SessionHeaderValue).Verifiable();
 
-                Subject.GetInstance(_context, typeof(IMockContract));
+                Subject.GetInstanceAsync(_context, typeof(IMockContract)).GetAwaiter().GetResult();
             }
 
             [Fact]
-            public void Release_DestroyAction_Ok()
+            public async Task Release_DestroyAction_Ok()
             {
                 var ctxt = CreateContext(Contract.Destroy);
 
                 SetupRelease(ctxt);
 
-                Subject.ReleaseInstance(ctxt, _instance, null);
+                await Subject.ReleaseInstanceAsync(ctxt, _instance, null);
 
                 Mock.Verify();
             }
 
             [Fact]
-            public void Release_DestroyAction_InstanceDestroyed()
+            public async Task  Release_DestroyAction_InstanceDestroyed()
             {
                 var ctxt = CreateContext(Contract.Destroy);
 
                 SetupRelease();
 
-                Subject.ReleaseInstance(ctxt, _instance, null);
+                await Subject.ReleaseInstanceAsync(ctxt, _instance, null);
 
                 Assert.Equal(0, Subject.LocalCount);
             }
 
             [Fact]
-            public void Release_DestroyAction_OnInstanceReleasedCalled()
+            public async Task Release_DestroyAction_OnInstanceReleasedCalled()
             {
                 var ctxt = CreateContext(Contract.Destroy);
 
                 SetupRelease(ctxt);
 
-                Subject.ReleaseInstance(ctxt, _instance, null);
+                await Subject.ReleaseInstanceAsync(ctxt, _instance, null);
 
                 Mock.Verify();
             }
 
             [Fact]
-            public void Release_Action_InstanceNotDestroyed()
+            public async Task Release_Action_InstanceNotDestroyed()
             {
                 var ctxt = CreateContext(Contract.Action);
 
                 SetupRelease();
 
-                Subject.ReleaseInstance(ctxt, _instance, null);
+                await Subject.ReleaseInstanceAsync(ctxt, _instance, null);
 
                 Assert.Equal(1, Subject.LocalCount);
             }
 
             [Fact]
-            public void Release_DestroyAction_InstanceDisposed()
+            public async Task Release_DestroyAction_InstanceDisposed()
             {
                 var ctxt = CreateContext(Contract.Destroy);
                 SetupRelease();
 
-                Subject.ReleaseInstance(ctxt, _instance, null);
+                await Subject.ReleaseInstanceAsync(ctxt, _instance, null);
 
                 Assert.True((_instance as InstanceObject).Disposed);
             }
 
             [Fact]
-            public void Release_Action_InstanceNotDisposed()
+            public async Task Release_Action_InstanceNotDisposed()
             {
                 var ctxt = CreateContext(Contract.Action);
                 SetupRelease();
 
-                Subject.ReleaseInstance(ctxt, _instance, null);
+                await Subject.ReleaseInstanceAsync(ctxt, _instance, null);
 
                 Assert.False((_instance as InstanceObject).Disposed);
             }
 
             [Fact]
-            public void ReleaseWhenError_InitAction_InstanceDisposed()
+            public async Task ReleaseWhenError_InitAction_InstanceDisposed()
             {
                 var ctxt = CreateContext(Contract.Init);
                 SetupRelease();
 
-                Subject.ReleaseInstance(ctxt, _instance, new Exception());
+                await Subject.ReleaseInstanceAsync(ctxt, _instance, new Exception());
 
                 Assert.True((_instance as InstanceObject).Disposed);
             }
 
             [Fact]
-            public void ReleaseWhenError_Action_InstanceNotDisposed()
+            public async Task ReleaseWhenError_Action_InstanceNotDisposed()
             {
                 var ctxt = CreateContext(Contract.Action);
                 SetupRelease();
 
-                Subject.ReleaseInstance(ctxt, _instance, new Exception());
+                await Subject.ReleaseInstanceAsync(ctxt, _instance, new Exception());
 
                 Assert.False((_instance as InstanceObject).Disposed);
             }
 
             [Fact]
-            public void ReleaseWhenError_Destroy_InstanceDisposed()
+            public async Task ReleaseWhenError_Destroy_InstanceDisposed()
             {
                 var ctxt = CreateContext(Contract.Destroy);
                 SetupRelease();
 
-                Subject.ReleaseInstance(ctxt, _instance, new Exception());
+                await Subject.ReleaseInstanceAsync(ctxt, _instance, new Exception());
 
                 Assert.True((_instance as InstanceObject).Disposed);
             }
@@ -405,12 +406,12 @@ namespace Bolt.Server.Test
                 return _actions.Object.CreateNewSession();
             }
 
-            protected override void OnInstanceCreated(ServerActionContext context, string sessionId)
+            protected override async Task OnInstanceCreatedAsync(ServerActionContext context, string sessionId)
             {
                 _actions.Object.OnInstanceCreated(context, sessionId);
             }
 
-            protected override void OnInstanceReleased(ServerActionContext context, string sessionId)
+            protected override async Task OnInstanceReleasedAsync(ServerActionContext context, string sessionId)
             {
                 _actions.Object.OnInstanceReleased(context, sessionId);
             }

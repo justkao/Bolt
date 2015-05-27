@@ -1,13 +1,15 @@
-﻿namespace Bolt.Server.InstanceProviders
+﻿using System.Threading.Tasks;
+
+namespace Bolt.Server.InstanceProviders
 {
     public interface ISessionStore
     {
-        object Get(string sessionId);
+        Task<object> GetAsync(string sessionId);
 
-        void Set(string sessionId, object sessionObject);
+        Task SetAsync(string sessionId, object sessionObject);
 
-        void Update(string sessionId, object sessionObject);
+        Task UpdateAsync(string sessionId, object sessionObject);
 
-        bool Remove(string sessionId);
+        Task<bool> RemoveAsync(string sessionId);
     }
 }

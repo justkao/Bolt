@@ -7,7 +7,7 @@ namespace Bolt.Server.IntegrationTest
     {
         public object CurrentInstance { get; set; }
 
-        public object GetInstance(ServerActionContext context, Type type)
+        public object GetInstanceAsync(ServerActionContext context, Type type)
         {
             return CurrentInstance;
         }

@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Bolt.Server
 {
     public interface IInstanceProvider
     {
-        object GetInstance(ServerActionContext context, Type type);
+        Task<object> GetInstanceAsync(ServerActionContext context, Type type);
 
-        void ReleaseInstance(ServerActionContext context, object obj, Exception error);
+        Task ReleaseInstanceAsync(ServerActionContext context, object obj, Exception error);
     }
 }

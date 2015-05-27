@@ -59,7 +59,7 @@ namespace Bolt.Server.Filters
             bool instanceCreated = false;
             if (context.ContractInstance == null)
             {
-                context.ContractInstance = context.ContractInvoker.InstanceProvider.GetInstance(context, context.Action.Contract.Type);
+                context.ContractInstance = await context.ContractInvoker.InstanceProvider.GetInstanceAsync(context, context.Action.Contract.Type);
                 instanceCreated = true;
             }
 
@@ -70,24 +70,24 @@ namespace Bolt.Server.Filters
 
                 if (instanceCreated)
                 {
-                    ReleaseInstanceSafe(context, null);
+                    await ReleaseInstanceSafeAsync(context, null);
                 }
             }
             catch (Exception e)
             {
                 if (instanceCreated)
                 {
-                    ReleaseInstanceSafe(context, e);
+                    await ReleaseInstanceSafeAsync(context, e);
                 }
                 throw;
             }
         }
 
-        private void ReleaseInstanceSafe(ServerActionContext context, Exception exception)
+        private Task ReleaseInstanceSafeAsync(ServerActionContext context, Exception exception)
         {
             try
             {
-                context.ContractInvoker.InstanceProvider.ReleaseInstance(context, context.ContractInstance, exception);
+                return context.ContractInvoker.InstanceProvider.ReleaseInstanceAsync(context, context.ContractInstance, exception);
             }
             catch (Exception)
             {
@@ -97,6 +97,8 @@ namespace Bolt.Server.Filters
             {
                 context.ContractInstance = null;
             }
+
+            return CompletedTask.Done;
         }
 
         private async Task ExecuteAsync(ServerActionContext context)
