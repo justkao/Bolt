@@ -9,6 +9,8 @@
     "Microsoft.Framework.ConfigurationModel.Abstractions": "1.0.0-*",
     "Microsoft.AspNet.Http.Abstractions": "1.0.0-*",
     "Microsoft.AspNet.Http.Extensions": "1.0.0-*",
+    "Microsoft.Framework.Caching.Abstractions": "1.0.0-*",
+    "Microsoft.Framework.Caching.Memory": "1.0.0-*",
     "Microsoft.Framework.OptionsModel": "1.0.0-*",
     "Microsoft.AspNet.Routing": "1.0.0-*",
     "Bolt.Core": "",

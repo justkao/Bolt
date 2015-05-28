@@ -67,10 +67,8 @@ namespace Bolt.Server.InstanceProviders
                 {
                     try
                     {
-                        if (await session.DestroyAsync())
-                        {
-                            await OnInstanceReleasedAsync(context, session.Session);
-                        }
+                        await session.DestroyAsync();
+                        await OnInstanceReleasedAsync(context, session.Session);
                     }
                     catch (Exception e)
                     {
@@ -83,10 +81,8 @@ namespace Bolt.Server.InstanceProviders
             }
             else if (context.Action == CloseSession)
             {
-                if (await session.DestroyAsync())
-                {
-                    await OnInstanceReleasedAsync(context, session.Session);
-                }
+                await session.DestroyAsync();
+                await OnInstanceReleasedAsync(context, session.Session);
             }
             else
             {

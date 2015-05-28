@@ -10,6 +10,6 @@ namespace Bolt.Server.InstanceProviders
 
         Task CommitAsync();
 
-        Task<bool> DestroyAsync();
+        Task DestroyAsync();
     }
 }
