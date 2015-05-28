@@ -3,7 +3,7 @@ using System;
 
 namespace Bolt.Server.InstanceProviders
 {
-    public class SessionHandler
+    public class SessionHandler : IServerSessionHandler
     {
         public string SessionHeader => _options.SessionHeader;
 
@@ -17,11 +17,6 @@ namespace Bolt.Server.InstanceProviders
             }
 
             _options = options;
-        }
-
-        public virtual string CreateIdentifier()
-        {
-            return Guid.NewGuid().ToString();
         }
 
         public virtual string GetIdentifier(HttpContext context)
@@ -40,23 +35,25 @@ namespace Bolt.Server.InstanceProviders
             return sessionId;
         }
 
-        public virtual void Initialize(HttpContext context, string session)
+        public virtual string Initialize(HttpContext context)
         {
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
 
-            if (session == null)
-            {
-                throw new ArgumentNullException(nameof(session));
-            }
-
-            context.Response.Headers[SessionHeader] = session;
+            var session = GenerateIdentifier();
+            context.Response.Headers[SessionHeader] = GenerateIdentifier();
+            return session;
         }
 
         public virtual void Destroy(HttpContext context)
         {
+        }
+
+        protected virtual string GenerateIdentifier()
+        {
+            return Guid.NewGuid().ToString();
         }
     }
 }

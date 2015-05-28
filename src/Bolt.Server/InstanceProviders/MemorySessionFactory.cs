@@ -12,9 +12,9 @@ namespace Bolt.Server.InstanceProviders
         private readonly BoltServerOptions _options;
         private readonly Timer _timer;
         private readonly ConcurrentDictionary<string, ContractSession> _items = new ConcurrentDictionary<string, ContractSession>();
-        private readonly SessionHandler _sessionHandler;
+        private readonly IServerSessionHandler _sessionHandler;
 
-        public MemorySessionFactory(BoltServerOptions options, SessionHandler sessionHandler = null)
+        public MemorySessionFactory(BoltServerOptions options, IServerSessionHandler sessionHandler = null)
         {
             _options = options;
             _sessionHandler = sessionHandler ?? new SessionHandler(options);
@@ -33,14 +33,29 @@ namespace Bolt.Server.InstanceProviders
 
         public Task<IContractSession> CreateAsync(HttpContext context, object instance)
         {
-            var session = _sessionHandler.CreateIdentifier();
-            ContractSession contractSession = new ContractSession(this, session, instance);
+            ContractSession contractSession = null;
+            var session = _sessionHandler.GetIdentifier(context);
+            if (session != null)
+            {
+                if (_items.TryGetValue(session, out contractSession))
+                {
+                    contractSession.TimeStamp = DateTime.UtcNow;
+                    return Task.FromResult((IContractSession)contractSession);
+                }
+                else
+                {
+                    _sessionHandler.Destroy(context);
+                }
+            }
+
+            session = _sessionHandler.Initialize(context);
+            contractSession = new ContractSession(this, session, instance);
             _items.TryAdd(session, contractSession);
 
             return Task.FromResult((IContractSession)contractSession);
         }
 
-        public Task<IContractSession> GetAsync(HttpContext context)
+        public Task<IContractSession> GetExistingAsync(HttpContext context)
         {
             var session = _sessionHandler.GetIdentifier(context);
 
@@ -57,23 +72,6 @@ namespace Bolt.Server.InstanceProviders
             }
 
             throw new SessionNotFoundException(session);
-        }
-
-        public Task<IContractSession> TryGetAsync(HttpContext context)
-        {
-            var session = _sessionHandler.GetIdentifier(context);
-            if (string.IsNullOrEmpty(session))
-            {
-                return null;
-            }
-
-            ContractSession contractSession;
-            if (_items.TryGetValue(session, out contractSession))
-            {
-                return Task.FromResult((IContractSession)contractSession);
-            }
-
-            return Task.FromResult<IContractSession>(null);
         }
 
         protected virtual bool ShouldTimeout(DateTime timestamp)

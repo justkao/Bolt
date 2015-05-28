@@ -21,12 +21,22 @@ namespace Bolt.Client.Channels
         public RecoverableChannel(Uri server, ClientConfiguration clientConfiguration)
             : base(clientConfiguration)
         {
+            if (server == null)
+            {
+                throw new ArgumentNullException(nameof(server));
+            }
+
             ServerProvider = new SingleServerProvider(server);
         }
 
         public RecoverableChannel(IServerProvider serverProvider, ClientConfiguration clientConfiguration)
             : base(clientConfiguration)
         {
+            if (serverProvider == null)
+            {
+                throw new ArgumentNullException(nameof(serverProvider));
+            }
+
             ServerProvider = serverProvider;
         }
 

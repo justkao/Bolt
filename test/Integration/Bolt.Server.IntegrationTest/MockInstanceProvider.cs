@@ -1,5 +1,5 @@
 using System;
-using Bolt.Server;
+using System.Threading.Tasks;
 
 namespace Bolt.Server.IntegrationTest
 {
@@ -14,6 +14,16 @@ namespace Bolt.Server.IntegrationTest
 
         public void ReleaseInstance(ServerActionContext context, object obj, Exception error)
         {
+        }
+
+        public Task ReleaseInstanceAsync(ServerActionContext context, object obj, Exception error)
+        {
+            throw new NotImplementedException();
+        }
+
+        Task<object> IInstanceProvider.GetInstanceAsync(ServerActionContext context, Type type)
+        {
+            throw new NotImplementedException();
         }
     }
 }

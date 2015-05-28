@@ -5,9 +5,7 @@ namespace Bolt.Server.InstanceProviders
 {
     public interface ISessionFactory
     {
-        Task<IContractSession> TryGetAsync(HttpContext context);
-
-        Task<IContractSession> GetAsync(HttpContext context);
+        Task<IContractSession> GetExistingAsync(HttpContext context);
 
         Task<IContractSession> CreateAsync(HttpContext context, object instance);
     }

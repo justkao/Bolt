@@ -1,4 +1,5 @@
 using System;
+using Bolt.Client.Channels;
 
 namespace Bolt.Client
 {
@@ -7,15 +8,21 @@ namespace Bolt.Client
     /// </summary>
     public class ClientConfiguration
     {
-        public ClientConfiguration()
+        public ClientConfiguration(BoltOptions options = null)
         {
-            Options = new BoltOptions();
+            Options = options ?? new BoltOptions();
             Serializer = new JsonSerializer();
             ExceptionWrapper = new JsonExceptionWrapper();
             DataHandler = new ClientDataHandler(Serializer, ExceptionWrapper);
             RequestHandler = new RequestHandler(DataHandler, new ClientErrorProvider(Options.ServerErrorHeader));
             EndpointProvider = new EndpointProvider(Options);
+            SessionHandler = new ClientSessionHandler(Options);
         }
+
+        /// <summary>
+        /// Gets or sets the Bolt options.
+        /// </summary>
+        public BoltOptions Options { get; private set; }
 
         /// <summary>
         /// Gets or sets the request forwarder that is used by channels to send and receive the requests.
@@ -48,8 +55,8 @@ namespace Bolt.Client
         public IEndpointProvider EndpointProvider { get; set; }
 
         /// <summary>
-        /// Gets or sets the Bolt options.
+        /// Gets or sets client session handler.
         /// </summary>
-        public BoltOptions Options { get; set; }
+        public IClientSessionHandler SessionHandler { get; set; }
     }
 }

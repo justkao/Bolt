@@ -12,8 +12,8 @@ namespace Bolt.Client.Channels
     public abstract class RecoverableStatefullChannel<TContract> : RecoverableChannel
         where TContract : ContractProxy
     {
-        private readonly string _sessionHeaderName;
         private readonly AwaitableCriticalSection _syncRoot = new AwaitableCriticalSection();
+        private readonly IClientSessionHandler _sessionHandler;
 
         private ConnectionDescriptor _activeConnection;
         private string _sessionId;
@@ -21,29 +21,38 @@ namespace Bolt.Client.Channels
         protected RecoverableStatefullChannel(Uri server, ClientConfiguration clientConfiguration)
             : base(new SingleServerProvider(server), clientConfiguration)
         {
-            _sessionHeaderName = clientConfiguration.Options.SessionHeader;
+            _sessionHandler = clientConfiguration.SessionHandler;
         }
 
-        protected RecoverableStatefullChannel(IServerProvider serverProvider, ClientConfiguration clientConfiguration)
+        protected RecoverableStatefullChannel(IServerProvider serverProvider, ClientConfiguration clientConfiguration, IClientSessionHandler sessionHandler)
             : base(serverProvider, clientConfiguration)
         {
-            _sessionHeaderName = clientConfiguration.Options.SessionHeader;
+            if (sessionHandler == null)
+            {
+                throw new ArgumentNullException(nameof(sessionHandler));
+            }
+
+            _sessionHandler = sessionHandler;
         }
 
         protected RecoverableStatefullChannel(RecoverableStatefullChannel<TContract> proxy)
             : base(proxy)
         {
-            _sessionHeaderName = proxy._sessionHeaderName;
+            _sessionHandler = proxy._sessionHandler;
         }
 
         protected RecoverableStatefullChannel(
             IServerProvider serverProvider,
-            string sessionHeaderName,
             IRequestHandler requestHandler,
-            IEndpointProvider endpointProvider)
+            IEndpointProvider endpointProvider, IClientSessionHandler sessionHandler)
             : base(serverProvider, requestHandler, endpointProvider)
         {
-            _sessionHeaderName = sessionHeaderName;
+            if (sessionHandler == null)
+            {
+                throw new ArgumentNullException(nameof(sessionHandler));
+            }
+
+            _sessionHandler = sessionHandler;
         }
 
         public string SessionId => _sessionId;
@@ -93,7 +102,7 @@ namespace Bolt.Client.Channels
                             c =>
                             {
                                 BeforeSending(c);
-                                WriteSessionHeader(c, sessionId);
+                                _sessionHandler.EnsureSession(c.Request, sessionId);
                             },
                             AfterReceived);
 
@@ -148,7 +157,7 @@ namespace Bolt.Client.Channels
 
         protected override void BeforeSending(ClientActionContext context)
         {
-            WriteSessionHeader(context, _sessionId);
+            _sessionHandler.EnsureSession(context.Request, _sessionId);
             base.BeforeSending(context);
         }
 
@@ -206,7 +215,7 @@ namespace Bolt.Client.Channels
                             EndpointProvider,
                             c =>
                             {
-                                WriteSessionHeader(c, sessionId);
+                                _sessionHandler.EnsureSession(c.Request, sessionId);
                                 BeforeSending(c);
                             },
                             ctxt =>
@@ -214,8 +223,7 @@ namespace Bolt.Client.Channels
                                 if (sessionId == null)
                                 {
                                     action = ctxt.Action;
-                                    sessionId = ctxt.Response.Headers.GetHeaderValue(_sessionHeaderName);
-
+                                    sessionId = _sessionHandler.GetSessionIdentifier(ctxt.Response);
                                 }
                             }));
 
@@ -258,17 +266,6 @@ namespace Bolt.Client.Channels
                 _activeConnection = connection;
                 _sessionId = sessionId;
                 return connection;
-            }
-        }
-
-        private void WriteSessionHeader(ClientActionContext context, string sessionId)
-        {
-            if (!string.IsNullOrEmpty(sessionId))
-            {
-                if (!context.Request.Headers.Contains(_sessionHeaderName))
-                {
-                    context.Request.Headers.Add(_sessionHeaderName, sessionId);
-                }
             }
         }
     }

@@ -40,23 +40,16 @@ namespace Bolt.Server.InstanceProviders
 
             if (context.Action == InitSession)
             {
-                contractSession = await _sessionFactory.TryGetAsync(context.HttpContext);
-                if (contractSession != null)
-                {
-                    context.HttpContext.SetFeature<IContractSession>(contractSession);
-                    return contractSession.Instance;
-                }
-
                 contractSession = await _sessionFactory.CreateAsync(context.HttpContext, await base.GetInstanceAsync(context, type));
                 context.ContractInstance = contractSession.Instance;
-                context.HttpContext.SetFeature<IContractSession>(contractSession);
+                context.HttpContext.SetFeature(contractSession);
 
                 await OnInstanceCreatedAsync(context, contractSession.Session);
                 return contractSession.Instance;
             }
 
-            contractSession = await _sessionFactory.GetAsync(context.HttpContext);
-            context.HttpContext.SetFeature<IContractSession>(contractSession);
+            contractSession = await _sessionFactory.GetExistingAsync(context.HttpContext);
+            context.HttpContext.SetFeature(contractSession);
             return context.ContractInstance;
         }
 
