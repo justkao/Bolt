@@ -1,24 +1,15 @@
 ﻿using Bolt.Common;
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Bolt.Server.InstanceProviders
 {
-    public class StateFullInstanceProvider : InstanceProvider, IDisposable
+    public class StateFullInstanceProvider : InstanceProvider
     {
-        private readonly BoltServerOptions _options;
+        private readonly ISessionFactory _sessionFactory;
 
-        private readonly Timer _timer;
-
-        private readonly ISessionStore _store;
-
-        private ConcurrentDictionary<string, DateTime> _timeStamps = new ConcurrentDictionary<string, DateTime>();
-
-        public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, BoltServerOptions options, ISessionStore store = null)
+        public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, ISessionFactory factory)
         {
             if (initInstanceAction == null)
             {
@@ -30,93 +21,62 @@ namespace Bolt.Server.InstanceProviders
                 throw new ArgumentNullException(nameof(releaseInstanceAction));
             }
 
-            if (options == null)
+            if (factory == null)
             {
-                throw new ArgumentNullException(nameof(options));
+                throw new ArgumentNullException(nameof(factory));
             }
 
-            _options = options;
             InitSession = initInstanceAction;
-            CloseSession = releaseInstanceAction;
-            _store = store ?? new MemorySessionStore();
-
-            if (SessionTimeout != TimeSpan.Zero)
-            {
-                _timer = new Timer(
-                    OnTimerElapsed,
-                    null,
-                    (int)TimeSpan.FromMinutes(1).TotalMilliseconds,
-                    (int)TimeSpan.FromMinutes(1).TotalMilliseconds);
-            }
+            _sessionFactory = factory;
         }
-
-        public string SessionHeader =>_options.SessionHeader;
-
-        public TimeSpan SessionTimeout => _options.SessionTimeout;
 
         public ActionDescriptor InitSession { get; }
 
         public ActionDescriptor CloseSession { get; }
 
-        public int LocalCount =>_timeStamps.Count;
-
         public sealed override async Task<object> GetInstanceAsync(ServerActionContext context, Type type)
         {
-            object instance;
-            string sessionId = GetSession(context);
+            IContractSession contractSession;
 
             if (context.Action == InitSession)
             {
-                if (sessionId != null)
+                contractSession = await _sessionFactory.TryGetAsync(context.HttpContext);
+                if (contractSession != null)
                 {
-                    instance = await _store.GetAsync(sessionId);
-                    if (instance != null)
-                    {
-                        _timeStamps[sessionId] = DateTime.UtcNow;
-                        return instance;
-                    }
+                    context.HttpContext.SetFeature<IContractSession>(contractSession);
+                    return contractSession.Instance;
                 }
 
-                string newSession = CreateNewSession();
-                instance = await base.GetInstanceAsync(context, type);
-                _timeStamps[newSession] = DateTime.UtcNow;
-                await OnInstanceCreatedAsync(context, newSession);
+                contractSession = await _sessionFactory.CreateAsync(context.HttpContext, await base.GetInstanceAsync(context, type));
+                context.ContractInstance = contractSession.Instance;
+                context.HttpContext.SetFeature<IContractSession>(contractSession);
 
-                await _store.SetAsync(newSession, instance);
-                context.HttpContext.Response.Headers[SessionHeader] = newSession;
-                return instance;
+                await OnInstanceCreatedAsync(context, contractSession.Session);
+                return contractSession.Instance;
             }
 
-            if (string.IsNullOrEmpty(sessionId))
-            {
-                throw new SessionHeaderNotFoundException();
-            }
-
-            instance = await _store.GetAsync(sessionId);
-            if (instance != null)
-            {
-                _timeStamps[sessionId] = DateTime.UtcNow;
-                return instance;
-            }
-
-            throw new SessionNotFoundException(sessionId);
+            contractSession = await _sessionFactory.GetAsync(context.HttpContext);
+            context.HttpContext.SetFeature<IContractSession>(contractSession);
+            return context.ContractInstance;
         }
 
         public sealed override async Task ReleaseInstanceAsync(ServerActionContext context, object obj, Exception error)
         {
+            var session = context.HttpContext.GetFeature<IContractSession>();
+            if (session == null)
+            {
+                return;
+            }
+
             if (context.Action == InitSession)
             {
                 if (error != null)
                 {
-                    // session initialization failed, cleanup the stack
-                    string session = GetSession(context);
-                    context.HttpContext.Response.Headers.Remove(SessionHeader);
-
                     try
                     {
-                        if (await ReleaseInstanceAsync(session))
+                        if (await session.DestroyAsync())
                         {
-                            await OnInstanceReleasedAsync(context, session);
+                            await OnInstanceReleasedAsync(context, session.Session);
                         }
                     }
                     catch (Exception e)
@@ -130,49 +90,15 @@ namespace Bolt.Server.InstanceProviders
             }
             else if (context.Action == CloseSession)
             {
-                string sessionId = GetSession(context);
-                if (!string.IsNullOrEmpty(sessionId))
+                if (await session.DestroyAsync())
                 {
-                    if (await ReleaseInstanceAsync(sessionId))
-                    {
-                        await OnInstanceReleasedAsync(context, sessionId);
-                    }
+                    await OnInstanceReleasedAsync(context, session.Session);
                 }
             }
             else
             {
-                await UpdateInstanceAsync(GetSession(context), context);
+                await session.CommitAsync();
             } 
-        }
-
-        protected virtual Task UpdateInstanceAsync(string sessionId, ServerActionContext context)
-        {
-            return _store.UpdateAsync(sessionId, context.ContractInstance);
-        }
-
-        private async Task<bool> ReleaseInstanceAsync(string sessionId)
-        {
-            object instance = await _store.GetAsync(sessionId);
-            if (instance != null)
-            {
-                await _store.RemoveAsync(sessionId);
-                DateTime stamp;
-                _timeStamps.TryRemove(sessionId, out stamp);
-                (instance as IDisposable)?.Dispose();
-                return true;
-            }
-
-            return false;
-        }
-
-        private void KeepAlive(string key)
-        {
-            _timeStamps[key] = DateTime.UtcNow;
-        }
-
-        public virtual void Dispose()
-        {
-            _timer?.Dispose();
         }
 
         protected virtual Task OnInstanceCreatedAsync(ServerActionContext context, string sessionId)
@@ -184,51 +110,5 @@ namespace Bolt.Server.InstanceProviders
         {
             return CompletedTask.Done;
         }
-
-        protected virtual bool ShouldTimeout(DateTime timestamp)
-        {
-            return (DateTime.UtcNow - timestamp) > SessionTimeout;
-        }
-
-        protected virtual string CreateNewSession()
-        {
-            return Guid.NewGuid().ToString();
-        }
-
-        protected virtual Task OnInstanceTimeoutedAsync(string session)
-        {
-            return CompletedTask.Done;
-        }
-
-        protected string GetSession(ServerActionContext context)
-        {
-            string sessionId = context.HttpContext.Request.Headers[SessionHeader];
-            if (string.IsNullOrEmpty(sessionId))
-            {
-                sessionId = context.HttpContext.Response.Headers[SessionHeader];
-            }
-
-            return sessionId;
-        }
-
-        private async void OnTimerElapsed(object state)
-        {
-            foreach (KeyValuePair<string, DateTime> pair in _timeStamps)
-            {
-                if (ShouldTimeout(pair.Value))
-                {
-                    try
-                    {
-                        if (await ReleaseInstanceAsync(pair.Key))
-                        {
-                            await OnInstanceTimeoutedAsync(pair.Key);
-                        }
-                    }
-                    catch (Exception)
-                    {
-                    }
-                }
-            }
-        } 
     }
 }

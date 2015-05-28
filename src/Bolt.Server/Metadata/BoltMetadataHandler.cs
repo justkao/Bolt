@@ -110,8 +110,6 @@ namespace Bolt.Server.Metadata
             {
                 m.SessionInit = statefullProvder.InitSession.Name;
                 m.SessionClose = statefullProvder.CloseSession.Name;
-                m.SessionClose = statefullProvder.CloseSession.Name;
-                m.SessionTimeout =(int) statefullProvder.SessionTimeout.TotalSeconds;
             }
 
             return m;
@@ -124,8 +122,6 @@ namespace Bolt.Server.Metadata
             public string ErrorHeader { get; set; }
 
             public string SessionHeader { get; set; }
-
-            public int? SessionTimeout{ get; set; }
 
             public string SessionInit { get; set; }
 

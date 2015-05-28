@@ -15,7 +15,13 @@ namespace Bolt.Server
         public static IContractInvoker UseStateFull<TContractImplementation>(this IBoltRouteHandler bolt, IContractActions actions, ActionDescriptor init, ActionDescriptor release, BoltServerOptions options = null, Action<IContractInvoker> configure = null)
             where TContractImplementation : new()
         {
-            return bolt.Use(actions, new StateFullInstanceProvider<TContractImplementation>(init, release, options ?? bolt.Configuration.Options), configure);
+            return bolt.UseStateFull<TContractImplementation>(actions, init, release, new MemorySessionFactory(options ?? bolt.Configuration.Options), configure);
+        }
+
+        public static IContractInvoker UseStateFull<TContractImplementation>(this IBoltRouteHandler bolt, IContractActions actions, ActionDescriptor init, ActionDescriptor release, ISessionFactory sessionFactory, Action<IContractInvoker> configure = null)
+            where TContractImplementation : new()
+        {
+            return bolt.Use(actions, new StateFullInstanceProvider<TContractImplementation>(init, release, sessionFactory), configure);
         }
 
         public static IContractInvoker Use(this IBoltRouteHandler bolt, IContractActions actions, IInstanceProvider instanceProvider, Action<IContractInvoker> configure = null)

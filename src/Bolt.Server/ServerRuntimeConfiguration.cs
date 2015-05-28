@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt.Server.InstanceProviders;
+using System;
 
 namespace Bolt.Server
 {
@@ -53,6 +54,11 @@ namespace Bolt.Server
         /// </summary>
         public IParameterHandler ParameterHandler { get; set; }
 
+        /// <summary>
+        /// Gets or sets <see cref="ISessionFactory"/> assigned to current context.
+        /// </summary>
+        public ISessionFactory SessionFactory { get; set; }
+
         public void Merge(ServerRuntimeConfiguration other)
         {
             if (other == null)
@@ -87,6 +93,10 @@ namespace Bolt.Server
             if (other.ParameterHandler != null)
             {
                 ParameterHandler = other.ParameterHandler;
+            }
+            if (other.SessionFactory != null)
+            {
+                SessionFactory = other.SessionFactory;
             }
         }
     }

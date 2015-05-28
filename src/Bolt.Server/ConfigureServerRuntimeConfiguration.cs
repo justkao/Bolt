@@ -2,6 +2,7 @@
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;
+using Bolt.Server.InstanceProviders;
 
 namespace Bolt.Server
 {
@@ -36,6 +37,7 @@ namespace Bolt.Server
             options.Serializer = _provider.GetRequiredService<ISerializer>();
             options.ExceptionWrapper = _provider.GetRequiredService<IExceptionWrapper>();
             options.ParameterHandler = _provider.GetRequiredService<IParameterHandler>();
+            options.SessionFactory = _provider.GetRequiredService<ISessionFactory>();
         }
     }
 }
