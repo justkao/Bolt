@@ -12,6 +12,8 @@ namespace Bolt.Server.InstanceProviders
         private readonly BoltServerOptions _options;
         private readonly IServerSessionHandler _sessionHandler;
 
+        public event EventHandler<SessionTimeoutEventArgs> SessionTimeouted;
+
         public DistributedSessionFactoryBase(BoltServerOptions options, IDistributedCache cache, IServerSessionHandler sessionHandler = null)
         {
             if (options == null)

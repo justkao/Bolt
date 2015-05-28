@@ -26,6 +26,8 @@ namespace Bolt.Server.InstanceProviders
 
         public TimeSpan SessionTimeout => _options.SessionTimeout;
 
+        public event EventHandler<SessionTimeoutEventArgs> SessionTimeouted;
+
         public Task<IContractSession> CreateAsync(HttpContext context, object instance)
         {
             ContractSession contractSession = null;
@@ -45,7 +47,9 @@ namespace Bolt.Server.InstanceProviders
 
             session = _sessionHandler.Initialize(context);
             contractSession = new ContractSession(this, session, instance);
-            _cache.Set(session, contractSession, new MemoryCacheEntryOptions() { SlidingExpiration = SessionTimeout });
+            var options = new MemoryCacheEntryOptions() { SlidingExpiration = SessionTimeout };
+            options.PostEvictionCallbacks.Add(new PostEvictionCallbackRegistration() { EvictionCallback = SessionEvictionCallback });
+            _cache.Set(session, contractSession, options);
 
             return Task.FromResult((IContractSession)contractSession);
         }
@@ -66,6 +70,18 @@ namespace Bolt.Server.InstanceProviders
             }
 
             throw new SessionNotFoundException(session);
+        }
+
+        private void SessionEvictionCallback(string key, object value, EvictionReason reason, object state)
+        {
+            switch (reason)
+            {
+                case EvictionReason.Removed:
+                case EvictionReason.Capacity:
+                case EvictionReason.Expired:
+                    SessionTimeouted?.Invoke(this, new SessionTimeoutEventArgs(key));
+                    break;
+            }
         }
 
         private class ContractSession : IContractSession
