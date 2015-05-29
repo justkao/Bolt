@@ -3,6 +3,8 @@ using Bolt;
 using Bolt.Server;
 using Bolt.Server.Filters;
 using Bolt.Server.Metadata;
+using Bolt.Server.InstanceProviders;
+using Bolt.Core;
 
 namespace Microsoft.Framework.DependencyInjection
 {
@@ -29,6 +31,8 @@ namespace Microsoft.Framework.DependencyInjection
             services.AddTransient<IContractInvoker, ContractInvoker>();
             services.AddTransient<IActionPicker, ActionPicker>();
             services.AddTransient<IParameterHandler, ParameterHandler>();
+            services.AddTransient<IServerSessionHandler, ServerSessionHandler>();
+            services.AddScoped<ISessionProvider, HttpContextSessionProvider>();
 
             return services;
         }

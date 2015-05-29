@@ -27,7 +27,7 @@ namespace Bolt.Server.InstanceProviders
             }
 
             _options = options;
-            _sessionHandler = sessionHandler ?? new SessionHandler(options);
+            _sessionHandler = sessionHandler ?? new ServerSessionHandler(options);
             _cache = cache;
         }
 

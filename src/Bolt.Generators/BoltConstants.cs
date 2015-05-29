@@ -32,6 +32,8 @@
             public static readonly ClassDescriptor BoltServerOptions = new ClassDescriptor("BoltServerOptions", Namespace);
 
             public static readonly ClassDescriptor BoltRouteHandlerInterface = new ClassDescriptor("IBoltRouteHandler", Namespace) { IsInterface = true };
+
+            public static readonly ClassDescriptor SessionFactoryInterface = new ClassDescriptor("ISessionFactory", InstanceProvidersNamespace);
         }
 
         internal static class Client

@@ -1,11 +1,10 @@
-﻿using System.Threading.Tasks;
+﻿using Bolt.Core;
+using System.Threading.Tasks;
 
 namespace Bolt.Server.InstanceProviders
 {
-    public interface IContractSession
+    public interface IContractSession : ISessionProvider
     {
-        string Session { get; }
-
         object Instance { get; }
 
         Task CommitAsync();

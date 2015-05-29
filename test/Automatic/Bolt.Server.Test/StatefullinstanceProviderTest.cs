@@ -149,7 +149,6 @@ namespace Bolt.Server.Test
             private void SetupInit(ServerActionContext ctxt, string session = "testsession", object instance = null)
             {
                 Mock.Setup(o => o.CreateInstance(ctxt, typeof(IMockContract))).Returns(instance ?? new object()).Verifiable();
-                Mock.Setup(o => o.CreateNewSession()).Returns(session).Verifiable();
             }
         }
 
@@ -165,7 +164,6 @@ namespace Bolt.Server.Test
                 _instance = new object();
 
                 Mock.Setup(o => o.CreateInstance(It.IsAny<ServerActionContext>(), typeof(IMockContract))).Returns(_instance).Verifiable();
-                Mock.Setup(o => o.CreateNewSession()).Returns(SessionHeaderValue).Verifiable();
 
                 Subject.GetInstanceAsync(ctxt, typeof(IMockContract)).GetAwaiter().GetResult();
             }
@@ -229,7 +227,6 @@ namespace Bolt.Server.Test
                 _instance = new InstanceObject();
 
                 Mock.Setup(o => o.CreateInstance(It.IsAny<ServerActionContext>(), typeof(IMockContract))).Returns(_instance).Verifiable();
-                Mock.Setup(o => o.CreateNewSession()).Returns(SessionHeaderValue).Verifiable();
 
                 Subject.GetInstanceAsync(_context, typeof(IMockContract)).GetAwaiter().GetResult();
             }
@@ -380,8 +377,6 @@ namespace Bolt.Server.Test
         {
             object CreateInstance(ServerActionContext context, Type type);
 
-            string CreateNewSession();
-
             void OnInstanceCreated(ServerActionContext context, string sessionId);
 
             void OnInstanceReleased(ServerActionContext context, string sessionId);
@@ -390,20 +385,24 @@ namespace Bolt.Server.Test
         protected class MockStateFullInstanceProvider : StateFullInstanceProvider
         {
             private readonly Mock<IInstanceProviderActions> _actions;
+            private readonly MemorySessionFactory _factory;
 
-            public MockStateFullInstanceProvider(MockContractDescriptor contract, string header, Mock<IInstanceProviderActions> actions) : base(contract.Init, contract.Destroy, new BoltServerOptions() { SessionHeader = header })
+            public MockStateFullInstanceProvider(MockContractDescriptor contract, string header, Mock<IInstanceProviderActions> actions) 
+                : this(contract, header, actions, new MemorySessionFactory(new BoltServerOptions() { SessionHeader = SessionHeader }))
             {
+            }
+
+            public MockStateFullInstanceProvider(MockContractDescriptor contract, string header, Mock<IInstanceProviderActions> actions, MemorySessionFactory factory) : base(contract.Init, contract.Destroy, factory)
+            {
+                _factory = factory;
                 _actions = actions;
             }
+
+            public int LocalCount => _factory.Count;
 
             protected override object CreateInstance(ServerActionContext context, Type type)
             {
                 return _actions.Object.CreateInstance(context, type);
-            }
-
-            protected override string CreateNewSession()
-            {
-                return _actions.Object.CreateNewSession();
             }
 
             protected override async Task OnInstanceCreatedAsync(ServerActionContext context, string sessionId)

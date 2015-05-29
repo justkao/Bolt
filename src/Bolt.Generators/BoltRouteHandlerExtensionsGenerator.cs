@@ -103,6 +103,20 @@ namespace Bolt.Generators
                     StateFullInstanceProviderBase);
             }
 
+            WriteLine(
+                "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, {3} factory) where TImplementation: {1}",
+                ContractDefinition.Name,
+                ContractDefinition.Root.FullName,
+                BoltRouteHandler,
+                BoltConstants.Server.SessionFactoryInterface);
+            using (WithBlock())
+            {
+                WriteLine(
+                    "return bolt.Use{0}(new {1}<TImplementation>(initInstanceAction, releaseInstanceAction, factory));",
+                    ContractDefinition.Name,
+                    StateFullInstanceProviderBase);
+            }
+
             WriteLine();
 
             WriteLine(

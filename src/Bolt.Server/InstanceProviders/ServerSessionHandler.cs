@@ -3,13 +3,13 @@ using System;
 
 namespace Bolt.Server.InstanceProviders
 {
-    public class SessionHandler : IServerSessionHandler
+    public class ServerSessionHandler : IServerSessionHandler
     {
         public string SessionHeader => _options.SessionHeader;
 
         private readonly BoltServerOptions _options;
 
-        public SessionHandler(BoltServerOptions options)
+        public ServerSessionHandler(BoltServerOptions options)
         {
             if (options == null)
             {
