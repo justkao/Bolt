@@ -7,7 +7,7 @@ using System.Threading;
 
 namespace Bolt.Server.InstanceProviders
 {
-    public class MemorySessionFactory : ISessionFactory
+    public class MemorySessionFactory : ISessionFactory, IDisposable
     {
         private readonly BoltServerOptions _options;
         private readonly Timer _timer;
@@ -37,7 +37,7 @@ namespace Bolt.Server.InstanceProviders
 
         public Task<IContractSession> CreateAsync(HttpContext context, object instance)
         {
-            ContractSession contractSession = null;
+            ContractSession contractSession;
             var session = _sessionHandler.GetIdentifier(context);
             if (session != null)
             {
@@ -46,10 +46,8 @@ namespace Bolt.Server.InstanceProviders
                     contractSession.TimeStamp = DateTime.UtcNow;
                     return Task.FromResult((IContractSession)contractSession);
                 }
-                else
-                {
-                    _sessionHandler.Destroy(context);
-                }
+
+                _sessionHandler.Destroy(context);
             }
 
             session = _sessionHandler.Initialize(context);
@@ -97,17 +95,19 @@ namespace Bolt.Server.InstanceProviders
 
         private class ContractSession : IContractSession
         {
-            private MemorySessionFactory _parent;
+            private readonly MemorySessionFactory _parent;
 
             public ContractSession(MemorySessionFactory parent, string session, object instance)
             {
                 _parent = parent;
+                Instance = instance;
+                SessionId = session;
                 TimeStamp = DateTime.UtcNow;
             }
 
-            public object Instance { get; private set; }
+            public object Instance { get; }
 
-            public string Session { get; private set; }
+            public string SessionId { get; }
 
             public DateTime TimeStamp { get; set; }
 
@@ -119,13 +119,9 @@ namespace Bolt.Server.InstanceProviders
             public void Destroy()
             {
                 ContractSession instance;
-
-                if (_parent._items.TryRemove(Session, out instance))
+                if (_parent._items.TryRemove(SessionId, out instance))
                 {
-                    if (instance != null)
-                    {
-                        (instance as IDisposable).Dispose();
-                    }
+                    (instance.Instance as IDisposable)?.Dispose();
                 }
             }
 
@@ -134,6 +130,11 @@ namespace Bolt.Server.InstanceProviders
                 Destroy();
                 return CompletedTask.Done;
             }
+        }
+
+        public void Dispose()
+        {
+            _timer?.Dispose();
         }
     }
 }

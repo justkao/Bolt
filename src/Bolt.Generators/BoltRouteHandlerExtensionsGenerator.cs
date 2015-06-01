@@ -74,15 +74,38 @@ namespace Bolt.Generators
                 using (WithBlock())
                 {
                     WriteLine(
-                        "var initSessionAction = {0}.Default.{1};",
+                        "var initSession = {0}.Default.{1};",
                         MetadataProvider.GetContractDescriptor(ContractDefinition).Name,
                         MetadataProvider.GetMethodDescriptor(ContractDefinition, initSession).Name);
                     WriteLine(
-                        "var closeSessionAction = {0}.Default.{1};",
+                        "var closeSession = {0}.Default.{1};",
                         MetadataProvider.GetContractDescriptor(ContractDefinition).Name,
                         MetadataProvider.GetMethodDescriptor(ContractDefinition, closeSession).Name);
                     WriteLine(
-                        "return bolt.Use{0}(new {1}<TImplementation>(initSessionAction, closeSessionAction, options ?? bolt.Configuration.Options));",
+                        "return bolt.Use{0}(new {1}<TImplementation>(initSession, closeSession, options ?? bolt.Configuration.Options));",
+                        ContractDefinition.Name,
+                        StateFullInstanceProviderBase);
+                }
+                WriteLine();
+
+                WriteLine(
+                    "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} bolt, {3} sessionFactory) where TImplementation: {1}",
+                    ContractDefinition.Name,
+                    ContractDefinition.Root.FullName,
+                    BoltRouteHandler,
+                    BoltConstants.Server.SessionFactoryInterface);
+                using (WithBlock())
+                {
+                    WriteLine(
+                        "var initSession = {0}.Default.{1};",
+                        MetadataProvider.GetContractDescriptor(ContractDefinition).Name,
+                        MetadataProvider.GetMethodDescriptor(ContractDefinition, initSession).Name);
+                    WriteLine(
+                        "var closeSession = {0}.Default.{1};",
+                        MetadataProvider.GetContractDescriptor(ContractDefinition).Name,
+                        MetadataProvider.GetMethodDescriptor(ContractDefinition, closeSession).Name);
+                    WriteLine(
+                        "return bolt.Use{0}(new {1}<TImplementation>(initSession, closeSession, sessionFactory));",
                         ContractDefinition.Name,
                         StateFullInstanceProviderBase);
                 }
@@ -90,7 +113,7 @@ namespace Bolt.Generators
             }
 
             WriteLine(
-                "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, {3} options = null) where TImplementation: {1}",
+                "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} bolt, ActionDescriptor initSession, ActionDescriptor closeSession, {3} options = null) where TImplementation: {1}",
                 ContractDefinition.Name,
                 ContractDefinition.Root.FullName,
                 BoltRouteHandler,
@@ -98,13 +121,13 @@ namespace Bolt.Generators
             using (WithBlock())
             {
                 WriteLine(
-                    "return bolt.Use{0}(new {1}<TImplementation>(initInstanceAction, releaseInstanceAction, options ?? bolt.Configuration.Options));",
+                    "return bolt.Use{0}(new {1}<TImplementation>(initSession, closeSession, options ?? bolt.Configuration.Options));",
                     ContractDefinition.Name,
                     StateFullInstanceProviderBase);
             }
 
             WriteLine(
-                "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, {3} factory) where TImplementation: {1}",
+                "public static IContractInvoker UseStateFull{0}<TImplementation>(this {2} bolt, ActionDescriptor initSession, ActionDescriptor closeSession, {3} factory) where TImplementation: {1}",
                 ContractDefinition.Name,
                 ContractDefinition.Root.FullName,
                 BoltRouteHandler,
@@ -112,7 +135,7 @@ namespace Bolt.Generators
             using (WithBlock())
             {
                 WriteLine(
-                    "return bolt.Use{0}(new {1}<TImplementation>(initInstanceAction, releaseInstanceAction, factory));",
+                    "return bolt.Use{0}(new {1}<TImplementation>(initSession, closeSession, factory));",
                     ContractDefinition.Name,
                     StateFullInstanceProviderBase);
             }

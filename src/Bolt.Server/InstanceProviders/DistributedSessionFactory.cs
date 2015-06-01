@@ -14,7 +14,7 @@ namespace Bolt.Server.InstanceProviders
 
         public event EventHandler<SessionTimeoutEventArgs> SessionTimeouted;
 
-        public DistributedSessionFactoryBase(BoltServerOptions options, IDistributedCache cache, IServerSessionHandler sessionHandler = null)
+        protected DistributedSessionFactoryBase(BoltServerOptions options, IDistributedCache cache, IServerSessionHandler sessionHandler = null)
         {
             if (options == null)
             {
@@ -83,25 +83,20 @@ namespace Bolt.Server.InstanceProviders
 
         private class ContractSession : IContractSession
         {
-            private DistributedSessionFactoryBase<T> _parent;
+            private readonly DistributedSessionFactoryBase<T> _parent;
 
             public ContractSession(DistributedSessionFactoryBase<T> parent, string session, T instance)
             {
                 _parent = parent;
                 Instance = instance;
+                SessionId = session;
             }
 
-            public T Instance { get; private set; }
+            private T Instance { get; }
 
-            public string Session { get; private set; }
+            public string SessionId { get; }
 
-            object IContractSession.Instance
-            {
-                get
-                {
-                    return Instance;
-                }
-            }
+            object IContractSession.Instance => Instance;
 
             public Task CommitAsync()
             {
@@ -111,12 +106,12 @@ namespace Bolt.Server.InstanceProviders
                 }
 
                 var rawData = _parent.Serialize(Instance);
-                return _parent._cache.SetAsync(Session, rawData, new DistributedCacheEntryOptions() { SlidingExpiration = _parent.SessionTimeout });
+                return _parent._cache.SetAsync(SessionId, rawData, new DistributedCacheEntryOptions() { SlidingExpiration = _parent.SessionTimeout });
             }
 
             public Task DestroyAsync()
             {
-                return _parent._cache.RemoveAsync(Session); 
+                return _parent._cache.RemoveAsync(SessionId); 
             }
         }
     }

@@ -9,16 +9,16 @@ namespace Bolt.Server.InstanceProviders
     {
         private readonly ISessionFactory _sessionFactory;
 
-        public StateFullInstanceProvider(ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, ISessionFactory factory)
+        public StateFullInstanceProvider(ActionDescriptor initSession, ActionDescriptor closeSession, ISessionFactory factory)
         {
-            if (initInstanceAction == null)
+            if (initSession == null)
             {
-                throw new ArgumentNullException(nameof(initInstanceAction));
+                throw new ArgumentNullException(nameof(initSession));
             }
 
-            if (releaseInstanceAction == null)
+            if (closeSession == null)
             {
-                throw new ArgumentNullException(nameof(releaseInstanceAction));
+                throw new ArgumentNullException(nameof(closeSession));
             }
 
             if (factory == null)
@@ -26,7 +26,8 @@ namespace Bolt.Server.InstanceProviders
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            InitSession = initInstanceAction;
+            InitSession = initSession;
+            CloseSession = closeSession;
             _sessionFactory = factory;
         }
 
@@ -44,7 +45,7 @@ namespace Bolt.Server.InstanceProviders
                 context.ContractInstance = contractSession.Instance;
                 context.HttpContext.SetFeature(contractSession);
 
-                await OnInstanceCreatedAsync(context, contractSession.Session);
+                await OnInstanceCreatedAsync(context, contractSession.SessionId);
                 return contractSession.Instance;
             }
 
@@ -68,7 +69,7 @@ namespace Bolt.Server.InstanceProviders
                     try
                     {
                         await session.DestroyAsync();
-                        await OnInstanceReleasedAsync(context, session.Session);
+                        await OnInstanceReleasedAsync(context, session.SessionId);
                     }
                     catch (Exception e)
                     {
@@ -82,7 +83,7 @@ namespace Bolt.Server.InstanceProviders
             else if (context.Action == CloseSession)
             {
                 await session.DestroyAsync();
-                await OnInstanceReleasedAsync(context, session.Session);
+                await OnInstanceReleasedAsync(context, session.SessionId);
             }
             else
             {

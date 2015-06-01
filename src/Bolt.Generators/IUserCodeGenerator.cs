@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Microsoft.Framework.Internal;
+
 namespace Bolt.Generators
 {
-    using Microsoft.Framework.Internal;
-
     public interface IUserCodeGenerator
     {
         void Generate(ClassGenerator generator, object context);

@@ -1,34 +1,29 @@
-﻿using Bolt.Core;
-using Microsoft.AspNet.Http;
-using System;
+﻿using System;
+using Bolt.Core;
+using Microsoft.AspNet.Hosting;
 
 namespace Bolt.Server.InstanceProviders
 {
     public class HttpContextSessionProvider : ISessionProvider
     {
-        private readonly HttpContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public HttpContextSessionProvider(HttpContext context)
+        public HttpContextSessionProvider(IHttpContextAccessor httpContextAccessor)
         {
-            if (context == null)
+            if (httpContextAccessor == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw new ArgumentNullException(nameof(httpContextAccessor));
             }
 
-            _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public string SessionId
         {
             get
             {
-                var session = _context.GetFeature<IContractSession>();
-                if ( session == null)
-                {
-                    return null;
-                }
-
-                return session.SessionId;
+                IContractSession session = _httpContextAccessor.HttpContext?.GetFeature<IContractSession>();
+                return session?.SessionId;
             }
         }
     }
