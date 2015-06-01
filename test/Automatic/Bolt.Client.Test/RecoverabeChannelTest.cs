@@ -5,26 +5,11 @@ using System.Threading.Tasks;
 using Bolt.Client.Channels;
 using Moq;
 using Xunit;
-using System.Reflection;
+
 using System.Net.Http;
 
 namespace Bolt.Client.Test
 {
-    public interface ITestContract
-    {
-        string Execute(string param);
-    }
-
-    public class TestContractDescriptor : ContractDescriptor
-    {
-        public TestContractDescriptor():base(typeof(ITestContract), "TestContract")
-        {
-            Execute = Add("Execute", typeof(string), typeof(ITestContract).GetTypeInfo().GetMethod("Execute"));
-        }
-
-        public ActionDescriptor Execute { get; set; }
-    }
-
     public class RecoverabeChannelTest
     {
         [Fact]
