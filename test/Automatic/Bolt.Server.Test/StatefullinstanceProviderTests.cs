@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Bolt.Server.InstanceProviders;
 using Moq;
 using Xunit;
 
@@ -194,6 +195,8 @@ namespace Bolt.Server.Test
 
             private readonly ServerActionContext _context;
 
+            private IContractSession _session;
+
             public ReleaseInstanceWithExistingSession()
             {
                 _context = CreateContext(Contract.Init);
@@ -203,6 +206,7 @@ namespace Bolt.Server.Test
                 Mock.Setup(o => o.GenerateSessionid()).Returns(SessionHeaderValue);
 
                 Subject.GetInstanceAsync(_context, typeof(IMockContract)).GetAwaiter().GetResult();
+                _session = _context.HttpContext.GetFeature<IContractSession>();
             }
 
             [Fact]
@@ -316,6 +320,7 @@ namespace Bolt.Server.Test
             protected override ServerActionContext CreateContext(ActionDescriptor descriptor)
             {
                 var ctxt = base.CreateContext(descriptor);
+                ctxt.HttpContext.SetFeature(_session);
                 ctxt.HttpContext.Request.Headers[SessionHeader] = SessionHeaderValue;
                 return ctxt;
             }

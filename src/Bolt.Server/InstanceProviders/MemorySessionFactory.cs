@@ -10,30 +10,42 @@ namespace Bolt.Server.InstanceProviders
     public class MemorySessionFactory : ISessionFactory, IDisposable
     {
         private readonly BoltServerOptions _options;
-        private readonly Timer _timer;
+        private Timer _timer;
         private readonly ConcurrentDictionary<string, ContractSession> _items = new ConcurrentDictionary<string, ContractSession>();
         private readonly IServerSessionHandler _sessionHandler;
+        private TimeSpan _timeoutCheckInterval;
 
         public MemorySessionFactory(BoltServerOptions options, IServerSessionHandler sessionHandler = null)
         {
             _options = options;
             _sessionHandler = sessionHandler ?? new ServerSessionHandler(options);
-
-            if (SessionTimeout != TimeSpan.Zero)
-            {
-                _timer = new Timer(
-                    OnTimerElapsed,
-                    null,
-                    (int)TimeSpan.FromMinutes(1).TotalMilliseconds,
-                    (int)TimeSpan.FromMinutes(1).TotalMilliseconds);
-            }
+            _timeoutCheckInterval = TimeSpan.FromMinutes(1);
+            ResetTimer();
         }
 
         public int Count => _items.Count;
 
         public event EventHandler<SessionTimeoutEventArgs> SessionTimeouted;
 
-        public TimeSpan SessionTimeout => _options.SessionTimeout;
+        public TimeSpan TimeoutCheckInterval
+        {
+            get { return _timeoutCheckInterval; }
+            set
+            {
+                _timeoutCheckInterval = value;
+                ResetTimer();
+            }
+        }
+
+        public TimeSpan SessionTimeout
+        {
+            get { return _options.SessionTimeout; }
+            set
+            {
+                _options.SessionTimeout = value;
+                ResetTimer();
+            }
+        }
 
         public Task<IContractSession> CreateAsync(HttpContext context, object instance)
         {
@@ -96,6 +108,24 @@ namespace Bolt.Server.InstanceProviders
         protected virtual bool ShouldTimeout(DateTime timestamp)
         {
             return (DateTime.UtcNow - timestamp) > SessionTimeout;
+        }
+
+        private void ResetTimer()
+        {
+            _timer?.Dispose();
+
+            if (SessionTimeout != TimeSpan.Zero)
+            {
+                _timer = new Timer(
+                    OnTimerElapsed,
+                    null,
+                    (int)TimeoutCheckInterval.TotalMilliseconds,
+                    (int)TimeoutCheckInterval.TotalMilliseconds);
+            }
+            else
+            {
+                _timer = null;
+            }
         }
 
         private void OnTimerElapsed(object state)
