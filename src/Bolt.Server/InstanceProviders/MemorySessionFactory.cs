@@ -76,6 +76,23 @@ namespace Bolt.Server.InstanceProviders
             throw new SessionNotFoundException(session);
         }
 
+        public bool Destroy(string sessionId)
+        {
+            if (sessionId == null)
+            {
+                throw new ArgumentNullException(nameof(sessionId));
+            }
+
+            ContractSession instance;
+            if (_items.TryRemove(sessionId, out instance))
+            {
+                (instance.Instance as IDisposable)?.Dispose();
+                return true;
+            }
+
+            return false;
+        }
+
         protected virtual bool ShouldTimeout(DateTime timestamp)
         {
             return (DateTime.UtcNow - timestamp) > SessionTimeout;
@@ -118,11 +135,7 @@ namespace Bolt.Server.InstanceProviders
 
             public void Destroy()
             {
-                ContractSession instance;
-                if (_parent._items.TryRemove(SessionId, out instance))
-                {
-                    (instance.Instance as IDisposable)?.Dispose();
-                }
+                _parent.Destroy(SessionId);
             }
 
             public Task DestroyAsync()

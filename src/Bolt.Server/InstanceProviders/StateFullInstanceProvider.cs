@@ -51,7 +51,7 @@ namespace Bolt.Server.InstanceProviders
 
             contractSession = await _sessionFactory.GetExistingAsync(context.HttpContext);
             context.HttpContext.SetFeature(contractSession);
-            return context.ContractInstance;
+            return contractSession.Instance;
         }
 
         public sealed override async Task ReleaseInstanceAsync(ServerActionContext context, object obj, Exception error)

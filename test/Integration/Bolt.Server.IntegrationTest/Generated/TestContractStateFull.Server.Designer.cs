@@ -98,14 +98,25 @@ namespace Bolt.Server
 
         public static IContractInvoker UseStateFullTestContractStateFull<TImplementation>(this IBoltRouteHandler bolt, Bolt.Server.BoltServerOptions options = null) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContractStateFull
         {
-            var initSessionAction = TestContractStateFullDescriptor.Default.Init;
-            var closeSessionAction = TestContractStateFullDescriptor.Default.Destroy;
-            return bolt.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(initSessionAction, closeSessionAction, options ?? bolt.Configuration.Options));
+            var initSession = TestContractStateFullDescriptor.Default.Init;
+            var closeSession = TestContractStateFullDescriptor.Default.Destroy;
+            return bolt.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(initSession, closeSession, options ?? bolt.Configuration.Options));
         }
 
-        public static IContractInvoker UseStateFullTestContractStateFull<TImplementation>(this IBoltRouteHandler bolt, ActionDescriptor initInstanceAction, ActionDescriptor releaseInstanceAction, Bolt.Server.BoltServerOptions options = null) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContractStateFull
+        public static IContractInvoker UseStateFullTestContractStateFull<TImplementation>(this IBoltRouteHandler bolt, Bolt.Server.InstanceProviders.ISessionFactory sessionFactory) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContractStateFull
         {
-            return bolt.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(initInstanceAction, releaseInstanceAction, options ?? bolt.Configuration.Options));
+            var initSession = TestContractStateFullDescriptor.Default.Init;
+            var closeSession = TestContractStateFullDescriptor.Default.Destroy;
+            return bolt.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(initSession, closeSession, sessionFactory));
+        }
+
+        public static IContractInvoker UseStateFullTestContractStateFull<TImplementation>(this IBoltRouteHandler bolt, ActionDescriptor initSession, ActionDescriptor closeSession, Bolt.Server.BoltServerOptions options = null) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContractStateFull
+        {
+            return bolt.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(initSession, closeSession, options ?? bolt.Configuration.Options));
+        }
+        public static IContractInvoker UseStateFullTestContractStateFull<TImplementation>(this IBoltRouteHandler bolt, ActionDescriptor initSession, ActionDescriptor closeSession, Bolt.Server.InstanceProviders.ISessionFactory factory) where TImplementation: Bolt.Server.IntegrationTest.Core.ITestContractStateFull
+        {
+            return bolt.UseTestContractStateFull(new StateFullInstanceProvider<TImplementation>(initSession, closeSession, factory));
         }
 
         public static IContractInvoker UseTestContractStateFull(this IBoltRouteHandler bolt, IInstanceProvider instanceProvider)

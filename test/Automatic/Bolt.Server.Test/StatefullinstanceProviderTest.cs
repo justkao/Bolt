@@ -1,12 +1,10 @@
-﻿using Bolt.Server.InstanceProviders;
-using System;
+﻿using System;
 using System.Reflection;
-using Microsoft.AspNet.Http;
-using Xunit;
-using Moq;
-using System.Collections.Generic;
-using Microsoft.AspNet.Http.Internal;
 using System.Threading.Tasks;
+using Bolt.Server.InstanceProviders;
+using Microsoft.AspNet.Http.Internal;
+using Moq;
+using Xunit;
 
 namespace Bolt.Server.Test
 {
@@ -28,11 +26,11 @@ namespace Bolt.Server.Test
             Destroy = Add("Destroy", typeof(Empty), typeof(IMockContract).GetTypeInfo().GetDeclaredMethod("Destroy"));
         }
 
-        public ActionDescriptor Init { get; private set; }
+        public ActionDescriptor Init { get; }
 
-        public ActionDescriptor Action { get; private set; }
+        public ActionDescriptor Action { get; }
 
-        public ActionDescriptor Destroy { get; private set; }
+        public ActionDescriptor Destroy { get; }
     }
 
     public class StatefullinstanceProviderTests
@@ -149,14 +147,16 @@ namespace Bolt.Server.Test
             private void SetupInit(ServerActionContext ctxt, string session = "testsession", object instance = null)
             {
                 Mock.Setup(o => o.CreateInstance(ctxt, typeof(IMockContract))).Returns(instance ?? new object()).Verifiable();
+                Mock.Setup(o => o.GenerateSessionid()).Returns(session ?? Guid.NewGuid().ToString()).Verifiable();
+
             }
         }
 
         public class GetInstanceWithExistingSession : StatefullinstanceProviderTestBase
         {
-            private string SessionHeaderValue = "session value";
+            private string _sessionHeaderValue = "session value";
 
-            private object _instance;
+            private readonly object _instance;
 
             public GetInstanceWithExistingSession()
             {
@@ -190,7 +190,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task Action_DifferentSession_EnsureThrows()
             {
-                SessionHeaderValue = "another session";
+                _sessionHeaderValue = "another session";
                 var ctxt = CreateContext(Contract.Action);
 
                 await Assert.ThrowsAsync<SessionNotFoundException>(() => Subject.GetInstanceAsync(ctxt, typeof(IMockContract)));
@@ -199,7 +199,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task Destroy_DifferentSession_EnsureThrows()
             {
-                SessionHeaderValue = "another session";
+                _sessionHeaderValue = "another session";
                 var ctxt = CreateContext(Contract.Destroy);
 
                 await Assert.ThrowsAsync<SessionNotFoundException>(() => Subject.GetInstanceAsync(ctxt, typeof(IMockContract)));
@@ -208,7 +208,7 @@ namespace Bolt.Server.Test
             protected override ServerActionContext CreateContext(ActionDescriptor descriptor)
             {
                 var ctxt = base.CreateContext(descriptor);
-                ctxt.HttpContext.Request.Headers[SessionHeader] = SessionHeaderValue;
+                ctxt.HttpContext.Request.Headers[SessionHeader] = _sessionHeaderValue;
                 return ctxt;
             }
         }
@@ -217,9 +217,9 @@ namespace Bolt.Server.Test
         {
             private string SessionHeaderValue = "session value";
 
-            private object _instance;
+            private readonly object _instance;
 
-            private ServerActionContext _context;
+            private readonly ServerActionContext _context;
 
             public ReleaseInstanceWithExistingSession()
             {
@@ -287,7 +287,7 @@ namespace Bolt.Server.Test
 
                 await Subject.ReleaseInstanceAsync(ctxt, _instance, null);
 
-                Assert.True((_instance as InstanceObject).Disposed);
+                Assert.True(((InstanceObject) _instance).Disposed);
             }
 
             [Fact]
@@ -309,7 +309,7 @@ namespace Bolt.Server.Test
 
                 await Subject.ReleaseInstanceAsync(ctxt, _instance, new Exception());
 
-                Assert.True((_instance as InstanceObject).Disposed);
+                Assert.True(((InstanceObject) _instance).Disposed);
             }
 
             [Fact]
@@ -320,7 +320,7 @@ namespace Bolt.Server.Test
 
                 await Subject.ReleaseInstanceAsync(ctxt, _instance, new Exception());
 
-                Assert.False((_instance as InstanceObject).Disposed);
+                Assert.False(((InstanceObject) _instance).Disposed);
             }
 
             [Fact]
@@ -362,7 +362,7 @@ namespace Bolt.Server.Test
     {
         protected const string SessionHeader = "test-session-id";
 
-        public StatefullinstanceProviderTestBase()
+        protected StatefullinstanceProviderTestBase()
         {
             Contract = new MockContractDescriptor();
             Mock = new Mock<IInstanceProviderActions>(MockBehavior.Loose);
@@ -380,6 +380,9 @@ namespace Bolt.Server.Test
             void OnInstanceCreated(ServerActionContext context, string sessionId);
 
             void OnInstanceReleased(ServerActionContext context, string sessionId);
+
+            string GenerateSessionid();
+
         }
 
         protected class MockStateFullInstanceProvider : StateFullInstanceProvider
@@ -387,12 +390,17 @@ namespace Bolt.Server.Test
             private readonly Mock<IInstanceProviderActions> _actions;
             private readonly MemorySessionFactory _factory;
 
-            public MockStateFullInstanceProvider(MockContractDescriptor contract, string header, Mock<IInstanceProviderActions> actions) 
-                : this(contract, header, actions, new MemorySessionFactory(new BoltServerOptions() { SessionHeader = SessionHeader }))
+            public MockStateFullInstanceProvider(MockContractDescriptor contract, string header,
+                Mock<IInstanceProviderActions> actions)
+                : this(
+                    contract, header, actions,
+                    new MemorySessionFactory(new BoltServerOptions() {SessionHeader = SessionHeader},
+                        new ServerSessionHandlerInternal(actions,
+                            new BoltServerOptions() {SessionHeader = SessionHeader})))
             {
             }
 
-            public MockStateFullInstanceProvider(MockContractDescriptor contract, string header, Mock<IInstanceProviderActions> actions, MemorySessionFactory factory) : base(contract.Init, contract.Destroy, factory)
+            private MockStateFullInstanceProvider(MockContractDescriptor contract, string header, Mock<IInstanceProviderActions> actions, MemorySessionFactory factory) : base(contract.Init, contract.Destroy, factory)
             {
                 _factory = factory;
                 _actions = actions;
@@ -413,6 +421,21 @@ namespace Bolt.Server.Test
             protected override async Task OnInstanceReleasedAsync(ServerActionContext context, string sessionId)
             {
                 _actions.Object.OnInstanceReleased(context, sessionId);
+            }
+
+            private class ServerSessionHandlerInternal : ServerSessionHandler
+            {
+                private readonly Mock<IInstanceProviderActions> _actions;
+
+                public ServerSessionHandlerInternal(Mock<IInstanceProviderActions> actions, BoltServerOptions options) : base(options)
+                {
+                    _actions = actions;
+                }
+
+                protected override string GenerateIdentifier()
+                {
+                    return _actions.Object.GenerateSessionid() ?? Guid.NewGuid().ToString();
+                }
             }
         }
 

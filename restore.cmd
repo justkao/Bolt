@@ -12,11 +12,11 @@ call dnu restore src\Bolt.Server\project.json --parallel
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 rem tests
-call dnu restore test\automatic\Bolt.Core.Test\project.json --parallel
+call dnu restore test\Automatic\Bolt.Core.Test\project.json --parallel
 if %errorlevel% neq 0 exit /b %errorlevel%
-call dnu restore test\automatic\Bolt.Client.Test\project.json --parallel
+call dnu restore test\Automatic\Bolt.Client.Test\project.json --parallel
 if %errorlevel% neq 0 exit /b %errorlevel%
-call dnu restore test\automatic\Bolt.Core.Test\project.json --parallel
+call dnu restore test\Automatic\Bolt.Core.Test\project.json --parallel
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 call dnu restore test\Integration\Bolt.Server.IntegrationTest\project.json --parallel

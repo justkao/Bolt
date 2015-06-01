@@ -61,6 +61,12 @@ namespace Bolt.Console
             }
         }
 
+        public Assembly Load(AssemblyName name)
+        {
+            return Load(name.Name);
+        }
+
+
         public Assembly Load(string assembly)
         {
             var originalName = assembly;

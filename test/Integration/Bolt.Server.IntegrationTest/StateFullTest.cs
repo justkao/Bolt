@@ -13,6 +13,10 @@ namespace Bolt.Server.IntegrationTest
 {
     public class StateFullTest : IntegrationTestBase
     {
+        private StateFullInstanceProvider InstanceProvider { get; set; }
+
+        private MemorySessionFactory Factory { get; set; }
+
         [Fact]
         public async Task Async_EnsureStatePersistedBetweenCalls()
         {
@@ -45,9 +49,7 @@ namespace Bolt.Server.IntegrationTest
 
             await client.GetStateAsync();
             string sessionId1 = ((TestContractStateFullChannel)client.Channel).SessionId;
-
-            StateFullInstanceProvider instanceProvider = InstanceProvider;
-            instanceProvider.ReleaseInstance(sessionId1);
+            Factory.Destroy(sessionId1);
 
             try
             {
@@ -69,7 +71,7 @@ namespace Bolt.Server.IntegrationTest
             string session = ((TestContractStateFullChannel)client.Channel).SessionId;
 
             StateFullInstanceProvider instanceProvider = InstanceProvider;
-            instanceProvider.ReleaseInstance(session);
+            Factory.Destroy(session);
 
             await client.GetStateAsync();
         }
@@ -106,9 +108,7 @@ namespace Bolt.Server.IntegrationTest
 
             client.GetState();
             string sessionId1 = ((TestContractStateFullChannel)client.Channel).SessionId;
-
-            StateFullInstanceProvider instanceProvider = InstanceProvider;
-            instanceProvider.ReleaseInstance(sessionId1);
+            Factory.Destroy(sessionId1);
 
             try
             {
@@ -130,7 +130,7 @@ namespace Bolt.Server.IntegrationTest
             string session = ((TestContractStateFullChannel)client.Channel).SessionId;
 
             StateFullInstanceProvider instanceProvider = InstanceProvider;
-            instanceProvider.ReleaseInstance(session);
+            Factory.Destroy(session);
 
             client.GetState();
         }
@@ -144,7 +144,7 @@ namespace Bolt.Server.IntegrationTest
             string session = ((TestContractStateFullChannel)client.Channel).SessionId;
             client.Dispose();
             StateFullInstanceProvider instanceProvider = InstanceProvider;
-            Assert.False(instanceProvider.ReleaseInstance(session));
+            Assert.False(Factory.Destroy(session));
         }
 
         [Fact]
@@ -156,10 +156,8 @@ namespace Bolt.Server.IntegrationTest
             string session = ((TestContractStateFullChannel)client.Channel).SessionId;
             await (client as IChannel).CloseAsync();
             StateFullInstanceProvider instanceProvider = InstanceProvider;
-            Assert.False(instanceProvider.ReleaseInstance(session));
+            Assert.False(Factory.Destroy(session));
         }
-
-        private StateFullInstanceProvider InstanceProvider { get; set; }
 
         [Fact]
         public async Task Async_Request_ClosedProxy_EnsureSessionClosedException()
@@ -211,22 +209,22 @@ namespace Bolt.Server.IntegrationTest
         public void ExecuteManyRequests_SingleChannel_EnsureOnlyOneSessionCreated()
         {
             TestContractStateFullProxy channel = GetChannel();
-            int before = InstanceProvider.LocalCount;
+            int before = Factory.Count;
             Task.WaitAll(Enumerable.Repeat(0, 5).Select(_ => Task.Run(() => channel.GetState())).ToArray());
-            Assert.Equal(before + 1, InstanceProvider.LocalCount);
+            Assert.Equal(before + 1, Factory.Count);
             channel.Dispose();
-            Assert.Equal(before, InstanceProvider.LocalCount);
+            Assert.Equal(before, Factory.Count);
         }
 
         [Fact]
         public async Task Async_ExecuteManyRequests_SingleChannel_EnsureOnlyOneSessionCreated()
         {
             TestContractStateFullProxy channel = GetChannel();
-            int before = InstanceProvider.LocalCount;
+            int before = Factory.Count;
             await Task.WhenAll(Enumerable.Repeat(0, 100).Select(_ => channel.GetStateAsync()));
-            Assert.Equal(before + 1, InstanceProvider.LocalCount);
+            Assert.Equal(before + 1, Factory.Count);
             await (channel as IChannel).CloseAsync();
-            Assert.Equal(before, InstanceProvider.LocalCount);
+            Assert.Equal(before, Factory.Count);
         }
 
 
@@ -284,12 +282,12 @@ namespace Bolt.Server.IntegrationTest
             TestContractStateFullChannel statefull = channel.Channel as TestContractStateFullChannel;
             statefull.ExtendedInitialization = true;
 
-            int before = InstanceProvider.LocalCount;
+            int before = Factory.Count;
 
             channel.GetState();
             channel.Dispose();
 
-            Assert.Equal(before, InstanceProvider.LocalCount);
+            Assert.Equal(before, Factory.Count);
         }
 
         [Fact]
@@ -300,7 +298,7 @@ namespace Bolt.Server.IntegrationTest
             statefull.ExtendedInitialization = true;
             statefull.FailExtendedInitialization = true;
 
-            int before = InstanceProvider.LocalCount;
+            int before = Factory.Count;
 
             try
             {
@@ -310,7 +308,7 @@ namespace Bolt.Server.IntegrationTest
             {
             }
 
-            Assert.Equal(before, InstanceProvider.LocalCount);
+            Assert.Equal(before, Factory.Count);
         }
 
         [Fact]
@@ -321,8 +319,6 @@ namespace Bolt.Server.IntegrationTest
             await channel.GetStateAsync();
             await (channel as IChannel).CloseAsync();
         }
-
-
 
         [Fact]
         public void CloseSession_EnsureSessionIdNull()
@@ -355,7 +351,8 @@ namespace Bolt.Server.IntegrationTest
         {
             appBuilder.UseBolt((h) =>
             {
-                var contract = h.UseStateFullTestContractStateFull<TestContractStateFull>();
+                Factory = new MemorySessionFactory(h.Configuration.Options);
+                var contract = h.UseStateFullTestContractStateFull<TestContractStateFull>(Factory);
                 InstanceProvider = (StateFullInstanceProvider)contract.InstanceProvider;
             });
         }
