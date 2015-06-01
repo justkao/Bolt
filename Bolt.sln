@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{5D2CA858-5
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Automatic", "Automatic", "{F63AC733-201C-43F7-9C13-FFB262BAB3AE}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Core.Test", "Test\Automatic\Bolt.Core.Test\Bolt.Core.Test.xproj", "{18486979-C4ED-4A5E-A16E-403000765774}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Core.Test", "test\Automatic\Bolt.Core.Test\Bolt.Core.Test.xproj", "{18486979-C4ED-4A5E-A16E-403000765774}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integration", "Integration", "{2FAB4C9F-3A59-45C6-9B0C-0A032272BF76}"
 EndProject

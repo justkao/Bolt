@@ -28,7 +28,8 @@ namespace Bolt.Generators
                     continue;
                 }
 
-                prop.SetValue(generator, Convert.ChangeType(properties[prop.Name], prop.Property.PropertyType));
+                // TODO:
+                // prop.SetValue(generator, Convert.ChangeType(properties[prop.Name], prop.Property.PropertyType));
             }
 
             return generator;

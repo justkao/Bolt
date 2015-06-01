@@ -18,10 +18,7 @@ namespace Bolt.Server.IntegrationTest
 
         public bool FailExtendedInitialization { get; set; }
 
-        public override bool IsRecoverable
-        {
-            get { return true; }
-        }
+        public override bool IsRecoverable => true;
 
         protected override bool HandleError(ClientActionContext context, Exception error)
         {

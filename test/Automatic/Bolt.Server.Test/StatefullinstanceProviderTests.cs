@@ -1,38 +1,10 @@
-﻿using System;
-using System.Reflection;
+using System;
 using System.Threading.Tasks;
-using Bolt.Server.InstanceProviders;
-using Microsoft.AspNet.Http.Internal;
 using Moq;
 using Xunit;
 
 namespace Bolt.Server.Test
 {
-    public interface IMockContract
-    {
-        void Init();
-
-        void Action();
-
-        void Destroy();
-    }
-
-    public class MockContractDescriptor : ContractDescriptor
-    {
-        public MockContractDescriptor() : base(typeof(IMockContract))
-        {
-            Init = Add("Init", typeof(Empty), typeof(IMockContract).GetTypeInfo().GetDeclaredMethod("Init"));
-            Action = Add("Action", typeof(Empty), typeof(IMockContract).GetTypeInfo().GetDeclaredMethod("Action"));
-            Destroy = Add("Destroy", typeof(Empty), typeof(IMockContract).GetTypeInfo().GetDeclaredMethod("Destroy"));
-        }
-
-        public ActionDescriptor Init { get; }
-
-        public ActionDescriptor Action { get; }
-
-        public ActionDescriptor Destroy { get; }
-    }
-
     public class StatefullinstanceProviderTests
     {
         public class ReleaseInstanceWithoutSession : StatefullinstanceProviderTestBase
@@ -164,6 +136,7 @@ namespace Bolt.Server.Test
                 _instance = new object();
 
                 Mock.Setup(o => o.CreateInstance(It.IsAny<ServerActionContext>(), typeof(IMockContract))).Returns(_instance).Verifiable();
+                Mock.Setup(o => o.GenerateSessionid()).Returns(_sessionHeaderValue);
 
                 Subject.GetInstanceAsync(ctxt, typeof(IMockContract)).GetAwaiter().GetResult();
             }
@@ -227,6 +200,7 @@ namespace Bolt.Server.Test
                 _instance = new InstanceObject();
 
                 Mock.Setup(o => o.CreateInstance(It.IsAny<ServerActionContext>(), typeof(IMockContract))).Returns(_instance).Verifiable();
+                Mock.Setup(o => o.GenerateSessionid()).Returns(SessionHeaderValue);
 
                 Subject.GetInstanceAsync(_context, typeof(IMockContract)).GetAwaiter().GetResult();
             }
@@ -331,7 +305,7 @@ namespace Bolt.Server.Test
 
                 await Subject.ReleaseInstanceAsync(ctxt, _instance, new Exception());
 
-                Assert.True((_instance as InstanceObject).Disposed);
+                Assert.True(((InstanceObject) _instance).Disposed);
             }
 
             private void SetupRelease(ServerActionContext ctxt = null)
@@ -356,103 +330,5 @@ namespace Bolt.Server.Test
                 }
             }
         }
-    }
-
-    public abstract class StatefullinstanceProviderTestBase
-    {
-        protected const string SessionHeader = "test-session-id";
-
-        protected StatefullinstanceProviderTestBase()
-        {
-            Contract = new MockContractDescriptor();
-            Mock = new Mock<IInstanceProviderActions>(MockBehavior.Loose);
-            Subject = CreateSubject();
-        }
-
-        protected MockStateFullInstanceProvider Subject { get; set; }
-
-        protected Mock<IInstanceProviderActions> Mock { get; set; }
-
-        public interface IInstanceProviderActions
-        {
-            object CreateInstance(ServerActionContext context, Type type);
-
-            void OnInstanceCreated(ServerActionContext context, string sessionId);
-
-            void OnInstanceReleased(ServerActionContext context, string sessionId);
-
-            string GenerateSessionid();
-
-        }
-
-        protected class MockStateFullInstanceProvider : StateFullInstanceProvider
-        {
-            private readonly Mock<IInstanceProviderActions> _actions;
-            private readonly MemorySessionFactory _factory;
-
-            public MockStateFullInstanceProvider(MockContractDescriptor contract, string header,
-                Mock<IInstanceProviderActions> actions)
-                : this(
-                    contract, header, actions,
-                    new MemorySessionFactory(new BoltServerOptions() {SessionHeader = SessionHeader},
-                        new ServerSessionHandlerInternal(actions,
-                            new BoltServerOptions() {SessionHeader = SessionHeader})))
-            {
-            }
-
-            private MockStateFullInstanceProvider(MockContractDescriptor contract, string header, Mock<IInstanceProviderActions> actions, MemorySessionFactory factory) : base(contract.Init, contract.Destroy, factory)
-            {
-                _factory = factory;
-                _actions = actions;
-            }
-
-            public int LocalCount => _factory.Count;
-
-            protected override object CreateInstance(ServerActionContext context, Type type)
-            {
-                return _actions.Object.CreateInstance(context, type);
-            }
-
-            protected override async Task OnInstanceCreatedAsync(ServerActionContext context, string sessionId)
-            {
-                _actions.Object.OnInstanceCreated(context, sessionId);
-            }
-
-            protected override async Task OnInstanceReleasedAsync(ServerActionContext context, string sessionId)
-            {
-                _actions.Object.OnInstanceReleased(context, sessionId);
-            }
-
-            private class ServerSessionHandlerInternal : ServerSessionHandler
-            {
-                private readonly Mock<IInstanceProviderActions> _actions;
-
-                public ServerSessionHandlerInternal(Mock<IInstanceProviderActions> actions, BoltServerOptions options) : base(options)
-                {
-                    _actions = actions;
-                }
-
-                protected override string GenerateIdentifier()
-                {
-                    return _actions.Object.GenerateSessionid() ?? Guid.NewGuid().ToString();
-                }
-            }
-        }
-
-        protected virtual ServerActionContext CreateContext(ActionDescriptor descriptor)
-        {
-            return new ServerActionContext()
-            {
-                Action = descriptor,
-                HttpContext = new DefaultHttpContext()
-            };
-        }
-
-        protected virtual MockStateFullInstanceProvider CreateSubject()
-        {
-            return new MockStateFullInstanceProvider(Contract, SessionHeader, Mock);
-        }
-
-        protected MockContractDescriptor Contract { get; private set; }
     }
 }

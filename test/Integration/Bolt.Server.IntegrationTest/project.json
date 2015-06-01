@@ -5,7 +5,6 @@
     "Bolt.Client": "",
     "Bolt.Server.IntegrationTest.Core": "",
     "Bolt.Test.Common": "",
-    "xunit": "2.1.0-*",
     "xunit.runner.aspnet": "2.0.0-aspnet-*",
     "Microsoft.AspNet.TestHost": "1.0.0-*",
     "Moq": "4.2.1502.911"

@@ -43,7 +43,7 @@ namespace Bolt.Server.InstanceProviders
             }
 
             var session = GenerateIdentifier();
-            context.Response.Headers[SessionHeader] = GenerateIdentifier();
+            context.Response.Headers[SessionHeader] = session;
             return session;
         }
 

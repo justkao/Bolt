@@ -51,6 +51,7 @@ namespace Bolt.Server.IntegrationTest.Core
             GetState = Add("GetState", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("GetState"));
             NextCallWillFailProxy = Add("NextCallWillFailProxy", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("NextCallWillFailProxy"));
             Destroy = Add("Destroy", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("Destroy"));
+            GetSessionId = Add("GetSessionId", typeof(Bolt.Empty), typeof(ITestContractStateFull).GetTypeInfo().GetMethod("GetSessionId"));
         }
 
         public static readonly TestContractStateFullDescriptor Default = new TestContractStateFullDescriptor();
@@ -66,5 +67,7 @@ namespace Bolt.Server.IntegrationTest.Core
         public  Bolt.ActionDescriptor NextCallWillFailProxy { get; private set; }
 
         public  Bolt.ActionDescriptor Destroy { get; private set; }
+
+        public  Bolt.ActionDescriptor GetSessionId { get; private set; }
     }
 }

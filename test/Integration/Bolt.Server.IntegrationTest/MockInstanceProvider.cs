@@ -7,23 +7,14 @@ namespace Bolt.Server.IntegrationTest
     {
         public object CurrentInstance { get; set; }
 
-        public object GetInstanceAsync(ServerActionContext context, Type type)
-        {
-            return CurrentInstance;
-        }
-
-        public void ReleaseInstance(ServerActionContext context, object obj, Exception error)
-        {
-        }
-
         public Task ReleaseInstanceAsync(ServerActionContext context, object obj, Exception error)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(true);
         }
 
         Task<object> IInstanceProvider.GetInstanceAsync(ServerActionContext context, Type type)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(CurrentInstance);
         }
     }
 }

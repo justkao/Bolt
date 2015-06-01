@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Bolt.Core;
 using Xunit;
 
 namespace Bolt.Server.IntegrationTest
@@ -318,6 +319,26 @@ namespace Bolt.Server.IntegrationTest
             await channel.InitAsync();
             await channel.GetStateAsync();
             await (channel as IChannel).CloseAsync();
+        }
+
+        [Fact]
+        public async Task Async_GetSessionId_EnsureCorrect()
+        {
+            TestContractStateFullProxy channel = GetChannel();
+            var sesionId = await channel.GetSessionIdAsync();
+            Assert.NotNull(sesionId);
+
+            Assert.Equal(((ISessionProvider) channel.Channel).SessionId, sesionId);
+        }
+
+        [Fact]
+        public void GetSessionId_EnsureCorrect()
+        {
+            TestContractStateFullProxy channel = GetChannel();
+            var sesionId = channel.GetSessionId();
+            Assert.NotNull(sesionId);
+
+            Assert.Equal(((ISessionProvider)channel.Channel).SessionId, sesionId);
         }
 
         [Fact]

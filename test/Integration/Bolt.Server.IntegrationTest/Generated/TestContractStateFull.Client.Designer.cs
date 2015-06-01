@@ -36,6 +36,8 @@ namespace Bolt.Server.IntegrationTest.Core
         Task NextCallWillFailProxyAsync();
 
         Task DestroyAsync();
+
+        Task<string> GetSessionIdAsync();
     }
 }
 
@@ -119,6 +121,16 @@ namespace Bolt.Server.IntegrationTest.Core
         public virtual Task DestroyAsync()
         {
             return SendAsync(Bolt.Empty.Instance, Descriptor.Destroy, CancellationToken.None);
+        }
+
+        public virtual string GetSessionId()
+        {
+            return Send<string, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.GetSessionId, CancellationToken.None);
+        }
+
+        public virtual Task<string> GetSessionIdAsync()
+        {
+            return SendAsync<string, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.GetSessionId, CancellationToken.None);
         }
 
     }

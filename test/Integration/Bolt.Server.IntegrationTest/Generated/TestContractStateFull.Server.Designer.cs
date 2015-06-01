@@ -34,6 +34,7 @@ namespace Bolt.Server.IntegrationTest.Core
             Add(Descriptor.GetState, TestContractStateFull_GetState);
             Add(Descriptor.NextCallWillFailProxy, TestContractStateFull_NextCallWillFailProxy);
             Add(Descriptor.Destroy, TestContractStateFull_Destroy);
+            Add(Descriptor.GetSessionId, TestContractStateFull_GetSessionId);
         }
 
         protected virtual Task TestContractStateFull_Init(ServerActionContext context)
@@ -77,6 +78,13 @@ namespace Bolt.Server.IntegrationTest.Core
         {
             var instance = context.GetRequiredInstance<ITestContractStateFull>();
             instance.Destroy();
+            return Task.FromResult(true);
+        }
+
+        protected virtual Task TestContractStateFull_GetSessionId(ServerActionContext context)
+        {
+            var instance = context.GetRequiredInstance<ITestContractStateFull>();
+            context.Result = instance.GetSessionId();
             return Task.FromResult(true);
         }
     }

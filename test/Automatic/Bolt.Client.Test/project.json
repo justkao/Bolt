@@ -3,7 +3,8 @@
     "Bolt.Client": "",
     "Bolt.Common": "",
     "Bolt.Test.Common": "",
-    "xunit.runner.aspnet": "2.0.0-aspnet-*"
+    "xunit.runner.aspnet": "2.0.0-aspnet-*",
+    "Moq": "4.2.1502.911"
   },
   "frameworks": {
     "dnx451": { }
