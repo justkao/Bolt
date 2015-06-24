@@ -26,7 +26,7 @@
         "System.Runtime.Serialization": ""
       }
     },
-    "dnxcore50": {
+    "dotnet": {
       "dependencies": {
         "System.Runtime": "4.0.20.0-*",
         "System.Collections": "4.0.10-*",
