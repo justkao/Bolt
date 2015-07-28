@@ -49,7 +49,7 @@ namespace Bolt.Console
         {
             DocumentGenerator document = Parent.Parent.GetDocument(execution.GetOutput(this));
             document.Context = Parent.Context;
-            document.Formatter.Assemblies.AddRange(Parent.Parent.AssemblyCache);
+            document.Formatter.Assemblies.AddRange(Parent.Parent.AssemblyCache.Loader);
             DoExecute(document, CoerceDescriptor(execution.Definition));
         }
 

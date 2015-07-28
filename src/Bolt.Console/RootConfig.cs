@@ -21,6 +21,8 @@ namespace Bolt.Console
         {
             Contracts = new List<ContractConfig>();
             AssemblyCache = cache;
+            Generators = new List<GeneratorConfig>();
+            Assemblies = new List<string>();
         }
 
         public static RootConfig CreateFromConfig(AssemblyCache cache, string file)
@@ -54,41 +56,37 @@ namespace Bolt.Console
             return config;
         }
 
-        public static RootConfig CreateFromAssembly(AssemblyCache cache, string assembly, GenerateContractMode mode,  bool internalVisibility, bool generateAll = false)
+        public static RootConfig CreateFromAssembly(AssemblyCache cache, string assembly, GenerateContractMode mode, bool internalVisibility)
         {
             RootConfig root = new RootConfig(cache)
             {
                 Contracts = new List<ContractConfig>()
             };
 
-            if (!string.IsNullOrEmpty(assembly))
+            Assembly loadedAssembly = null;
+            if (!string.IsNullOrEmpty(assembly) && File.Exists(assembly))
             {
-                if (File.Exists(assembly))
-                {
-                    root.Assemblies = new List<string> { Path.GetFullPath(assembly) };
-                    foreach (TypeInfo type in root.AssemblyCache.GetTypes(root.AssemblyCache.Load(assembly)))
-                    {
-                        root.AddContract(type, mode, internalVisibility);
-                    }
-                }
+                root.Assemblies = new List<string> { Path.GetFullPath(assembly) };
+                loadedAssembly = cache.Loader.Load(assembly);
             }
-            else if (generateAll)
+            else
             {
-                var hostedAssembly = root.AssemblyCache.HostedAssembly;
-                if (hostedAssembly != null)
+                loadedAssembly = cache.HostedAssembly;
+            }
+
+            if (loadedAssembly != null)
+            {
+                foreach (var type in root.AssemblyCache.GetTypes(loadedAssembly))
                 {
-                    foreach (TypeInfo type in root.AssemblyCache.GetTypes(hostedAssembly))
-                    {
-                        root.AddContract(type, mode, internalVisibility);
-                    }
-                }
+                    root.AddContract(type.GetTypeInfo(), mode, internalVisibility);
+                };
             }
 
             return root;
         }
 
         [JsonIgnore]
-        public AssemblyCache AssemblyCache { get; set; }
+        public AssemblyCache AssemblyCache { get; private set; }
 
         public List<string> Assemblies { get; set; }
 
@@ -112,6 +110,24 @@ namespace Bolt.Console
             return JsonConvert.SerializeObject(
                 this,
                 new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() });
+        }
+
+        public void AddContractsFromNamespace(string ns, GenerateContractMode mode, bool internalVisibility)
+        {
+            foreach (var type in AssemblyCache.GetTypes(ns))
+            {
+                AddContract(type.GetTypeInfo(), mode, internalVisibility);
+                Console.WriteLine($"Contract '{type.Name.Bold()}' added.");
+            }
+        }
+
+        public void AddAllContracts(GenerateContractMode mode, bool internalVisibility)
+        {
+            foreach (var type in AssemblyCache.GetTypes())
+            {
+                AddContract(type.GetTypeInfo(), mode, internalVisibility);
+                Console.WriteLine($"Contract '{type.Name.Bold()}' added.");
+            }
         }
 
         public void AddContract(string name, GenerateContractMode mode, bool internalVisibility)
@@ -193,12 +209,12 @@ namespace Bolt.Console
 
                 foreach (string dir in directories)
                 {
-                    AssemblyCache.AddDirectory(dir);
+                    AssemblyCache.Loader.AddDirectory(dir);
                 }
 
                 foreach (string assembly in Assemblies)
                 {
-                    AssemblyCache.Load(assembly);
+                    AssemblyCache.Loader.Load(assembly);
                 }
             }
 

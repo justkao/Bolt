@@ -14,17 +14,11 @@ namespace Bolt.Console
 
         private readonly AssemblyCache _cache;
 
-#if !NET45
         public Program(IServiceProvider provider, Microsoft.Framework.Runtime.ILibraryManager manager, Microsoft.Framework.Runtime.IAssemblyLoadContextAccessor accessor, Microsoft.Framework.Runtime.IAssemblyLoaderContainer container, Microsoft.Framework.Runtime.IApplicationEnvironment environment)
         {
             _cache = new AssemblyCache(manager, accessor, container, environment);
         }
-#else
-        public Program()
-        {
-            _cache = new AssemblyCache();
-        }
-#endif
+
         public int Main(string[] args)
         {
             var app = new CommandLineApplication();
@@ -131,7 +125,7 @@ namespace Bolt.Console
 
                 c.OnExecute(() =>
                 {
-                    bool inputMustExist = !contractOption.Values.Any();
+                    bool inputMustExist = !_cache.IsHosted();
                     bool inputExists = !string.IsNullOrEmpty(input.Value);
 
                     if (inputMustExist && !inputExists)
@@ -150,14 +144,14 @@ namespace Bolt.Console
 
                     if (inputExists)
                     {
-                        _cache.AddDirectory(Path.GetDirectoryName(Path.GetFullPath(input.Value)));
+                        _cache.Loader.AddDirectory(Path.GetDirectoryName(Path.GetFullPath(input.Value)));
                     }
 
                     foreach (var dir in dirOption.Values)
                     {
                         if (Directory.Exists(dir))
                         {
-                            _cache.AddDirectory(dir);
+                            _cache.Loader.AddDirectory(dir);
                         }
                     }
                     var mode = GenerateContractMode.All;
@@ -167,7 +161,6 @@ namespace Bolt.Console
                     }
                     catch (Exception)
                     {
-                        
                         Console.WriteLine($"Invalid mode option specified: {modeOption.Value().White().Bold()}, Available options: {rawModeValues.Bold()}".Yellow());
                         return 1;
                     }
@@ -175,29 +168,45 @@ namespace Bolt.Console
                     bool asInternal = internalSwitch.HasValue() ? true : false;
 
                     RootConfig rootConfig;
-
-                    if (extension == ".exe" || extension == ".dll" || !inputExists)
+                    if ( inputExists)
                     {
-						Console.WriteLine($"Loading all contracts from assembly: ${input.Value}");
-                        try
+                        if (extension == ".exe" || extension == ".dll")
                         {
-                            rootConfig = RootConfig.CreateFromAssembly(_cache, inputExists ? input.Value : null, mode, asInternal, !contractOption.Values.Any());
-                            rootConfig.IgnoreGeneratorErrors = true;
+                            rootConfig = new RootConfig(_cache);
+                            try
+                            {
+                                Console.WriteLine($"Loading all contracts from assembly: ${input.Value}");
+                                _cache.Loader.Load(input.Value);
+                                rootConfig.Assemblies.Add(input.Value);
+                            }
+                            catch (Exception e)
+                            {
+                                return HandleError($"Failed to read assembly: {input.Value.White().Bold()}", e);
+                            }
+
+                            if (AddContracts(rootConfig, contractOption.Values, mode, asInternal) != 0)
+                            {
+                                return 1;
+                            }
                         }
-                        catch(Exception e)
+                        else
                         {
-                            return HandleError($"Failed to read assembly: {input.Value.White().Bold()}", e);
+                            try
+                            {
+                                rootConfig = RootConfig.CreateFromConfig(_cache, input.Value);
+                            }
+                            catch (Exception e)
+                            {
+                                return HandleError($"Failed to read Bolt configuration: {input.Value.White().Bold()}", e);
+                            }
                         }
                     }
                     else
                     {
-                        try
+                        rootConfig = new RootConfig(_cache);
+                        if (AddContracts(rootConfig, contractOption.Values, mode, asInternal) != 0)
                         {
-                            rootConfig = RootConfig.CreateFromConfig(_cache, input.Value);
-                        }
-                        catch (Exception e)
-                        {
-                            return HandleError($"Failed to read Bolt configuration: {input.Value.White().Bold()}", e);
+                            return 1;
                         }
                     }
 
@@ -208,18 +217,6 @@ namespace Bolt.Console
                     else
                     {
                         rootConfig.OutputDirectory = Path.GetDirectoryName(input.Value);
-                    }
-
-                    foreach (var contract in contractOption.Values)
-                    {
-                        try
-                        {
-                            rootConfig.AddContract(contract, mode, asInternal);
-                        }
-                        catch (Exception e)
-                        {
-                            return HandleError($"Failed to resolve contract: {contract.White().Bold()}", e);
-                        }
                     }
 
                     return rootConfig.Generate();
@@ -236,6 +233,52 @@ namespace Bolt.Console
             {
                 _cache.Dispose();
             }
+        }
+
+        private int AddContracts(RootConfig rootConfig, List<string> contracts, GenerateContractMode mode, bool internalVisibility)
+        {
+            if (!contracts.Any() || contracts.Any(c => c.EndsWith(".*", StringComparison.OrdinalIgnoreCase)))
+            {
+                try
+                {
+                    rootConfig.AddAllContracts(mode, internalVisibility);
+                }
+                catch (Exception e)
+                {
+                    return HandleError($"Failed to resolve contracts", e);
+                }
+
+                return 0;
+            }
+
+            foreach (var contract in contracts)
+            {
+                if (contract.EndsWith(".*", StringComparison.OrdinalIgnoreCase))
+                {
+                    var ns = contract.TrimEnd(new[] { '*', '.' });
+                    try
+                    {
+                        rootConfig.AddContractsFromNamespace(ns, mode, internalVisibility);
+                    }
+                    catch (Exception e)
+                    {
+                        return HandleError($"Failed to resolve contracts: {contract.White().Bold()}", e);
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        rootConfig.AddContract(contract, mode, internalVisibility);
+                    }
+                    catch (Exception e)
+                    {
+                        return HandleError($"Failed to resolve contract: {contract.White().Bold()}", e);
+                    }
+                }
+            }
+
+            return 0;
         }
 
         internal static int HandleError(string message, Exception e)

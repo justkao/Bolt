@@ -24,8 +24,6 @@ namespace Bolt.Server.IntegrationTest.Core
 {
     public partial class TestContractActions : Bolt.Server.ContractActions<Bolt.Server.IntegrationTest.Core.TestContractDescriptor>
     {
-        // useless comment added by user generator - 'Bolt.Server.IntegrationTest.Core.UserCodeGenerator', Context - 'generatorContext2'
-
         public TestContractActions()
         {
             Add(Descriptor.SimpleMethodWithSimpleArguments, TestContract_SimpleMethodWithSimpleArguments);

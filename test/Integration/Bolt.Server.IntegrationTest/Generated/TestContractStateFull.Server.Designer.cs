@@ -24,8 +24,6 @@ namespace Bolt.Server.IntegrationTest.Core
 {
     public partial class TestContractStateFullActions : Bolt.Server.ContractActions<Bolt.Server.IntegrationTest.Core.TestContractStateFullDescriptor>
     {
-        // useless comment added by user generator - 'Bolt.Server.IntegrationTest.Core.UserCodeGenerator', Context - ''
-
         public TestContractStateFullActions()
         {
             Add(Descriptor.Init, TestContractStateFull_Init);

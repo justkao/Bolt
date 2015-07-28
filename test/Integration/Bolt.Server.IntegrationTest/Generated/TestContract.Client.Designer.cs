@@ -23,30 +23,50 @@ using Bolt.Server.IntegrationTest.Core.Parameters;
 
 namespace Bolt.Server.IntegrationTest.Core
 {
-    public partial interface ITestContractInnerAsync : ITestContractInner
+    public partial interface ITestContractInnerAsync : ITestContractInner, IExcludedContractAsync
     {
         Task SimpleMethodWithComplexParameterAsync(Bolt.Test.Common.CompositeType compositeType);
+
+        Task<int> SimpleFunctionAsync();
+
+        Task<List<Bolt.Test.Common.CompositeType>> FunctionReturningHugeDataAsync();
+
+        Task MethodTakingHugeDataAsync(List<Bolt.Test.Common.CompositeType> arg);
 
         Task MethodWithNotSerializableTypeAsync(Bolt.Test.Common.NotSerializableType arg);
 
         Task<Bolt.Test.Common.NotSerializableType> FunctionWithNotSerializableTypeAsync();
+
+        Task MethodWithManyArgumentsAsync(Bolt.Test.Common.CompositeType arg1, Bolt.Test.Common.CompositeType arg2, DateTime time);
     }
 }
 
 namespace Bolt.Server.IntegrationTest.Core
 {
-    public partial interface ITestContractAsync : ITestContract, ITestContractInnerAsync
+    public partial interface IExcludedContractAsync : IExcludedContract
     {
+        Task ThisMethodShouldBeExcludedAsync();
+    }
+}
+
+namespace Bolt.Server.IntegrationTest.Core
+{
+    public partial interface ITestContractAsync : ITestContract, ITestContractInnerAsync, IExcludedContractAsync
+    {
+        Task SimpleMethodWithSimpleArgumentsAsync(int val);
+
         Task SimpleMethodAsync();
+
+        Task SimpleMethodWithCancellationAsync(System.Threading.CancellationToken cancellation);
+
+        Task<Bolt.Test.Common.CompositeType> ComplexFunctionAsync();
     }
 }
 
 namespace Bolt.Server.IntegrationTest.Core
 {
-    public partial class TestContractProxy : ContractProxy<Bolt.Server.IntegrationTest.Core.TestContractDescriptor>, Bolt.Server.IntegrationTest.Core.ITestContract, ITestContractInnerAsync, ITestContractAsync
+    public partial class TestContractProxy : ContractProxy<Bolt.Server.IntegrationTest.Core.TestContractDescriptor>, Bolt.Server.IntegrationTest.Core.ITestContract, ITestContractInnerAsync, IExcludedContractAsync, ITestContractAsync
     {
-        // useless comment added by user generator - 'Bolt.Server.IntegrationTest.Core.UserCodeGenerator', Context - 'generatorContext2'
-
         public TestContractProxy(Bolt.Server.IntegrationTest.Core.TestContractProxy proxy) : base(proxy)
         {
         }
@@ -60,6 +80,13 @@ namespace Bolt.Server.IntegrationTest.Core
             var bolt_Params = new Bolt.Server.IntegrationTest.Core.Parameters.SimpleMethodWithSimpleArgumentsParameters();
             bolt_Params.Val = val;
             Send(bolt_Params, Descriptor.SimpleMethodWithSimpleArguments, CancellationToken.None);
+        }
+
+        public virtual Task SimpleMethodWithSimpleArgumentsAsync(int val)
+        {
+            var bolt_Params = new Bolt.Server.IntegrationTest.Core.Parameters.SimpleMethodWithSimpleArgumentsParameters();
+            bolt_Params.Val = val;
+            return SendAsync(bolt_Params, Descriptor.SimpleMethodWithSimpleArguments, CancellationToken.None);
         }
 
         public virtual void SimpleMethod()
@@ -82,10 +109,21 @@ namespace Bolt.Server.IntegrationTest.Core
             Send(Bolt.Empty.Instance, Descriptor.SimpleMethodWithCancellation, cancellation);
         }
 
+        public virtual Task SimpleMethodWithCancellationAsync(CancellationToken cancellation)
+        {
+            return SendAsync(Bolt.Empty.Instance, Descriptor.SimpleMethodWithCancellation, cancellation);
+        }
+
         public virtual Bolt.Test.Common.CompositeType ComplexFunction()
         {
             return Send<Bolt.Test.Common.CompositeType, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.ComplexFunction, CancellationToken.None);
         }
+
+        public virtual Task<Bolt.Test.Common.CompositeType> ComplexFunctionAsync()
+        {
+            return SendAsync<Bolt.Test.Common.CompositeType, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.ComplexFunction, CancellationToken.None);
+        }
+
         public virtual void SimpleMethodWithComplexParameter(Bolt.Test.Common.CompositeType compositeType)
         {
             var bolt_Params = new Bolt.Server.IntegrationTest.Core.Parameters.SimpleMethodWithComplexParameterParameters();
@@ -105,9 +143,19 @@ namespace Bolt.Server.IntegrationTest.Core
             return Send<int, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.SimpleFunction, CancellationToken.None);
         }
 
+        public virtual Task<int> SimpleFunctionAsync()
+        {
+            return SendAsync<int, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.SimpleFunction, CancellationToken.None);
+        }
+
         public virtual List<Bolt.Test.Common.CompositeType> FunctionReturningHugeData()
         {
             return Send<List<Bolt.Test.Common.CompositeType>, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.FunctionReturningHugeData, CancellationToken.None);
+        }
+
+        public virtual Task<List<Bolt.Test.Common.CompositeType>> FunctionReturningHugeDataAsync()
+        {
+            return SendAsync<List<Bolt.Test.Common.CompositeType>, Bolt.Empty>(Bolt.Empty.Instance, Descriptor.FunctionReturningHugeData, CancellationToken.None);
         }
 
         public virtual void MethodTakingHugeData(List<Bolt.Test.Common.CompositeType> arg)
@@ -115,6 +163,13 @@ namespace Bolt.Server.IntegrationTest.Core
             var bolt_Params = new Bolt.Server.IntegrationTest.Core.Parameters.MethodTakingHugeDataParameters();
             bolt_Params.Arg = arg;
             Send(bolt_Params, Descriptor.MethodTakingHugeData, CancellationToken.None);
+        }
+
+        public virtual Task MethodTakingHugeDataAsync(List<Bolt.Test.Common.CompositeType> arg)
+        {
+            var bolt_Params = new Bolt.Server.IntegrationTest.Core.Parameters.MethodTakingHugeDataParameters();
+            bolt_Params.Arg = arg;
+            return SendAsync(bolt_Params, Descriptor.MethodTakingHugeData, CancellationToken.None);
         }
 
         public virtual void MethodWithNotSerializableType(Bolt.Test.Common.NotSerializableType arg)
@@ -154,9 +209,25 @@ namespace Bolt.Server.IntegrationTest.Core
             bolt_Params.Time = time;
             Send(bolt_Params, Descriptor.MethodWithManyArguments, CancellationToken.None);
         }
+
+        public virtual Task MethodWithManyArgumentsAsync(Bolt.Test.Common.CompositeType arg1, Bolt.Test.Common.CompositeType arg2, DateTime time)
+        {
+            var bolt_Params = new Bolt.Server.IntegrationTest.Core.Parameters.MethodWithManyArgumentsParameters();
+            bolt_Params.Arg1 = arg1;
+            bolt_Params.Arg2 = arg2;
+            bolt_Params.Time = time;
+            return SendAsync(bolt_Params, Descriptor.MethodWithManyArguments, CancellationToken.None);
+        }
+
         public virtual void ThisMethodShouldBeExcluded()
         {
             Send(Bolt.Empty.Instance, Descriptor.ThisMethodShouldBeExcluded, CancellationToken.None);
         }
+
+        public virtual Task ThisMethodShouldBeExcludedAsync()
+        {
+            return SendAsync(Bolt.Empty.Instance, Descriptor.ThisMethodShouldBeExcluded, CancellationToken.None);
+        }
+
     }
 }

@@ -45,8 +45,6 @@ namespace Bolt.Server.IntegrationTest.Core
 {
     public partial class TestContractStateFullProxy : ContractProxy<Bolt.Server.IntegrationTest.Core.TestContractStateFullDescriptor>, Bolt.Server.IntegrationTest.Core.ITestContractStateFull, ITestContractStateFullAsync
     {
-        // useless comment added by user generator - 'Bolt.Server.IntegrationTest.Core.UserCodeGenerator', Context - ''
-
         public TestContractStateFullProxy(Bolt.Server.IntegrationTest.Core.TestContractStateFullProxy proxy) : base(proxy)
         {
         }
