@@ -116,9 +116,8 @@ namespace Bolt.Console
 
         private IEnumerable<Type> GetTypesInternal(Assembly assembly, string ns)
         {
-            var found = assembly.GetTypes().Where(t =>
+            var found = assembly.DefinedTypes.Where(info =>
             {
-                var info = t.GetTypeInfo();
                 if (!info.IsInterface)
                 {
                     return false;
@@ -129,12 +128,12 @@ namespace Bolt.Console
                     return true;
                 }
 
-                return t.Namespace.StartsWith(ns, StringComparison.OrdinalIgnoreCase);
+                return info.Namespace.StartsWith(ns, StringComparison.OrdinalIgnoreCase);
             });
 
             if (found.Any())
             {
-                return found;
+                return found.Select(t => t.AsType());
             }
 
             return Enumerable.Empty<Type>();
