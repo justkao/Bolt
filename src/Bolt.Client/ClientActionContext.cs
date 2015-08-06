@@ -2,6 +2,7 @@
 using System.Net;
 using System.Net.Http;
 using System.Threading;
+using Bolt.Core;
 
 namespace Bolt.Client
 {
@@ -10,6 +11,10 @@ namespace Bolt.Client
     /// </summary>
     public class ClientActionContext : ActionContextBase, IDisposable
     {
+        public IObjectSerializer Parameters { get; set; }
+
+        public bool ParametersHandled { get; set; }
+
         /// <summary>
         /// The Uri of destination server where the request will be processed.
         /// </summary>
@@ -31,9 +36,19 @@ namespace Bolt.Client
         public HttpResponseMessage Response { get; set; }
 
         /// <summary>
+        /// Gets or sets the final parsed result.
+        /// </summary>
+        public ResponseDescriptor Result { get; set; }
+        
+        /// <summary>
         /// The timeout for the request.
         /// </summary>
         public TimeSpan ResponseTimeout { get; set; }
+
+        public Type ResponseType
+        {
+            get { return null; }
+        }
 
         public void Dispose()
         {

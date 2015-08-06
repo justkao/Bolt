@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Bolt.Client.Filters;
 
 namespace Bolt.Client.Channels
 {
@@ -18,12 +20,12 @@ namespace Bolt.Client.Channels
         }
 
         public DelegatedChannel(Uri server, ClientConfiguration configuration, Action<ClientActionContext> beforeSending = null, Action<ClientActionContext> afterReceived = null)
-            : this(server, configuration.RequestHandler, configuration.EndpointProvider, beforeSending, afterReceived)
+            : this(server, configuration.RequestHandler, configuration.EndpointProvider, configuration.Filters, beforeSending, afterReceived)
         {
         }
 
-        public DelegatedChannel(Uri server, IRequestHandler requestHandler, IEndpointProvider endpointProvider, Action<ClientActionContext> beforeSending = null, Action<ClientActionContext> afterReceived = null)
-            : base(requestHandler, endpointProvider)
+        public DelegatedChannel(Uri server, IRequestHandler requestHandler, IEndpointProvider endpointProvider, IReadOnlyCollection<IClientExecutionFilter> filters, Action<ClientActionContext> beforeSending = null, Action<ClientActionContext> afterReceived = null)
+            : base(requestHandler, endpointProvider, filters)
         {
             _server = server;
             _beforeSending = beforeSending;

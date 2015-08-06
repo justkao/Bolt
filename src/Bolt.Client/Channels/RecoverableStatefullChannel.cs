@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using Bolt.Client.Filters;
 using Bolt.Client.Helpers;
 using Bolt.Core;
 
@@ -45,8 +47,10 @@ namespace Bolt.Client.Channels
         protected RecoverableStatefullChannel(
             IServerProvider serverProvider,
             IRequestHandler requestHandler,
-            IEndpointProvider endpointProvider, IClientSessionHandler sessionHandler)
-            : base(serverProvider, requestHandler, endpointProvider)
+            IEndpointProvider endpointProvider,
+            IClientSessionHandler sessionHandler, 
+            IReadOnlyCollection<IClientExecutionFilter> filters)
+            : base(serverProvider, requestHandler, endpointProvider, filters)
         {
             if (sessionHandler == null)
             {
@@ -99,7 +103,8 @@ namespace Bolt.Client.Channels
                         DelegatedChannel channel = new DelegatedChannel(
                             _activeConnection.Server,
                             RequestHandler,
-                            EndpointProvider,
+                            EndpointProvider, 
+                            Filters,
                             c =>
                             {
                                 BeforeSending(c);
@@ -185,7 +190,7 @@ namespace Bolt.Client.Channels
 
         protected TContract CreateContract(Uri server)
         {
-            return CreateContract(new DelegatedChannel(server, RequestHandler, EndpointProvider, BeforeSending, AfterReceived));
+            return CreateContract(new DelegatedChannel(server, RequestHandler, EndpointProvider,Filters, BeforeSending, AfterReceived));
         }
 
         private async Task<ConnectionDescriptor> EnsureConnectionAsync()
@@ -214,6 +219,7 @@ namespace Bolt.Client.Channels
                             connection.Server,
                             RequestHandler,
                             EndpointProvider,
+                            Filters,
                             c =>
                             {
                                 _sessionHandler.EnsureSession(c.Request, sessionId);

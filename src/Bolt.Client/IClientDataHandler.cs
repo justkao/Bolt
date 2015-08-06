@@ -16,13 +16,11 @@ namespace Bolt.Client
         /// <summary>
         /// Serializes the request parameters and writes them into the request body.
         /// </summary>
-        /// <typeparam name="T">The type of parameters.</typeparam>
         /// <param name="context">Request context of action.</param>
-        /// <param name="parameters">The instance of <see cref="T"/>. In case that called action has no parameters then <see cref="Empty.Instance"/> is send.</param>
         /// <exception cref="SerializeParametersException">Thrown if there is problem to serialize the parameters.</exception>
         /// <exception cref="OperationCanceledException">Throw if request was cancelled.</exception>
         /// <exception cref="TimeoutException">Thrown if request timeouted.</exception>
-        void WriteParameters<T>(ClientActionContext context, T parameters);
+        void WriteParameters(ClientActionContext context);
 
         /// <summary>
         /// Reads and parses the response send from Bolt server.
@@ -34,7 +32,7 @@ namespace Bolt.Client
         /// <exception cref="OperationCanceledException">Throw if request was cancelled.</exception>
         /// <exception cref="TimeoutException">Thrown if request timeouted.</exception>
         /// <returns>Task representing the async action.</returns>
-        Task<T> ReadResponseAsync<T>(ClientActionContext context);
+        Task<object> ReadResponseAsync(ClientActionContext context);
 
         /// <summary>
         /// If the server response code indicates the error this function is used to deserialize the exception from server response.

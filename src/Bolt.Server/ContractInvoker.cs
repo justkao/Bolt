@@ -9,7 +9,7 @@ namespace Bolt.Server
     {
         public ContractInvoker()
         {
-            Filters = new List<IActionExecutionFilter>();
+            Filters = new List<IServerExecutionFilter>();
             Configuration = new ServerRuntimeConfiguration();
         }
 
@@ -19,7 +19,7 @@ namespace Bolt.Server
 
         public IInstanceProvider InstanceProvider { get; set; }
 
-        public IList<IActionExecutionFilter> Filters { get; set; }
+        public IList<IServerExecutionFilter> Filters { get; set; }
 
         public IBoltRouteHandler Parent { get;  set; }
 
@@ -50,7 +50,7 @@ namespace Bolt.Server
 
         protected virtual Task ExecuteActionAsync(ServerActionContext context, Func<ServerActionContext, Task> actionImplementation)
         {
-            return new CoreAction().ExecuteAsync(context, actionImplementation);
+            return new CoreServerAction().ExecuteAsync(context, actionImplementation);
         }
 
         protected virtual void OverrideFeature(IBoltFeature feature)

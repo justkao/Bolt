@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 #if !NET45
-using Microsoft.Framework.Runtime;
+using Microsoft.Dnx.Runtime;
 #endif
 using Microsoft.Framework.Runtime.Common.CommandLine;
 

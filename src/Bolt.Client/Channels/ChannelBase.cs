@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Bolt.Client.Filters;
 using Bolt.Common;
 
 namespace Bolt.Client.Channels
@@ -24,12 +26,12 @@ namespace Bolt.Client.Channels
         }
 
         protected ChannelBase(ClientConfiguration configuration)
-            : this(configuration.RequestHandler, configuration.EndpointProvider)
+            : this(configuration.RequestHandler, configuration.EndpointProvider, configuration.Filters)
         {
             DefaultResponseTimeout = configuration.DefaultResponseTimeout;
         }
 
-        protected ChannelBase(IRequestHandler requestHandler, IEndpointProvider endpointProvider)
+        protected ChannelBase(IRequestHandler requestHandler, IEndpointProvider endpointProvider, IReadOnlyCollection<IClientExecutionFilter> filters)
         {
             if (requestHandler == null)
             {
@@ -41,6 +43,7 @@ namespace Bolt.Client.Channels
                 throw new ArgumentNullException(nameof(endpointProvider));
             }
 
+            Filters = filters ?? new List<IClientExecutionFilter>();
             RequestHandler = requestHandler;
             EndpointProvider = endpointProvider;
         }
@@ -48,6 +51,8 @@ namespace Bolt.Client.Channels
         public IRequestHandler RequestHandler { get; }
 
         public IEndpointProvider EndpointProvider { get; }
+
+        public IReadOnlyCollection<IClientExecutionFilter> Filters { get; }
 
         public bool IsClosed { get; protected set; }
 
@@ -109,15 +114,20 @@ namespace Bolt.Client.Channels
             ConnectionDescriptor connection,
             ActionDescriptor actionDescriptor,
             CancellationToken cancellation,
+            Type responseType, 
+            Type parametersType,
             object parameters)
         {
             return new ClientActionContext
             {
+                ResponseType = responseType,
+                ParametersType = parametersType,
                 Action = actionDescriptor,
                 Cancellation = cancellation,
                 Connection = connection,
                 Request = CreateRequest(connection, actionDescriptor),
-                ResponseTimeout = DefaultResponseTimeout
+                ResponseTimeout = DefaultResponseTimeout,
+                Parameters = parameters
             };
         }
 
@@ -131,12 +141,11 @@ namespace Bolt.Client.Channels
 
             var connection = await GetConnectionAsync();
 
-            using (ClientActionContext ctxt = CreateContext(connection, descriptor, cancellation, parameters))
+            using (ClientActionContext ctxt = CreateContext(connection, descriptor, cancellation,typeof(T), typeof(TParameters),  parameters))
             {
-                BeforeSending(ctxt);
-                ResponseDescriptor<T> result = await RequestHandler.GetResponseAsync<T, TParameters>(ctxt, parameters);
-                AfterReceived(ctxt);
-                return result.GetResultOrThrow();
+                CoreClientAction clientAction = new CoreClientAction(Filters);
+                await clientAction.ExecuteAsync(ctxt, ExecuteCoreAsync);
+                return (T) ctxt.Result.GetResultOrThrow();
             }
         }
 
@@ -198,6 +207,18 @@ namespace Bolt.Client.Channels
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        protected async Task ExecuteCoreAsync(ClientActionContext ctxt)
+        {
+            BeforeSending(ctxt);
+
+            if (ctxt.Result == null)
+            {
+                ctxt.Result = await RequestHandler.GetResponseAsync(ctxt, ctxt.Parameters);
+            }
+
+            AfterReceived(ctxt);
         }
 
         private void Dispose(bool disposeManagedResources)

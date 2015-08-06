@@ -8,7 +8,7 @@ namespace Bolt.Server
     {
         IInstanceProvider InstanceProvider { get; set; }
 
-        IList<IActionExecutionFilter> Filters { get; set; }
+        IList<IServerExecutionFilter> Filters { get; set; }
 
         IBoltRouteHandler Parent { get; set; }
 

@@ -45,12 +45,12 @@ namespace Bolt.Server
 
             Logger = factory.CreateLogger<BoltRouteHandler>();
             MetadataHandler = metadataHandler;
-            Filters = new List<IActionExecutionFilter>();
+            Filters = new List<IServerExecutionFilter>();
             ApplicationServices = applicationServices;
             Configuration = defaultConfiguration.Options;
         }
 
-        public IList<IActionExecutionFilter> Filters { get; }
+        public IList<IServerExecutionFilter> Filters { get; }
 
         public IServiceProvider ApplicationServices { get; }
 

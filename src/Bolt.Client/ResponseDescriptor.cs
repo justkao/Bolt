@@ -6,11 +6,9 @@ namespace Bolt.Client
     /// <summary>
     /// Describes the Bolt server response with additional metadata attached.
     /// </summary>
-    /// <typeparam name="TResponse">The type of response.</typeparam>
-    public struct ResponseDescriptor<TResponse>
+    public class ResponseDescriptor
     {
         public ResponseDescriptor(HttpResponseMessage response, ClientActionContext context, Exception error, ResponseError errorType)
-            : this()
         {
             Context = context;
             ErrorType = errorType;
@@ -18,8 +16,7 @@ namespace Bolt.Client
             Response = response;
         }
 
-        public ResponseDescriptor(HttpResponseMessage response, ClientActionContext context, TResponse result)
-            : this()
+        public ResponseDescriptor(HttpResponseMessage response, ClientActionContext context, object result)
         {
             Response = response;
             Result = result;
@@ -59,9 +56,9 @@ namespace Bolt.Client
         /// <remarks>
         /// <see cref="Empty.Instance"/> is returned if client do not expect any data.
         /// </remarks>
-        public TResponse Result { get; }
+        public object Result { get; }
 
-        public TResponse GetResultOrThrow()
+        public object GetResultOrThrow()
         {
             if (!IsSuccess)
             {

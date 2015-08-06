@@ -14,7 +14,7 @@ namespace Bolt.Console
 
         private readonly AssemblyCache _cache;
 
-        public Program(IServiceProvider provider, Microsoft.Framework.Runtime.ILibraryManager manager, Microsoft.Framework.Runtime.IAssemblyLoadContextAccessor accessor, Microsoft.Framework.Runtime.IAssemblyLoaderContainer container, Microsoft.Framework.Runtime.IApplicationEnvironment environment)
+        public Program(Microsoft.Dnx.Runtime.ILibraryManager manager, Microsoft.Dnx.Runtime.IAssemblyLoadContextAccessor accessor, Microsoft.Dnx.Runtime.IAssemblyLoaderContainer container, Microsoft.Dnx.Runtime.IApplicationEnvironment environment)
         {
             _cache = new AssemblyCache(manager, accessor, container, environment);
         }

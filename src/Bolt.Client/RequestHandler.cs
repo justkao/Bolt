@@ -28,9 +28,9 @@ namespace Bolt.Client
             _errorProvider = errorProvider;
         }
 
-        public virtual async Task<ResponseDescriptor<T>> GetResponseAsync<T, TParameters>(
+        public virtual async Task<ResponseDescriptor> GetResponseAsync(
             ClientActionContext context,
-            TParameters parameters)
+            object parameters)
         {
             context.Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(_dataHandler.ContentType));
             if (context.Connection.KeepAlive)
@@ -38,13 +38,17 @@ namespace Bolt.Client
                 context.Request.Headers.Connection.Add("Keep-Alive");
             }
 
-            try
+            if (!context.ParametersHandled)
             {
-                _dataHandler.WriteParameters(context, parameters);
-            }
-            catch (BoltSerializationException e)
-            {
-                return new ResponseDescriptor<T>(null, context, e, ResponseError.Serialization);
+                try
+                {
+                    _dataHandler.WriteParameters(context, parameters);
+                }
+                catch (BoltSerializationException e)
+                {
+                    return new ResponseDescriptor(null, context, e, ResponseError.Serialization);
+                }
+                context.ParametersHandled = true;
             }
 
             CancellationToken timeoutToken = CancellationToken.None;
@@ -75,20 +79,20 @@ namespace Bolt.Client
             catch (Exception e)
             {
                 e.EnsureNotCancelled();
-                return new ResponseDescriptor<T>(context.Response, context, e, ResponseError.Communication);
+                return new ResponseDescriptor(context.Response, context, e, ResponseError.Communication);
             }
 
-            return await CreateResponseAsync<T>(context);
+            return await CreateResponseAsync(context);
         }
 
-        protected virtual async Task<ResponseDescriptor<T>> CreateResponseAsync<T>(ClientActionContext context)
+        protected virtual async Task<ResponseDescriptor> CreateResponseAsync(ClientActionContext context)
         {
             if (!context.Response.IsSuccessStatusCode)
             {
                 Exception serverError = ReadBoltServerErrorIfAvailable(context);
                 if (serverError != null)
                 {
-                    return new ResponseDescriptor<T>(context.Response, context, serverError, ResponseError.Server);
+                    return new ResponseDescriptor(context.Response, context, serverError, ResponseError.Server);
                 }
 
                 try
@@ -96,12 +100,12 @@ namespace Bolt.Client
                     Exception error = await _dataHandler.ReadExceptionAsync(context);
                     if (error != null)
                     {
-                        return new ResponseDescriptor<T>(context.Response, context, error, ResponseError.Client);
+                        return new ResponseDescriptor(context.Response, context, error, ResponseError.Client);
                     }
                 }
                 catch (BoltSerializationException e)
                 {
-                    return new ResponseDescriptor<T>(context.Response, context, e, ResponseError.Deserialization);
+                    return new ResponseDescriptor(context.Response, context, e, ResponseError.Deserialization);
                 }
                 catch (OperationCanceledException)
                 {
@@ -110,7 +114,7 @@ namespace Bolt.Client
                 catch (Exception e)
                 {
                     e.EnsureNotCancelled();
-                    return new ResponseDescriptor<T>(context.Response, context, e, ResponseError.Communication);
+                    return new ResponseDescriptor(context.Response, context, e, ResponseError.Communication);
                 }
 
                 context.Response.EnsureSuccessStatusCode();
@@ -118,7 +122,7 @@ namespace Bolt.Client
 
             try
             {
-                return new ResponseDescriptor<T>(context.Response, context, await _dataHandler.ReadResponseAsync<T>(context));
+                return new ResponseDescriptor(context.Response, context, await _dataHandler.ReadResponseAsync(context));
             }
             catch (OperationCanceledException)
             {
@@ -126,12 +130,12 @@ namespace Bolt.Client
             }
             catch (BoltSerializationException e)
             {
-                return new ResponseDescriptor<T>(context.Response, context, e, ResponseError.Deserialization);
+                return new ResponseDescriptor(context.Response, context, e, ResponseError.Deserialization);
             }
             catch (Exception e)
             {
                 e.EnsureNotCancelled();
-                return new ResponseDescriptor<T>(context.Response, context, e, ResponseError.Communication);
+                return new ResponseDescriptor(context.Response, context, e, ResponseError.Communication);
             }
         }
 

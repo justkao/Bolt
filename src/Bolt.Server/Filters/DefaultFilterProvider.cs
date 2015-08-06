@@ -4,7 +4,7 @@ namespace Bolt.Server.Filters
 {
     public class DefaultFilterProvider : IFilterProvider
     {
-        public IEnumerable<IActionExecutionFilter> GetFilters(ServerActionContext context)
+        public IEnumerable<IServerExecutionFilter> GetFilters(ServerActionContext context)
         {
             foreach (var filter in context.ContractInvoker.Filters)
             {

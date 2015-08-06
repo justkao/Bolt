@@ -19,7 +19,7 @@
         "System.Runtime.Serialization": ""
       },
       "dependencies": {
-        "Microsoft.Framework.Runtime.Abstractions": "1.0.0-*"
+        "Microsoft.Dnx.Runtime.Abstractions": "1.0.0-*"
       }
     },
     "dnxcore50": {
@@ -34,7 +34,7 @@
         "System.Runtime.Serialization.Primitives": "4.0.0-*",
         "System.Diagnostics.Debug": "4.0.10-*",
         "System.Console": "4.0.0-*",
-        "Microsoft.Framework.Runtime.Abstractions": "1.0.0-*",
+        "Microsoft.Dnx.Runtime.Abstractions": "1.0.0-*",
         "System.IO.FileSystem": "4.0.0-*"
       }
     }

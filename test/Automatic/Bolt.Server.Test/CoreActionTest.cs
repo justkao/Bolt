@@ -12,7 +12,7 @@ namespace Bolt.Server.Test
                 ContractInvoker = new MockContractInvoker() { }
             };
 
-            CoreAction action = new CoreAction();
+            CoreServerAction serverAction = new CoreServerAction();
         }
 
         public ServerActionContext Context { get; set; }

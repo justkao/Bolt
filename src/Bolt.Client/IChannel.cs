@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using Bolt.Core;
 
 namespace Bolt.Client
 {
@@ -28,12 +29,13 @@ namespace Bolt.Client
         /// Sends the request to Bolt server.
         /// </summary>
         /// <typeparam name="TResult">The expected type of result.</typeparam>
-        /// <typeparam name="TRequestParameters">The parameters of action.</typeparam>
         /// <param name="parameters">The data required to execute the action on Bolt server.</param>
         /// <param name="descriptor">The action descriptor.</param>
         /// <param name="cancellation">Cancellation token for current action.</param>
         /// <returns>Task representing the ongoing async action.</returns>
         /// <remarks>The void return value or parameters should be represented by <see cref="Empty"/> type.</remarks>
-        Task<TResult> SendAsync<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation);
+        Task<TResult> SendAsync<TResult>(IObjectSerializer parameters, ActionDescriptor descriptor, CancellationToken cancellation);
+
+        ISerializer Serializer { get;  }
     }
 }

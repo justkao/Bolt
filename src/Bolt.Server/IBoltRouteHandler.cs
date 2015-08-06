@@ -13,7 +13,7 @@ namespace Bolt.Server
 
         IContractInvoker Get(ContractDescriptor descriptor);
 
-        IList<IActionExecutionFilter> Filters { get; }
+        IList<IServerExecutionFilter> Filters { get; }
 
         IServiceProvider ApplicationServices { get; }
     }

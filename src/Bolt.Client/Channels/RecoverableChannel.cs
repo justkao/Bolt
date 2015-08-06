@@ -1,7 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Bolt.Client.Filters;
 
 namespace Bolt.Client.Channels
 {
@@ -40,8 +42,8 @@ namespace Bolt.Client.Channels
             ServerProvider = serverProvider;
         }
 
-        public RecoverableChannel(IServerProvider serverProvider, IRequestHandler requestHandler, IEndpointProvider endpointProvider)
-            : base(requestHandler, endpointProvider)
+        public RecoverableChannel(IServerProvider serverProvider, IRequestHandler requestHandler, IEndpointProvider endpointProvider, IReadOnlyCollection<IClientExecutionFilter>  filters)
+            : base(requestHandler, endpointProvider, filters)
         {
             ServerProvider = serverProvider;
         }
@@ -80,14 +82,13 @@ namespace Bolt.Client.Channels
 
                 if (connection != null)
                 {
-                    using (ClientActionContext ctxt = CreateContext(connection, descriptor, cancellation, parameters))
+                    using (ClientActionContext ctxt = CreateContext(connection, descriptor, cancellation, typeof(T), typeof(TParameters), parameters))
                     {
                         try
                         {
-                            BeforeSending(ctxt);
-                            ResponseDescriptor<T> result = await RequestHandler.GetResponseAsync<T, TParameters>(ctxt, parameters);
-                            AfterReceived(ctxt);
-                            return result.GetResultOrThrow();
+                            CoreClientAction clientAction = new CoreClientAction(Filters);
+                            await clientAction.ExecuteAsync(ctxt, ExecuteCoreAsync);
+                            return (T) ctxt.Result.GetResultOrThrow();
                         }
                         catch (Exception e)
                         {

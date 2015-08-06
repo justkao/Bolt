@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace Bolt.Server.Filters
 {
-    public interface IActionExecutionFilter
+    public interface IServerExecutionFilter
     {
         int Order { get; }
 

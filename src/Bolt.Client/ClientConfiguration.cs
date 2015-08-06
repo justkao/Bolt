@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using Bolt.Client.Channels;
+using Bolt.Client.Filters;
 
 namespace Bolt.Client
 {
@@ -58,5 +60,7 @@ namespace Bolt.Client
         /// Gets or sets client session handler.
         /// </summary>
         public IClientSessionHandler SessionHandler { get; set; }
+
+        public List<IClientExecutionFilter> Filters { get; set; }
     }
 }

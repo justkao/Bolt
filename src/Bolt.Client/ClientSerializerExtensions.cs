@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using Bolt.Core;
 
 namespace Bolt.Client
 {
@@ -11,29 +12,19 @@ namespace Bolt.Client
         /// <summary>
         /// Serializes the parameters instance into the raw byte array.
         /// </summary>
-        /// <typeparam name="TParameters">Type of parameters to serialize.</typeparam>
         /// <param name="serializer">The data serializer instance.</param>
+        /// <param name="parametersType">Type of parameters to serialize.</param>
         /// <param name="parameters">The instance of parameters. Might be null of <see cref="Empty.Instance"/></param>
         /// <param name="actionDescriptor">The descriptor for action that is using the parameters class.</param>
         /// <returns>The serialized parameters or null.</returns>
         /// <exception cref="TimeoutException">Thrown if timeout occurred.</exception>
         /// <exception cref="OperationCanceledException">Thrown if operation was cancelled.</exception>
         /// <exception cref="SerializeParametersException">Thrown if any error occurred during serialization.</exception>
-        public static byte[] SerializeParameters<TParameters>(this ISerializer serializer, TParameters parameters, ActionDescriptor actionDescriptor)
+        public static Stream SerializeParameters(this IObjectSerializer serializer, ActionDescriptor actionDescriptor)
         {
-            if (typeof(TParameters) == typeof(Empty))
-            {
-                return null;
-            }
-
-            if (Equals(parameters, null))
-            {
-                return null;
-            }
-
             try
             {
-                return serializer.Serialize(parameters);
+                return serializer.Serialize();
             }
             catch (TimeoutException)
             {
@@ -52,32 +43,37 @@ namespace Bolt.Client
                 e.EnsureNotCancelled();
 
                 throw new SerializeParametersException(
-                    $"Failed to serialize parameters for action '{actionDescriptor}'. Parameters type - '{typeof (TParameters).FullName}'",
+                    $"Failed to serialize parameters for action '{actionDescriptor}'.",
                     e);
             }
         }
 
         /// <summary>
-        /// Deserialize the server response into the concrete type.
+        /// Deserialize the server response into the concrete resultType.
         /// </summary>
-        /// <typeparam name="T">The type of data to deserialize.</typeparam>
         /// <param name="serializer">The data serializer instance.</param>
+        /// <param name="resultType">Expected result type.</param>
         /// <param name="stream">The stream used to deserialize the data.</param>
         /// <param name="actionDescriptor">The action context of deserialize operation.</param>
         /// <returns>The deserialized data or default(T) if stream is null or empty.</returns>
         /// <exception cref="TimeoutException">Thrown if timeout occurred.</exception>
         /// <exception cref="OperationCanceledException">Thrown if operation was cancelled.</exception>
         /// <exception cref="DeserializeResponseException">Thrown if any error occurred during deserialization.</exception>
-        public static T DeserializeResponse<T>(this ISerializer serializer, Stream stream, ActionDescriptor actionDescriptor)
+        public static object DeserializeResponse(this ISerializer serializer, Type resultType, Stream stream, ActionDescriptor actionDescriptor)
         {
+            if (resultType == typeof (Empty))
+            {
+                return Empty.Instance;
+            }
+
             if (stream == null || stream.Length == 0)
             {
-                return default(T);
+                return null;
             }
 
             try
             {
-                return serializer.Read<T>(stream);
+                return serializer.Read(resultType, stream);
             }
             catch (TimeoutException)
             {
@@ -99,10 +95,10 @@ namespace Bolt.Client
         }
 
         /// <summary>
-        /// Deserialize the server response into the concrete type.
+        /// Deserialize the server response into the concrete resultType.
         /// </summary>
         /// <param name="serializer">The data serializer instance.</param>
-        /// <param name="type">The type of data to deserialize.</param>
+        /// <param name="type">The resultType of data to deserialize.</param>
         /// <param name="stream">The stream used to deserialize the data.</param>
         /// <param name="actionDescriptor">The action context of deserialize operation.</param>
         /// <returns>The deserialized data or default(T) if stream is null or empty.</returns>

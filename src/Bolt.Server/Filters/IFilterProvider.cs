@@ -4,6 +4,6 @@ namespace Bolt.Server.Filters
 {
     public interface IFilterProvider
     {
-        IEnumerable<IActionExecutionFilter> GetFilters(ServerActionContext context);
+        IEnumerable<IServerExecutionFilter> GetFilters(ServerActionContext context);
     }
 }

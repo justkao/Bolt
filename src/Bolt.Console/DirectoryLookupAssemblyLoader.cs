@@ -1,4 +1,4 @@
-﻿using Microsoft.Framework.Runtime;
+﻿using Microsoft.Dnx.Runtime;
 using Microsoft.Framework.Runtime.Common.CommandLine;
 using System;
 using System.Collections;

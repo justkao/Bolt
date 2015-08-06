@@ -17,6 +17,7 @@ using System.Threading.Tasks;
 
 using Bolt.Client;
 using Bolt.Client.Channels;
+using Bolt.Core;
 using Bolt.Server.IntegrationTest.Core;
 using Bolt.Server.IntegrationTest.Core.Parameters;
 
@@ -77,8 +78,11 @@ namespace Bolt.Server.IntegrationTest.Core
 
         public virtual void SimpleMethodWithSimpleArguments(int val)
         {
-            var bolt_Params = new Bolt.Server.IntegrationTest.Core.Parameters.SimpleMethodWithSimpleArgumentsParameters();
-            bolt_Params.Val = val;
+            IObjectSerializer serializer = Channel.Serializer.CreateSerializer();
+            serializer.AddValue("val", typeof(int), val);
+            serializer.AddValue("val", typeof(int), val);
+
+
             Send(bolt_Params, Descriptor.SimpleMethodWithSimpleArguments, CancellationToken.None);
         }
 

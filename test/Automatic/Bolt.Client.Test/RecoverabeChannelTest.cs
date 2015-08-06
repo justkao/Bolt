@@ -7,6 +7,7 @@ using Moq;
 using Xunit;
 
 using System.Net.Http;
+using Bolt.Client.Filters;
 
 namespace Bolt.Client.Test
 {
@@ -52,7 +53,7 @@ namespace Bolt.Client.Test
         public void Execute_EnsureOpened()
         {
             Mock<IRequestHandler> mocked = new Mock<IRequestHandler>();
-            mocked.Setup(v => v.GetResponseAsync<string, string>(It.IsAny<ClientActionContext>(), "test")).Returns(Task.FromResult(new ResponseDescriptor<string>(new HttpResponseMessage(), new ClientActionContext(), "test")));
+            mocked.Setup(v => v.GetResponseAsync(It.IsAny<ClientActionContext>(), "test")).Returns(Task.FromResult(new ResponseDescriptor(new HttpResponseMessage(), new ClientActionContext(), "test")));
 
             var channel = Create(requestHandler: mocked);
         }
@@ -81,7 +82,7 @@ namespace Bolt.Client.Test
             public Exception Error { get; set; }
 
             public TestRecoverableChannel(IServerProvider serverProvider, IRequestHandler requestHandler, IEndpointProvider endpointProvider)
-                : base(serverProvider, requestHandler, endpointProvider)
+                : base(serverProvider, requestHandler, endpointProvider, new List<IClientExecutionFilter>())
             {
             }
 

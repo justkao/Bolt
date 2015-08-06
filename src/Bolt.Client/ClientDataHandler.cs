@@ -28,33 +28,32 @@ namespace Bolt.Client
 
         public IExceptionWrapper ExceptionWrapper { get; }
 
-        public virtual void WriteParameters<T>(ClientActionContext context, T parameters)
+        public virtual void WriteParameters(ClientActionContext context)
         {
-            if (typeof(T) == typeof(Empty))
+            if (context.Parameters == null || !context.Parameters.HasValues())
             {
                 // auto set content length to 0
                 return;
             }
 
-            byte[] raw = Serializer.SerializeParameters(parameters, context.Action);
-            context.Request.Content = new ByteArrayContent(raw);
+            context.Request.Content = new StreamContent(context.Parameters.SerializeParameters(context.Action));
         }
 
-        public virtual async Task<T> ReadResponseAsync<T>(ClientActionContext context)
+        public virtual async Task<object> ReadResponseAsync(ClientActionContext context)
         {
-            if (typeof(T) == typeof(Empty))
+            if (context.ResponseType == typeof(Empty))
             {
-                return default(T);
+                return Empty.Instance;
             }
 
             using (Stream stream = new MemoryStream(await context.Response.Content.ReadAsByteArrayAsync()))
             {
                 if (stream.Length == 0)
                 {
-                    return default(T);
+                    return null;
                 }
 
-                return Serializer.DeserializeResponse<T>(stream, context.Action);
+                return Serializer.DeserializeResponse(context.ResponseType, stream, context.Action);
             }
         }
 
