@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client.Filters;
+using Bolt.Core;
 
 namespace Bolt.Client.Channels
 {
@@ -42,8 +44,13 @@ namespace Bolt.Client.Channels
             ServerProvider = serverProvider;
         }
 
-        public RecoverableChannel(IServerProvider serverProvider, IRequestHandler requestHandler, IEndpointProvider endpointProvider, IReadOnlyCollection<IClientExecutionFilter>  filters)
-            : base(requestHandler, endpointProvider, filters)
+        public RecoverableChannel(
+            ISerializer serializer,
+            IServerProvider serverProvider,
+            IRequestHandler requestHandler,
+            IEndpointProvider endpointProvider,
+            IReadOnlyCollection<IClientExecutionFilter> filters)
+            : base(serializer, requestHandler, endpointProvider, filters)
         {
             ServerProvider = serverProvider;
         }
@@ -54,7 +61,12 @@ namespace Bolt.Client.Channels
 
         public IServerProvider ServerProvider { get; }
 
-        public sealed override async Task<T> SendAsync<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        public sealed override async Task<object> SendAsync(
+            Type contract,
+            MethodInfo action,
+            Type responseType,
+            IObjectSerializer parameters,
+            CancellationToken cancellation)
         {
             EnsureNotClosed();
 
@@ -82,13 +94,13 @@ namespace Bolt.Client.Channels
 
                 if (connection != null)
                 {
-                    using (ClientActionContext ctxt = CreateContext(connection, descriptor, cancellation, typeof(T), typeof(TParameters), parameters))
+                    using (ClientActionContext ctxt = CreateContext(connection, contract, action, cancellation, responseType, parameters))
                     {
                         try
                         {
                             CoreClientAction clientAction = new CoreClientAction(Filters);
                             await clientAction.ExecuteAsync(ctxt, ExecuteCoreAsync);
-                            return (T) ctxt.Result.GetResultOrThrow();
+                            return ctxt.Result.GetResultOrThrow();
                         }
                         catch (Exception e)
                         {

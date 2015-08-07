@@ -1,6 +1,7 @@
 ﻿using Bolt.Common;
 using System;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace Bolt.Server.InstanceProviders
@@ -9,7 +10,7 @@ namespace Bolt.Server.InstanceProviders
     {
         private readonly ISessionFactory _sessionFactory;
 
-        public StateFullInstanceProvider(ActionDescriptor initSession, ActionDescriptor closeSession, ISessionFactory factory)
+        public StateFullInstanceProvider(MethodInfo initSession, MethodInfo closeSession, ISessionFactory factory)
         {
             if (initSession == null)
             {
@@ -31,9 +32,9 @@ namespace Bolt.Server.InstanceProviders
             _sessionFactory = factory;
         }
 
-        public ActionDescriptor InitSession { get; }
+        public MethodInfo InitSession { get; }
 
-        public ActionDescriptor CloseSession { get; }
+        public MethodInfo CloseSession { get; }
 
         public sealed override async Task<object> GetInstanceAsync(ServerActionContext context, Type type)
         {

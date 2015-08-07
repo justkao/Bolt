@@ -9,33 +9,30 @@
     },
     "Newtonsoft.Json": "6.0.8",
     "Bolt.Common": { "type": "build" },
-    "Bolt.Generators": ""
+    "Bolt.Generators": "",
+    "Microsoft.Dnx.Runtime.Abstractions": "1.0.0-*"
   },
   "frameworks": {
     "dnx451": {
       "frameworkAssemblies": {
-        "System.Runtime": "",
         "System.Collections": "",
+        "System.Runtime": "",
         "System.Runtime.Serialization": ""
-      },
-      "dependencies": {
-        "Microsoft.Dnx.Runtime.Abstractions": "1.0.0-*"
       }
     },
     "dnxcore50": {
       "dependencies": {
-        "System.Runtime": "4.0.20-*",
         "System.Collections": "4.0.10-*",
-        "System.Linq": "4.0.0-*",
-        "System.Reflection.Primitives": "4.0.0-*",
-        "System.Reflection.Extensions": "4.0.0-*",
-        "System.IO": "4.0.10-*",
-        "System.Reflection": "4.0.10-*",
-        "System.Runtime.Serialization.Primitives": "4.0.0-*",
-        "System.Diagnostics.Debug": "4.0.10-*",
         "System.Console": "4.0.0-*",
-        "Microsoft.Dnx.Runtime.Abstractions": "1.0.0-*",
-        "System.IO.FileSystem": "4.0.0-*"
+        "System.Diagnostics.Debug": "4.0.10-*",
+        "System.IO": "4.0.10-*",
+        "System.IO.FileSystem": "4.0.0-*",
+        "System.Linq": "4.0.0-*",
+        "System.Reflection": "4.0.10-*",
+        "System.Reflection.Extensions": "4.0.0-*",
+        "System.Reflection.Primitives": "4.0.0-*",
+        "System.Runtime": "4.0.20-*",
+        "System.Runtime.Serialization.Primitives": "4.0.10-*"
       }
     }
   },

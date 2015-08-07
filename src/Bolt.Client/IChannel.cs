@@ -1,3 +1,5 @@
+using System;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Core;
@@ -28,13 +30,14 @@ namespace Bolt.Client
         /// <summary>
         /// Sends the request to Bolt server.
         /// </summary>
-        /// <typeparam name="TResult">The expected type of result.</typeparam>
+        /// <param name="contract">Contract that contains the action.</param>
+        /// <param name="action">The action action.</param>
+        /// <param name="resultType">The expected type of result.</param>
         /// <param name="parameters">The data required to execute the action on Bolt server.</param>
-        /// <param name="descriptor">The action descriptor.</param>
         /// <param name="cancellation">Cancellation token for current action.</param>
         /// <returns>Task representing the ongoing async action.</returns>
         /// <remarks>The void return value or parameters should be represented by <see cref="Empty"/> type.</remarks>
-        Task<TResult> SendAsync<TResult>(IObjectSerializer parameters, ActionDescriptor descriptor, CancellationToken cancellation);
+        Task<object> SendAsync(Type contract, MethodInfo action, Type resultType, IObjectSerializer parameters, CancellationToken cancellation);
 
         ISerializer Serializer { get;  }
     }

@@ -7,15 +7,12 @@ namespace Bolt.Server
     {
         public async Task HandleAsync(ServerActionContext context)
         {
-            if (context.Action.HasParameters && context.Parameters == null)
-            {
-                var feature = context.HttpContext.GetFeature<IBoltFeature>();
+            IBoltFeature feature = context.HttpContext.GetFeature<IBoltFeature>();
 
-                context.Parameters =
-                    feature.Configuration.Serializer.DeserializeParameters(
-                        await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted),
-                        context.Action);
-            }
+            context.Parameters =
+                feature.Configuration.Serializer.DeserializeParameters(
+                    await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted),
+                    context.Action);
         }
     }
 }

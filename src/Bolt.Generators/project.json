@@ -3,10 +3,7 @@
   "authors": [ "Martin Tomka" ],
   "description": "Bolt library containing helper classes for code generation.",
   "dependencies": {
-    "Bolt.Common": { "type": "build" },
-    "Microsoft.Framework.PropertyHelper.Sources": { "type": "build", "version": "1.0.0-*" },
-    "Microsoft.Framework.NotNullAttribute.Sources": { "type": "build","version": "1.0.0-*" }
-
+    "Bolt.Common": { "type": "build" }
   },
   "frameworks": {
     "net45": {
@@ -19,25 +16,25 @@
     },
     "dnx451": {
       "frameworkAssemblies": {
-        "System.Runtime": "",
         "System.Collections": "",
-        "System.Runtime.Serialization": "",
-        "System.Collections.Concurrent": ""
+        "System.Collections.Concurrent": "",
+        "System.Runtime": "",
+        "System.Runtime.Serialization": ""
       }
     },
     "dotnet": {
       "dependencies": {
-        "System.Runtime": "4.0.20-*",
+        "System.Collections": "4.0.10.0-*",
+        "System.Collections.Concurrent": "4.0.10-*",
+        "System.ComponentModel.TypeConverter": "4.0.0-*",
+        "System.Diagnostics.Debug": "4.0.10-*",
+        "System.IO": "4.0.10.0-*",
         "System.Linq": "4.0.0-*",
         "System.Reflection": "4.0.10-*",
         "System.Reflection.Extensions": "4.0.0-*",
+        "System.Runtime": "4.0.20-*",
         "System.Runtime.Serialization.Primitives": "4.0.0-*",
-        "System.Diagnostics.Debug": "4.0.10-*",
-        "System.ComponentModel.TypeConverter": "4.0.0-*",
-        "System.Collections": "4.0.10.0-*",
-        "System.IO": "4.0.10.0-*",
-        "System.Threading.Tasks": "4.0.10-*",
-        "System.Collections.Concurrent": "4.0.10-*"
+        "System.Threading.Tasks": "4.0.10-*"
       }
     }
   }

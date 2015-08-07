@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 
 namespace Bolt
 {
@@ -7,15 +8,15 @@ namespace Bolt
     /// </summary>
     public class BoltServerException : Exception
     {
-        public BoltServerException(int errorCode, ActionDescriptor action, string url)
-            : base($"Execution of action '{action}' failed on server with error code '{errorCode}'. Url - '{url}'")
+        public BoltServerException(int errorCode, MethodInfo action, string url)
+            : base($"Execution of action '{action.Name}' failed on server with error code '{errorCode}'. Url - '{url}'")
         {
             ErrorCode = errorCode;
             Action = action;
         }
 
-        public BoltServerException(ServerErrorCode error, ActionDescriptor action, string url)
-            : base($"Execution of action '{action}' failed on server with error '{error}'. Url - '{url}'")
+        public BoltServerException(ServerErrorCode error, MethodInfo action, string url)
+            : base($"Execution of action '{action.Name}' failed on server with error '{error}'. Url - '{url}'")
         {
             Error = error;
             Action = action;
@@ -26,7 +27,7 @@ namespace Bolt
 
         public int? ErrorCode { get; set; }
 
-        public ActionDescriptor Action { get; private set; }
+        public MethodInfo Action { get; private set; }
 
         public string Url { get; set; }
     }

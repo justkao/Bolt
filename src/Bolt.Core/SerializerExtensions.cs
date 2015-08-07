@@ -9,13 +9,12 @@ namespace Bolt
             return (T)serializer.Read(typeof(T), data);
         }
 
-        public static byte[] Serialize<T>(this ISerializer serializer, T data)
+        public static MemoryStream Serialize<T>(this ISerializer serializer, T data)
         {
-            using (MemoryStream stream = new MemoryStream())
-            {
-                serializer.Write(stream, data);
-                return stream.ToArray();
-            }
+            MemoryStream stream = new MemoryStream();
+            serializer.Write(stream, data);
+            stream.Seek(0, SeekOrigin.Begin);
+            return stream;
         }
     }
 }

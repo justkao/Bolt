@@ -2,6 +2,11 @@
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
+using Bolt.Core;
 
 namespace Bolt.Server
 {
@@ -9,7 +14,7 @@ namespace Bolt.Server
     /// Context of single contract action. By default all properties are filled by <see cref="BoltRouteHandler"/>. 
     /// Optionaly <see cref="IContractInvoker"/> might override some properties if special handling is required.
     /// </summary>
-    public class ServerActionContext : ActionContextBase
+    public class ServerActionContext : ActionContextBase, IContractProvider
     {
         public HttpContext HttpContext { get; set; }
 
@@ -19,7 +24,7 @@ namespace Bolt.Server
 
         public object ContractInstance { get; set; }
 
-        public object Parameters { get; set; }
+        public IObjectDeserializer Parameters { get; set; }
 
         public object Result { get; set; }
 
@@ -29,39 +34,31 @@ namespace Bolt.Server
 
         public IContractInvoker ContractInvoker { get; set; }
 
-        public T GetRequiredInstance<T>()
+        public Type Contract => ContractInvoker?.Contract;
+
+        public object GetRequiredInstance()
         {
             if (ContractInstance == null)
             {
                 throw new InvalidOperationException("There is no contract instance assigned to current context.");
             }
 
-            if (!(ContractInstance is T))
+            if (!(ContractInstance.GetType().GetTypeInfo().ImplementedInterfaces.Contains(Contract)))
             {
-                throw new InvalidOperationException($"Contract instance of type {typeof(T).Name} is expected but {ContractInstance.GetType().Name} was provided.");
+                throw new InvalidOperationException($"Contract instance of type {Contract.Name} is expected but {ContractInstance.GetType().Name} was provided.");
             }
 
-            return (T) ContractInstance;
+            return ContractInstance;
         }
 
-        public T GetRequiredParameters<T>()
+        public IObjectDeserializer GetRequiredParameters()
         {
-            if (typeof (T) == typeof (Empty))
-            {
-                return default(T);
-            }
-
             if (Parameters == null)
             {
                 throw new InvalidOperationException("There is no paramters instance assigned to current context.");
             }
-
-            if (!(Parameters is T))
-            {
-                throw new InvalidOperationException($"Parameters instance of type {typeof(T).Name} is expected but {Parameters.GetType().Name} was provided.");
-            }
-
-            return (T)Parameters;
+    
+            return Parameters;
         }
 
         public void EnsureNotExecuted()
@@ -79,5 +76,6 @@ namespace Bolt.Server
                 throw new InvalidOperationException("Response has already been send to client.");
             }
         }
+
     }
 }

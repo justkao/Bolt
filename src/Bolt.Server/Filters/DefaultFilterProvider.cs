@@ -10,8 +10,8 @@ namespace Bolt.Server.Filters
             {
                 yield return filter;
             }
-
-            foreach (var filter in context.ContractInvoker.Parent.Filters)
+            
+            foreach (var filter in context.HttpContext.GetFeature<IBoltFeature>().Root.Filters)
             {
                 yield return filter;
             }

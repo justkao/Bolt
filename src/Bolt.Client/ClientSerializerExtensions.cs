@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
+
 using Bolt.Core;
 
 namespace Bolt.Client
@@ -13,14 +15,12 @@ namespace Bolt.Client
         /// Serializes the parameters instance into the raw byte array.
         /// </summary>
         /// <param name="serializer">The data serializer instance.</param>
-        /// <param name="parametersType">Type of parameters to serialize.</param>
-        /// <param name="parameters">The instance of parameters. Might be null of <see cref="Empty.Instance"/></param>
-        /// <param name="actionDescriptor">The descriptor for action that is using the parameters class.</param>
+        /// <param name="action">The descriptor for action that is using the parameters class.</param>
         /// <returns>The serialized parameters or null.</returns>
         /// <exception cref="TimeoutException">Thrown if timeout occurred.</exception>
         /// <exception cref="OperationCanceledException">Thrown if operation was cancelled.</exception>
         /// <exception cref="SerializeParametersException">Thrown if any error occurred during serialization.</exception>
-        public static Stream SerializeParameters(this IObjectSerializer serializer, ActionDescriptor actionDescriptor)
+        public static Stream SerializeParameters(this IObjectSerializer serializer, MethodInfo action)
         {
             try
             {
@@ -41,10 +41,7 @@ namespace Bolt.Client
             catch (Exception e)
             {
                 e.EnsureNotCancelled();
-
-                throw new SerializeParametersException(
-                    $"Failed to serialize parameters for action '{actionDescriptor}'.",
-                    e);
+                throw new SerializeParametersException($"Failed to serialize parameters for action '{action.Name}'.", e);
             }
         }
 
@@ -54,12 +51,12 @@ namespace Bolt.Client
         /// <param name="serializer">The data serializer instance.</param>
         /// <param name="resultType">Expected result type.</param>
         /// <param name="stream">The stream used to deserialize the data.</param>
-        /// <param name="actionDescriptor">The action context of deserialize operation.</param>
+        /// <param name="action">The action context of deserialize operation.</param>
         /// <returns>The deserialized data or default(T) if stream is null or empty.</returns>
         /// <exception cref="TimeoutException">Thrown if timeout occurred.</exception>
         /// <exception cref="OperationCanceledException">Thrown if operation was cancelled.</exception>
         /// <exception cref="DeserializeResponseException">Thrown if any error occurred during deserialization.</exception>
-        public static object DeserializeResponse(this ISerializer serializer, Type resultType, Stream stream, ActionDescriptor actionDescriptor)
+        public static object DeserializeResponse(this ISerializer serializer, Type resultType, Stream stream, MethodInfo action)
         {
             if (resultType == typeof (Empty))
             {
@@ -90,7 +87,7 @@ namespace Bolt.Client
             catch (Exception e)
             {
                 e.EnsureNotCancelled();
-                throw new DeserializeResponseException($"Failed to deserialize response data for action '{actionDescriptor}'.", e);
+                throw new DeserializeResponseException($"Failed to deserialize response data for action '{action.Name}'.", e);
             }
         }
 
@@ -100,12 +97,12 @@ namespace Bolt.Client
         /// <param name="serializer">The data serializer instance.</param>
         /// <param name="type">The resultType of data to deserialize.</param>
         /// <param name="stream">The stream used to deserialize the data.</param>
-        /// <param name="actionDescriptor">The action context of deserialize operation.</param>
+        /// <param name="action">The action context of deserialize operation.</param>
         /// <returns>The deserialized data or default(T) if stream is null or empty.</returns>
         /// <exception cref="TimeoutException">Thrown if timeout occurred.</exception>
         /// <exception cref="OperationCanceledException">Thrown if operation was cancelled.</exception>
         /// <exception cref="DeserializeResponseException">Thrown if any error occurred during deserialization.</exception>
-        public static object DeserializeExceptionResponse(this ISerializer serializer, Type type, Stream stream, ActionDescriptor actionDescriptor)
+        public static object DeserializeExceptionResponse(this ISerializer serializer, Type type, Stream stream, MethodInfo action)
         {
             if (stream == null || stream.Length == 0)
             {
@@ -131,7 +128,7 @@ namespace Bolt.Client
             catch (Exception e)
             {
                 e.EnsureNotCancelled();
-                throw new DeserializeResponseException($"Failed to deserialize exception response data for action '{actionDescriptor}'.", e);
+                throw new DeserializeResponseException($"Failed to deserialize exception response data for action '{action.Name}'.", e);
             }
         }
     }

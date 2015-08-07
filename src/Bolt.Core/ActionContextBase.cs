@@ -10,7 +10,7 @@ namespace Bolt
     {
         private IDictionary<object, object> _items;
 
-        public ActionDescriptor Action { get; set; }
+        public MethodInfo Action { get; set; }
 
         public IDictionary<object, object> Items
         {

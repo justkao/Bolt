@@ -11,7 +11,7 @@ namespace Bolt.Server
 
         void Add(IContractInvoker contractInvoker);
 
-        IContractInvoker Get(ContractDescriptor descriptor);
+        IContractInvoker Get(Type contract);
 
         IList<IServerExecutionFilter> Filters { get; }
 

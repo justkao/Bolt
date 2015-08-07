@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Server.InstanceProviders;
 using Microsoft.AspNet.Http;
@@ -14,13 +15,21 @@ namespace Bolt.Server.Metadata
 {
     public class BoltMetadataHandler : IBoltMetadataHandler
     {
-        public BoltMetadataHandler(ILoggerFactory factory)
+        private readonly IActionResolver _actionResolver;
+
+        public BoltMetadataHandler(ILoggerFactory factory, IActionResolver actionResolver)
         {
             if (factory == null)
             {
                 throw new ArgumentNullException(nameof(factory));
             }
 
+            if (actionResolver == null)
+            {
+                throw new ArgumentNullException(nameof(actionResolver));
+            }
+
+            _actionResolver = actionResolver;
             Logger = factory.CreateLogger<BoltMetadataHandler>();
         }
 
@@ -30,8 +39,11 @@ namespace Bolt.Server.Metadata
         {
             try
             {
-                var result = JsonConvert.SerializeObject(contracts.Select(c => c.Descriptor.Name).ToList(),
-                    Formatting.Indented, new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore});
+                string result = JsonConvert.SerializeObject(
+                    contracts.Select(c => c.Contract.Name).ToList(),
+                    Formatting.Indented,
+                    new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+
                 await context.HttpContext.Response.WriteAsync(result);
                 return true;
             }
@@ -48,22 +60,27 @@ namespace Bolt.Server.Metadata
             {
                 string result = string.Empty;
                 string actionName = context.HttpContext.Request.Query["action"]?.Trim();
-                ActionDescriptor action = null;
+                MethodInfo action = null;
+
 
                 if (!string.IsNullOrEmpty(actionName))
                 {
-                    action = context.ContractInvoker.Descriptor.Find(actionName);
+                    action = _actionResolver.Resolve(context.Contract, actionName);
                 }
 
                 if (action == null)
                 {
                     var contractMetadata = CrateContractMetadata(context);
-                    result = JsonConvert.SerializeObject(contractMetadata, Formatting.Indented,
-                        new JsonSerializerSettings {NullValueHandling = NullValueHandling.Ignore});
+                    result = JsonConvert.SerializeObject(
+                        contractMetadata,
+                        Formatting.Indented,
+                        new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
                 }
                 else
                 {
-                    if (action.HasParameters)
+                    var actionParameters = action.GetParameters();
+
+                    if (actionParameters.Any())
                     {
                         JsonSchemaGenerator generator = new JsonSchemaGenerator();
 
@@ -71,9 +88,12 @@ namespace Bolt.Server.Metadata
                         {
                             using (var jw = new JsonTextWriter(sw))
                             {
+                                // TODO: fix
+                                /*
                                 jw.Formatting = Formatting.Indented;
                                 var schema = generator.Generate(action.Parameters);
                                 schema.WriteTo(jw);
+                                */
                             }
 
                             result = sw.GetStringBuilder().ToString();
@@ -89,7 +109,7 @@ namespace Bolt.Server.Metadata
             catch (Exception e)
             {
                 Logger.LogWarning(BoltLogId.HandleContractMetadataError,
-                    "Failed to generate Bolt metadata for contract '{0}'. Error: {1}", context.ContractInvoker.Descriptor, e);
+                    "Failed to generate Bolt metadata for contract '{0}'. Error: {1}", context.Contract.Name, e);
                 return false;
             }
         }
@@ -97,13 +117,12 @@ namespace Bolt.Server.Metadata
         private ContractMetadata CrateContractMetadata(ServerActionContext context)
         {
             var feature = context.HttpContext.GetFeature<IBoltFeature>();
-
             var m = new ContractMetadata
-            {
-                Actions = context.ContractInvoker.Descriptor.Select(a => a.Name).ToList(),
-                ErrorHeader = feature.Configuration.Options.ServerErrorHeader,
-                ContentType = feature.Configuration.Serializer.ContentType
-            };
+                        {
+                            Actions = Bolt.GetContractActions(context.Contract).Select(a => a.Name).ToList(),
+                            ErrorHeader = feature.Configuration.Options.ServerErrorHeader,
+                            ContentType = feature.Configuration.Serializer.ContentType
+                        };
 
             var statefullProvder = context.ContractInvoker.InstanceProvider as StateFullInstanceProvider;
             if (statefullProvder != null)

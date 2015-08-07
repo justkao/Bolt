@@ -20,12 +20,12 @@ namespace Bolt.Client.Channels
         }
 
         public DelegatedChannel(Uri server, ClientConfiguration configuration, Action<ClientActionContext> beforeSending = null, Action<ClientActionContext> afterReceived = null)
-            : this(server, configuration.RequestHandler, configuration.EndpointProvider, configuration.Filters, beforeSending, afterReceived)
+            : this(server, configuration.Serializer, configuration.RequestHandler, configuration.EndpointProvider, configuration.Filters, beforeSending, afterReceived)
         {
         }
 
-        public DelegatedChannel(Uri server, IRequestHandler requestHandler, IEndpointProvider endpointProvider, IReadOnlyCollection<IClientExecutionFilter> filters, Action<ClientActionContext> beforeSending = null, Action<ClientActionContext> afterReceived = null)
-            : base(requestHandler, endpointProvider, filters)
+        public DelegatedChannel(Uri server, ISerializer serializer, IRequestHandler requestHandler, IEndpointProvider endpointProvider, IReadOnlyCollection<IClientExecutionFilter> filters, Action<ClientActionContext> beforeSending = null, Action<ClientActionContext> afterReceived = null)
+            : base(serializer, requestHandler, endpointProvider, filters)
         {
             _server = server;
             _beforeSending = beforeSending;

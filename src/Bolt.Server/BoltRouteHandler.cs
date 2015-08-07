@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Server.Filters;
 using Bolt.Server.Metadata;
@@ -16,13 +17,13 @@ namespace Bolt.Server
 {
     public class BoltRouteHandler : IBoltRouteHandler, IEnumerable<IContractInvoker>
     {
-        private readonly IActionPicker _actionPicker;
+        private readonly IActionResolver _actionResolver;
         private readonly List<IContractInvoker> _invokers = new List<IContractInvoker>();
 
         public BoltRouteHandler(ILoggerFactory factory, IOptions<ServerRuntimeConfiguration> defaultConfiguration, IBoltMetadataHandler metadataHandler,
-             IServiceProvider applicationServices, IActionPicker actionPicker)
+             IServiceProvider applicationServices, IActionResolver actionResolver)
         {
-            _actionPicker = actionPicker;
+            _actionResolver = actionResolver;
             if (factory == null)
             {
                 throw new ArgumentNullException(nameof(factory));
@@ -38,9 +39,9 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(applicationServices));
             }
 
-            if (actionPicker == null)
+            if (actionResolver == null)
             {
-                throw new ArgumentNullException(nameof(actionPicker));
+                throw new ArgumentNullException(nameof(actionResolver));
             }
 
             Logger = factory.CreateLogger<BoltRouteHandler>();
@@ -69,22 +70,23 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(invoker));
             }
 
-            if (_invokers.FirstOrDefault(i => i.Descriptor.Name == invoker.Descriptor.Name) != null)
+            if (_invokers.FirstOrDefault(i => i.Contract.Name == invoker.Contract.Name) != null)
             {
-                throw new InvalidOperationException($"Invoker for contract '{invoker.Descriptor.Name}' already registered.");
+                throw new InvalidOperationException($"Invoker for contract '{invoker.Contract.Name}' already registered.");
             }
 
-            Logger.LogInformation(BoltLogId.ContractAdded, "Adding contract: {0}", invoker.Descriptor.Name);
+            Logger.LogInformation(BoltLogId.ContractAdded, "Adding contract: {0}", invoker.Contract.Name);
             _invokers.Add(invoker);
-            foreach (ActionDescriptor descriptor in invoker.Descriptor)
+
+            foreach (MethodInfo action in Bolt.GetContractActions(invoker.Contract))
             {
-                Logger.LogVerbose("Action: {0}", descriptor.Name);
+                Logger.LogVerbose("Action: {0}", action.Name);
             }
         }
 
-        public IContractInvoker Get(ContractDescriptor descriptor)
+        public IContractInvoker Get(Type contract)
         {
-            return _invokers.FirstOrDefault(i => i.Descriptor == descriptor);
+            return _invokers.FirstOrDefault(i => i.Contract == contract);
         }
 
         public IEnumerator<IContractInvoker> GetEnumerator()
@@ -246,12 +248,7 @@ namespace Bolt.Server
 
         protected virtual IBoltFeature AssignBoltFeature(HttpContext context, ServerActionContext actionContext)
         {
-            var boltFeature = new BoltFeature
-            {
-                ActionContext = actionContext,
-                Configuration = Configuration
-            };
-
+            var boltFeature = new BoltFeature(this) { ActionContext = actionContext, Configuration = Configuration };
             context.SetFeature<IBoltFeature>(boltFeature);
             return boltFeature;
         }
@@ -259,12 +256,12 @@ namespace Bolt.Server
         protected virtual IContractInvoker FindContract(IEnumerable<IContractInvoker> registeredContracts, string contractName)
         {
             contractName = contractName.ToLowerInvariant();
-            return registeredContracts.FirstOrDefault(i => string.CompareOrdinal(i.Descriptor.Name.ToLowerInvariant(), contractName) == 0);
+            return registeredContracts.FirstOrDefault(i => string.CompareOrdinal(i.Contract.Name.ToLowerInvariant(), contractName) == 0);
         }
 
-        protected virtual ActionDescriptor FindAction(ServerActionContext context, string actionName)
+        protected virtual MethodInfo FindAction(ServerActionContext context, string actionName)
         {
-            return _actionPicker.PickAction(context, actionName);
+            return _actionResolver.Resolve(context.ContractInvoker.Contract, actionName);
         }
 
         protected virtual async Task HandleContractRootAsync(RouteContext context, IContractInvoker descriptor)
@@ -286,7 +283,7 @@ namespace Bolt.Server
             }
             catch (Exception e)
             {
-                Logger.LogError(BoltLogId.HandleContractMetadataError, $"Failed to handle metadata for contract {descriptor.Descriptor}.", e);
+                Logger.LogError(BoltLogId.HandleContractMetadataError, $"Failed to handle metadata for contract {descriptor.Contract.Name}.", e);
             }
         }
 

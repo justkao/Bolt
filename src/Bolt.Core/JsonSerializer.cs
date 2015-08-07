@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
+
 using Bolt.Core;
+
 using Newtonsoft.Json;
 
 namespace Bolt
@@ -77,6 +78,11 @@ namespace Bolt
                 _parent = parent;
             }
 
+            public bool HasValues()
+            {
+                return _data.Count > 0;
+            }
+
             public void AddValue(string key, Type type, object value)
             {
                 if (key == null) throw new ArgumentNullException(nameof(key));
@@ -86,24 +92,21 @@ namespace Bolt
                 _data[key] = new Tuple<Type, object>(type, value);
             }
 
-            public Task WriteAsync(Stream stream, CancellationToken cancellation)
+            public Stream Serialize()
             {
-                cancellation.ThrowIfCancellationRequested();
-
                 Dictionary<string, string> result = new Dictionary<string, string>();
                 foreach (var pair in _data)
                 {
                     StringBuilder sb = new StringBuilder();
                     using (StringWriter writer = new StringWriter(sb))
                     {
-                        _parent.Serializer.Serialize(writer, writer);
+                        _parent.Serializer.Serialize(writer, pair.Value.Item2, pair.Value.Item1);
                     }
 
                     result[pair.Key] = sb.ToString();
                 }
 
-                var rawData = _parent.Serialize(result);
-                return stream.WriteAsync(rawData, 0, rawData.Length, cancellation);
+                return _parent.Serialize(result);
             }
         }
 

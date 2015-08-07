@@ -10,16 +10,7 @@ namespace TestService.Client
 {
     public class ClientFactory
     {
-        public static readonly ClientConfiguration Config = new ClientConfiguration
-        {
-            Filters = new List<IClientExecutionFilter>
-            {
-                new DelayFilter(),
-                new LoggingFilter(),
-                new ErrorFilter(),
-                new NewlineFilter()
-            }
-        };
+        public static readonly ClientConfiguration Config = new ClientConfiguration();
 
         public static ITestContract CreateIISBolt()
         {

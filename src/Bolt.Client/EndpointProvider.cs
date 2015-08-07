@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using System.Text;
 
 namespace Bolt.Client
@@ -17,7 +18,7 @@ namespace Bolt.Client
             _options = options;
         }
 
-        public virtual Uri GetEndpoint(Uri server, ActionDescriptor actionDescriptor)
+        public virtual Uri GetEndpoint(Uri server, Type contract, MethodInfo action)
         {
             StringBuilder sb = new StringBuilder();
             if (server != null)
@@ -25,7 +26,7 @@ namespace Bolt.Client
                 sb.Append(server);
             }
 
-            if (actionDescriptor != null)
+            if (action != null)
             {
                 if (sb.Length > 0 && sb[sb.Length - 1] == '/')
                 {
@@ -34,7 +35,7 @@ namespace Bolt.Client
                         sb.Append(_options.Prefix + "/");
                     }
 
-                    sb.Append(actionDescriptor.Contract.Name);
+                    sb.Append(contract.Name);
                 }
                 else
                 {
@@ -43,13 +44,25 @@ namespace Bolt.Client
                         sb.Append("/" + _options.Prefix);
                     }
 
-                    sb.Append("/" + actionDescriptor.Contract.Name);
+                    sb.Append("/" + contract.Name);
                 }
 
-                sb.Append("/" + actionDescriptor.Name);
+                sb.Append("/" + TrimAsyncPostfix(action.Name));
             }
 
             return new Uri(sb.ToString(), server != null ? UriKind.Absolute : UriKind.Relative);
+        }
+
+
+        private string TrimAsyncPostfix(string actionName)
+        {
+            int index = actionName.IndexOf(Bolt.AsyncPostFix, StringComparison.OrdinalIgnoreCase);
+            if (index <= 0)
+            {
+                return actionName;
+            }
+
+            return actionName.Substring(0, index);
         }
     }
 }

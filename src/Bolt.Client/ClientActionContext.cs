@@ -45,10 +45,7 @@ namespace Bolt.Client
         /// </summary>
         public TimeSpan ResponseTimeout { get; set; }
 
-        public Type ResponseType
-        {
-            get { return null; }
-        }
+        public Type ResponseType { get; set; }
 
         public void Dispose()
         {

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Reflection;
+
 using Microsoft.Framework.DependencyInjection;
 
 namespace Bolt.Server.InstanceProviders
@@ -7,13 +9,13 @@ namespace Bolt.Server.InstanceProviders
     {
         private ObjectFactory _factory;
 
-        public StateFullInstanceProvider(ActionDescriptor initSession, ActionDescriptor closeSession, BoltServerOptions options)
+        public StateFullInstanceProvider(MethodInfo initSession, MethodInfo closeSession, BoltServerOptions options)
             : base(initSession, closeSession, new MemorySessionFactory(options))
         {
         }
 
 
-        public StateFullInstanceProvider(ActionDescriptor initSession, ActionDescriptor closeSession, ISessionFactory sessionFactory = null)
+        public StateFullInstanceProvider(MethodInfo initSession, MethodInfo closeSession, ISessionFactory sessionFactory = null)
             : base(initSession, closeSession, sessionFactory)
         {
         }

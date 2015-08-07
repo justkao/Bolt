@@ -14,8 +14,8 @@ namespace Bolt.Server
 
             if (context.Result != null)
             {
-                byte[] raw = feature.Configuration.Serializer.SerializeResponse(context.Result, context.Action);
-                if (raw != null && raw.Length > 0)
+                byte[] raw = feature.Configuration.Serializer.SerializeResponse(context.Result, context.Action).ToArray();
+                if (raw.Length > 0)
                 {
                     context.HttpContext.Response.ContentLength = raw.Length;
                     context.HttpContext.Response.ContentType = feature.Configuration.Serializer.ContentType;

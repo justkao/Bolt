@@ -96,42 +96,9 @@ namespace Bolt.Generators
             });
         }
 
-        public DocumentGenerator Descriptor(ContractDefinition definition = null, ClassDescriptor descriptor = null)
+        public DocumentGenerator Proxy(ContractDefinition definition = null, ClassDescriptor descriptor = null, bool forceAsync = false)
         {
-            return
-                AddContractGenerator(
-                    new ContractDescriptorGenerator(Output, Formatter, IntendProvider)
-                        {
-                            ContractDefinition = definition ?? ContractDefinition,
-                            ContractDescriptor = descriptor
-                        });
-        }
-
-        public DocumentGenerator Contract(ContractDefinition definition = null, ClassDescriptor descriptor = null)
-        {
-            return
-                AddContractGenerator(
-                    new ContractGenerator(Output, Formatter, IntendProvider)
-                        {
-                            ContractDefinition = definition ?? ContractDefinition,
-                            ContractDescriptor = descriptor
-                        });
-        }
-
-        public DocumentGenerator Server(ContractDefinition definition = null, ClassDescriptor descriptor = null)
-        {
-            return
-                AddContractGenerator(
-                    new ContractActionsGenerator(Output, Formatter, IntendProvider)
-                        {
-                            ContractDefinition = definition ?? ContractDefinition,
-                            ContractDescriptor = descriptor
-                        });
-        }
-
-        public DocumentGenerator Client(ContractDefinition definition = null, ClassDescriptor descriptor = null, bool forceAsync = false)
-        {
-            return AddContractGenerator(new ClientGenerator(Output, Formatter, IntendProvider)
+            return AddContractGenerator(new ProxyGenerator(Output, Formatter, IntendProvider)
             {
                 ContractDefinition = definition ?? ContractDefinition,
                 ContractDescriptor = descriptor,

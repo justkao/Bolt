@@ -1,25 +1,23 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
+
+using Bolt.Core;
 
 namespace Bolt.Server
 {
     public static class ServerSerializerExtensions
     {
-        public static object DeserializeParameters(this ISerializer serializer, Stream stream, ActionDescriptor actionDescriptor)
+        public static IObjectDeserializer DeserializeParameters(this ISerializer serializer, Stream stream, MethodInfo action)
         {
-            if (actionDescriptor.Parameters == typeof(Empty))
-            {
-                return null;
-            }
-
             if (stream == null || stream.Length == 0)
             {
-                throw new DeserializeParametersException($"The data required to deserialize '{actionDescriptor.Parameters.Name}' parameters for action '{actionDescriptor}' are not available in request.");
+                throw new DeserializeParametersException($"The data required to deserialize  parameters for action '{action.Name}' are not available in request.");
             }
 
             try
             {
-                return serializer.Read(actionDescriptor.Parameters, stream);
+                return serializer.CreateDeserializer(stream);
             }
             catch (OperationCanceledException)
             {
@@ -33,11 +31,27 @@ namespace Bolt.Server
             {
                 e.EnsureNotCancelled();
 
-                throw new DeserializeParametersException($"Failed to deserialize parameters for action '{actionDescriptor}'. Parameters type - '{actionDescriptor.Parameters.FullName}'",e);
+                throw new DeserializeParametersException($"Failed to deserialize parameters for action '{action.Name}'.",e);
             }
         }
 
-        public static byte[] SerializeResponse(this ISerializer serializer, object data, ActionDescriptor actionDescriptor)
+        public static object ReadParameterValue(this IObjectDeserializer serializer, MethodInfo action, string key, Type parameterType)
+        {
+            try
+            {
+                return serializer.GetValue(key, parameterType);
+            }
+            catch (DeserializeParametersException)
+            {
+                throw;
+            }
+            catch (Exception e)
+            {
+                throw new DeserializeParametersException($"Failed to deserialize parameter '{key}' for action '{action.Name}'.", e);
+            }
+        }
+
+        public static MemoryStream SerializeResponse(this ISerializer serializer, object data, MethodInfo action)
         {
             if (Equals(data, null))
             {
@@ -59,7 +73,7 @@ namespace Bolt.Server
             catch (Exception e)
             {
                 e.EnsureNotCancelled();
-                throw new SerializeResponseException($"Failed to serialize response data for action '{actionDescriptor}'.", e);
+                throw new SerializeResponseException($"Failed to serialize response data for action '{action.Name}'.", e);
             }
         }
     }

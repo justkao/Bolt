@@ -24,7 +24,7 @@ namespace Bolt.Client
         /// <summary>
         /// Gets or sets the Bolt options.
         /// </summary>
-        public BoltOptions Options { get; private set; }
+        public BoltOptions Options { get; }
 
         /// <summary>
         /// Gets or sets the request forwarder that is used by channels to send and receive the requests.

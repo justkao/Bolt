@@ -12,6 +12,6 @@
     }
   },
   "commands": {
-    "gen": "Bolt.Console code Generated/Configuration.json"
+    "gen": "Bolt.Console code --contract ITestContract --output ../TestService/Generated/ --mode Proxy"
   }
 }

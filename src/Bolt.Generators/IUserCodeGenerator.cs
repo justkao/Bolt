@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Microsoft.Framework.Internal;
-
 namespace Bolt.Generators
 {
     public interface IUserCodeGenerator
@@ -21,6 +19,7 @@ namespace Bolt.Generators
                 return generator;
             }
 
+            /*
             foreach (var prop in PropertyHelper.GetProperties(generator))
             {
                 if (!properties.ContainsKey(prop.Name))
@@ -31,6 +30,7 @@ namespace Bolt.Generators
                 // TODO:
                 // prop.SetValue(generator, Convert.ChangeType(properties[prop.Name], prop.Property.PropertyType));
             }
+            */
 
             return generator;
         }

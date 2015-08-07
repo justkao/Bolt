@@ -31,8 +31,6 @@ namespace Bolt.Generators
 
         public Type Root { get; }
 
-        public Type ParametersBase { get; set; }
-
         public string Name { get; private set; }
 
         public string Namespace { get; private set; }

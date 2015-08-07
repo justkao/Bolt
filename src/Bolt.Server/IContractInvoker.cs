@@ -4,15 +4,11 @@ using Bolt.Server.Filters;
 
 namespace Bolt.Server
 {
-    public interface IContractInvoker : IContractDescriptorProvider
+    public interface IContractInvoker : IContractProvider
     {
         IInstanceProvider InstanceProvider { get; set; }
 
         IList<IServerExecutionFilter> Filters { get; set; }
-
-        IBoltRouteHandler Parent { get; set; }
-
-        IContractActions Actions { get; set; }
 
         Task ExecuteAsync(ServerActionContext context);
 

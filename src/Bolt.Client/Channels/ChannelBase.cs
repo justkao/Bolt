@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client.Filters;
 using Bolt.Common;
+using Bolt.Core;
 
 namespace Bolt.Client.Channels
 {
@@ -22,16 +24,17 @@ namespace Bolt.Client.Channels
 
             RequestHandler = proxy.RequestHandler;
             EndpointProvider = proxy.EndpointProvider;
+            Serializer = proxy.Serializer;
             IsClosed = proxy.IsClosed;
         }
 
         protected ChannelBase(ClientConfiguration configuration)
-            : this(configuration.RequestHandler, configuration.EndpointProvider, configuration.Filters)
+            : this(configuration.Serializer, configuration.RequestHandler, configuration.EndpointProvider, configuration.Filters)
         {
             DefaultResponseTimeout = configuration.DefaultResponseTimeout;
         }
 
-        protected ChannelBase(IRequestHandler requestHandler, IEndpointProvider endpointProvider, IReadOnlyCollection<IClientExecutionFilter> filters)
+        protected ChannelBase(ISerializer serializer, IRequestHandler requestHandler, IEndpointProvider endpointProvider, IReadOnlyCollection<IClientExecutionFilter> filters)
         {
             if (requestHandler == null)
             {
@@ -44,6 +47,7 @@ namespace Bolt.Client.Channels
             }
 
             Filters = filters ?? new List<IClientExecutionFilter>();
+            Serializer = serializer;
             RequestHandler = requestHandler;
             EndpointProvider = endpointProvider;
         }
@@ -112,42 +116,44 @@ namespace Bolt.Client.Channels
 
         protected virtual ClientActionContext CreateContext(
             ConnectionDescriptor connection,
-            ActionDescriptor actionDescriptor,
+            Type contract,
+            MethodInfo action,
             CancellationToken cancellation,
             Type responseType, 
-            Type parametersType,
-            object parameters)
+            IObjectSerializer parameters)
         {
             return new ClientActionContext
             {
                 ResponseType = responseType,
-                ParametersType = parametersType,
-                Action = actionDescriptor,
+                Action = action,
                 Cancellation = cancellation,
                 Connection = connection,
-                Request = CreateRequest(connection, actionDescriptor),
+                Request = CreateRequest(connection, contract, action),
                 ResponseTimeout = DefaultResponseTimeout,
                 Parameters = parameters
             };
         }
 
-        public virtual async Task<T> SendAsync<T, TParameters>(
-            TParameters parameters,
-            ActionDescriptor descriptor,
+        public virtual async Task<object> SendAsync(
+            Type contract,
+            MethodInfo action,
+            Type responseType,
+            IObjectSerializer parameters,
             CancellationToken cancellation)
         {
             EnsureNotClosed();
-            ValidateParameters(parameters, descriptor);
 
             var connection = await GetConnectionAsync();
 
-            using (ClientActionContext ctxt = CreateContext(connection, descriptor, cancellation,typeof(T), typeof(TParameters),  parameters))
+            using (ClientActionContext ctxt = CreateContext(connection, contract, action, cancellation, responseType, parameters))
             {
                 CoreClientAction clientAction = new CoreClientAction(Filters);
                 await clientAction.ExecuteAsync(ctxt, ExecuteCoreAsync);
-                return (T) ctxt.Result.GetResultOrThrow();
+                return ctxt.Result.GetResultOrThrow();
             }
         }
+
+        public ISerializer Serializer { get; }
 
         protected virtual void BeforeSending(ClientActionContext context)
         {
@@ -157,9 +163,9 @@ namespace Bolt.Client.Channels
         {
         }
 
-        protected virtual HttpRequestMessage CreateRequest(ConnectionDescriptor connection, ActionDescriptor descriptor)
+        protected virtual HttpRequestMessage CreateRequest(ConnectionDescriptor connection,Type contract, MethodInfo action)
         {
-            Uri uri = EndpointProvider.GetEndpoint(connection.Server, descriptor);
+            Uri uri = EndpointProvider.GetEndpoint(connection.Server, contract, action);
 
             return new HttpRequestMessage
             {
@@ -177,29 +183,6 @@ namespace Bolt.Client.Channels
             if (IsClosed)
             {
                 throw new ChannelClosedException("Channel is already closed.");
-            }
-        }
-
-        private void ValidateParameters<TParams>(TParams parameters, ActionDescriptor action)
-        {
-            if (!action.HasParameters)
-            {
-                if (action.Parameters != typeof(Empty))
-                {
-                    throw new InvalidOperationException($"Invalid parameters type provided for action '{action.Name}'. Expected parameter type object should be '{typeof (Empty).FullName}', but was '{typeof (TParams).FullName}' instead.");
-                }
-            }
-            else
-            {
-                if (Equals(parameters, default(TParams)))
-                {
-                    throw new InvalidOperationException($"Parameters must not be null. Action '{action.Name}'.");
-                }
-
-                if (action.Parameters != typeof(TParams))
-                {
-                    throw new InvalidOperationException($"Invalid parameters type provided for action '{action.Name}'. Expected parameter type object should be '{typeof (TParams).FullName}', but was '{typeof (TParams).FullName}' instead.");
-                }
             }
         }
 

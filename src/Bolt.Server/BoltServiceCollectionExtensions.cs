@@ -29,10 +29,12 @@ namespace Microsoft.Framework.DependencyInjection
             services.AddTransient<IBoltMetadataHandler, BoltMetadataHandler>();
             services.AddTransient<IFilterProvider, DefaultFilterProvider>();
             services.AddTransient<IContractInvoker, ContractInvoker>();
-            services.AddTransient<IActionPicker, ActionPicker>();
+            services.AddTransient<IActionInvoker, ActionInvoker>();
+            services.AddTransient<IActionResolver, ActionResolver>();
             services.AddTransient<IParameterHandler, ParameterHandler>();
             services.AddTransient<IServerSessionHandler, ServerSessionHandler>();
             services.AddScoped<ISessionProvider, HttpContextSessionProvider>();
+            services.AddSingleton<IContractInvokerFactory, ContractInvokerFactory>();
 
             return services;
         }

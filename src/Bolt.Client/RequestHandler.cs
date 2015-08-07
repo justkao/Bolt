@@ -42,7 +42,7 @@ namespace Bolt.Client
             {
                 try
                 {
-                    _dataHandler.WriteParameters(context, parameters);
+                    _dataHandler.WriteParameters(context);
                 }
                 catch (BoltSerializationException e)
                 {

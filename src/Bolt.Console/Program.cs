@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Framework.Runtime.Common.CommandLine;
+
+using Microsoft.Dnx.Runtime.Common.CommandLine;
 
 namespace Bolt.Console
 {
@@ -154,7 +156,8 @@ namespace Bolt.Console
                             _cache.Loader.AddDirectory(dir);
                         }
                     }
-                    var mode = GenerateContractMode.All;
+
+                    GenerateContractMode mode;
                     try
                     {
                         mode = modeOption.HasValue() ? (GenerateContractMode)Enum.Parse(typeof(GenerateContractMode), modeOption.Value(), true) : GenerateContractMode.All;
@@ -165,7 +168,7 @@ namespace Bolt.Console
                         return 1;
                     }
 
-                    bool asInternal = internalSwitch.HasValue() ? true : false;
+                    bool asInternal = internalSwitch.HasValue();
 
                     RootConfig rootConfig;
                     if ( inputExists)
@@ -297,56 +300,38 @@ namespace Bolt.Console
             rootConfig.Modifier = "<public|internal>";
             rootConfig.Assemblies = new List<string> { "<AssemblyPath>", "<AssemblyPath>", "<AssemblyPath>" };
             rootConfig.Generators = new List<GeneratorConfig>
-            {
+                                        {
                                             new GeneratorConfig
-                                            {
+                                                {
                                                     Name = "<GeneratorName>",
                                                     Type = "<FullTypeName>",
-                                                    Properties = new Dictionary<string, string>
-                                                    {
-                                                                         { "<Name>", "<Value>" }
-                                                                     }
+                                                    Properties =
+                                                        new Dictionary<string, string>
+                                                            {
+                                                                {
+                                                                    "<Name>",
+                                                                    "<Value>"
+                                                                }
+                                                            }
                                                 }
                                         };
 
-            rootConfig.Contracts = new List<ContractConfig>();
-            rootConfig.Contracts.Add(new ContractConfig
-            {
-                Contract = "<Type>",
-                Modifier = "<public|internal>",
-                Context = "<Context> // passed to user code generators",
-                Excluded = new List<string> { "<FullTypeName>", "<FullTypeName>" },
-                Client = new ClientConfig
-                {
-                    ForceAsync = true,
-                    Generator = "<GeneratorName>",
-                    Output = "<Path>",
-                    Excluded = new List<string> { "<FullTypeName>", "<FullTypeName>" },
-                    Suffix = "<Suffix> // suffix for generated client proxy, defaults to 'Proxy'",
-                    Modifier = "<public|internal>",
-                    Namespace = "<Namespace> // namespace of generated proxy, defaults to contract namespace if null",
-                    Name = "<ProxyName> // name of generated proxy, defaults to 'ContractName + Suffix' if null",
-                    ExcludedInterfaces = new List<string> { "<FullTypeName>", "<FullTypeName>" }
-                },
-                Server = new ServerConfig
-                {
-                    Output = "<Path>",
-                    Excluded = new List<string> { "<FullTypeName>" },
-                    Suffix = "<Suffix> // suffix for generated server invokers, defaults to 'Invoker'",
-                    Modifier = "<public|internal>",
-                    Namespace = "<Namespace> // namespace of generated server invoker, defaults to contract namespace if null",
-                    Name = "<ProxyName> // name of generated server invoker, defaults to 'ContractName + Suffix' if null",
-                    Generator = "<GeneratorName> // user defined generator for server invokers",
-                    GeneratorEx = "<GeneratorName> // user defined generator for invoker extensions",
-                    StateFullBase = "<FullTypeName> // base class used for statefull invokers",
-                    GenerateExtensions = true
-                },
-                Descriptor = new DescriptorConfig
-                {
-                    Modifier = "<public|internal>",
-                    Output = "<Path>"
-                }
-            });
+            rootConfig.Contracts = new List<ProxyConfig>();
+            rootConfig.Contracts.Add(
+                new ProxyConfig
+                    {
+                        Contract = "<Type>",
+                        Modifier = "<public|internal>",
+                        Context = "<Context> // passed to user code generators",
+                        Excluded = new List<string> { "<FullTypeName>", "<FullTypeName>" },
+                        ForceAsync = true,
+                        Generator = "<GeneratorName>",
+                        Output = "<Path>",
+                        Suffix = "<Suffix> // suffix for generated client proxy, defaults to 'Proxy'",
+                        Namespace = "<Namespace> // namespace of generated proxy, defaults to contract namespace if null",
+                        Name = "<ProxyName> // name of generated proxy, defaults to 'ContractName + Suffix' if null",
+                        ExcludedInterfaces = new List<string> { "<FullTypeName>", "<FullTypeName>" }
+                    });
 
             return rootConfig;
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.IO;
 using System.Threading.Tasks;
 using Bolt.Common;
 using Microsoft.AspNet.Http;
@@ -116,7 +117,7 @@ namespace Bolt.Server
                 return Task.FromResult(0);
             }
 
-            byte[] raw = context.Serializer.SerializeResponse(wrappedException, context.ActionContext.Action);
+            MemoryStream raw = context.Serializer.SerializeResponse(wrappedException, context.ActionContext.Action);
             if (raw == null || raw.Length == 0)
             {
                 httpContext.Response.Body.Dispose();
@@ -126,7 +127,7 @@ namespace Bolt.Server
             httpContext.Response.ContentLength = raw.Length;
             httpContext.Response.ContentType = context.Serializer.ContentType;
 
-            return httpContext.Response.Body.WriteAsync(raw, 0, raw.Length, httpContext.RequestAborted);
+            return raw.CopyToAsync(httpContext.Response.Body, 4096, httpContext.RequestAborted);
         }
     }
 }

@@ -5,6 +5,8 @@ namespace Bolt.Server
 {
     public interface IBoltFeature
     {
+        IBoltRouteHandler Root { get; }
+
         ServerActionContext ActionContext { get; set; }
 
         ServerRuntimeConfiguration Configuration { get; set; }

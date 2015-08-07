@@ -1,9 +1,9 @@
-﻿using Bolt.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+
+using Bolt.Common;
 
 namespace Bolt.Server.Filters
 {
@@ -44,22 +44,10 @@ namespace Bolt.Server.Filters
 
         protected virtual async Task ExecuteCore(ServerActionContext context)
         {
-            var feature = context.HttpContext.GetFeature<IBoltFeature>();
-
-            if (context.Action.HasParameters && context.Parameters == null)
-            {
-                await feature.Configuration.ParameterHandler.HandleAsync(context);
-
-                if (context.Parameters == null)
-                {
-                    throw new InvalidOperationException( $"Action {context.Action} requires parameters to execute. Make sure that parameter handler assign parameters to context properly.");
-                }
-            }
-
             bool instanceCreated = false;
             if (context.ContractInstance == null)
             {
-                context.ContractInstance = await context.ContractInvoker.InstanceProvider.GetInstanceAsync(context, context.Action.Contract.Type);
+                context.ContractInstance = await context.ContractInvoker.InstanceProvider.GetInstanceAsync(context, context.ContractInvoker.Contract);
                 instanceCreated = true;
             }
 

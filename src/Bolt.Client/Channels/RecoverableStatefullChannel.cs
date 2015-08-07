@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Client.Filters;
 using Bolt.Client.Helpers;
@@ -45,12 +46,13 @@ namespace Bolt.Client.Channels
         }
 
         protected RecoverableStatefullChannel(
+            ISerializer serializer,
             IServerProvider serverProvider,
             IRequestHandler requestHandler,
             IEndpointProvider endpointProvider,
-            IClientSessionHandler sessionHandler, 
+            IClientSessionHandler sessionHandler,
             IReadOnlyCollection<IClientExecutionFilter> filters)
-            : base(serverProvider, requestHandler, endpointProvider, filters)
+            : base(serializer, serverProvider, requestHandler, endpointProvider, filters)
         {
             if (sessionHandler == null)
             {
@@ -102,6 +104,7 @@ namespace Bolt.Client.Channels
 
                         DelegatedChannel channel = new DelegatedChannel(
                             _activeConnection.Server,
+                            Serializer,
                             RequestHandler,
                             EndpointProvider, 
                             Filters,
@@ -190,7 +193,7 @@ namespace Bolt.Client.Channels
 
         protected TContract CreateContract(Uri server)
         {
-            return CreateContract(new DelegatedChannel(server, RequestHandler, EndpointProvider,Filters, BeforeSending, AfterReceived));
+            return CreateContract(new DelegatedChannel(server, Serializer, RequestHandler, EndpointProvider,Filters, BeforeSending, AfterReceived));
         }
 
         private async Task<ConnectionDescriptor> EnsureConnectionAsync()
@@ -211,12 +214,13 @@ namespace Bolt.Client.Channels
 
                 var connection = ServerProvider.GetServer();
                 string sessionId = null;
-                ActionDescriptor action = null;
+                MethodInfo action = null;
 
                 TContract contract =
                     CreateContract(
                         new DelegatedChannel(
                             connection.Server,
+                            Serializer,
                             RequestHandler,
                             EndpointProvider,
                             Filters,

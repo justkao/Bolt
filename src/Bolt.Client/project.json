@@ -58,18 +58,6 @@
     },
     "dotnet": {
       "dependencies": {
-        "System.Collections": "4.0.10-*",
-        "System.Diagnostics.Debug": "4.0.10-*",
-        "System.Linq": "4.0.0-*",
-        "System.Net.Http": "4.0.0-*",
-        "System.Net.Primitives": "4.0.10-*",
-        "System.Runtime": "4.0.20-*",
-        "System.Threading": "4.0.10-*",
-        "System.Threading.Timer": "4.0.0-*"
-      }
-    },
-    "dnxcore50": {
-      "dependencies": {
         "System.Runtime": "4.0.20-*",
         "System.Collections": "4.0.10-*",
         "System.Linq": "4.0.0-*",
@@ -77,7 +65,13 @@
         "System.Diagnostics.Debug": "4.0.10-*",
         "System.Threading": "4.0.10-*",
         "System.Net.Primitives": "4.0.10-*",
-        "System.Net.Http": "4.0.0-*"
+        "System.Net.Http": "4.0.0-*",
+        "System.IO": "4.0.10.0-*",
+        "System.Reflection": "4.0.10-*",
+        "System.Reflection.Extensions": "4.0.0-*",
+        "System.Runtime.Serialization.Primitives": "4.0.10-*",
+        "System.Text.Encoding": "4.0.10-*",
+        "System.Threading.Tasks": "4.0.10-*"
       }
     }
   }

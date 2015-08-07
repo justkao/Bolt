@@ -1,11 +1,13 @@
-﻿using Microsoft.Framework.Runtime.Common.CommandLine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
+
+using Microsoft.Dnx.Runtime.Common.CommandLine;
+
 using TestService.Core;
 
 namespace TestService.Client

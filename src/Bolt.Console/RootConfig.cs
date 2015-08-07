@@ -6,7 +6,8 @@ using System.Linq;
 using System.Reflection;
 using Bolt.Common;
 using Bolt.Generators;
-using Microsoft.Framework.Runtime.Common.CommandLine;
+
+using Microsoft.Dnx.Runtime.Common.CommandLine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
@@ -19,7 +20,7 @@ namespace Bolt.Console
 
         public RootConfig(AssemblyCache cache)
         {
-            Contracts = new List<ContractConfig>();
+            Contracts = new List<ProxyConfig>();
             AssemblyCache = cache;
             Generators = new List<GeneratorConfig>();
             Assemblies = new List<string>();
@@ -40,7 +41,7 @@ namespace Bolt.Console
             config.OutputDirectory = outputDirectory;
             config.AssemblyCache = cache;
 
-            foreach (ContractConfig contract in config.Contracts)
+            foreach (ProxyConfig contract in config.Contracts)
             {
                 contract.Parent = config;
             }
@@ -60,7 +61,7 @@ namespace Bolt.Console
         {
             RootConfig root = new RootConfig(cache)
             {
-                Contracts = new List<ContractConfig>()
+                Contracts = new List<ProxyConfig>()
             };
 
             Assembly loadedAssembly = null;
@@ -93,7 +94,7 @@ namespace Bolt.Console
         public List<GeneratorConfig> Generators { get; set; }
 
         [JsonProperty(Required = Required.Always)]
-        public List<ContractConfig> Contracts { get; set; }
+        public List<ProxyConfig> Contracts { get; set; }
 
         [JsonIgnore]
         public bool IgnoreGeneratorErrors { get; set; }
@@ -144,7 +145,7 @@ namespace Bolt.Console
 			}
         }
 
-        public ContractConfig AddContract(TypeInfo type, GenerateContractMode mode, bool internalVisibility)
+        public ProxyConfig AddContract(TypeInfo type, GenerateContractMode mode, bool internalVisibility)
         {
             if (type == null)
             {
@@ -161,37 +162,15 @@ namespace Bolt.Console
                 return null;
             }
 
-            ContractConfig c = new ContractConfig
+            ProxyConfig c = new ProxyConfig
             {
                 Parent = this,
                 Contract = type.AssemblyQualifiedName,
-                Modifier = internalVisibility ? "internal" : "public"
+                Modifier = internalVisibility ? "internal" : "public",
+                ForceAsync = true,
+                Namespace = type.Namespace,
+                Mode = mode
             };
-
-            if (mode.HasFlag(GenerateContractMode.Client))
-            {
-                c.Client = new ClientConfig
-                {
-                    ForceAsync = true,
-                    Namespace = type.Namespace
-                };
-            }
-
-            if (mode.HasFlag(GenerateContractMode.Server))
-            {
-                c.Server = new ServerConfig
-                {
-                    Namespace = type.Namespace
-                };
-            }
-
-            if (mode.HasFlag(GenerateContractMode.Descriptor))
-            {
-                c.Descriptor = new DescriptorConfig
-                {
-                    Namespace = type.Namespace
-                };
-            }
 
             Contracts.Add(c);
             return c;
@@ -220,7 +199,7 @@ namespace Bolt.Console
 
             Stopwatch watch = Stopwatch.StartNew();
 
-            foreach (ContractConfig contract in Contracts)
+            foreach (ProxyConfig contract in Contracts)
             {
                 try
                 {

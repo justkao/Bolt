@@ -80,7 +80,7 @@ namespace Bolt.Generators
 
         protected virtual ClassDescriptor CreateDefaultDescriptor()
         {
-            return MetadataProvider.GetContractDescriptor(ContractDefinition);
+            return new ClassDescriptor(ContractDefinition.Name, ContractDefinition.Namespace);
         }
 
         public virtual bool ShouldBeAsync(MethodInfo method, bool force)
