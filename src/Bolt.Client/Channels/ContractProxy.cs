@@ -12,6 +12,10 @@ namespace Bolt.Client.Channels
     /// </summary>
     public abstract class ContractProxy : IContractProvider, IChannel
     {
+        protected ContractProxy()
+        {
+        }
+
         protected ContractProxy(ContractProxy proxy)
         {
             if (proxy == null)
@@ -53,7 +57,7 @@ namespace Bolt.Client.Channels
         /// <summary>
         /// The channel used to communicate with Bolt server.
         /// </summary>
-        public IChannel Channel { get; }
+        public IChannel Channel { get; protected set; }
 
         #region IChannel Implementation
 
