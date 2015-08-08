@@ -144,8 +144,8 @@ namespace Bolt.Client.Proxy.Test
             int param2 = 10;
             CancellationToken cancellationToken = new CancellationTokenSource().Token;
 
-            objectSerializer.Setup(s => s.AddValue(nameof(param1), typeof (string), param1)).Verifiable();
-            objectSerializer.Setup(s => s.AddValue(nameof(param2), typeof (int), param2)).Verifiable();
+            objectSerializer.Setup(s => s.Write(nameof(param1), typeof (string), param1)).Verifiable();
+            objectSerializer.Setup(s => s.Write(nameof(param2), typeof (int), param2)).Verifiable();
 
             contract.Setup(c => c.Serializer).Returns(jsonSerializer.Object);
             contract.Setup(

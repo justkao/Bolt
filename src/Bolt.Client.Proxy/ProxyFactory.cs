@@ -120,7 +120,8 @@ namespace Bolt.Client.Proxy
                         parameterSerializer = _channel.Serializer.CreateSerializer();
                     }
 
-                    parameterSerializer.AddValue(parameters[i].Name, parameters[i].ParameterType,
+                    parameterSerializer.WriteParameter(invocation.Method, parameters[i].Name,
+                        parameters[i].ParameterType,
                         invocation.GetArgumentValue(i));
                 }
 

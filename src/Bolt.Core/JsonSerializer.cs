@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Text;
-
 using Bolt.Core;
-
 using Newtonsoft.Json;
 
 namespace Bolt
@@ -30,9 +27,10 @@ namespace Bolt
             return new JsonObjectSerializer(this);
         }
 
-        public IObjectDeserializer CreateDeserializer(Stream stream)
+        public IObjectSerializer CreateSerializer(Stream inputStream)
         {
-            return new JsonObjectDeserializer(this, stream);
+            if (inputStream == null) throw new ArgumentNullException(nameof(inputStream));
+            return new JsonObjectSerializer(this, this.Read<Dictionary<string, string>>(inputStream));
         }
 
         public Newtonsoft.Json.JsonSerializer Serializer { get; }
@@ -70,20 +68,23 @@ namespace Bolt
         {
             private readonly JsonSerializer _parent;
 
-            private readonly Dictionary<string, Tuple<Type, object>> _data =
-                new Dictionary<string, Tuple<Type, object>>();
+            private readonly Dictionary<string, string> _data;
 
             public JsonObjectSerializer(JsonSerializer parent)
             {
                 _parent = parent;
+                _data = new Dictionary<string, string>();
             }
 
-            public bool HasValues()
+            public JsonObjectSerializer(JsonSerializer parent, Dictionary<string, string> data)
             {
-                return _data.Count > 0;
+                _parent = parent;
+                _data = data;
             }
 
-            public void AddValue(string key, Type type, object value)
+            public bool IsEmpty => _data.Count == 0;
+
+            public void Write(string key, Type type, object value)
             {
                 if (key == null) throw new ArgumentNullException(nameof(key));
                 if (type == null) throw new ArgumentNullException(nameof(type));
@@ -93,39 +94,16 @@ namespace Bolt
                     return;
                 }
 
-                _data[key] = new Tuple<Type, object>(type, value);
-            }
-
-            public Stream Serialize()
-            {
-                Dictionary<string, string> result = new Dictionary<string, string>();
-                foreach (var pair in _data)
+                StringBuilder sb = new StringBuilder();
+                using (StringWriter writer = new StringWriter(sb))
                 {
-                    StringBuilder sb = new StringBuilder();
-                    using (StringWriter writer = new StringWriter(sb))
-                    {
-                        _parent.Serializer.Serialize(writer, pair.Value.Item2, pair.Value.Item1);
-                    }
-
-                    result[pair.Key] = sb.ToString();
+                    _parent.Serializer.Serialize(writer, value, type);
                 }
 
-                return _parent.Serialize(result);
-            }
-        }
-
-        private class JsonObjectDeserializer : IObjectDeserializer
-        {
-            private readonly JsonSerializer _parent;
-            private readonly Dictionary<string, string> _data;
-
-            public JsonObjectDeserializer(JsonSerializer parent, Stream stream)
-            {
-                _parent = parent;
-                _data = _parent.Read<Dictionary<string, string>>(stream);
+                _data[key] = sb.ToString();
             }
 
-            public object GetValue(string key, Type type)
+            public bool TryRead(string key, Type type, out object value)
             {
                 if (key == null) throw new ArgumentNullException(nameof(key));
                 if (type == null) throw new ArgumentNullException(nameof(type));
@@ -137,12 +115,19 @@ namespace Bolt
                     {
                         using (JsonReader jsonReader = new JsonTextReader(reader))
                         {
-                            return _parent.Serializer.Deserialize(jsonReader, type);
+                            value = _parent.Serializer.Deserialize(jsonReader, type);
+                            return true;
                         }
                     }
                 }
 
-                return null;
+                value = null;
+                return false;
+            }
+
+            public Stream GetOutputStream()
+            {
+                return _parent.Serialize(_data);
             }
         }
 

@@ -24,7 +24,7 @@ namespace Bolt.Server
 
         public object ContractInstance { get; set; }
 
-        public IObjectDeserializer Parameters { get; set; }
+        public IObjectSerializer Parameters { get; set; }
 
         public object Result { get; set; }
 
@@ -51,7 +51,7 @@ namespace Bolt.Server
             return ContractInstance;
         }
 
-        public IObjectDeserializer GetRequiredParameters()
+        public IObjectSerializer GetRequiredParameters()
         {
             if (Parameters == null)
             {

@@ -78,14 +78,14 @@ namespace Bolt.Server.IntegrationTest.Core
         public virtual void SimpleMethodWithSimpleArguments(int val)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("val", typeof(int), val);
+            bolt_Params.WriteParameter(__SimpleMethodWithSimpleArgumentsAction, "val", typeof(int), val);
             Send(__SimpleMethodWithSimpleArgumentsAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task SimpleMethodWithSimpleArgumentsAsync(int val)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("val", typeof(int), val);
+            bolt_Params.WriteParameter(__SimpleMethodWithSimpleArgumentsAction, "val", typeof(int), val);
             return SendAsync(__SimpleMethodWithSimpleArgumentsAction, bolt_Params, CancellationToken.None);
         }
 
@@ -127,14 +127,14 @@ namespace Bolt.Server.IntegrationTest.Core
         public virtual void SimpleMethodWithComplexParameter(Bolt.Test.Common.CompositeType compositeType)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("compositeType", typeof(Bolt.Test.Common.CompositeType), compositeType);
+            bolt_Params.WriteParameter(__SimpleMethodWithComplexParameterAction, "compositeType", typeof(Bolt.Test.Common.CompositeType), compositeType);
             Send(__SimpleMethodWithComplexParameterAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task SimpleMethodWithComplexParameterAsync(Bolt.Test.Common.CompositeType compositeType)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("compositeType", typeof(Bolt.Test.Common.CompositeType), compositeType);
+            bolt_Params.WriteParameter(__SimpleMethodWithComplexParameterAction, "compositeType", typeof(Bolt.Test.Common.CompositeType), compositeType);
             return SendAsync(__SimpleMethodWithComplexParameterAction, bolt_Params, CancellationToken.None);
         }
 
@@ -161,28 +161,28 @@ namespace Bolt.Server.IntegrationTest.Core
         public virtual void MethodTakingHugeData(List<Bolt.Test.Common.CompositeType> arg)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("arg", typeof(List<Bolt.Test.Common.CompositeType>), arg);
+            bolt_Params.WriteParameter(__MethodTakingHugeDataAction, "arg", typeof(List<Bolt.Test.Common.CompositeType>), arg);
             Send(__MethodTakingHugeDataAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task MethodTakingHugeDataAsync(List<Bolt.Test.Common.CompositeType> arg)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("arg", typeof(List<Bolt.Test.Common.CompositeType>), arg);
+            bolt_Params.WriteParameter(__MethodTakingHugeDataAction, "arg", typeof(List<Bolt.Test.Common.CompositeType>), arg);
             return SendAsync(__MethodTakingHugeDataAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual void MethodWithNotSerializableType(Bolt.Test.Common.NotSerializableType arg)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("arg", typeof(Bolt.Test.Common.NotSerializableType), arg);
+            bolt_Params.WriteParameter(__MethodWithNotSerializableTypeAction, "arg", typeof(Bolt.Test.Common.NotSerializableType), arg);
             Send(__MethodWithNotSerializableTypeAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task MethodWithNotSerializableTypeAsync(Bolt.Test.Common.NotSerializableType arg)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("arg", typeof(Bolt.Test.Common.NotSerializableType), arg);
+            bolt_Params.WriteParameter(__MethodWithNotSerializableTypeAction, "arg", typeof(Bolt.Test.Common.NotSerializableType), arg);
             return SendAsync(__MethodWithNotSerializableTypeAction, bolt_Params, CancellationToken.None);
         }
 
@@ -204,18 +204,18 @@ namespace Bolt.Server.IntegrationTest.Core
         public virtual void MethodWithManyArguments(Bolt.Test.Common.CompositeType arg1, Bolt.Test.Common.CompositeType arg2, DateTime time)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("arg1", typeof(Bolt.Test.Common.CompositeType), arg1);
-            bolt_Params.AddValue("arg2", typeof(Bolt.Test.Common.CompositeType), arg2);
-            bolt_Params.AddValue("time", typeof(DateTime), time);
+            bolt_Params.WriteParameter(__MethodWithManyArgumentsAction, "arg1", typeof(Bolt.Test.Common.CompositeType), arg1);
+            bolt_Params.WriteParameter(__MethodWithManyArgumentsAction, "arg2", typeof(Bolt.Test.Common.CompositeType), arg2);
+            bolt_Params.WriteParameter(__MethodWithManyArgumentsAction, "time", typeof(DateTime), time);
             Send(__MethodWithManyArgumentsAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task MethodWithManyArgumentsAsync(Bolt.Test.Common.CompositeType arg1, Bolt.Test.Common.CompositeType arg2, DateTime time)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("arg1", typeof(Bolt.Test.Common.CompositeType), arg1);
-            bolt_Params.AddValue("arg2", typeof(Bolt.Test.Common.CompositeType), arg2);
-            bolt_Params.AddValue("time", typeof(DateTime), time);
+            bolt_Params.WriteParameter(__MethodWithManyArgumentsAction, "arg1", typeof(Bolt.Test.Common.CompositeType), arg1);
+            bolt_Params.WriteParameter(__MethodWithManyArgumentsAction, "arg2", typeof(Bolt.Test.Common.CompositeType), arg2);
+            bolt_Params.WriteParameter(__MethodWithManyArgumentsAction, "time", typeof(DateTime), time);
             return SendAsync(__MethodWithManyArgumentsAction, bolt_Params, CancellationToken.None);
         }
 

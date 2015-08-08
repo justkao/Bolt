@@ -180,7 +180,7 @@ namespace Bolt.Generators
 
             foreach (ParameterInfo info in methodDescriptor.GetParameters())
             {
-                WriteLine($"bolt_Params.AddValue(\"{info.Name}\", typeof({FormatType(info.ParameterType)}), {variables[info]});");
+                WriteLine($"bolt_Params.WriteParameter({GetStaticActionName(methodDescriptor.Method)}, \"{info.Name}\", typeof({FormatType(info.ParameterType)}), {variables[info]});");
             }
 
             return new GenerateRequestCodeResult

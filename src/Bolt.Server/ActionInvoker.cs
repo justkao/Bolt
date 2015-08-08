@@ -76,7 +76,7 @@ namespace Bolt.Server
 
             private IEnumerable<object> BuildParameters(ServerActionContext actionContext)
             {
-                IObjectDeserializer rawParameters = actionContext.GetRequiredParameters();
+                IObjectSerializer rawParameters = actionContext.GetRequiredParameters();
 
                 foreach (ParameterInfo parameter in Parameters)
                 {

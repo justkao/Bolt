@@ -66,28 +66,28 @@ namespace Bolt.Server.IntegrationTest.Core
         public virtual void InitEx(bool failOperation)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("failOperation", typeof(bool), failOperation);
+            bolt_Params.WriteParameter(__InitExAction, "failOperation", typeof(bool), failOperation);
             Send(__InitExAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task InitExAsync(bool failOperation)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("failOperation", typeof(bool), failOperation);
+            bolt_Params.WriteParameter(__InitExAction, "failOperation", typeof(bool), failOperation);
             return SendAsync(__InitExAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual void SetState(string state)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("state", typeof(string), state);
+            bolt_Params.WriteParameter(__SetStateAction, "state", typeof(string), state);
             Send(__SetStateAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task SetStateAsync(string state)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("state", typeof(string), state);
+            bolt_Params.WriteParameter(__SetStateAction, "state", typeof(string), state);
             return SendAsync(__SetStateAction, bolt_Params, CancellationToken.None);
         }
 

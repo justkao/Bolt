@@ -14,6 +14,6 @@ namespace Bolt
 
         IObjectSerializer CreateSerializer();
 
-        IObjectDeserializer CreateDeserializer(Stream stream);
+        IObjectSerializer CreateSerializer(Stream inputStream);
     }
 }

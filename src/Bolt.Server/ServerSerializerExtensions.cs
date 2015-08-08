@@ -8,7 +8,7 @@ namespace Bolt.Server
 {
     public static class ServerSerializerExtensions
     {
-        public static IObjectDeserializer DeserializeParameters(this ISerializer serializer, Stream stream, MethodInfo action)
+        public static IObjectSerializer DeserializeParameters(this ISerializer serializer, Stream stream, MethodInfo action)
         {
             if (stream == null || stream.Length == 0)
             {
@@ -17,7 +17,7 @@ namespace Bolt.Server
 
             try
             {
-                return serializer.CreateDeserializer(stream);
+                return serializer.CreateSerializer(stream);
             }
             catch (OperationCanceledException)
             {
@@ -35,11 +35,13 @@ namespace Bolt.Server
             }
         }
 
-        public static object ReadParameterValue(this IObjectDeserializer serializer, MethodInfo action, string key, Type parameterType)
+        public static object ReadParameterValue(this IObjectSerializer serializer, MethodInfo action, string key, Type parameterType)
         {
             try
             {
-                return serializer.GetValue(key, parameterType);
+                object value;
+                serializer.TryRead(key, parameterType, out value);
+                return value;
             }
             catch (DeserializeParametersException)
             {

@@ -30,7 +30,7 @@ namespace Bolt.Client
 
         public virtual void WriteParameters(ClientActionContext context)
         {
-            if (context.Parameters == null || !context.Parameters.HasValues())
+            if (context.Parameters == null || context.Parameters.IsEmpty)
             {
                 // auto set content length to 0
                 return;

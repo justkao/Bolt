@@ -35,28 +35,28 @@ namespace TestService.Core
         public virtual Person UpdatePerson(Person person, CancellationToken cancellation)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("person", typeof(Person), person);
+            bolt_Params.Write("person", typeof(Person), person);
             return Send<Person>(__UpdatePersonAction, bolt_Params, cancellation);
         }
 
         public virtual Task<Person> UpdatePersonAsync(Person person, CancellationToken cancellation)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("person", typeof(Person), person);
+            bolt_Params.Write("person", typeof(Person), person);
             return SendAsync<Person>(__UpdatePersonAction, bolt_Params, cancellation);
         }
 
         public virtual Person UpdatePersonThatThrowsInvalidOperationException(Person person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("person", typeof(Person), person);
+            bolt_Params.Write("person", typeof(Person), person);
             return Send<Person>(__UpdatePersonThatThrowsInvalidOperationExceptionAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task<Person> UpdatePersonThatThrowsInvalidOperationExceptionAsync(Person person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("person", typeof(Person), person);
+            bolt_Params.Write("person", typeof(Person), person);
             return SendAsync<Person>(__UpdatePersonThatThrowsInvalidOperationExceptionAction, bolt_Params, CancellationToken.None);
         }
 
@@ -78,63 +78,63 @@ namespace TestService.Core
         public virtual Task DoNothingWithComplexParameterAsAsync(List<Person> person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("person", typeof(List<Person>), person);
+            bolt_Params.Write("person", typeof(List<Person>), person);
             return SendAsync(__DoNothingWithComplexParameterAsAsyncAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual void DoNothingWithComplexParameter(List<Person> person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("person", typeof(List<Person>), person);
+            bolt_Params.Write("person", typeof(List<Person>), person);
             Send(__DoNothingWithComplexParameterAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task DoNothingWithComplexParameterAsync(List<Person> person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("person", typeof(List<Person>), person);
+            bolt_Params.Write("person", typeof(List<Person>), person);
             return SendAsync(__DoNothingWithComplexParameterAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual int GetSimpleType(int arg)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("arg", typeof(int), arg);
+            bolt_Params.Write("arg", typeof(int), arg);
             return Send<int>(__GetSimpleTypeAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task<int> GetSimpleTypeAsync(int arg)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("arg", typeof(int), arg);
+            bolt_Params.Write("arg", typeof(int), arg);
             return SendAsync<int>(__GetSimpleTypeAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task GetSimpleTypeAsAsync(int arg)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("arg", typeof(int), arg);
+            bolt_Params.Write("arg", typeof(int), arg);
             return SendAsync(__GetSimpleTypeAsAsyncAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Person GetSinglePerson(Person person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("person", typeof(Person), person);
+            bolt_Params.Write("person", typeof(Person), person);
             return Send<Person>(__GetSinglePersonAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task<Person> GetSinglePersonAsync(Person person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("person", typeof(Person), person);
+            bolt_Params.Write("person", typeof(Person), person);
             return SendAsync<Person>(__GetSinglePersonAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task<Person> GetSinglePersonAsAsync(Person person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("person", typeof(Person), person);
+            bolt_Params.Write("person", typeof(Person), person);
             return SendAsync<Person>(__GetSinglePersonAsAsyncAction, bolt_Params, CancellationToken.None);
         }
 
@@ -151,7 +151,7 @@ namespace TestService.Core
         public virtual Task<List<Person>> GetManyPersonsAsAsync(Person person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.AddValue("person", typeof(Person), person);
+            bolt_Params.Write("person", typeof(Person), person);
             return SendAsync<List<Person>>(__GetManyPersonsAsAsyncAction, bolt_Params, CancellationToken.None);
         }
 

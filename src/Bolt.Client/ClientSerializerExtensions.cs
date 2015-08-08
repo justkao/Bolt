@@ -11,6 +11,33 @@ namespace Bolt.Client
     /// </summary>
     public static class ClientSerializerExtensions
     {
+        public static void WriteParameter(this IObjectSerializer serializer, MethodInfo action, string key, Type valueType, object value)
+        {
+            try
+            {
+                serializer.Write(key, valueType, value);
+            }
+            catch (TimeoutException)
+            {
+                throw;
+            }
+            catch (OperationCanceledException)
+            {
+                throw;
+            }
+            catch (SerializeParametersException)
+            {
+                throw;
+            }
+            catch (Exception e)
+            {
+                e.EnsureNotCancelled();
+
+                throw new SerializeParametersException(
+                    $"Failed to serialize value for parameter '{key}' and action '{action.Name}'.", e);
+            }
+        }
+
         /// <summary>
         /// Serializes the parameters instance into the raw byte array.
         /// </summary>
@@ -24,7 +51,7 @@ namespace Bolt.Client
         {
             try
             {
-                return serializer.Serialize();
+                return serializer.GetOutputStream();
             }
             catch (TimeoutException)
             {

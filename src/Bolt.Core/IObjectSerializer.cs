@@ -5,10 +5,12 @@ namespace Bolt.Core
 {
     public interface IObjectSerializer
     {
-        bool HasValues();
+        bool IsEmpty { get; }
 
-        void AddValue(string key, Type type, object value);
+        void Write(string key, Type type, object value);
 
-        Stream Serialize();
+        bool TryRead(string key, Type type, out object value);
+
+        Stream GetOutputStream();
     }
 }
