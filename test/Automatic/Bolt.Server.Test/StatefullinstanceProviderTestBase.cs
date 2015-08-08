@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Common;
 using Bolt.Server.InstanceProviders;
@@ -89,12 +90,12 @@ namespace Bolt.Server.Test
             }
         }
 
-        protected virtual ServerActionContext CreateContext(ActionDescriptor descriptor)
+        protected virtual ServerActionContext CreateContext(MethodInfo action)
         {
             return new ServerActionContext()
             {
-                Action = descriptor,
-                HttpContext = new DefaultHttpContext()
+                HttpContext = new DefaultHttpContext(),
+                Action = action
             };
         }
 

@@ -1,4 +1,5 @@
 using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Server.InstanceProviders;
 using Moq;
@@ -179,9 +180,9 @@ namespace Bolt.Server.Test
                 await Assert.ThrowsAsync<SessionNotFoundException>(() => Subject.GetInstanceAsync(ctxt, typeof(IMockContract)));
             }
 
-            protected override ServerActionContext CreateContext(ActionDescriptor descriptor)
+            protected override ServerActionContext CreateContext(MethodInfo action)
             {
-                var ctxt = base.CreateContext(descriptor);
+                var ctxt = base.CreateContext(action);
                 ctxt.HttpContext.Request.Headers[SessionHeader] = _sessionHeaderValue;
                 return ctxt;
             }
@@ -317,9 +318,9 @@ namespace Bolt.Server.Test
                 Mock.Setup(o => o.OnInstanceReleased(ctxt ?? _context, SessionHeaderValue)).Verifiable();
             }
 
-            protected override ServerActionContext CreateContext(ActionDescriptor descriptor)
+            protected override ServerActionContext CreateContext(MethodInfo action)
             {
-                var ctxt = base.CreateContext(descriptor);
+                var ctxt = base.CreateContext(action);
                 ctxt.HttpContext.SetFeature(_session);
                 ctxt.HttpContext.Request.Headers[SessionHeader] = SessionHeaderValue;
                 return ctxt;

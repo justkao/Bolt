@@ -39,6 +39,8 @@ namespace Bolt.Client
         /// <remarks>The void return value or parameters should be represented by <see cref="Empty"/> type.</remarks>
         Task<object> SendAsync(Type contract, MethodInfo action, Type resultType, IObjectSerializer parameters, CancellationToken cancellation);
 
+        object Send(Type contract, MethodInfo action, Type resultType, IObjectSerializer parameters, CancellationToken cancellation);
+
         ISerializer Serializer { get;  }
     }
 }

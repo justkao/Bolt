@@ -18,12 +18,12 @@ namespace Bolt.Server
     public class BoltRouteHandler : IBoltRouteHandler, IEnumerable<IContractInvoker>
     {
         private readonly IActionResolver _actionResolver;
+        private readonly IContractResolver _contractResolver;
         private readonly List<IContractInvoker> _invokers = new List<IContractInvoker>();
 
         public BoltRouteHandler(ILoggerFactory factory, IOptions<ServerRuntimeConfiguration> defaultConfiguration, IBoltMetadataHandler metadataHandler,
-             IServiceProvider applicationServices, IActionResolver actionResolver)
+             IServiceProvider applicationServices, IActionResolver actionResolver, IContractResolver contractResolver)
         {
-            _actionResolver = actionResolver;
             if (factory == null)
             {
                 throw new ArgumentNullException(nameof(factory));
@@ -44,11 +44,18 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(actionResolver));
             }
 
+            if (contractResolver == null)
+            {
+                throw new ArgumentNullException(nameof(contractResolver));
+            }
+
             Logger = factory.CreateLogger<BoltRouteHandler>();
             MetadataHandler = metadataHandler;
             Filters = new List<IServerExecutionFilter>();
             ApplicationServices = applicationServices;
             Configuration = defaultConfiguration.Options;
+            _actionResolver = actionResolver;
+            _contractResolver = contractResolver;
         }
 
         public IList<IServerExecutionFilter> Filters { get; }
@@ -78,7 +85,7 @@ namespace Bolt.Server
             Logger.LogInformation(BoltLogId.ContractAdded, "Adding contract: {0}", invoker.Contract.Name);
             _invokers.Add(invoker);
 
-            foreach (MethodInfo action in Bolt.GetContractActions(invoker.Contract))
+            foreach (MethodInfo action in BoltFramework.GetContractActions(invoker.Contract))
             {
                 Logger.LogVerbose("Action: {0}", action.Name);
             }
@@ -255,8 +262,13 @@ namespace Bolt.Server
 
         protected virtual IContractInvoker FindContract(IEnumerable<IContractInvoker> registeredContracts, string contractName)
         {
-            contractName = contractName.ToLowerInvariant();
-            return registeredContracts.FirstOrDefault(i => string.CompareOrdinal(i.Contract.Name.ToLowerInvariant(), contractName) == 0);
+            var found = _contractResolver.Resolve(registeredContracts.Select(c => c.Contract), contractName);
+            if (found == null)
+            {
+                return null;
+            }
+
+            return registeredContracts.First(c => c.Contract == found);
         }
 
         protected virtual MethodInfo FindAction(ServerActionContext context, string actionName)

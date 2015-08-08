@@ -87,7 +87,11 @@ namespace Bolt
             {
                 if (key == null) throw new ArgumentNullException(nameof(key));
                 if (type == null) throw new ArgumentNullException(nameof(type));
-                if (value == null) throw new ArgumentNullException(nameof(value));
+
+                if (Equals(value, null))
+                {
+                    return;
+                }
 
                 _data[key] = new Tuple<Type, object>(type, value);
             }

@@ -119,7 +119,7 @@ namespace Bolt.Server.Metadata
             var feature = context.HttpContext.GetFeature<IBoltFeature>();
             var m = new ContractMetadata
                         {
-                            Actions = Bolt.GetContractActions(context.Contract).Select(a => a.Name).ToList(),
+                            Actions = BoltFramework.GetContractActions(context.Contract).Select(a => a.Name).ToList(),
                             ErrorHeader = feature.Configuration.Options.ServerErrorHeader,
                             ContentType = feature.Configuration.Serializer.ContentType
                         };

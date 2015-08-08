@@ -19,6 +19,7 @@ namespace Bolt.Client
             RequestHandler = new RequestHandler(DataHandler, new ClientErrorProvider(Options.ServerErrorHeader));
             EndpointProvider = new EndpointProvider(Options);
             SessionHandler = new ClientSessionHandler(Options);
+            ProxyFactory = new ProxyFactory();
         }
 
         /// <summary>
@@ -36,29 +37,16 @@ namespace Bolt.Client
         /// </summary>
         public IClientDataHandler DataHandler { get; set; }
 
-        /// <summary>
-        /// Gets or sets the default response timeout.
-        /// </summary>
         public TimeSpan DefaultResponseTimeout { get; set; }
 
-        /// <summary>
-        /// Gets or sets the serializer.
-        /// </summary>
         public ISerializer Serializer { get; set; }
 
-        /// <summary>
-        /// Gets or sets the exception serializer.
-        /// </summary>
         public IExceptionWrapper ExceptionWrapper { get; set; }
 
-        /// <summary>
-        /// Gets or sets the endpoint provider.
-        /// </summary>
         public IEndpointProvider EndpointProvider { get; set; }
 
-        /// <summary>
-        /// Gets or sets client session handler.
-        /// </summary>
+        public IProxyFactory ProxyFactory { get; set; }
+
         public IClientSessionHandler SessionHandler { get; set; }
 
         public List<IClientExecutionFilter> Filters { get; set; }

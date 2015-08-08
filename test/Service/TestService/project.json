@@ -8,6 +8,7 @@
     "Bolt.Common": { "type": "build" },
     "Bolt.Generators": "",
     "Bolt.Client": "",
+    "Bolt.Client.Proxy": "",
     "TestService.Core": ""
   },
   "compile": [ "**/*.cs", "../TestService.Core/Generated/TestContract.Client.Designer.cs" ],
@@ -18,9 +19,6 @@
         "System.Collections": "",
         "System.Runtime.Serialization": "",
         "System.ServiceModel": ""
-      },
-      "dependencies": {
-        "Microsoft.Framework.Runtime": "1.0.0-*"
       }
     }
   },

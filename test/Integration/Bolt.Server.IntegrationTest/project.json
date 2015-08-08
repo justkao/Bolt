@@ -3,11 +3,13 @@
   "dependencies": {
     "Bolt.Server": "",
     "Bolt.Client": "",
+    "Bolt.Client.Proxy": "",
     "Bolt.Server.IntegrationTest.Core": "",
     "Bolt.Test.Common": "",
-    "xunit.runner.aspnet": "2.0.0-aspnet-*",
+    "xunit.runner.aspnet": "2.0.0-*",
     "Microsoft.AspNet.TestHost": "1.0.0-*",
-    "Moq": "4.2.1502.911"
+    "Moq": "4.2.1502.911",
+    "Castle.Core": "3.3.3"
   },
   "frameworks": {
     "dnx451": { }

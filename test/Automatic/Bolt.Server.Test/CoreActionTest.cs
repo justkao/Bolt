@@ -9,7 +9,7 @@ namespace Bolt.Server.Test
             Context = new ServerActionContext()
             {
                 Action = Descriptor.Action,
-                ContractInvoker = new MockContractInvoker() { }
+                ContractInvoker = new MockContractInvoker() {}
             };
 
             CoreServerAction serverAction = new CoreServerAction();
@@ -21,6 +21,9 @@ namespace Bolt.Server.Test
 
         private class MockContractInvoker : ContractInvoker
         {
+            public MockContractInvoker() : base(new ActionInvoker())
+            {
+            }
         }
     }
 }

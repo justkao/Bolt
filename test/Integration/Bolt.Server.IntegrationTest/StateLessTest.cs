@@ -16,7 +16,6 @@ namespace Bolt.Server.IntegrationTest
 {
     public class StateLessTest : IntegrationTestBase
     {
-
         [Fact]
         public void ClientCallsAsyncMethod_AsyncOnClientAndServer_EnsureExecutedOnServer()
         {
@@ -307,8 +306,8 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public void LongOperation_TimeoutSet_EnsureCallTimeouted()
         {
-            TestContractProxy client = CreateChannel();
-            ((ChannelBase)client.Channel).DefaultResponseTimeout = TimeSpan.FromSeconds(0.1);
+            ITestContractAsync client = CreateChannel();
+            ((ChannelBase)((ContractProxy) client).Channel).DefaultResponseTimeout = TimeSpan.FromSeconds(0.1);
             CompositeType arg = CompositeType.CreateRandom();
 
             Mock<ITestContract> server = Server();
@@ -338,7 +337,7 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public void ServerReturnsBigData_EnsureReceivedOnClient()
         {
-            TestContractProxy channel = CreateChannel();
+            ITestContractAsync channel = CreateChannel();
             Server()
                 .Setup(v => v.FunctionReturningHugeData())
                 .Returns(() => Enumerable.Repeat(0, 1000).Select(_ => CompositeType.CreateRandom()).ToList());
@@ -350,7 +349,7 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public void ClientSendsBigData_EnsureReceivedOnServer()
         {
-            TestContractProxy channel = CreateChannel();
+            ITestContractAsync channel = CreateChannel();
             var data = Enumerable.Repeat(0, 1000).Select(_ => CompositeType.CreateRandom()).ToList();
 
             Mock<ITestContract> server = Server();
@@ -369,23 +368,19 @@ namespace Bolt.Server.IntegrationTest
             return mock;
         }
 
-        public virtual TestContractProxy CreateChannel(int retries = 0)
+        public virtual ITestContractAsync CreateChannel(int retries = 0)
         {
             return ClientConfiguration.CreateProxy<TestContractProxy>(ServerUrl);
-        }
-
-        public virtual TestContractProxy CreateChannel(int retries, TimeSpan retryDelay, params Uri[] servers)
-        {
-            TestContractProxy proxy = ClientConfiguration.CreateProxy<TestContractProxy>(new MultipleServersProvider(servers));
-            proxy.WithRetries(retries, retryDelay);
-            return proxy;
         }
 
         public MockInstanceProvider InstanceProvider = new MockInstanceProvider();
 
         protected override void Configure(IApplicationBuilder appBuilder)
         {
-            appBuilder.UseBolt((h) => h.UseTestContract(InstanceProvider));
+            appBuilder.UseBolt((h) =>
+            {
+                h.Use<ITestContract>(InstanceProvider);
+            });
         }
     }
 }

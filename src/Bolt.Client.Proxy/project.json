@@ -47,6 +47,46 @@
           "type": "build"
         }
       }
+    },
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.Collections": {
+          "version": "",
+          "type": "build"
+        },
+        "System.Diagnostics.Debug": {
+          "version": "",
+          "type": "build"
+        },
+        "System.Linq": {
+          "version": "",
+          "type": "build"
+        },
+        "System.Net.Http": {
+          "version": "",
+          "type": "build"
+        },
+        "System.Reflection": {
+          "version": "",
+          "type": "build"
+        },
+        "System.Reflection.Extensions": {
+          "version": "",
+          "type": "build"
+        },
+        "System.Runtime": {
+          "version": "",
+          "type": "build"
+        },
+        "System.Runtime.Serialization": {
+          "version": "",
+          "type": "build"
+        },
+        "System.Threading": {
+          "version": "",
+          "type": "build"
+        }
+      }
     }
   }
 }

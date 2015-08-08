@@ -1,16 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
-using Bolt.Client;
 using System.ServiceModel;
 using System.Threading.Tasks;
+using Bolt.Client;
 using Bolt.Client.Filters;
+using Bolt.Client.Proxy;
 using TestService.Core;
 
-namespace TestService.Client
+namespace TestService
 {
     public class ClientFactory
     {
-        public static readonly ClientConfiguration Config = new ClientConfiguration();
+        public static readonly ClientConfiguration Config = new ClientConfiguration()
+        {
+            ProxyFactory = new DynamicProxyFactory()
+        };
 
         public static ITestContract CreateIISBolt()
         {
@@ -20,6 +23,11 @@ namespace TestService.Client
         public static ITestContract CreateBolt()
         {
             return Config.CreateProxy<TestContractProxy>(Servers.BoltServer);
+        }
+
+        public static ITestContract CreateDynamicBolt()
+        {
+            return Config.CreateProxy<ITestContract>(Servers.BoltServer);
         }
 
         public static ITestContract CreateWcf()

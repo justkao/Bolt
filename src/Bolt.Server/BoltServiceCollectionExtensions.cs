@@ -31,6 +31,7 @@ namespace Microsoft.Framework.DependencyInjection
             services.AddTransient<IContractInvoker, ContractInvoker>();
             services.AddTransient<IActionInvoker, ActionInvoker>();
             services.AddTransient<IActionResolver, ActionResolver>();
+            services.AddTransient<IContractResolver, ContractResolver>();
             services.AddTransient<IParameterHandler, ParameterHandler>();
             services.AddTransient<IServerSessionHandler, ServerSessionHandler>();
             services.AddScoped<ISessionProvider, HttpContextSessionProvider>();

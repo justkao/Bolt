@@ -7,7 +7,7 @@ namespace Bolt.Core.Test
 {
     public class ExceptionWrapperTest
     {
-        private IExceptionWrapper _serializer;
+        private readonly IExceptionWrapper _serializer;
 
         public ExceptionWrapperTest()
         {

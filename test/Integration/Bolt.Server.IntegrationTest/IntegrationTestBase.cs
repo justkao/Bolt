@@ -1,5 +1,5 @@
 ﻿using System;
-
+using System.Reflection;
 using Bolt.Client;
 using Microsoft.Framework.DependencyInjection;
 

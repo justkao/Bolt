@@ -28,7 +28,7 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(instanceProvider));
             }
 
-            Bolt.ValidateContract(contract);
+            BoltFramework.ValidateContract(contract);
 
             ContractInvoker invoker = new ContractInvoker(_actionInvoker) { Contract = contract, InstanceProvider = instanceProvider };
             return invoker;

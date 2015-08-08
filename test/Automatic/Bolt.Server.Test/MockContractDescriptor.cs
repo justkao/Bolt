@@ -2,19 +2,19 @@
 
 namespace Bolt.Server.Test
 {
-    public class MockContractDescriptor : ContractDescriptor
+    public class MockContractDescriptor
     {
-        public MockContractDescriptor() : base(typeof(IMockContract))
+        public MockContractDescriptor() 
         {
-            Init = Add("Init", typeof(Empty), typeof(IMockContract).GetTypeInfo().GetDeclaredMethod("Init"));
-            Action = Add("Action", typeof(Empty), typeof(IMockContract).GetTypeInfo().GetDeclaredMethod("Action"));
-            Destroy = Add("Destroy", typeof(Empty), typeof(IMockContract).GetTypeInfo().GetDeclaredMethod("Destroy"));
+            Init = typeof (IMockContract).GetTypeInfo().GetDeclaredMethod(nameof(IMockContract.Init));
+            Action = typeof (IMockContract).GetTypeInfo().GetDeclaredMethod(nameof(IMockContract.Action));
+            Destroy = typeof (IMockContract).GetTypeInfo().GetDeclaredMethod(nameof(IMockContract.Destroy));
         }
 
-        public ActionDescriptor Init { get; }
+        public MethodInfo Init { get; }
 
-        public ActionDescriptor Action { get; }
+        public MethodInfo Action { get; }
 
-        public ActionDescriptor Destroy { get; }
+        public MethodInfo Destroy { get; }
     }
 }

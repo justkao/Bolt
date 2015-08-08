@@ -8,7 +8,7 @@ using Bolt.Common;
 
 namespace Bolt
 {
-    public static class Bolt
+    public static class BoltFramework
     {
         public const string AsyncPostFix = "Async";
 
@@ -111,6 +111,42 @@ namespace Bolt
             }
 
             return method.ReturnType;
+        }
+
+        public static string GetContractName(Type contract)
+        {
+            if (contract == null)
+            {
+                throw new ArgumentNullException(nameof(contract));
+            }
+
+            string name = contract.Name;
+            if (name.StartsWith("I"))
+            {
+                name = name.Substring(1);
+            }
+
+            string coerced;
+            if (TrimAsyncPostfix(name, out coerced))
+            {
+                return coerced;
+            }
+
+            return name;
+        }
+
+        public static bool TrimAsyncPostfix(string name, out string coercedName)
+        {
+            coercedName = null;
+            int index = name.IndexOf(AsyncPostFix, StringComparison.OrdinalIgnoreCase);
+            if (index <= 0)
+            {
+                coercedName = name;
+                return false;
+            }
+
+            coercedName = name.Substring(0, index);
+            return true;
         }
 
         private static bool InitializesSession(MethodInfo method)

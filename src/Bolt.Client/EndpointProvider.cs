@@ -35,7 +35,7 @@ namespace Bolt.Client
                         sb.Append(_options.Prefix + "/");
                     }
 
-                    sb.Append(contract.Name);
+                    sb.Append(CoerceContractName(contract));
                 }
                 else
                 {
@@ -44,25 +44,26 @@ namespace Bolt.Client
                         sb.Append("/" + _options.Prefix);
                     }
 
-                    sb.Append("/" + contract.Name);
+                    sb.Append("/" + CoerceContractName(contract));
                 }
 
-                sb.Append("/" + TrimAsyncPostfix(action.Name));
+                string coerced;
+                if (Bolt.BoltFramework.TrimAsyncPostfix(action.Name, out coerced))
+                {
+                    sb.Append("/" + coerced);
+                }
+                else
+                {
+                    sb.Append("/" + action.Name);
+                }
             }
 
             return new Uri(sb.ToString(), server != null ? UriKind.Absolute : UriKind.Relative);
         }
 
-
-        private string TrimAsyncPostfix(string actionName)
+        private string CoerceContractName(Type contract)
         {
-            int index = actionName.IndexOf(Bolt.AsyncPostFix, StringComparison.OrdinalIgnoreCase);
-            if (index <= 0)
-            {
-                return actionName;
-            }
-
-            return actionName.Substring(0, index);
+            return Bolt.BoltFramework.GetContractName(contract);
         }
     }
 }

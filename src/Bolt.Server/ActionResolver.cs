@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Bolt.Server
 {
@@ -19,36 +20,14 @@ namespace Bolt.Server
             {
                 actionName = actionName.ToLowerInvariant();
             }
+            BoltFramework.TrimAsyncPostfix(actionName, out actionName);
 
-            string action;
-
-            MethodInfo found;
-            // we prefer async versions
-            if (!TrimAsyncPostfix(actionName, out action))
-            {
-                action = actionName + Bolt.AsyncPostFix;
-                // regular search
-                found = candidates.FirstOrDefault(m => CoerceMethodName(m.Name, lowerCase) == action);
-                if (found != null)
-                {
-                    return found;
-                }
-            }
-            else
-            {
-                found = candidates.FirstOrDefault(m => CoerceMethodName(m.Name, lowerCase) == action);
-                if (found != null)
-                {
-                    return found;
-                }
-            }
-
-            // regular search
-            return candidates.FirstOrDefault(m => CoerceMethodName(m.Name, lowerCase) == actionName);
+            return SelectByPriority(candidates.Where(m => CoerceMethodName(m.Name, lowerCase) == actionName));
         }
 
         private string CoerceMethodName(string name, bool lowerCase)
         {
+            BoltFramework.TrimAsyncPostfix(name, out name);
             if (lowerCase)
             {
                 return name.ToLowerInvariant();
@@ -57,17 +36,17 @@ namespace Bolt.Server
             return name;
         }
 
-        private bool TrimAsyncPostfix(string actionName, out string coerced)
+        private MethodInfo SelectByPriority(IEnumerable<MethodInfo> candidates)
         {
-            coerced = null;
-            int index = actionName.IndexOf(Bolt.AsyncPostFix, StringComparison.OrdinalIgnoreCase);
-            if (index <= 0)
+            return candidates.OrderBy(m =>
             {
-                return false;
-            }
+                if (typeof(Task).IsAssignableFrom(m.ReturnType))
+                {
+                    return 0;
+                }
 
-            coerced = actionName.Substring(0, index);
-            return true;
+                return 1;
+            }).FirstOrDefault();
         }
     }
 }

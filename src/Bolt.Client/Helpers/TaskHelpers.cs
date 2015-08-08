@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Bolt.Client
+namespace Bolt.Client.Helpers
 {
     internal static class TaskHelpers
     {

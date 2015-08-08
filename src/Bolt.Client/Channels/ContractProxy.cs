@@ -2,7 +2,6 @@ using System;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Bolt.Core;
 
 namespace Bolt.Client.Channels
@@ -97,6 +96,11 @@ namespace Bolt.Client.Channels
             return Channel.SendAsync(contract, action, resultType, parameters, cancellation);
         }
 
+        object IChannel.Send(Type contract, MethodInfo action, Type resultType, IObjectSerializer parameters, CancellationToken cancellation)
+        {
+            return Channel.Send(contract, action, resultType, parameters, cancellation);
+        }
+
         protected Task SendAsync(MethodInfo action, IObjectSerializer parameters, CancellationToken cancellation)
         {
             return SendAsync<Empty>(action, parameters, cancellation);
@@ -110,7 +114,7 @@ namespace Bolt.Client.Channels
 
         protected void Send(MethodInfo action, IObjectSerializer parameters, CancellationToken cancellation)
         {
-            TaskHelpers.Execute(() => SendAsync<Empty>(action, parameters, cancellation));
+            Channel.Send(Contract, action, typeof(void), parameters, cancellation);
         }
 
         protected TResult Send<TResult>(
@@ -118,7 +122,7 @@ namespace Bolt.Client.Channels
             IObjectSerializer parameters,
             CancellationToken cancellation)
         {
-            return TaskHelpers.Execute(() => SendAsync<TResult>(action, parameters, cancellation));
+            return (TResult) Channel.Send(Contract, action, typeof (TResult), parameters, cancellation);
         }
 
         #endregion

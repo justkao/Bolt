@@ -21,7 +21,6 @@ namespace Bolt.Server.IntegrationTest.Core
 
     public interface ITestContractStateFull
     {
-        [InitSession]
         [AsyncOperation]
         void Init();
 

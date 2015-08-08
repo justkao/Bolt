@@ -89,6 +89,8 @@ namespace TestService.Client
             if (IsPortUsed(Servers.BoltServer.Port))
             {
                 yield return new Tuple<string, ITestContract>("Bolt", ClientFactory.CreateBolt());
+
+                yield return new Tuple<string, ITestContract>("Bolt(dynamic proxy)", ClientFactory.CreateDynamicBolt());
             }
 
             if (IsPortUsed(Servers.IISBoltServer.Port))
@@ -115,6 +117,7 @@ namespace TestService.Client
                 catch (Exception e)
                 {
                     Console.WriteLine($"{e.Message.Red()}");
+                    Console.WriteLine($"{e}");
                 }
             }
 

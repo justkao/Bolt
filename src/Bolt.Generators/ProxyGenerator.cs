@@ -53,7 +53,7 @@ namespace Bolt.Generators
 
         public override void Generate(object context)
         {
-            AddUsings(BoltConstants.Client.Namespace, BoltConstants.Client.ChannelsNamespace, "System.Threading");
+            AddUsings(BoltConstants.Client.Namespace, BoltConstants.Client.ChannelsNamespace, "System.Threading", "System.Reflection");
 
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
             generator.Modifier = Modifier;
@@ -220,6 +220,24 @@ namespace Bolt.Generators
                 Name ?? ContractDefinition.Name + Suffix,
                 Namespace ?? ContractDefinition.Namespace,
                 baseClasses.Distinct().ToArray());
+        }
+
+        private void GenerateStaticActions(ClassGenerator generator)
+        {
+            foreach (MethodInfo effectiveMethod in ContractDefinition.GetEffectiveMethods())
+            {
+                generator.WriteLine(
+                    "private static readonly {0} {1} = typeof({2}).GetMethod(nameof({2}.{3}));",
+                    FormatType<MethodInfo>(),
+                    GetStaticActionName(effectiveMethod),
+                    FormatType(effectiveMethod.DeclaringType),
+                    effectiveMethod.Name);
+            }
+        }
+
+        private static string GetStaticActionName(MethodInfo effectiveMethod)
+        {
+            return $"__{effectiveMethod.Name}Action";
         }
     }
 }

@@ -7,6 +7,7 @@ using Moq;
 using Xunit;
 
 using System.Net.Http;
+using System.Reflection;
 using Bolt.Client.Filters;
 
 namespace Bolt.Client.Test
@@ -63,9 +64,10 @@ namespace Bolt.Client.Test
             url = url ?? new Uri("http://localhost");
 
             var endpointProvider = new Mock<IEndpointProvider>();
-            endpointProvider.Setup(e => e.GetEndpoint(It.IsAny<Uri>(), It.IsAny<ActionDescriptor>())).Returns(url);
+            endpointProvider.Setup(e => e.GetEndpoint(It.IsAny<Uri>(), It.IsAny<Type>(), It.IsAny<MethodInfo>())).Returns(url);
 
             return new TestRecoverableChannel(
+                new JsonSerializer(), 
                 new SingleServerProvider(url),
                 requestHandler != null ? requestHandler.Object : Mock.Of<IRequestHandler>(),
                 endpointProvider.Object);
@@ -81,8 +83,8 @@ namespace Bolt.Client.Test
 
             public Exception Error { get; set; }
 
-            public TestRecoverableChannel(IServerProvider serverProvider, IRequestHandler requestHandler, IEndpointProvider endpointProvider)
-                : base(serverProvider, requestHandler, endpointProvider, new List<IClientExecutionFilter>())
+            public TestRecoverableChannel(ISerializer serializer, IServerProvider serverProvider, IRequestHandler requestHandler, IEndpointProvider endpointProvider)
+                : base(serializer, serverProvider, requestHandler, endpointProvider, new List<IClientExecutionFilter>())
             {
             }
 

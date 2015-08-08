@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client.Filters;
+using Bolt.Client.Helpers;
 using Bolt.Common;
 using Bolt.Core;
 
@@ -151,6 +152,18 @@ namespace Bolt.Client.Channels
                 await clientAction.ExecuteAsync(ctxt, ExecuteCoreAsync);
                 return ctxt.Result.GetResultOrThrow();
             }
+        }
+
+        public virtual object Send(Type contract, MethodInfo action, Type resultType, IObjectSerializer parameters,
+            CancellationToken cancellation)
+        {
+            if (resultType == typeof (void) || resultType == typeof (Empty))
+            {
+                TaskHelpers.Execute(() => SendAsync(contract, action, resultType, parameters, cancellation) as Task);
+                return Empty.Instance;
+            }
+
+            return TaskHelpers.Execute(() => SendAsync(contract, action, resultType, parameters, cancellation));
         }
 
         public ISerializer Serializer { get; }

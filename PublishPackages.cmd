@@ -11,6 +11,8 @@ set version="0.9.1.1"
 
 .nuget\nuget.exe push bolt_packages\Bolt.Client.%version%.nupkg
 
+.nuget\nuget.exe push bolt_packages\Bolt.Client.Proxy.%version%.nupkg
+
 .nuget\nuget.exe push bolt_packages\Bolt.Helpers.%version%.nupkg
 
 .nuget\nuget.exe push bolt_packages\Bolt.Generators.%version%.nupkg
