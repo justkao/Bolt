@@ -4,14 +4,14 @@ namespace Bolt.Client.Channels
 {
     public static class ChannelExtensions
     {
-        public static DelegatedChannel CreateDelegated(this ClientConfiguration configuration, string server)
+        public static DirectChannel CreateDelegated(this ClientConfiguration configuration, string server)
         {
             return configuration.CreateDelegated(new Uri(server));
         }
 
-        public static DelegatedChannel CreateDelegated(this ClientConfiguration configuration, Uri server)
+        public static DirectChannel CreateDelegated(this ClientConfiguration configuration, Uri server)
         {
-            return new DelegatedChannel(server, configuration)
+            return new DirectChannel(server, configuration)
             {
                 DefaultResponseTimeout = configuration.DefaultResponseTimeout
             };

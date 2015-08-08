@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Bolt.Common;
 using Bolt.Core;
 using Bolt.Server.Filters;
@@ -14,18 +13,29 @@ namespace Bolt.Server
 {
     public class ActionInvoker : IActionInvoker
     {
+        private readonly ISessionHandler _sessionHandler;
         private readonly ConcurrentDictionary<MethodInfo, ActionDescriptor> _actions = new ConcurrentDictionary<MethodInfo, ActionDescriptor>();
+
+        public ActionInvoker(ISessionHandler sessionHandler)
+        {
+            if (sessionHandler == null) throw new ArgumentNullException(nameof(sessionHandler));
+
+            _sessionHandler = sessionHandler;
+        }
 
         public Task InvokeAsync(ServerActionContext context)
         {
-            ActionDescriptor result = _actions.GetOrAdd(context.Action, a => new ActionDescriptor(a));
+            ActionDescriptor result = _actions.GetOrAdd(context.Action, a => new ActionDescriptor(a, _sessionHandler));
             return result.Invoke(context);
         }
 
         private class ActionDescriptor
         {
-            public ActionDescriptor(MethodInfo actionInfo)
+            private readonly ISessionHandler _sessionHandler;
+
+            public ActionDescriptor(MethodInfo actionInfo, ISessionHandler sessionHandler)
             {
+                _sessionHandler = sessionHandler;
                 Parameters = actionInfo.GetParameters().ToList();
                 ParametersTypes = Parameters.Select(p => p.ParameterType).ToArray();
                 HasParameters =
@@ -47,28 +57,48 @@ namespace Bolt.Server
             {
                 IBoltFeature boltFeature = context.HttpContext.GetFeature<IBoltFeature>();
 
-                object[] arguments = null;
-                if (HasParameters && context.Parameters == null)
+                if (context.Action == BoltFramework.InitSessionAction)
                 {
-                    await boltFeature.Configuration.ParameterHandler.HandleAsync(context);
-                    arguments = BuildParameters(context).ToArray();
+                    await _sessionHandler.HandleInitSessionAsync(context);
                 }
-
-                var instance = context.GetRequiredInstance();
-                MethodInfo implementedMethod = instance.GetType().GetRuntimeMethod(context.Action.Name, ParametersTypes);
-                object result = implementedMethod.Invoke(instance, arguments);
-
-                if (result is Task)
+                else if (context.Action == BoltFramework.DestroySessionAction)
                 {
-                    await (result as Task);
-                    if (result.GetType().IsGenericType())
-                    {
-                        context.Result = result.GetType().GetRuntimeProperty("Result").GetValue(result);
-                    }
+                    await _sessionHandler.HandleDestroySessionAsync(context);
                 }
                 else
                 {
-                    context.Result = result;
+                    object[] arguments = null;
+                    if (HasParameters && context.Parameters == null)
+                    {
+                        await boltFeature.Configuration.ParameterHandler.HandleAsync(context);
+                        arguments = BuildParameters(context).ToArray();
+                    }
+
+                    var instance = context.GetRequiredInstance();
+                    MethodInfo implementedMethod = instance.GetType().GetRuntimeMethod(context.Action.Name, ParametersTypes);
+
+                    object result;
+                    try
+                    {
+                        result = implementedMethod.Invoke(instance, arguments ?? new object[0]);
+                    }
+                    catch (TargetInvocationException e)
+                    {
+                        throw e.InnerException;
+                    }
+
+                    if (result is Task)
+                    {
+                        await (result as Task);
+                        if (result.GetType().IsGenericType())
+                        {
+                            context.Result = result.GetType().GetRuntimeProperty("Result").GetValue(result);
+                        }
+                    }
+                    else
+                    {
+                        context.Result = result;
+                    }
                 }
 
                 await boltFeature.Configuration.ResponseHandler.HandleAsync(context);

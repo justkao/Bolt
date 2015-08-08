@@ -28,7 +28,6 @@ namespace Bolt.Server
 
         public IList<IServerExecutionFilter> Filters { get; set; }
 
-
         public ServerRuntimeConfiguration Configuration { get; }
 
         public virtual Task ExecuteAsync(ServerActionContext context)

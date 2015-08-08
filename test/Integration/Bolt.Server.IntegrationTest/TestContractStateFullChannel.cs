@@ -6,17 +6,13 @@ using System.Threading.Tasks;
 
 namespace Bolt.Server.IntegrationTest
 {
-    public class TestContractStateFullChannel : RecoverableStatefullChannel<TestContractStateFullProxy>
+    public class TestContractStateFullChannel : RecoverableStatefullChannel
     {
         public TestContractStateFullChannel(Uri server, ClientConfiguration clientConfiguration)
-            : base(server, clientConfiguration)
+            : base(typeof(ITestContractStateFullAsync), server, clientConfiguration)
         {
             Retries = 1;
         }
-
-        public bool ExtendedInitialization { get; set; }
-
-        public bool FailExtendedInitialization { get; set; }
 
         public override bool IsRecoverable => true;
 
@@ -29,20 +25,6 @@ namespace Bolt.Server.IntegrationTest
             }
 
             return base.HandleError(context, error);
-        }
-
-        protected override Task OnProxyClosingAsync(TestContractStateFullProxy contract)
-        {
-            return contract.DestroyAsync();
-        }
-
-        protected override async Task OnProxyOpeningAsync(TestContractStateFullProxy contract)
-        {
-            await contract.InitAsync();
-            if (ExtendedInitialization)
-            {
-                await contract.InitExAsync(FailExtendedInitialization);
-            }
         }
     }
 }

@@ -88,8 +88,14 @@ namespace Bolt.Client.Proxy
                                 typeof (ChannelInterceptor).GetMethod(nameof(Convert),
                                     BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.DeclaredOnly)
                                     .MakeGenericMethod(innerType);
-
-                            invocation.ReturnValue = method.Invoke(null, new[] {(object) result});
+                            try
+                            {
+                                invocation.ReturnValue = method.Invoke(null, new[] { (object)result });
+                            }
+                            catch (TargetInvocationException e)
+                            {
+                                throw e.InnerException;
+                            }
                         }
                     }
                 }

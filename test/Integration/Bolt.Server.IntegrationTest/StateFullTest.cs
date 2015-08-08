@@ -6,13 +6,16 @@ using Microsoft.AspNet.Builder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using Bolt.Core;
+using Bolt.Session;
+using Microsoft.Framework.DependencyInjection;
+using Moq;
 using Xunit;
 
 namespace Bolt.Server.IntegrationTest
 {
-    public class StateFullTest : IntegrationTestBase
+    public class StateFullTest : IntegrationTestBase, ITestState
     {
         private StateFullInstanceProvider InstanceProvider { get; set; }
 
@@ -235,17 +238,9 @@ namespace Bolt.Server.IntegrationTest
             var channel = GetChannel();
             (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
             channel.GetState();
-            channel.Destroy();
+            ((IChannel) channel).Close();
 
-            try
-            {
-                channel.GetState();
-                Assert.True(false, "BoltServerException was not thrown.");
-            }
-            catch (BoltServerException e)
-            {
-                Assert.Equal(ServerErrorCode.SessionNotFound, e.Error.Value);
-            }
+            Assert.Throws<ChannelClosedException>(() => channel.GetState());
         }
 
         [Fact]
@@ -254,69 +249,115 @@ namespace Bolt.Server.IntegrationTest
             var channel = GetChannel();
             (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
             await channel.GetStateAsync();
-            await channel.DestroyAsync();
+            await ((IChannel)channel).CloseAsync();
 
-            try
-            {
-                await channel.GetStateAsync();
-                Assert.True(false, "BoltServerException was not thrown.");
-            }
-            catch (BoltServerException e)
-            {
-                Assert.Equal(ServerErrorCode.SessionNotFound, e.Error.Value);
-            }
+            await Assert.ThrowsAsync<ChannelClosedException>(() => channel.GetStateAsync());
         }
 
         [Fact]
-        public void InitSession_Explicitely_EnsureInitialized()
+        public async Task OpenSession_EnsureCallbackCalled()
         {
-            var channel = GetChannel();
-            channel.Init();
-            channel.GetState();
-            ((IChannel) channel).Dispose();
+            ITestContractStateFullAsync channel = GetChannel();
+            RecoverableStatefullChannel recoverable = GetInnerChannel(channel);
+
+            recoverable.InitSessionParameters = new InitSessionParameters();
+            recoverable.InitSessionParameters.UserData["temp"] = "temp";
+
+            SessionCallback = new Mock<ISessionCallback>();
+            SessionCallback.Setup(c => c.InitSessionAsync(It.IsAny<InitSessionParameters>(), It.IsAny<CancellationToken>()))
+                .Returns(
+                    () => Task.FromResult(new InitSessionResult())).Verifiable();
+
+
+            (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
+            await channel.GetStateAsync();
+
+            SessionCallback.Verify();
         }
 
         [Fact]
-        public void InitSessionEx_EnsureInitialized()
+        public async Task CloseSession_EnsureCallbackCalled()
         {
-            var channel = GetChannel();
-            TestContractStateFullChannel statefull = GetInnerChannel(channel) as TestContractStateFullChannel;
-            statefull.ExtendedInitialization = true;
+            ITestContractStateFullAsync channel = GetChannel();
+            RecoverableStatefullChannel recoverable = GetInnerChannel(channel);
 
-            int before = Factory.Count;
 
-            channel.GetState();
-            (channel as IChannel).Dispose();
+            SessionCallback = new Mock<ISessionCallback>();
+            SessionCallback.Setup(c => c.DestroySessionAsync(It.IsAny<DestroySessionParameters>(), It.IsAny<CancellationToken>()))
+                .Returns(
+                    () => Task.FromResult(new DestroySessionResult())).Verifiable();
 
-            Assert.Equal(before, Factory.Count);
+
+            (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
+            await channel.GetStateAsync();
+            await recoverable.CloseAsync();
+
+            SessionCallback.Verify();
         }
 
         [Fact]
-        public void InitSessionEx_Fails_EnsureSessionDestroyed()
+        public async Task OpenSession_EnsureProperResult()
         {
-            var channel = GetChannel();
-            TestContractStateFullChannel statefull = GetInnerChannel(channel) as TestContractStateFullChannel;
-            statefull.ExtendedInitialization = true;
-            statefull.FailExtendedInitialization = true;
+            ITestContractStateFullAsync channel = GetChannel();
+            RecoverableStatefullChannel recoverable = GetInnerChannel(channel);
 
-            int before = Factory.Count;
+            recoverable.InitSessionParameters = new InitSessionParameters();
+            recoverable.InitSessionParameters.UserData["temp"] = "temp";
 
-            try
-            {
-                channel.GetState();
-            }
-            catch (Exception)
-            {
-            }
+            SessionCallback = new Mock<ISessionCallback>();
+            SessionCallback.Setup(
+                c => c.InitSessionAsync(It.IsAny<InitSessionParameters>(), It.IsAny<CancellationToken>()))
+                .Returns<InitSessionParameters, CancellationToken>(
+                    (p, c) =>
+                    {
+                        InitSessionResult result = new InitSessionResult();
+                        result.UserData["temp"] = p.UserData["temp"];
+                        return Task.FromResult(result);
+                    }).Verifiable();
 
-            Assert.Equal(before, Factory.Count);
+
+            (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
+            await channel.GetStateAsync();
+            SessionCallback.Verify();
+
+            Assert.Equal("temp", recoverable.InitSessionResult.UserData["temp"]);
+        }
+
+        [Fact]
+        public async Task CloseSession_EnsureProperResult()
+        {
+            ITestContractStateFullAsync channel = GetChannel();
+            RecoverableStatefullChannel recoverable = GetInnerChannel(channel);
+
+            recoverable.DestroySessionParameters = new DestroySessionParameters();
+            recoverable.DestroySessionParameters.UserData["temp"] = "temp";
+
+            SessionCallback = new Mock<ISessionCallback>();
+            SessionCallback.Setup(
+                c => c.DestroySessionAsync(It.IsAny<DestroySessionParameters>(), It.IsAny<CancellationToken>()))
+                .Returns<DestroySessionParameters, CancellationToken>(
+                    (p, c) =>
+                    {
+                        DestroySessionResult result = new DestroySessionResult();
+                        result.UserData["temp"] = p.UserData["temp"];
+                        return Task.FromResult(result);
+                    }).Verifiable();
+
+
+            (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
+            await channel.GetStateAsync();
+            await recoverable.CloseAsync();
+
+            SessionCallback.Verify();
+
+            Assert.Equal("temp", recoverable.DestroySessionResult.UserData["temp"]);
         }
 
         [Fact]
         public async Task Async_InitSession_Explicitely_EnsureInitialized()
         {
-            var channel = GetChannel();
-            await channel.InitAsync();
+            ITestContractStateFullAsync channel = GetChannel();
+            await ((IChannel) channel).OpenAsync();
             await channel.GetStateAsync();
             await (channel as IChannel).CloseAsync();
         }
@@ -348,7 +389,7 @@ namespace Bolt.Server.IntegrationTest
             proxy.GetState();
             ((IChannel) proxy).Dispose();
 
-            Assert.Null(((RecoverableStatefullChannel<TestContractStateFullProxy>)(((ContractProxy)proxy).Channel)).SessionId);
+            Assert.Null(((RecoverableStatefullChannel)(((ContractProxy)proxy).Channel)).SessionId);
         }
 
         [Fact]
@@ -358,7 +399,7 @@ namespace Bolt.Server.IntegrationTest
             await channel.GetStateAsync();
             await (channel as ICloseable).CloseAsync();
 
-            Assert.Null(((RecoverableStatefullChannel<TestContractStateFullProxy>)GetInnerChannel(channel)).SessionId);
+            Assert.Null(((RecoverableStatefullChannel)GetInnerChannel(channel)).SessionId);
         }
 
         public virtual ITestContractStateFullAsync GetChannel()
@@ -368,19 +409,28 @@ namespace Bolt.Server.IntegrationTest
                     new TestContractStateFullChannel(ServerUrl, ClientConfiguration));
         }
 
+        protected override void ConfigureServices(IServiceCollection services)
+        {
+            services.AddInstance<ITestState>(this);
+
+            base.ConfigureServices(services);
+        }
+
         protected override void Configure(IApplicationBuilder appBuilder)
         {
             appBuilder.UseBolt((h) =>
             {
                 Factory = new MemorySessionFactory(h.Configuration.Options);
-                var contract = h.UseStateFull<ITestContractStateFull, TestContractStateFull>(Factory);
+                IContractInvoker contract = h.UseStateFull<ITestContractStateFull, TestContractStateFull>(Factory);
                 InstanceProvider = (StateFullInstanceProvider)contract.InstanceProvider;
             });
         }
 
-        private IChannel GetInnerChannel(object proxy)
+        private RecoverableStatefullChannel GetInnerChannel(object proxy)
         {
-            return ((ContractProxy) proxy).Channel;
+            return (RecoverableStatefullChannel) ((IChannelProvider) proxy).Channel;
         }
+
+        public Mock<ISessionCallback> SessionCallback { get; set; }
     }
 }

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Bolt.Session;
 
 namespace Bolt.Client
 {
@@ -30,6 +31,18 @@ namespace Bolt.Client
 
         public virtual void WriteParameters(ClientActionContext context)
         {
+            if (context.Action == BoltFramework.InitSessionAction)
+            {
+                context.Request.Content = new StreamContent(Serializer.Serialize((InitSessionParameters) context.SessionParameters));
+                return;
+            }
+
+            if (context.Action == BoltFramework.DestroySessionAction)
+            {
+                context.Request.Content = new StreamContent(Serializer.Serialize((DestroySessionParameters) context.SessionParameters));
+                return;
+            }
+
             if (context.Parameters == null || context.Parameters.IsEmpty)
             {
                 // auto set content length to 0

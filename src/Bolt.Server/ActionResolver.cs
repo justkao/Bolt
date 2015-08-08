@@ -10,11 +10,37 @@ namespace Bolt.Server
     {
         public MethodInfo Resolve(Type contract, string actionName)
         {
+            if (actionName.ToLowerInvariant() == BoltFramework.InitSessionAction.Name.ToLowerInvariant())
+            {
+                return BoltFramework.InitSessionAction;
+            }
+
+            if (actionName.ToLowerInvariant() == BoltFramework.DestroySessionAction.Name.ToLowerInvariant())
+            {
+                return BoltFramework.DestroySessionAction;
+            }
+
             List<MethodInfo> candidates = contract.GetRuntimeMethods().ToList();
-            return Resolve(candidates, actionName, false) ?? Resolve(candidates, actionName, true);
+            MethodInfo found = Resolve(candidates, actionName, false) ?? Resolve(candidates, actionName, true);
+            if (found != null)
+            {
+                return found;
+            }
+
+            foreach (Type iface in contract.GetTypeInfo().GetInterfaces())
+            {
+                candidates = iface.GetRuntimeMethods().ToList();
+                found = Resolve(candidates, actionName, false) ?? Resolve(candidates, actionName, true);
+                if (found != null)
+                {
+                    return found;
+                }
+            }
+
+            return null;
         }
 
-        private MethodInfo Resolve(List<MethodInfo> candidates, string actionName, bool lowerCase)
+        private MethodInfo Resolve(IReadOnlyCollection<MethodInfo> candidates, string actionName, bool lowerCase)
         {
             if (lowerCase)
             {

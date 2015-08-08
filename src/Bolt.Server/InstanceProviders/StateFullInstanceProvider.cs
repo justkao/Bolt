@@ -1,8 +1,7 @@
-﻿using Bolt.Common;
-using System;
+﻿using System;
 using System.Diagnostics;
-using System.Reflection;
 using System.Threading.Tasks;
+using Bolt.Common;
 
 namespace Bolt.Server.InstanceProviders
 {
@@ -10,37 +9,22 @@ namespace Bolt.Server.InstanceProviders
     {
         private readonly ISessionFactory _sessionFactory;
 
-        public StateFullInstanceProvider(MethodInfo initSession, MethodInfo closeSession, ISessionFactory factory)
+        public StateFullInstanceProvider(ISessionFactory factory)
         {
-            if (initSession == null)
-            {
-                throw new ArgumentNullException(nameof(initSession));
-            }
-
-            if (closeSession == null)
-            {
-                throw new ArgumentNullException(nameof(closeSession));
-            }
-
             if (factory == null)
             {
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            InitSession = initSession;
-            CloseSession = closeSession;
             _sessionFactory = factory;
         }
 
-        public MethodInfo InitSession { get; }
-
-        public MethodInfo CloseSession { get; }
 
         public sealed override async Task<object> GetInstanceAsync(ServerActionContext context, Type type)
         {
             IContractSession contractSession;
 
-            if (context.Action == InitSession)
+            if (context.Action == BoltFramework.InitSessionAction)
             {
                 contractSession = await _sessionFactory.CreateAsync(context.HttpContext, await base.GetInstanceAsync(context, type));
                 context.ContractInstance = contractSession.Instance;
@@ -63,7 +47,7 @@ namespace Bolt.Server.InstanceProviders
                 return;
             }
 
-            if (context.Action == InitSession)
+            if (context.Action == BoltFramework.InitSessionAction)
             {
                 if (error != null)
                 {
@@ -81,7 +65,7 @@ namespace Bolt.Server.InstanceProviders
                     }
                 }
             }
-            else if (context.Action == CloseSession)
+            else if (context.Action == BoltFramework.DestroySessionAction)
             {
                 await session.DestroyAsync();
                 await OnInstanceReleasedAsync(context, session.SessionId);

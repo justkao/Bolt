@@ -1,5 +1,5 @@
 ﻿using System;
-using Bolt.Core;
+using Bolt.Session;
 using Microsoft.AspNet.Hosting;
 
 namespace Bolt.Server.InstanceProviders

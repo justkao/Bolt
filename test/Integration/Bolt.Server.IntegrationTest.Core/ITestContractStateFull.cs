@@ -1,33 +1,7 @@
-﻿using System;
-using System.Runtime.Serialization;
-
-namespace Bolt.Server.IntegrationTest.Core
+﻿namespace Bolt.Server.IntegrationTest.Core
 {
-#if !DNXCORE50
-    [Serializable]
-#endif
-    public class TestContractProxyFailedException : Exception
-    {
-        public TestContractProxyFailedException()
-        {
-        }
-#if !DNXCORE50
-        protected TestContractProxyFailedException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
-        {
-        }
-#endif
-    }
-
     public interface ITestContractStateFull
     {
-        [AsyncOperation]
-        void Init();
-
-        [InitSession]
-        [AsyncOperation]
-        void InitEx(bool failOperation);
-
         [AsyncOperation]
         void SetState(string state);
 
@@ -36,10 +10,6 @@ namespace Bolt.Server.IntegrationTest.Core
 
         [AsyncOperation]
         void NextCallWillFailProxy();
-
-        [CloseSession]
-        [AsyncOperation]
-        void Destroy();
 
         [AsyncOperation]
         string GetSessionId();

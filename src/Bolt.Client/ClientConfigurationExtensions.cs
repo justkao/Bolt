@@ -5,6 +5,33 @@ namespace Bolt.Client
 {
     public static class ClientConfigurationExtensions
     {
+        public static TContract CreateStatefullProxy<TContract>(this ClientConfiguration clientConfiguration, string uri)
+            where TContract : class
+        {
+            return clientConfiguration.CreateStatefullProxy<TContract>(new SingleServerProvider(new Uri(uri)));
+        }
+
+        public static TContract CreateStatefullProxy<TContract>(this ClientConfiguration clientConfiguration, Uri uri)
+            where TContract : class
+        {
+            return clientConfiguration.CreateStatefullProxy<TContract>(new SingleServerProvider(uri));
+        }
+
+        public static TContract CreateStatefullProxy<TContract>(this ClientConfiguration clientConfiguration,
+            IServerProvider serverProvider)
+            where TContract : class
+        {
+            RecoverableStatefullChannel channel = new RecoverableStatefullChannel(typeof(TContract), serverProvider, clientConfiguration);
+            TContract result = clientConfiguration.CreateProxy<TContract>(channel);
+
+            if (result is IContractProvider)
+            {
+                channel.Contract = (result as IContractProvider).Contract;
+            }
+
+            return result;
+        }
+
         public static TContract CreateProxy<TContract>(this ClientConfiguration clientConfiguration, string uri)
             where TContract : class
         {
@@ -17,7 +44,8 @@ namespace Bolt.Client
             return clientConfiguration.CreateProxy<TContract>(new SingleServerProvider(uri));
         }
 
-        public static TContract CreateProxy<TContract>(this ClientConfiguration clientConfiguration,  IServerProvider serverProvider) 
+        public static TContract CreateProxy<TContract>(this ClientConfiguration clientConfiguration,
+            IServerProvider serverProvider)
             where TContract : class
         {
             return clientConfiguration.CreateProxy<TContract>(clientConfiguration.CreateRecoverable(serverProvider));

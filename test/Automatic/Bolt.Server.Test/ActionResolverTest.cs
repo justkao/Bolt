@@ -10,12 +10,14 @@ namespace Bolt.Server.Test
         [InlineData("methodAsync")]
         [InlineData("methodasync")]
         [InlineData("method")]
+        [InlineData("innermethod")]
+        [InlineData("InnerMethod")]
         [Theory]
         public void Resolve_Ok(string actionName)
         {
             ActionResolver resolver = new ActionResolver();
 
-            Assert.NotNull(resolver.Resolve(typeof (Contract1), actionName));
+            Assert.NotNull(resolver.Resolve(typeof (IContract1), actionName));
         }
 
         [InlineData("Method")]
@@ -28,28 +30,44 @@ namespace Bolt.Server.Test
         {
             ActionResolver resolver = new ActionResolver();
 
-            Assert.NotNull(resolver.Resolve(typeof(Contract2), actionName));
-            Assert.Equal(nameof(Contract2.MethodAsync), resolver.Resolve(typeof (Contract2), actionName).Name);
+            Assert.NotNull(resolver.Resolve(typeof(IContract2), actionName));
+            Assert.Equal(nameof(IContract2.MethodAsync), resolver.Resolve(typeof (IContract2), actionName).Name);
         }
 
-        private class Contract1
+        [InlineData("initboltsession")]
+        [InlineData("InitBoltSession")]
+        [Theory]
+        public void Init_SessionAction_ProperActionResolved(string actionName)
         {
-            public void Method()
-            {
-                
-            }
+            ActionResolver resolver = new ActionResolver();
+            Assert.Equal(BoltFramework.InitSessionAction, resolver.Resolve(typeof(IContract1), actionName));
         }
 
-        private class Contract2
+        [InlineData("destroyboltsession")]
+        [InlineData("DestroyBoltSession")]
+        [Theory]
+        public void DestroySessionAction_ProperActionResolved(string actionName)
         {
-            public void Method()
-            {
-            }
+            ActionResolver resolver = new ActionResolver();
+            Assert.Equal(BoltFramework.DestroySessionAction, resolver.Resolve(typeof(IContract1), actionName));
+        }
 
-            public Task MethodAsync()
-            {
-                return Task.FromResult(true);
-            }
+        private  interface IContract1 : IContractInner
+        {
+            void Method();
+        }
+
+        private interface IContractInner
+        {
+            void InnerMethod();
+        }
+
+
+        private interface IContract2 : IContractInner
+        {
+            void Method();
+
+            Task MethodAsync();
         }
     }
 }

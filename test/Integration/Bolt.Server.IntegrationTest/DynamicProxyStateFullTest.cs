@@ -13,7 +13,7 @@ namespace Bolt.Server.IntegrationTest
 
         public override ITestContractStateFullAsync GetChannel()
         {
-            return ClientConfiguration.CreateProxy<ITestContractStateFullAsync>(ServerUrl);
+            return ClientConfiguration.CreateProxy<ITestContractStateFullAsync>(new TestContractStateFullChannel(ServerUrl, ClientConfiguration));
         }
     }
 }

@@ -1,31 +1,23 @@
 ﻿using System;
-using Bolt.Core;
+using System.Threading;
+using System.Threading.Tasks;
+using Bolt.Server.IntegrationTest.Core;
+using Bolt.Session;
 
-namespace Bolt.Server.IntegrationTest.Core
+namespace Bolt.Server.IntegrationTest
 {
-    public class TestContractStateFull : ITestContractStateFull
+    public class TestContractStateFull : ITestContractStateFull, ISessionCallback
     {
         private readonly ISessionProvider _sessionProvider;
+        private readonly ITestState _testState;
         private bool _initialized;
         private string _state;
         private bool _failProxy;
 
-        public TestContractStateFull(ISessionProvider sessionProvider)
+        public TestContractStateFull(ISessionProvider sessionProvider, ITestState testState)
         {
             _sessionProvider = sessionProvider;
-        }
-
-        public void Init()
-        {
-            _initialized = true;
-        }
-
-        public void InitEx(bool failOperation)
-        {
-            if (failOperation)
-            {
-                throw new InvalidOperationException("Forced failure.");
-            }
+            _testState = testState;
         }
 
         public void SetState(string state)
@@ -73,6 +65,28 @@ namespace Bolt.Server.IntegrationTest.Core
         public string GetSessionId()
         {
             return _sessionProvider.SessionId;
+        }
+
+        public Task<InitSessionResult> InitSessionAsync(InitSessionParameters parameters, CancellationToken cancellation)
+        {
+            _initialized = true;
+            if (_testState.SessionCallback == null)
+            {
+                return Task.FromResult(new InitSessionResult());
+            }
+
+            return _testState.SessionCallback.Object.InitSessionAsync(parameters, cancellation);
+        }
+
+        public Task<DestroySessionResult> DestroySessionAsync(DestroySessionParameters parameters, CancellationToken cancellation)
+        {
+            _initialized = false;
+            if (_testState.SessionCallback == null)
+            {
+                return Task.FromResult(new DestroySessionResult());
+            }
+
+            return _testState.SessionCallback.Object.DestroySessionAsync(parameters, cancellation);
         }
     }
 }

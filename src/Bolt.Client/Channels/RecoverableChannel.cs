@@ -86,7 +86,7 @@ namespace Bolt.Client.Channels
 
                     if (!HandleOpenConnectionError(e))
                     {
-                        throw;
+                        throw new BoltConnectionException("Failed to open connection to server.", e);
                     }
 
                     error = e;

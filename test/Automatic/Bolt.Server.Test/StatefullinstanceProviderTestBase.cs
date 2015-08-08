@@ -49,7 +49,7 @@ namespace Bolt.Server.Test
             {
             }
 
-            private MockStateFullInstanceProvider(MockContractDescriptor contract, Mock<IInstanceProviderActions> actions, MemorySessionFactory factory) : base(contract.Init, contract.Destroy, factory)
+            private MockStateFullInstanceProvider(MockContractDescriptor contract, Mock<IInstanceProviderActions> actions, MemorySessionFactory factory) : base(factory)
             {
                 _factory = factory;
                 _actions = actions;

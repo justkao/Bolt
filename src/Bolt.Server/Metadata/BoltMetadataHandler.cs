@@ -4,10 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Bolt.Server.InstanceProviders;
 using Microsoft.AspNet.Http;
 using Microsoft.Framework.Logging;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema;
 
@@ -123,14 +121,6 @@ namespace Bolt.Server.Metadata
                             ErrorHeader = feature.Configuration.Options.ServerErrorHeader,
                             ContentType = feature.Configuration.Serializer.ContentType
                         };
-
-            var statefullProvder = context.ContractInvoker.InstanceProvider as StateFullInstanceProvider;
-            if (statefullProvder != null)
-            {
-                m.SessionInit = statefullProvder.InitSession.Name;
-                m.SessionClose = statefullProvder.CloseSession.Name;
-            }
-
             return m;
         }
 
@@ -141,10 +131,6 @@ namespace Bolt.Server.Metadata
             public string ErrorHeader { get; set; }
 
             public string SessionHeader { get; set; }
-
-            public string SessionInit { get; set; }
-
-            public string SessionClose { get; set; }
 
             public List<string> Actions { get; set; }
         }

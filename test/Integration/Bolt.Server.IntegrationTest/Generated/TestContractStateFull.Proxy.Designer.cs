@@ -25,17 +25,11 @@ namespace Bolt.Server.IntegrationTest.Core
 {
     public partial interface ITestContractStateFullAsync : ITestContractStateFull
     {
-        Task InitAsync();
-
-        Task InitExAsync(bool failOperation);
-
         Task SetStateAsync(string state);
 
         Task<string> GetStateAsync();
 
         Task NextCallWillFailProxyAsync();
-
-        Task DestroyAsync();
 
         Task<string> GetSessionIdAsync();
     }
@@ -51,30 +45,6 @@ namespace Bolt.Server.IntegrationTest.Core
 
         public TestContractStateFullProxy(IChannel channel) : base(typeof(Bolt.Server.IntegrationTest.Core.ITestContractStateFull), channel)
         {
-        }
-
-        public virtual void Init()
-        {
-            Send(__InitAction, null, CancellationToken.None);
-        }
-
-        public virtual Task InitAsync()
-        {
-            return SendAsync(__InitAction, null, CancellationToken.None);
-        }
-
-        public virtual void InitEx(bool failOperation)
-        {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__InitExAction, "failOperation", typeof(bool), failOperation);
-            Send(__InitExAction, bolt_Params, CancellationToken.None);
-        }
-
-        public virtual Task InitExAsync(bool failOperation)
-        {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__InitExAction, "failOperation", typeof(bool), failOperation);
-            return SendAsync(__InitExAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual void SetState(string state)
@@ -111,16 +81,6 @@ namespace Bolt.Server.IntegrationTest.Core
             return SendAsync(__NextCallWillFailProxyAction, null, CancellationToken.None);
         }
 
-        public virtual void Destroy()
-        {
-            Send(__DestroyAction, null, CancellationToken.None);
-        }
-
-        public virtual Task DestroyAsync()
-        {
-            return SendAsync(__DestroyAction, null, CancellationToken.None);
-        }
-
         public virtual string GetSessionId()
         {
             return Send<string>(__GetSessionIdAction, null, CancellationToken.None);
@@ -132,12 +92,9 @@ namespace Bolt.Server.IntegrationTest.Core
         }
 
 
-        private static readonly MethodInfo __InitAction = typeof(ITestContractStateFull).GetMethod(nameof(ITestContractStateFull.Init));
-        private static readonly MethodInfo __InitExAction = typeof(ITestContractStateFull).GetMethod(nameof(ITestContractStateFull.InitEx));
         private static readonly MethodInfo __SetStateAction = typeof(ITestContractStateFull).GetMethod(nameof(ITestContractStateFull.SetState));
         private static readonly MethodInfo __GetStateAction = typeof(ITestContractStateFull).GetMethod(nameof(ITestContractStateFull.GetState));
         private static readonly MethodInfo __NextCallWillFailProxyAction = typeof(ITestContractStateFull).GetMethod(nameof(ITestContractStateFull.NextCallWillFailProxy));
-        private static readonly MethodInfo __DestroyAction = typeof(ITestContractStateFull).GetMethod(nameof(ITestContractStateFull.Destroy));
         private static readonly MethodInfo __GetSessionIdAction = typeof(ITestContractStateFull).GetMethod(nameof(ITestContractStateFull.GetSessionId));
     }
 }

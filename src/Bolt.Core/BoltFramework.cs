@@ -5,12 +5,21 @@ using System.Reflection;
 using System.Threading.Tasks;
 
 using Bolt.Common;
+using Bolt.Session;
 
 namespace Bolt
 {
     public static class BoltFramework
     {
         public const string AsyncPostFix = "Async";
+
+        public static readonly MethodInfo InitSessionAction =
+            typeof(BoltFramework).GetTypeInfo()
+                .DeclaredMethods.First(m => m.IsStatic && m.Name == nameof(InitBoltSession));
+
+        public static readonly MethodInfo DestroySessionAction =
+            typeof (BoltFramework).GetTypeInfo()
+                .DeclaredMethods.First(m => m.IsStatic && m.Name == nameof(DestroyBoltSession));
 
         public static IEnumerable<MethodInfo> GetContractActions(Type contract)
         {
@@ -47,55 +56,6 @@ namespace Bolt
                 throw new InvalidOperationException(
                     $"Unable to use interface '{contract.FullName}' as contract because it methods with the same name.");
             }
-
-            if (methods.Where(InitializesSession).Count() > 1)
-            {
-                throw new InvalidOperationException(
-                    $"Unable to use interface '{contract.FullName}' as contract because it contains multiple methods annotated with '{typeof(InitSessionAttribute).Name}'.");
-            }
-
-            if (methods.Where(ClosesSession).Count() > 1)
-            {
-                throw new InvalidOperationException(
-                    $"Unable to use interface '{contract.FullName}' as contract because it contains multiple methods annotated with '{typeof(CloseSessionAttribute).Name}'.");
-            }
-        }
-
-        public static void ValidateStatefullContract(Type contract)
-        {
-            ValidateContract(contract);
-
-            if (GetInitSessionMethod(contract) == null)
-            {
-                throw new InvalidOperationException(
-                    $"Unable to use interface '{contract.FullName}' as statefull contract because it missing init session metod annotated with '{typeof(InitSessionAttribute).Name}'.");
-            }
-
-            if (GetCloseSessionMethod(contract) == null)
-            {
-                throw new InvalidOperationException(
-                    $"Unable to use interface '{contract.FullName}' as statefull contract because it missing init session metod annotated with '{typeof(CloseSessionAttribute).Name}'.");
-            }
-        }
-
-        public static MethodInfo GetInitSessionMethod(Type contract)
-        {
-            if (contract == null)
-            {
-                throw new ArgumentNullException(nameof(contract));
-            }
-
-            return contract.GetRuntimeMethods().FirstOrDefault(InitializesSession);
-        }
-
-        public static MethodInfo GetCloseSessionMethod(Type contract)
-        {
-            if (contract == null)
-            {
-                throw new ArgumentNullException(nameof(contract));
-            }
-
-            return contract.GetRuntimeMethods().FirstOrDefault(ClosesSession);
         }
 
         public static Type GetResultType(MethodInfo method)
@@ -149,18 +109,12 @@ namespace Bolt
             return true;
         }
 
-        private static bool InitializesSession(MethodInfo method)
+        private static void InitBoltSession()
         {
-            Attribute found =
-                method.GetCustomAttributes<Attribute>(true).FirstOrDefault(a => a.GetType().Name == typeof(InitSessionAttribute).Name);
-            return found != null;
         }
 
-        private static bool ClosesSession(MethodInfo method)
+        private static void DestroyBoltSession()
         {
-            Attribute found =
-                method.GetCustomAttributes<Attribute>(true).FirstOrDefault(a => a.GetType().Name == typeof(CloseSessionAttribute).Name);
-            return found != null;
         }
     }
 }

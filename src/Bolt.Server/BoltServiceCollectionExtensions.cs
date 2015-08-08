@@ -4,7 +4,8 @@ using Bolt.Server;
 using Bolt.Server.Filters;
 using Bolt.Server.Metadata;
 using Bolt.Server.InstanceProviders;
-using Bolt.Core;
+using Bolt.Session;
+using Newtonsoft.Json;
 
 namespace Microsoft.Framework.DependencyInjection
 {
@@ -21,7 +22,7 @@ namespace Microsoft.Framework.DependencyInjection
         {
             services.ConfigureOptions<ConfigureServerRuntimeConfiguration>();
 
-            services.AddTransient<ISerializer, JsonSerializer>();
+            services.AddTransient<ISerializer, Bolt.JsonSerializer>();
             services.AddTransient<IExceptionWrapper, JsonExceptionWrapper>();
             services.AddTransient<IResponseHandler, ResponseHandler>();
             services.AddTransient<IBoltRouteHandler, BoltRouteHandler>();
@@ -33,6 +34,7 @@ namespace Microsoft.Framework.DependencyInjection
             services.AddTransient<IActionResolver, ActionResolver>();
             services.AddTransient<IContractResolver, ContractResolver>();
             services.AddTransient<IParameterHandler, ParameterHandler>();
+            services.AddTransient<ISessionHandler, SessionHandler>();
             services.AddTransient<IServerSessionHandler, ServerSessionHandler>();
             services.AddScoped<ISessionProvider, HttpContextSessionProvider>();
             services.AddSingleton<IContractInvokerFactory, ContractInvokerFactory>();

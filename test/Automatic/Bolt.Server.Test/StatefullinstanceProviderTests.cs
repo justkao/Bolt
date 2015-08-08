@@ -14,7 +14,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task Destroy_ShouldNotThrow()
             {
-                var ctxt = CreateContext(Contract.Destroy);
+                var ctxt = CreateContext(BoltFramework.DestroySessionAction);
 
                 await Subject.ReleaseInstanceAsync(ctxt, It.IsAny<object>(), null);
             }
@@ -33,7 +33,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task Init_Ok()
             {
-                var ctxt = CreateContext(Contract.Init);
+                var ctxt = CreateContext(BoltFramework.InitSessionAction);
                 SetupInit(ctxt);
 
                 await Subject.GetInstanceAsync(ctxt, typeof(IMockContract));
@@ -44,7 +44,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task Init_EnsureInstanceCreatedAndCached()
             {
-                var ctxt = CreateContext(Contract.Init);
+                var ctxt = CreateContext(BoltFramework.InitSessionAction);
                 SetupInit(ctxt);
 
                 await Subject.GetInstanceAsync(ctxt, typeof(IMockContract));
@@ -55,7 +55,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task Init_EnsureSessionHeaderCreated()
             {
-                var ctxt = CreateContext(Contract.Init);
+                var ctxt = CreateContext(BoltFramework.InitSessionAction);
                 SetupInit(ctxt);
 
                 await Subject.GetInstanceAsync(ctxt, typeof(IMockContract));
@@ -66,7 +66,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task Init_EnsureSessionHeaderValue()
             {
-                var ctxt = CreateContext(Contract.Init);
+                var ctxt = CreateContext(BoltFramework.InitSessionAction);
                 SetupInit(ctxt, "testsession");
 
                 await Subject.GetInstanceAsync(ctxt, typeof(IMockContract));
@@ -77,7 +77,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task Init_EnsureInstance()
             {
-                var ctxt = CreateContext(Contract.Init);
+                var ctxt = CreateContext(BoltFramework.InitSessionAction);
                 var instance = new object();
 
                 SetupInit(ctxt, "testsession", instance);
@@ -90,7 +90,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task Init_EnsureOnInstanceCreatedCalled()
             {
-                var ctxt = CreateContext(Contract.Init);
+                var ctxt = CreateContext(BoltFramework.InitSessionAction);
                 var instance = new object();
 
                 SetupInit(ctxt, "testsession", instance);
@@ -114,7 +114,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task Destroy_Throws()
             {
-                var ctxt = CreateContext(Contract.Destroy);
+                var ctxt = CreateContext(BoltFramework.DestroySessionAction);
                 await Assert.ThrowsAsync<SessionHeaderNotFoundException>(() => Subject.GetInstanceAsync(ctxt, typeof(IMockContract)));
             }
 
@@ -134,7 +134,7 @@ namespace Bolt.Server.Test
 
             public GetInstanceWithExistingSession()
             {
-                var ctxt = CreateContext(Contract.Init);
+                var ctxt = CreateContext(BoltFramework.InitSessionAction);
                 _instance = new object();
 
                 Mock.Setup(o => o.CreateInstance(It.IsAny<ServerActionContext>(), typeof(IMockContract))).Returns(_instance).Verifiable();
@@ -146,7 +146,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task Init_ExistingSession_Ok()
             {
-                var ctxt = CreateContext(Contract.Init);
+                var ctxt = CreateContext(BoltFramework.InitSessionAction);
 
                 var result = await Subject.GetInstanceAsync(ctxt, typeof(IMockContract));
                 Assert.Equal(_instance, result);
@@ -175,7 +175,7 @@ namespace Bolt.Server.Test
             public async Task Destroy_DifferentSession_EnsureThrows()
             {
                 _sessionHeaderValue = "another session";
-                var ctxt = CreateContext(Contract.Destroy);
+                var ctxt = CreateContext(BoltFramework.DestroySessionAction);
 
                 await Assert.ThrowsAsync<SessionNotFoundException>(() => Subject.GetInstanceAsync(ctxt, typeof(IMockContract)));
             }
@@ -200,7 +200,7 @@ namespace Bolt.Server.Test
 
             public ReleaseInstanceWithExistingSession()
             {
-                _context = CreateContext(Contract.Init);
+                _context = CreateContext(BoltFramework.InitSessionAction);
                 _instance = new InstanceObject();
 
                 Mock.Setup(o => o.CreateInstance(It.IsAny<ServerActionContext>(), typeof(IMockContract))).Returns(_instance).Verifiable();
@@ -213,7 +213,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task Release_DestroyAction_Ok()
             {
-                var ctxt = CreateContext(Contract.Destroy);
+                var ctxt = CreateContext(BoltFramework.DestroySessionAction);
 
                 SetupRelease(ctxt);
 
@@ -225,7 +225,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task  Release_DestroyAction_InstanceDestroyed()
             {
-                var ctxt = CreateContext(Contract.Destroy);
+                var ctxt = CreateContext(BoltFramework.DestroySessionAction);
 
                 SetupRelease();
 
@@ -237,7 +237,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task Release_DestroyAction_OnInstanceReleasedCalled()
             {
-                var ctxt = CreateContext(Contract.Destroy);
+                var ctxt = CreateContext(BoltFramework.DestroySessionAction);
 
                 SetupRelease(ctxt);
 
@@ -261,7 +261,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task Release_DestroyAction_InstanceDisposed()
             {
-                var ctxt = CreateContext(Contract.Destroy);
+                var ctxt = CreateContext(BoltFramework.DestroySessionAction);
                 SetupRelease();
 
                 await Subject.ReleaseInstanceAsync(ctxt, _instance, null);
@@ -283,7 +283,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task ReleaseWhenError_InitAction_InstanceDisposed()
             {
-                var ctxt = CreateContext(Contract.Init);
+                var ctxt = CreateContext(BoltFramework.InitSessionAction);
                 SetupRelease();
 
                 await Subject.ReleaseInstanceAsync(ctxt, _instance, new Exception());
@@ -305,7 +305,7 @@ namespace Bolt.Server.Test
             [Fact]
             public async Task ReleaseWhenError_Destroy_InstanceDisposed()
             {
-                var ctxt = CreateContext(Contract.Destroy);
+                var ctxt = CreateContext(BoltFramework.DestroySessionAction);
                 SetupRelease();
 
                 await Subject.ReleaseInstanceAsync(ctxt, _instance, new Exception());

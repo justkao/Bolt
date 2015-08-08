@@ -9,7 +9,7 @@ namespace Bolt.Client.Channels
     /// <summary>
     /// Base class for all Bolt generated proxies. The <see cref="ContractProxy"/> requires instance of <see cref="IChannel"/> that is used to communicate with Bolt server.
     /// </summary>
-    public abstract class ContractProxy : IContractProvider, IChannel
+    public abstract class ContractProxy : IContractProvider, IChannel, IChannelProvider
     {
         protected ContractProxy()
         {

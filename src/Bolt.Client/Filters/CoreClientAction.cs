@@ -14,7 +14,7 @@ namespace Bolt.Client.Filters
 
         public int Order => int.MaxValue;
 
-        public CoreClientAction( IReadOnlyCollection<IClientExecutionFilter> filters)
+        public CoreClientAction(IReadOnlyCollection<IClientExecutionFilter> filters)
         {
             _filters = filters;
         }

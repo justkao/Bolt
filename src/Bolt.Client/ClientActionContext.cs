@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using Bolt.Core;
+using Bolt.Session;
 
 namespace Bolt.Client
 {
@@ -12,6 +13,8 @@ namespace Bolt.Client
     public class ClientActionContext : ActionContextBase, IDisposable
     {
         public IObjectSerializer Parameters { get; set; }
+
+        public SessionParametersBase SessionParameters { get; set; }
 
         public bool ParametersHandled { get; set; }
 

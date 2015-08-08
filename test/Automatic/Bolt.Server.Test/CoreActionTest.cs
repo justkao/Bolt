@@ -21,7 +21,7 @@ namespace Bolt.Server.Test
 
         private class MockContractInvoker : ContractInvoker
         {
-            public MockContractInvoker() : base(new ActionInvoker())
+            public MockContractInvoker() : base(new ActionInvoker(new SessionHandler()))
             {
             }
         }

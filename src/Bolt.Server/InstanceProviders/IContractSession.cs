@@ -1,5 +1,5 @@
-﻿using Bolt.Core;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Bolt.Session;
 
 namespace Bolt.Server.InstanceProviders
 {

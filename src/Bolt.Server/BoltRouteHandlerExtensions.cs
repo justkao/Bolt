@@ -1,6 +1,4 @@
 using System;
-using System.Reflection;
-
 using Bolt.Server.InstanceProviders;
 using Microsoft.Framework.DependencyInjection;
 
@@ -20,25 +18,9 @@ namespace Bolt.Server
             BoltServerOptions options = null,
             Action<IContractInvoker> configure = null) where TContractImplementation : TContract
         {
-            BoltFramework.ValidateStatefullContract(typeof (TContract));
+            BoltFramework.ValidateContract(typeof (TContract));
 
             return bolt.UseStateFull<TContract, TContractImplementation>(
-                BoltFramework.GetInitSessionMethod(typeof (TContract)),
-                BoltFramework.GetCloseSessionMethod(typeof (TContract)),
-                new MemorySessionFactory(options ?? bolt.Configuration.Options),
-                configure);
-        }
-
-        public static IContractInvoker UseStateFull<TContract, TContractImplementation>(
-            this IBoltRouteHandler bolt,
-            MethodInfo init,
-            MethodInfo release,
-            BoltServerOptions options = null,
-            Action<IContractInvoker> configure = null) where TContractImplementation : TContract
-        {
-            return bolt.UseStateFull<TContract, TContractImplementation>(
-                init,
-                release,
                 new MemorySessionFactory(options ?? bolt.Configuration.Options),
                 configure);
         }
@@ -48,27 +30,9 @@ namespace Bolt.Server
             ISessionFactory sessionFactory,
             Action<IContractInvoker> configure = null) where TContractImplementation : TContract
         {
-            BoltFramework.ValidateStatefullContract(typeof (TContract));
-
             return
                 bolt.Use<TContract>(
-                    new StateFullInstanceProvider<TContractImplementation>(
-                        BoltFramework.GetInitSessionMethod(typeof (TContract)),
-                        BoltFramework.GetCloseSessionMethod(typeof (TContract)),
-                        sessionFactory),
-                    configure);
-        }
-
-        public static IContractInvoker UseStateFull<TContract, TContractImplementation>(
-            this IBoltRouteHandler bolt,
-            MethodInfo init,
-            MethodInfo release,
-            ISessionFactory sessionFactory,
-            Action<IContractInvoker> configure = null) where TContractImplementation : TContract
-        {
-            return
-                bolt.Use<TContract>(
-                    new StateFullInstanceProvider<TContractImplementation>(init, release, sessionFactory), configure);
+                    new StateFullInstanceProvider<TContractImplementation>(sessionFactory), configure);
         }
 
         public static IContractInvoker Use<TContract>(

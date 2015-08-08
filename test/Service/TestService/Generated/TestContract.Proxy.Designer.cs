@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -35,28 +36,28 @@ namespace TestService.Core
         public virtual Person UpdatePerson(Person person, CancellationToken cancellation)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.Write("person", typeof(Person), person);
+            bolt_Params.WriteParameter(__UpdatePersonAction, "person", typeof(Person), person);
             return Send<Person>(__UpdatePersonAction, bolt_Params, cancellation);
         }
 
         public virtual Task<Person> UpdatePersonAsync(Person person, CancellationToken cancellation)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.Write("person", typeof(Person), person);
+            bolt_Params.WriteParameter(__UpdatePersonAction, "person", typeof(Person), person);
             return SendAsync<Person>(__UpdatePersonAction, bolt_Params, cancellation);
         }
 
         public virtual Person UpdatePersonThatThrowsInvalidOperationException(Person person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.Write("person", typeof(Person), person);
+            bolt_Params.WriteParameter(__UpdatePersonThatThrowsInvalidOperationExceptionAction, "person", typeof(Person), person);
             return Send<Person>(__UpdatePersonThatThrowsInvalidOperationExceptionAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task<Person> UpdatePersonThatThrowsInvalidOperationExceptionAsync(Person person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.Write("person", typeof(Person), person);
+            bolt_Params.WriteParameter(__UpdatePersonThatThrowsInvalidOperationExceptionAction, "person", typeof(Person), person);
             return SendAsync<Person>(__UpdatePersonThatThrowsInvalidOperationExceptionAction, bolt_Params, CancellationToken.None);
         }
 
@@ -78,63 +79,63 @@ namespace TestService.Core
         public virtual Task DoNothingWithComplexParameterAsAsync(List<Person> person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.Write("person", typeof(List<Person>), person);
+            bolt_Params.WriteParameter(__DoNothingWithComplexParameterAsAsyncAction, "person", typeof(List<Person>), person);
             return SendAsync(__DoNothingWithComplexParameterAsAsyncAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual void DoNothingWithComplexParameter(List<Person> person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.Write("person", typeof(List<Person>), person);
+            bolt_Params.WriteParameter(__DoNothingWithComplexParameterAction, "person", typeof(List<Person>), person);
             Send(__DoNothingWithComplexParameterAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task DoNothingWithComplexParameterAsync(List<Person> person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.Write("person", typeof(List<Person>), person);
+            bolt_Params.WriteParameter(__DoNothingWithComplexParameterAction, "person", typeof(List<Person>), person);
             return SendAsync(__DoNothingWithComplexParameterAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual int GetSimpleType(int arg)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.Write("arg", typeof(int), arg);
+            bolt_Params.WriteParameter(__GetSimpleTypeAction, "arg", typeof(int), arg);
             return Send<int>(__GetSimpleTypeAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task<int> GetSimpleTypeAsync(int arg)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.Write("arg", typeof(int), arg);
+            bolt_Params.WriteParameter(__GetSimpleTypeAction, "arg", typeof(int), arg);
             return SendAsync<int>(__GetSimpleTypeAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task GetSimpleTypeAsAsync(int arg)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.Write("arg", typeof(int), arg);
+            bolt_Params.WriteParameter(__GetSimpleTypeAsAsyncAction, "arg", typeof(int), arg);
             return SendAsync(__GetSimpleTypeAsAsyncAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Person GetSinglePerson(Person person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.Write("person", typeof(Person), person);
+            bolt_Params.WriteParameter(__GetSinglePersonAction, "person", typeof(Person), person);
             return Send<Person>(__GetSinglePersonAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task<Person> GetSinglePersonAsync(Person person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.Write("person", typeof(Person), person);
+            bolt_Params.WriteParameter(__GetSinglePersonAction, "person", typeof(Person), person);
             return SendAsync<Person>(__GetSinglePersonAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task<Person> GetSinglePersonAsAsync(Person person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.Write("person", typeof(Person), person);
+            bolt_Params.WriteParameter(__GetSinglePersonAsAsyncAction, "person", typeof(Person), person);
             return SendAsync<Person>(__GetSinglePersonAsAsyncAction, bolt_Params, CancellationToken.None);
         }
 
@@ -151,7 +152,7 @@ namespace TestService.Core
         public virtual Task<List<Person>> GetManyPersonsAsAsync(Person person)
         {
             var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.Write("person", typeof(Person), person);
+            bolt_Params.WriteParameter(__GetManyPersonsAsAsyncAction, "person", typeof(Person), person);
             return SendAsync<List<Person>>(__GetManyPersonsAsAsyncAction, bolt_Params, CancellationToken.None);
         }
 
@@ -209,24 +210,24 @@ namespace TestService.Core
             return SendAsync(__InnerOperationExAsync2Action, null, CancellationToken.None);
         }
 
-        private static readonly System.Reflection.MethodInfo __UpdatePersonAction = typeof(TestService.Core.ITestContract).GetMethod("UpdatePerson");
-        private static readonly System.Reflection.MethodInfo __UpdatePersonThatThrowsInvalidOperationExceptionAction = typeof(TestService.Core.ITestContract).GetMethod("UpdatePersonThatThrowsInvalidOperationException");
-        private static readonly System.Reflection.MethodInfo __DoNothingAsAsyncAction = typeof(TestService.Core.ITestContract).GetMethod("DoNothingAsAsync");
-        private static readonly System.Reflection.MethodInfo __DoNothingAction = typeof(TestService.Core.ITestContract).GetMethod("DoNothing");
-        private static readonly System.Reflection.MethodInfo __DoNothingWithComplexParameterAsAsyncAction = typeof(TestService.Core.ITestContract).GetMethod("DoNothingWithComplexParameterAsAsync");
-        private static readonly System.Reflection.MethodInfo __DoNothingWithComplexParameterAction = typeof(TestService.Core.ITestContract).GetMethod("DoNothingWithComplexParameter");
-        private static readonly System.Reflection.MethodInfo __GetSimpleTypeAction = typeof(TestService.Core.ITestContract).GetMethod("GetSimpleType");
-        private static readonly System.Reflection.MethodInfo __GetSimpleTypeAsAsyncAction = typeof(TestService.Core.ITestContract).GetMethod("GetSimpleTypeAsAsync");
-        private static readonly System.Reflection.MethodInfo __GetSinglePersonAction = typeof(TestService.Core.ITestContract).GetMethod("GetSinglePerson");
-        private static readonly System.Reflection.MethodInfo __GetSinglePersonAsAsyncAction = typeof(TestService.Core.ITestContract).GetMethod("GetSinglePersonAsAsync");
-        private static readonly System.Reflection.MethodInfo __GetManyPersonsAction = typeof(TestService.Core.ITestContract).GetMethod("GetManyPersons");
-        private static readonly System.Reflection.MethodInfo __GetManyPersonsAsAsyncAction = typeof(TestService.Core.ITestContract).GetMethod("GetManyPersonsAsAsync");
-        private static readonly System.Reflection.MethodInfo __ThrowsAction = typeof(TestService.Core.ITestContract).GetMethod("Throws");
-        private static readonly System.Reflection.MethodInfo __ThrowsCustomAction = typeof(TestService.Core.ITestContract).GetMethod("ThrowsCustom");
-        private static readonly System.Reflection.MethodInfo __InnerOperationAction = typeof(TestService.Core.ITestContract).GetMethod("InnerOperation");
-        private static readonly System.Reflection.MethodInfo __InnerOperation3Action = typeof(TestService.Core.ITestContract).GetMethod("InnerOperation3");
-        private static readonly System.Reflection.MethodInfo __InnerOperationExAsyncAction = typeof(TestService.Core.ITestContract).GetMethod("InnerOperationExAsync");
-        private static readonly System.Reflection.MethodInfo __InnerOperation2Action = typeof(TestService.Core.ITestContract).GetMethod("InnerOperation2");
-        private static readonly System.Reflection.MethodInfo __InnerOperationExAsync2Action = typeof(TestService.Core.ITestContract).GetMethod("InnerOperationExAsync2");
+        private static readonly MethodInfo __UpdatePersonAction = typeof(ITestContract).GetMethod(nameof(ITestContract.UpdatePerson));
+        private static readonly MethodInfo __UpdatePersonThatThrowsInvalidOperationExceptionAction = typeof(ITestContract).GetMethod(nameof(ITestContract.UpdatePersonThatThrowsInvalidOperationException));
+        private static readonly MethodInfo __DoNothingAsAsyncAction = typeof(ITestContract).GetMethod(nameof(ITestContract.DoNothingAsAsync));
+        private static readonly MethodInfo __DoNothingAction = typeof(ITestContract).GetMethod(nameof(ITestContract.DoNothing));
+        private static readonly MethodInfo __DoNothingWithComplexParameterAsAsyncAction = typeof(ITestContract).GetMethod(nameof(ITestContract.DoNothingWithComplexParameterAsAsync));
+        private static readonly MethodInfo __DoNothingWithComplexParameterAction = typeof(ITestContract).GetMethod(nameof(ITestContract.DoNothingWithComplexParameter));
+        private static readonly MethodInfo __GetSimpleTypeAction = typeof(ITestContract).GetMethod(nameof(ITestContract.GetSimpleType));
+        private static readonly MethodInfo __GetSimpleTypeAsAsyncAction = typeof(ITestContract).GetMethod(nameof(ITestContract.GetSimpleTypeAsAsync));
+        private static readonly MethodInfo __GetSinglePersonAction = typeof(ITestContract).GetMethod(nameof(ITestContract.GetSinglePerson));
+        private static readonly MethodInfo __GetSinglePersonAsAsyncAction = typeof(ITestContract).GetMethod(nameof(ITestContract.GetSinglePersonAsAsync));
+        private static readonly MethodInfo __GetManyPersonsAction = typeof(ITestContract).GetMethod(nameof(ITestContract.GetManyPersons));
+        private static readonly MethodInfo __GetManyPersonsAsAsyncAction = typeof(ITestContract).GetMethod(nameof(ITestContract.GetManyPersonsAsAsync));
+        private static readonly MethodInfo __ThrowsAction = typeof(ITestContract).GetMethod(nameof(ITestContract.Throws));
+        private static readonly MethodInfo __ThrowsCustomAction = typeof(ITestContract).GetMethod(nameof(ITestContract.ThrowsCustom));
+        private static readonly MethodInfo __InnerOperationAction = typeof(IInnerTestContract).GetMethod(nameof(IInnerTestContract.InnerOperation));
+        private static readonly MethodInfo __InnerOperation3Action = typeof(IInnerTestContract).GetMethod(nameof(IInnerTestContract.InnerOperation3));
+        private static readonly MethodInfo __InnerOperationExAsyncAction = typeof(IInnerTestContract).GetMethod(nameof(IInnerTestContract.InnerOperationExAsync));
+        private static readonly MethodInfo __InnerOperation2Action = typeof(IInnerTestContract2).GetMethod(nameof(IInnerTestContract2.InnerOperation2));
+        private static readonly MethodInfo __InnerOperationExAsync2Action = typeof(IInnerTestContract2).GetMethod(nameof(IInnerTestContract2.InnerOperationExAsync2));
     }
 }
