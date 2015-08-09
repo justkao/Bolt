@@ -463,7 +463,7 @@ namespace Bolt.Server.IntegrationTest
             appBuilder.UseBolt((h) =>
             {
                 Factory = new MemorySessionFactory(h.Configuration.Options);
-                IContractInvoker contract = h.UseStateFull<ITestContractStateFull, TestContractStateFull>(Factory);
+                IContractInvoker contract = h.UseSession<ITestContractStateFull, TestContractStateFull>(Factory);
                 InstanceProvider = (StateFullInstanceProvider)contract.InstanceProvider;
             });
         }
