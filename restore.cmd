@@ -20,6 +20,8 @@ call dnu restore test\Automatic\Bolt.Client.Test\project.json --parallel
 if %errorlevel% neq 0 exit /b %errorlevel%
 call dnu restore test\Automatic\Bolt.Core.Test\project.json --parallel
 if %errorlevel% neq 0 exit /b %errorlevel%
+call dnu restore test\Automatic\Bolt.Server.Test\project.json --parallel
+if %errorlevel% neq 0 exit /b %errorlevel%
 call dnu restore test\Automatic\Bolt.Client.Proxy.Test\project.json --parallel
 if %errorlevel% neq 0 exit /b %errorlevel%
 
