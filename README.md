@@ -26,6 +26,14 @@ proxy.DoYourThing();
 * In you startup class use Bolt extensions to register Bolt into the pipeline
 
 ```c#
+
+public void ConfigureServices(IServiceCollection services)
+{
+    services.AddLogging();
+    services.AddOptions();
+    services.AddBolt();
+}
+
 public void Configuration(IApplicationBuilder app)
 {
     appBuilder.UseBolt((h) =>
@@ -40,14 +48,13 @@ Bolt also supports:
 
 * Sessions
 * Generation of async interfaces
-* CancellationToken 
-* Multiple Content Types (json, xml, protocol buffers)
+* CancellationToken support
 * Asynchronous methods
 * Recoverable Proxy
 * Server Failover support
 * Modularity - every component and behavior of Bolt is replaceable
-* User Code Generators - plug your own code into the generated classes
-* Configuration Based Generation - define Configuration.json file to describe how contracts should be generated
+* User Code Generators - plug your own code into the generated proxies
+* Configuration Based Generation - define Configuration.json file to describe how proxies should be generated
 
 #### Bolt Packages
 * **[Bolt.Core](https://www.nuget.org/packages/Bolt.Core/)** - contains common interfaces and helpers shared by both client and server. Multiple platforms are supported for this package. Portable Class Library(PCL) 
