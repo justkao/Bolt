@@ -6,26 +6,26 @@ namespace Bolt.Server
 {
     public static class BoltRouteHandlerExtensions
     {
-        public static IContractInvoker UseStateLess<TContract, TContractImplementation>(
+        public static IContractInvoker Use<TContract, TContractImplementation>(
             this IBoltRouteHandler bolt,
             Action<IContractInvoker> configure = null) where TContractImplementation : TContract
         {
             return bolt.Use<TContract>(new InstanceProvider<TContractImplementation>(), configure);
         }
 
-        public static IContractInvoker UseStateFull<TContract, TContractImplementation>(
+        public static IContractInvoker UseSession<TContract, TContractImplementation>(
             this IBoltRouteHandler bolt,
             BoltServerOptions options = null,
             Action<IContractInvoker> configure = null) where TContractImplementation : TContract
         {
             BoltFramework.ValidateContract(typeof (TContract));
 
-            return bolt.UseStateFull<TContract, TContractImplementation>(
+            return bolt.UseSession<TContract, TContractImplementation>(
                 new MemorySessionFactory(options ?? bolt.Configuration.Options),
                 configure);
         }
 
-        public static IContractInvoker UseStateFull<TContract, TContractImplementation>(
+        public static IContractInvoker UseSession<TContract, TContractImplementation>(
             this IBoltRouteHandler bolt,
             ISessionFactory sessionFactory,
             Action<IContractInvoker> configure = null) where TContractImplementation : TContract

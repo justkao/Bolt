@@ -2,6 +2,10 @@
 
 if not exist packages mkdir packages
 
+
+call dnu pack src\Bolt.Common\project.json --configuration Release
+for /R src\Bolt.Common\ %%f in (*.nupkg) do copy "%%f" packages\
+
 call dnu pack src\Bolt.Core\project.json --configuration Release
 for /R src\Bolt.Core\ %%f in (*.nupkg) do copy "%%f" packages\
 

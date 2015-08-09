@@ -1,7 +1,7 @@
 {
-  "version": "0.11.0-alpha",
+  "version": "0.13.0-alpha",
   "authors": [ "Martin Tomka" ],
-  "description": "Bolt client proxy factory.",
+  "description": "Contains factory for dynamic Bolt proxy generation.",
   "dependencies": {
     "Bolt.Common": { "type": "build" },
     "Bolt.Client": "",
