@@ -5,23 +5,23 @@ namespace Bolt.Client
 {
     public static class ClientConfigurationExtensions
     {
-        public static TContract CreateStatefullProxy<TContract>(this ClientConfiguration clientConfiguration, string uri)
+        public static TContract CreateSessionProxy<TContract>(this ClientConfiguration clientConfiguration, string uri)
             where TContract : class
         {
-            return clientConfiguration.CreateStatefullProxy<TContract>(new SingleServerProvider(new Uri(uri)));
+            return clientConfiguration.CreateSessionProxy<TContract>(new SingleServerProvider(new Uri(uri)));
         }
 
-        public static TContract CreateStatefullProxy<TContract>(this ClientConfiguration clientConfiguration, Uri uri)
+        public static TContract CreateSessionProxy<TContract>(this ClientConfiguration clientConfiguration, Uri uri)
             where TContract : class
         {
-            return clientConfiguration.CreateStatefullProxy<TContract>(new SingleServerProvider(uri));
+            return clientConfiguration.CreateSessionProxy<TContract>(new SingleServerProvider(uri));
         }
 
-        public static TContract CreateStatefullProxy<TContract>(this ClientConfiguration clientConfiguration,
+        public static TContract CreateSessionProxy<TContract>(this ClientConfiguration clientConfiguration,
             IServerProvider serverProvider)
             where TContract : class
         {
-            RecoverableStatefullChannel channel = new RecoverableStatefullChannel(typeof(TContract), serverProvider, clientConfiguration);
+            SessionChannel channel = new SessionChannel(typeof(TContract), serverProvider, clientConfiguration);
             TContract result = clientConfiguration.CreateProxy<TContract>(channel);
 
             if (result is IContractProvider)

@@ -12,7 +12,7 @@ using Bolt.Client.Filters;
 
 namespace Bolt.Client.Test
 {
-    public class RecoverabeChannelTest
+    public class SessionChannelTest
     {
         [Fact]
         public void New_IsNotOpened()

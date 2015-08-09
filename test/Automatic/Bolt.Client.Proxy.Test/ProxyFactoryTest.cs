@@ -178,7 +178,7 @@ namespace Bolt.Client.Proxy.Test
 
         private ProxyFactory Create()
         {
-            return new ProxyFactory();
+            return new DynamicProxyFactory();
         }
     }
 }

@@ -4,16 +4,16 @@ using Bolt.Server.IntegrationTest.Core;
 
 namespace Bolt.Server.IntegrationTest
 {
-    public class DynamicProxyStateFullTest: StateFullTest
+    public class DynamicProxySessionTest: SessionTest
     {
-        public DynamicProxyStateFullTest()
+        public DynamicProxySessionTest()
         {
             ClientConfiguration.ProxyFactory = new DynamicProxyFactory();
         }
 
         public override ITestContractStateFullAsync GetChannel()
         {
-            return ClientConfiguration.CreateProxy<ITestContractStateFullAsync>(new TestContractStateFullChannel(ServerUrl, ClientConfiguration));
+            return ClientConfiguration.CreateProxy<ITestContractStateFullAsync>(new TestContractSessionChannel(ServerUrl, ClientConfiguration));
         }
     }
 }

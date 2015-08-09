@@ -10,6 +10,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Bolt.Client.Proxy;
 using Xunit;
 
 namespace Bolt.Server.IntegrationTest
@@ -255,6 +256,16 @@ namespace Bolt.Server.IntegrationTest
             }
 
             System.Console.WriteLine("Creating {0} proxies manually has taken {1}ms", 10000, watch.ElapsedMilliseconds);
+
+            DynamicProxyFactory factory = new DynamicProxyFactory();
+
+            watch.Restart();
+            for (int i = 0; i < cnt; i++)
+            {
+                factory.CreateProxy<ITestCollectionOrderer>(new RecoverableChannel(new SingleServerProvider(ServerUrl), ClientConfiguration));
+            }
+
+            System.Console.WriteLine("Creating dynamic {0} proxies manually has taken {1}ms", 10000, watch.ElapsedMilliseconds);
         }
 
         [Fact]

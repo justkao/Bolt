@@ -27,7 +27,7 @@ namespace Bolt.Server
                 return found;
             }
 
-            foreach (Type iface in contract.GetTypeInfo().GetInterfaces())
+            foreach (Type iface in contract.GetTypeInfo().ImplementedInterfaces)
             {
                 candidates = iface.GetRuntimeMethods().ToList();
                 found = Resolve(candidates, actionName, false) ?? Resolve(candidates, actionName, true);

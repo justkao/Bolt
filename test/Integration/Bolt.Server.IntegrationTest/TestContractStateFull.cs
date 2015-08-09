@@ -67,7 +67,7 @@ namespace Bolt.Server.IntegrationTest
             return _sessionProvider.SessionId;
         }
 
-        public Task<InitSessionResult> InitSessionAsync(InitSessionParameters parameters, CancellationToken cancellation)
+        public Task<InitSessionResult> InitSessionAsync(InitSessionParameters parameters, ActionContextBase context, CancellationToken cancellation)
         {
             _initialized = true;
             if (_testState.SessionCallback == null)
@@ -75,10 +75,10 @@ namespace Bolt.Server.IntegrationTest
                 return Task.FromResult(new InitSessionResult());
             }
 
-            return _testState.SessionCallback.Object.InitSessionAsync(parameters, cancellation);
+            return _testState.SessionCallback.Object.InitSessionAsync(parameters, context, cancellation);
         }
 
-        public Task<DestroySessionResult> DestroySessionAsync(DestroySessionParameters parameters, CancellationToken cancellation)
+        public Task<DestroySessionResult> DestroySessionAsync(DestroySessionParameters parameters, ActionContextBase context, CancellationToken cancellation)
         {
             _initialized = false;
             if (_testState.SessionCallback == null)
@@ -86,7 +86,7 @@ namespace Bolt.Server.IntegrationTest
                 return Task.FromResult(new DestroySessionResult());
             }
 
-            return _testState.SessionCallback.Object.DestroySessionAsync(parameters, cancellation);
+            return _testState.SessionCallback.Object.DestroySessionAsync(parameters, context, cancellation);
         }
     }
 }

@@ -29,7 +29,7 @@ namespace Bolt.Server
                     e);
             }
 
-            context.Result = await callback.InitSessionAsync(parameters, context.RequestAborted);
+            context.Result = await callback.InitSessionAsync(parameters, context, context.RequestAborted);
         }
 
         public async Task HandleDestroySessionAsync(ServerActionContext context)
@@ -54,7 +54,7 @@ namespace Bolt.Server
                     e);
             }
 
-            context.Result = await callback.DestroySessionAsync(parameters, context.RequestAborted);
+            context.Result = await callback.DestroySessionAsync(parameters, context, context.RequestAborted);
         }
     }
 }

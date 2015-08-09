@@ -24,7 +24,7 @@ namespace Bolt.Core.Test
         [Fact]
         public void Read_NullArgument_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => Serializer.Read<string>(null));
+            Assert.Throws<ArgumentNullException>(() => Serializer.Read<string>((Stream)null));
         }
 
         [Fact]
