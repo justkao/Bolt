@@ -20,6 +20,7 @@ namespace Bolt.Client
             EndpointProvider = new EndpointProvider(Options);
             SessionHandler = new ClientSessionHandler(Options);
             ProxyFactory = new ProxyFactory();
+            Filters = new List<IClientExecutionFilter>();
         }
 
         /// <summary>

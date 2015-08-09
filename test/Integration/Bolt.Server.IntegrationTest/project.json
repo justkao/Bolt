@@ -8,6 +8,7 @@
     "Bolt.Test.Common": "",
     "xunit.runner.aspnet": "2.0.0-*",
     "Microsoft.AspNet.TestHost": "1.0.0-*",
+    "Microsoft.AspNet.Localization": "1.0.0-*",
     "Moq": "4.2.1502.911",
     "Castle.Core": "3.3.3"
   },

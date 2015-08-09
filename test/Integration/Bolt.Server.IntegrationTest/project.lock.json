@@ -234,6 +234,25 @@
           "lib/dnx451/Microsoft.AspNet.Http.Features.dll": {}
         }
       },
+      "Microsoft.AspNet.Localization/1.0.0-beta7-10408": {
+        "dependencies": {
+          "Microsoft.AspNet.Http.Extensions": "1.0.0-beta7-11788",
+          "Microsoft.Framework.Globalization.CultureInfoCache": "1.0.0-beta7-10408",
+          "Microsoft.Framework.Localization.Abstractions": "1.0.0-beta7-10408"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/dnx451/Microsoft.AspNet.Localization.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Microsoft.AspNet.Localization.dll": {}
+        }
+      },
       "Microsoft.AspNet.Routing/1.0.0-beta7-12064": {
         "dependencies": {
           "Microsoft.AspNet.Http.Extensions": "1.0.0-beta7-11788",
@@ -572,6 +591,34 @@
         },
         "runtime": {
           "lib/dnx451/Microsoft.Framework.DependencyInjection.Abstractions.dll": {}
+        }
+      },
+      "Microsoft.Framework.Globalization.CultureInfoCache/1.0.0-beta7-10408": {
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/dnx451/Microsoft.Framework.Globalization.CultureInfoCache.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Microsoft.Framework.Globalization.CultureInfoCache.dll": {}
+        }
+      },
+      "Microsoft.Framework.Localization.Abstractions/1.0.0-beta7-10408": {
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/dnx451/Microsoft.Framework.Localization.Abstractions.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Microsoft.Framework.Localization.Abstractions.dll": {}
         }
       },
       "Microsoft.Framework.Logging/1.0.0-beta7-11651": {
@@ -950,6 +997,19 @@
         "repo.json"
       ]
     },
+    "Microsoft.AspNet.Localization/1.0.0-beta7-10408": {
+      "sha512": "fyxxial9qOr9U/ZB66QB3QXh9Es+yvD2dybK/omeLxxjYi6qDFFnwxOWtF7XXDFtDep/xmJgnB4EbjfTsfPG2A==",
+      "files": [
+        "lib/dnx451/Microsoft.AspNet.Localization.dll",
+        "lib/dnx451/Microsoft.AspNet.Localization.xml",
+        "lib/dnxcore50/Microsoft.AspNet.Localization.dll",
+        "lib/dnxcore50/Microsoft.AspNet.Localization.xml",
+        "Microsoft.AspNet.Localization.1.0.0-beta7-10408.nupkg",
+        "Microsoft.AspNet.Localization.1.0.0-beta7-10408.nupkg.sha512",
+        "Microsoft.AspNet.Localization.nuspec",
+        "repo.json"
+      ]
+    },
     "Microsoft.AspNet.Routing/1.0.0-beta7-12064": {
       "serviceable": true,
       "sha512": "gNBE9iBfkmS4CkwadgHD6U3KRvzUJ61nn9pBkW5JUswnwP6YZmvnGjU/BpB5hC/4iK+glGpkvzPhwbFVQ27Q4Q==",
@@ -1246,6 +1306,32 @@
         "repo.json"
       ]
     },
+    "Microsoft.Framework.Globalization.CultureInfoCache/1.0.0-beta7-10408": {
+      "sha512": "vrL9L8D4iO2aARTIhrgKZ63n0BmQk+sSdyr3QQL/u2BxbQ3QSFBzLF/wke0ZaawdIOYGvabUE2C9kcYRYsILLw==",
+      "files": [
+        "lib/dnx451/Microsoft.Framework.Globalization.CultureInfoCache.dll",
+        "lib/dnx451/Microsoft.Framework.Globalization.CultureInfoCache.xml",
+        "lib/dnxcore50/Microsoft.Framework.Globalization.CultureInfoCache.dll",
+        "lib/dnxcore50/Microsoft.Framework.Globalization.CultureInfoCache.xml",
+        "Microsoft.Framework.Globalization.CultureInfoCache.1.0.0-beta7-10408.nupkg",
+        "Microsoft.Framework.Globalization.CultureInfoCache.1.0.0-beta7-10408.nupkg.sha512",
+        "Microsoft.Framework.Globalization.CultureInfoCache.nuspec",
+        "repo.json"
+      ]
+    },
+    "Microsoft.Framework.Localization.Abstractions/1.0.0-beta7-10408": {
+      "sha512": "PcqaGPX8C67ho11iHD6eWywqteKvxZPwOxDAfoaIvW6Od/ySJLBRLV4weJD8G/af5nKIvOY/VReP8rV843KRDA==",
+      "files": [
+        "lib/dnx451/Microsoft.Framework.Localization.Abstractions.dll",
+        "lib/dnx451/Microsoft.Framework.Localization.Abstractions.xml",
+        "lib/dnxcore50/Microsoft.Framework.Localization.Abstractions.dll",
+        "lib/dnxcore50/Microsoft.Framework.Localization.Abstractions.xml",
+        "Microsoft.Framework.Localization.Abstractions.1.0.0-beta7-10408.nupkg",
+        "Microsoft.Framework.Localization.Abstractions.1.0.0-beta7-10408.nupkg.sha512",
+        "Microsoft.Framework.Localization.Abstractions.nuspec",
+        "repo.json"
+      ]
+    },
     "Microsoft.Framework.Logging/1.0.0-beta7-11651": {
       "serviceable": true,
       "sha512": "4aQ6Ly9BmnIIsyM/T0i9V2E55WydtxCNB5Mwy5VqG1kO8Ld35bCrEQzgP94s5EfEYpoXSrTthBthQpU5wDwF3A==",
@@ -1446,6 +1532,7 @@
       "Bolt.Test.Common ",
       "xunit.runner.aspnet >= 2.0.0-*",
       "Microsoft.AspNet.TestHost >= 1.0.0-*",
+      "Microsoft.AspNet.Localization >= 1.0.0-*",
       "Moq >= 4.2.1502.911",
       "Castle.Core >= 3.3.3"
     ],

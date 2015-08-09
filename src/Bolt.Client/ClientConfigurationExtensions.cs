@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using Bolt.Client.Channels;
+using Bolt.Client.Filters;
 
 namespace Bolt.Client
 {
@@ -57,10 +59,29 @@ namespace Bolt.Client
             if (clientConfiguration.ProxyFactory == null)
             {
                 throw new InvalidOperationException(
-                    $"Unable to create proxy for contract '{typeof (TContract).Name}' becasue proxy factory is not initialized.");
+                    $"Unable to create proxy for contract '{typeof(TContract).Name}' becasue proxy factory is not initialized.");
             }
 
             return clientConfiguration.ProxyFactory.CreateProxy<TContract>(channel);
+        }
+
+        public static ClientConfiguration AddFilter<T>(this ClientConfiguration clientConfiguration) where T: IClientExecutionFilter, new()
+        {
+            return clientConfiguration.AddFilter(Activator.CreateInstance<T>());
+        }
+
+        public static ClientConfiguration AddFilter(this ClientConfiguration clientConfiguration, IClientExecutionFilter executionFilter)
+        {
+            if (clientConfiguration == null) throw new ArgumentNullException(nameof(clientConfiguration));
+            if (executionFilter == null) throw new ArgumentNullException(nameof(executionFilter));
+
+            if (clientConfiguration.Filters == null)
+            {
+                clientConfiguration.Filters = new List<IClientExecutionFilter>();
+            }
+
+            clientConfiguration.Filters.Add(executionFilter);
+            return clientConfiguration;
         }
     }
 }
