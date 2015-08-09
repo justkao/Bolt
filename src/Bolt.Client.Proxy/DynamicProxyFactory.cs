@@ -11,6 +11,8 @@ namespace Bolt.Client.Proxy
 {
     public class DynamicProxyFactory : ProxyFactory
     {
+        public static readonly DynamicProxyFactory Default = new DynamicProxyFactory();
+
         private readonly ProxyGenerator _generator = new ProxyGenerator();
 
         public override T CreateProxy<T>(IChannel channel)

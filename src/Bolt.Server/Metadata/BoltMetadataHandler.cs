@@ -38,7 +38,7 @@ namespace Bolt.Server.Metadata
             try
             {
                 string result = JsonConvert.SerializeObject(
-                    contracts.Select(c => c.Contract.Name).ToList(),
+                    contracts.Select(c => BoltFramework.GetContractName(c.Contract)).ToList(),
                     Formatting.Indented,
                     new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 
@@ -60,7 +60,6 @@ namespace Bolt.Server.Metadata
                 string actionName = context.HttpContext.Request.Query["action"]?.Trim();
                 MethodInfo action = null;
 
-
                 if (!string.IsNullOrEmpty(actionName))
                 {
                     action = _actionResolver.Resolve(context.Contract, actionName);
@@ -76,22 +75,24 @@ namespace Bolt.Server.Metadata
                 }
                 else
                 {
-                    var actionParameters = action.GetParameters();
-
+                    List<ParameterInfo> actionParameters = BoltFramework.GetEffectiveParameters(action).ToList();
                     if (actionParameters.Any())
                     {
                         JsonSchemaGenerator generator = new JsonSchemaGenerator();
+                        JsonSchema schema = new JsonSchema
+                        {
+                            Properties = actionParameters.ToDictionary(p => p.Name, p => generator.Generate(p.ParameterType)),
+                            Description = $"Arguments for '{actionName}' action",
+                            Required = true,
+                            Type = JsonSchemaType.Object  
+                        };
 
                         using (var sw = new StringWriter())
                         {
-                            using (var jw = new JsonTextWriter(sw))
+                            using (JsonTextWriter jw = new JsonTextWriter(sw))
                             {
-                                // TODO: fix
-                                /*
                                 jw.Formatting = Formatting.Indented;
-                                var schema = generator.Generate(action.Parameters);
                                 schema.WriteTo(jw);
-                                */
                             }
 
                             result = sw.GetStringBuilder().ToString();

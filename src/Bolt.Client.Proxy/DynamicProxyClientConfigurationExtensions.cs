@@ -13,7 +13,7 @@ namespace Bolt.Client.Proxy
                 return configuration;
             }
 
-            configuration.ProxyFactory = new DynamicProxyFactory();
+            configuration.ProxyFactory = DynamicProxyFactory.Default;
             return configuration;
         }
     }

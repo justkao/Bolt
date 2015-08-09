@@ -20,10 +20,10 @@
     "dotnet": {
       "dependencies": {
         "System.Collections": "4.0.11-*",
-        "System.Linq": "4.0.0-*",
+        "System.Linq": "4.0.1-*",
         "System.Reflection.Extensions": "4.0.0-*",
         "System.Runtime.Serialization.Primitives": "4.0.10-*",
-        "System.Text.Encoding": "4.0.10-*"
+        "System.Text.Encoding": "4.0.11-*"
       }
     }
   }

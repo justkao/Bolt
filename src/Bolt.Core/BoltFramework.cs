@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Bolt.Common;
@@ -107,6 +108,17 @@ namespace Bolt
 
             coercedName = name.Substring(0, index);
             return true;
+        }
+
+        public static IEnumerable<ParameterInfo> GetEffectiveParameters(MethodInfo method)
+        {
+            ParameterInfo[] p = method.GetParameters();
+            if (p.Length == 0)
+            {
+                return Enumerable.Empty<ParameterInfo>();
+            }
+
+            return method.GetParameters().Where(info => info.ParameterType != typeof (CancellationToken) && info.ParameterType != typeof (CancellationToken?));
         }
 
         private static void InitBoltSession()
