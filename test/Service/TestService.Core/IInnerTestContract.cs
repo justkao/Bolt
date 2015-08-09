@@ -1,9 +1,13 @@
-﻿using Bolt;
+﻿using System;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
 namespace TestService.Core
 {
+    public class AsyncOperationAttribute : Attribute
+    {
+    }
+
     [ServiceContract]
     public interface IInnerTestContract2
     {
@@ -18,6 +22,8 @@ namespace TestService.Core
     {
         [AsyncOperation]
         void InnerOperation();
+
+        Task<string> InnerOperation3();
 
         Task InnerOperationExAsync();
     }

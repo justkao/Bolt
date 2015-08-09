@@ -1,4 +1,5 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Reflection;
 
 namespace Bolt
 {
@@ -7,16 +8,14 @@ namespace Bolt
     /// </summary>
     public abstract class ActionContextBase
     {
-        protected ActionContextBase(ActionDescriptor action)
+        private IDictionary<object, object> _items;
+
+        public MethodInfo Action { get; set; }
+
+        public IDictionary<object, object> Items
         {
-            if (action == null)
-            {
-                throw new ArgumentNullException("action");
-            }
-
-            Action = action;
+            get { return _items ?? (_items = new Dictionary<object, object>()); }
+            set { _items = value; }
         }
-
-        public ActionDescriptor Action { get; private set; }
     }
 }

@@ -1,0 +1,28 @@
+﻿{
+  "version": "0.13.0-alpha",
+  "description": "Bolt code generation tool used to generate client and server code.",
+  "authors": [ "Martin Tomka" ],
+  "dependencies": {
+    "Microsoft.Framework.CommandLineUtils.Sources": {
+      "version": "1.0.0-*",
+      "type": "build"
+    },
+    "Newtonsoft.Json": "6.0.8",
+    "Bolt.Common": { "type": "build" },
+    "Bolt.Generators": "",
+    "Microsoft.Dnx.Runtime.Abstractions": "1.0.0-*"
+  },
+  "frameworks": {
+    "dnx451": {
+    },
+    "dnxcore50": {
+      "dependencies": {
+        "System.Console": "4.0.0-*",
+        "System.IO.FileSystem": "4.0.1-*"
+      }
+    }
+  },
+  "commands": {
+    "Bolt.Console": "Bolt.Console"
+  }
+}

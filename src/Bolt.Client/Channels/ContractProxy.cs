@@ -1,63 +1,64 @@
 using System;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Bolt.Core;
 
 namespace Bolt.Client.Channels
 {
     /// <summary>
     /// Base class for all Bolt generated proxies. The <see cref="ContractProxy"/> requires instance of <see cref="IChannel"/> that is used to communicate with Bolt server.
     /// </summary>
-    public abstract class ContractProxy : IContractDescriptorProvider, IChannel
+    public abstract class ContractProxy : IContractProvider, IChannel, IChannelProvider
     {
+        protected ContractProxy()
+        {
+        }
+
         protected ContractProxy(ContractProxy proxy)
         {
             if (proxy == null)
             {
-                throw new ArgumentNullException("proxy");
+                throw new ArgumentNullException(nameof(proxy));
             }
 
-            Descriptor = proxy.Descriptor;
+            Contract = proxy.Contract;
             Channel = proxy.Channel;
         }
 
         /// <summary>
         /// Initializes the instance will the channel and contract descriptor.
         /// </summary>
-        /// <param name="contractDescriptor">The contract descriptor.</param>
+        /// <param name="contract">The contract descriptor.</param>
         /// <param name="channel">The channel used to communicate with bolt server.</param>
         /// <exception cref="ArgumentNullException">Thrown if any of parameters is null.</exception>
-        protected ContractProxy(ContractDescriptor contractDescriptor, IChannel channel)
+        protected ContractProxy(Type contract, IChannel channel)
         {
-            if (contractDescriptor == null)
+            if (contract == null)
             {
-                throw new ArgumentNullException("contractDescriptor");
+                throw new ArgumentNullException(nameof(contract));
             }
 
             if (channel == null)
             {
-                throw new ArgumentNullException("channel");
+                throw new ArgumentNullException(nameof(channel));
             }
 
-            Descriptor = contractDescriptor;
+            Contract = contract;
             Channel = channel;
         }
 
         /// <summary>
         /// Gets the contract descriptor that describes the available proxy actions.
         /// </summary>
-        public ContractDescriptor Descriptor { get; protected set; }
+        public Type Contract { get; protected set; }
 
         /// <summary>
         /// The channel used to communicate with Bolt server.
         /// </summary>
-        public IChannel Channel { get; private set; }
+        public IChannel Channel { get; protected set; }
 
         #region IChannel Implementation
-
-        public virtual CancellationToken GetCancellationToken(ActionDescriptor descriptor)
-        {
-            return Channel.GetCancellationToken(descriptor);
-        }
 
         public void Dispose()
         {
@@ -74,10 +75,9 @@ namespace Bolt.Client.Channels
             return Channel.OpenAsync();
         }
 
-        bool IChannel.IsOpened
-        {
-            get { return Channel.IsOpened; }
-        }
+        bool IChannel.IsOpened => Channel.IsOpened;
+
+        ISerializer IChannel.Serializer => Channel.Serializer;
 
         void ICloseable.Close()
         {
@@ -89,29 +89,40 @@ namespace Bolt.Client.Channels
             return Channel.CloseAsync();
         }
 
-        bool ICloseable.IsClosed
+        bool ICloseable.IsClosed => Channel.IsClosed;
+
+        Task<object> IChannel.SendAsync(Type contract, MethodInfo action, Type resultType, IObjectSerializer parameters, CancellationToken cancellation)
         {
-            get { return Channel.IsClosed; }
+            return Channel.SendAsync(contract, action, resultType, parameters, cancellation);
         }
 
-        Task IChannel.SendAsync<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        object IChannel.Send(Type contract, MethodInfo action, Type resultType, IObjectSerializer parameters, CancellationToken cancellation)
         {
-            return Channel.SendAsync(parameters, descriptor, cancellation);
+            return Channel.Send(contract, action, resultType, parameters, cancellation);
         }
 
-        Task<TResult> IChannel.SendAsync<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        protected Task SendAsync(MethodInfo action, IObjectSerializer parameters, CancellationToken cancellation)
         {
-            return Channel.SendAsync<TResult, TRequestParameters>(parameters, descriptor, cancellation);
+            return SendAsync<Empty>(action, parameters, cancellation);
         }
 
-        void IChannel.Send<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        protected async Task<TResult> SendAsync<TResult>(MethodInfo action, IObjectSerializer parameters, CancellationToken cancellation)
         {
-            Channel.Send(parameters, descriptor, cancellation);
+            object result =  await Channel.SendAsync(Contract, action, typeof(TResult), parameters, cancellation);
+            return (TResult)result;
         }
 
-        TResult IChannel.Send<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
+        protected void Send(MethodInfo action, IObjectSerializer parameters, CancellationToken cancellation)
         {
-            return Channel.Send<TResult, TRequestParameters>(parameters, descriptor, cancellation);
+            Channel.Send(Contract, action, typeof(void), parameters, cancellation);
+        }
+
+        protected TResult Send<TResult>(
+            MethodInfo action,
+            IObjectSerializer parameters,
+            CancellationToken cancellation)
+        {
+            return (TResult) Channel.Send(Contract, action, typeof (TResult), parameters, cancellation);
         }
 
         #endregion

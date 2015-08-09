@@ -1,0 +1,20 @@
+﻿{
+  "version": "1.0.0-*",
+  "dependencies": {
+    "Bolt.Core": "",
+    "Bolt.Server": "",
+    "Bolt.Client": "",
+    "Bolt.Common": "",
+    "Bolt.Test.Common": "",
+    "Bolt.Generators": "",
+    "Bolt.Console": ""
+  },
+  "compileExclude": "Generated\\*.*",
+  "frameworks": {
+    "dnx451": {
+    }
+  },
+  "commands": {
+    "gen": "Bolt.Console code --contract *.* --output ../Bolt.Server.IntegrationTest/Generated/"
+  }
+}

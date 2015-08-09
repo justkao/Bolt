@@ -1,16 +1,14 @@
 ﻿using System;
-using System.Net;
+using System.Net.Http;
 
 namespace Bolt.Client
 {
     /// <summary>
     /// Describes the Bolt server response with additional metadata attached.
     /// </summary>
-    /// <typeparam name="TResponse">The type of response.</typeparam>
-    public struct ResponseDescriptor<TResponse>
+    public class ResponseDescriptor
     {
-        public ResponseDescriptor(HttpWebResponse response, ClientActionContext context, Exception error, ResponseErrorType errorType)
-            : this()
+        public ResponseDescriptor(HttpResponseMessage response, ClientActionContext context, Exception error, ResponseError errorType)
         {
             Context = context;
             ErrorType = errorType;
@@ -18,20 +16,19 @@ namespace Bolt.Client
             Response = response;
         }
 
-        public ResponseDescriptor(HttpWebResponse response, ClientActionContext context, TResponse result)
-            : this()
+        public ResponseDescriptor(HttpResponseMessage response, ClientActionContext context, object result)
         {
             Response = response;
             Result = result;
             Context = context;
-            ErrorType = ResponseErrorType.None;
+            ErrorType = ResponseError.None;
             Error = null;
         }
 
         /// <summary>
         /// The server response.
         /// </summary>
-        public HttpWebResponse Response { get; private set; }
+        public HttpResponseMessage Response { get; private set; }
 
         /// <summary>
         /// The context of request action.
@@ -41,20 +38,17 @@ namespace Bolt.Client
         /// <summary>
         /// Error that occurred durring processing of action.
         /// </summary>
-        public Exception Error { get; private set; }
+        public Exception Error { get; }
 
         /// <summary>
         /// The type of error that occurred.
         /// </summary>
-        public ResponseErrorType ErrorType { get; private set; }
+        public ResponseError ErrorType { get; }
 
         /// <summary>
         /// Determines whether request was successful.
         /// </summary>
-        public bool IsSuccess
-        {
-            get { return ErrorType == ResponseErrorType.None; }
-        }
+        public bool IsSuccess => ErrorType == ResponseError.None;
 
         /// <summary>
         /// Gets the deserialized server result. 
@@ -62,9 +56,9 @@ namespace Bolt.Client
         /// <remarks>
         /// <see cref="Empty.Instance"/> is returned if client do not expect any data.
         /// </remarks>
-        public TResponse Result { get; private set; }
+        public object Result { get; }
 
-        public TResponse GetResultOrThrow()
+        public object GetResultOrThrow()
         {
             if (!IsSuccess)
             {

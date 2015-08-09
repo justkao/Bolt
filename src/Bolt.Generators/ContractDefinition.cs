@@ -13,7 +13,7 @@ namespace Bolt.Generators
         {
             if (root == null)
             {
-                throw new ArgumentNullException("root");
+                throw new ArgumentNullException(nameof(root));
             }
 
             if (!root.GetTypeInfo().IsInterface)
@@ -24,14 +24,12 @@ namespace Bolt.Generators
             Root = root;
             Name = Root.Name[0] == 'I' ? Root.Name.Substring(1) : Root.Name;
             Namespace = root.Namespace;
-            _excludedContracts = excludedContracts != null ? excludedContracts.ToList() : new List<Type>();
+            _excludedContracts = excludedContracts?.ToList() ?? new List<Type>();
 
             Validate();
         }
 
-        public Type Root { get; private set; }
-
-        public Type ParametersBase { get; set; }
+        public Type Root { get; }
 
         public string Name { get; private set; }
 
@@ -58,7 +56,7 @@ namespace Bolt.Generators
 
         public virtual IReadOnlyCollection<Type> GetEffectiveContracts()
         {
-            List<Type> contracts = new List<Type>()
+            List<Type> contracts = new List<Type>
             {
                 Root
             };
@@ -87,12 +85,18 @@ namespace Bolt.Generators
 
         public MethodInfo GetInitSessionMethod()
         {
-            return GetEffectiveMethods().FirstOrDefault(m => m.GetCustomAttribute<InitSessionAttribute>() != null);
+            return GetEffectiveMethods().FirstOrDefault(m => m.CustomAttributes.FirstOrDefault(a => a.AttributeType.Name == BoltConstants.Core.InitSessionAttribute.Name) != null);
         }
 
         public MethodInfo GetCloseSessionMethod()
         {
-            return GetEffectiveMethods().FirstOrDefault(m => m.GetCustomAttribute<CloseSessionAttribute>() != null);
+            return GetEffectiveMethods().FirstOrDefault(m => m.CustomAttributes.FirstOrDefault(a => a.AttributeType.Name == BoltConstants.Core.CloseSessionAttribute.Name) != null);
+        }
+
+        public bool IsValid()
+        {
+            List<MethodInfo> methods = GetEffectiveMethods().ToList();
+            return methods.Select(m => m.Name).Distinct().Count() == methods.Count();
         }
 
         private IEnumerable<Type> GetInterfacesInternal(IEnumerable<Type> interfaces)
@@ -110,10 +114,10 @@ namespace Bolt.Generators
 
         private void Validate()
         {
-            List<MethodInfo> methods = GetEffectiveMethods().ToList();
-            if (methods.Select(m => m.Name).Distinct().Count() != methods.Count())
+            if (!IsValid())
             {
-                throw new InvalidOperationException(string.Format("Cotnract {0} contains multiple methods with the same name.", Root.FullName));
+                throw new InvalidOperationException(
+                    $"Contract {Root.FullName} contains multiple methods with the same name.");
             }
         }
     }

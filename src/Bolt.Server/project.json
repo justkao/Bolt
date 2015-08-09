@@ -1,3 +1,30 @@
 ﻿{
-    "shared": "**\\*.cs"
+  "version": "0.13.0-alpha",
+  "description": "Bolt Server side libraries based on ASP.NET 5. The Bolt is portable and lightweight alternative to WCF library.",
+  "authors": [ "Martin Tomka" ],
+  "dependencies": {
+    "Bolt.Common": { "type": "build" },
+    "Bolt.Core": "",
+    "Microsoft.AspNet.Hosting.Abstractions": "1.0.0-*",
+    "Microsoft.AspNet.Http.Abstractions": "1.0.0-*",
+    "Microsoft.AspNet.Http.Extensions": "1.0.0-*",
+    "Microsoft.AspNet.Routing": "1.0.0-*",
+    "Microsoft.Framework.Caching.Abstractions": "1.0.0-*",
+    "Microsoft.Framework.Configuration.Abstractions": "1.0.0-*",
+    "Microsoft.Framework.DependencyInjection.Abstractions": "1.0.0-*",
+    "Microsoft.Framework.Logging.Abstractions": "1.0.0-*",
+    "Microsoft.Framework.OptionsModel": "1.0.0-*",
+    "Newtonsoft.Json": "6.0.8"
+  },
+  "frameworks": {
+    "dnx451": {
+      "frameworkAssemblies": {
+      }
+    },
+    "dnxcore50": {
+      "dependencies": {
+        "System.Threading.Timer": "4.0.0-*"
+      }
+    }
+  }
 }

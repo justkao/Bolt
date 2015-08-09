@@ -8,6 +8,10 @@ namespace TestService.Core
 {
     public class TestContractImplementation : ITestContract
     {
+        public TestContractImplementation()
+        {
+        }
+
         public Person UpdatePerson(Person person, CancellationToken cancellation)
         {
             return null;
@@ -53,7 +57,7 @@ namespace TestService.Core
 
         public int GetSimpleType(int arg)
         {
-            return new Random().Next();
+            return arg;
         }
 
         public Task GetSimpleTypeAsAsync(int arg)
@@ -117,6 +121,11 @@ namespace TestService.Core
         public Task InnerOperationExAsync2()
         {
             throw new NotImplementedException();
+        }
+
+        public Task<string> InnerOperation3()
+        {
+            return Task.FromResult("InnerOperation3");
         }
     }
 }

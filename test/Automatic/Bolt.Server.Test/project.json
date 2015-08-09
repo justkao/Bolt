@@ -1,0 +1,19 @@
+﻿{
+  "dependencies": {
+    "Bolt.Server": "",
+    "Bolt.Common": "",
+    "Bolt.Test.Common": "",
+    "xunit": "2.1.0-beta1-build2945",
+    "xunit.runner.aspnet": "2.0.0-aspnet-*",
+    "Microsoft.AspNet.Http": "1.0.0-*",
+    "Moq": "4.2.1502.0911"
+  },
+  "frameworks": {
+    "dnx451": {
+
+    }
+  },
+  "commands": {
+    "test": "xunit.runner.aspnet -parallel none"
+  }
+}

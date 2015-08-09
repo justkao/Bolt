@@ -80,7 +80,7 @@ namespace Bolt.Generators
 
         protected virtual ClassDescriptor CreateDefaultDescriptor()
         {
-            return MetadataProvider.GetContractDescriptor(ContractDefinition);
+            return new ClassDescriptor(ContractDefinition.Name, ContractDefinition.Namespace);
         }
 
         public virtual bool ShouldBeAsync(MethodInfo method, bool force)
@@ -97,7 +97,18 @@ namespace Bolt.Generators
                 return methods.All(m => m.Name != method.Name + "Async");
             }
 
-            return method.GetCustomAttribute<AsyncOperationAttribute>() != null && methods.All(m => m.Name != method.Name + "Async");
+            if (!method.CustomAttributes.Any())
+            {
+                return false;
+            }
+
+            var found = method.CustomAttributes.FirstOrDefault(a => a.AttributeType.Name == BoltConstants.Core.AsyncOperationAttribute.Name);
+            if (found == null)
+            {
+                return false;
+            }
+
+            return methods.All(m => m.Name != method.Name + "Async");
         }
 
         public virtual ClassGenerator CreateClassGenerator(ClassDescriptor descriptor)
@@ -107,13 +118,14 @@ namespace Bolt.Generators
 
         public T CreateEx<T>() where T : ContractGeneratorBase, new()
         {
-            T res = new T();
-            res.Output = Output;
-            res.Formatter = Formatter;
-            res.IntendProvider = IntendProvider;
-            res.MetadataProvider = MetadataProvider;
-            res.ContractDefinition = ContractDefinition;
-            return res;
+            return new T
+            {
+                Output = Output,
+                Formatter = Formatter,
+                IntendProvider = IntendProvider,
+                MetadataProvider = MetadataProvider,
+                ContractDefinition = ContractDefinition
+            };
         }
     }
 }

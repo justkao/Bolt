@@ -27,4 +27,5 @@ nuget.exe
 *.pdb
 *.dll
 *.nupkg
-/src/Bolt.Console/tools/
+project.lock.json
+debugSettings.json

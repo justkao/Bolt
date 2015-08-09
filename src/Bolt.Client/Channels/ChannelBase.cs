@@ -1,7 +1,13 @@
 ﻿using System;
-using System.Net;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Bolt.Client.Filters;
+using Bolt.Client.Helpers;
+using Bolt.Common;
+using Bolt.Core;
 
 namespace Bolt.Client.Channels
 {
@@ -14,50 +20,50 @@ namespace Bolt.Client.Channels
         {
             if (proxy == null)
             {
-                throw new ArgumentNullException("proxy");
+                throw new ArgumentNullException(nameof(proxy));
             }
 
-            RequestForwarder = proxy.RequestForwarder;
+            RequestHandler = proxy.RequestHandler;
             EndpointProvider = proxy.EndpointProvider;
+            Serializer = proxy.Serializer;
             IsClosed = proxy.IsClosed;
         }
 
         protected ChannelBase(ClientConfiguration configuration)
-            : this(configuration.RequestForwarder, configuration.EndpointProvider)
+            : this(configuration.Serializer, configuration.RequestHandler, configuration.EndpointProvider, configuration.Filters)
         {
             DefaultResponseTimeout = configuration.DefaultResponseTimeout;
         }
 
-        protected ChannelBase(IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
+        protected ChannelBase(ISerializer serializer, IRequestHandler requestHandler, IEndpointProvider endpointProvider, IReadOnlyCollection<IClientExecutionFilter> filters)
         {
-            if (requestForwarder == null)
+            if (requestHandler == null)
             {
-                throw new ArgumentNullException("requestForwarder");
+                throw new ArgumentNullException(nameof(requestHandler));
             }
 
             if (endpointProvider == null)
             {
-                throw new ArgumentNullException("endpointProvider");
+                throw new ArgumentNullException(nameof(endpointProvider));
             }
 
-            RequestForwarder = requestForwarder;
+            Filters = filters ?? new List<IClientExecutionFilter>();
+            Serializer = serializer;
+            RequestHandler = requestHandler;
             EndpointProvider = endpointProvider;
         }
 
-        public IRequestForwarder RequestForwarder { get; private set; }
+        public IRequestHandler RequestHandler { get; }
 
-        public IEndpointProvider EndpointProvider { get; private set; }
+        public IEndpointProvider EndpointProvider { get; }
+
+        public IReadOnlyCollection<IClientExecutionFilter> Filters { get; }
 
         public bool IsClosed { get; protected set; }
 
         public bool IsOpened { get; protected set; }
 
         public TimeSpan DefaultResponseTimeout { get; set; }
-
-        public virtual CancellationToken GetCancellationToken(ActionDescriptor descriptor)
-        {
-            return CancellationToken.None;
-        }
 
         public virtual void Open()
         {
@@ -73,31 +79,15 @@ namespace Bolt.Client.Channels
 
         public virtual Task OpenAsync()
         {
-            Open();
-            return Task.FromResult(0);
-        }
+            EnsureNotClosed();
 
-        public Task SendAsync<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
-        {
-            return SendCoreAsync<Empty, TRequestParameters>(parameters, descriptor, cancellation);
-        }
+            if (IsOpened)
+            {
+                return CompletedTask.Done;
+            }
 
-        public Task<TResult> SendAsync<TResult, TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
-        {
-            return SendCoreAsync<TResult, TRequestParameters>(parameters, descriptor, cancellation);
-        }
-
-        public void Send<TRequestParameters>(TRequestParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
-        {
-            SendCore<Empty, TRequestParameters>(parameters, descriptor, cancellation);
-        }
-
-        public TResult Send<TResult, TRequestParameters>(
-            TRequestParameters parameters,
-            ActionDescriptor descriptor,
-            CancellationToken cancellation)
-        {
-            return SendCore<TResult, TRequestParameters>(parameters, descriptor, cancellation);
+            IsOpened = true;
+            return CompletedTask.Done;
         }
 
         public virtual void Close()
@@ -113,63 +103,70 @@ namespace Bolt.Client.Channels
 
         public virtual Task CloseAsync()
         {
-            Close();
-            return Task.FromResult(0);
+            if (IsClosed)
+            {
+                return CompletedTask.Done;
+            }
+
+            IsClosed = true;
+            OnClosed();
+            return CompletedTask.Done;
         }
 
-        protected abstract Uri GetRemoteConnection();
-
-        protected virtual Task<Uri> GetRemoteConnectionAsync()
-        {
-            return Task.FromResult(GetRemoteConnection());
-        }
+        protected abstract Task<ConnectionDescriptor> GetConnectionAsync();
 
         protected virtual ClientActionContext CreateContext(
-            Uri server,
-            ActionDescriptor actionDescriptor,
+            ConnectionDescriptor connection,
+            Type contract,
+            MethodInfo action,
             CancellationToken cancellation,
-            object parameters)
+            Type responseType, 
+            IObjectSerializer parameters)
         {
-            return new ClientActionContext(actionDescriptor, CreateWebRequest(server, actionDescriptor), server, cancellation)
-                       {
-                           ResponseTimeout = DefaultResponseTimeout
-                       };
-        }
-
-        public virtual T SendCore<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
-        {
-            EnsureNotClosed();
-            ValidateParameters(parameters, descriptor);
-
-            Uri server = GetRemoteConnection();
-
-            using (ClientActionContext ctxt = CreateContext(server, descriptor, cancellation, parameters))
+            return new ClientActionContext
             {
-                BeforeSending(ctxt);
-                ResponseDescriptor<T> result = RequestForwarder.GetResponse<T, TParameters>(ctxt, parameters);
-                AfterReceived(ctxt);
-                return result.GetResultOrThrow();
-            }
+                ResponseType = responseType,
+                Action = action,
+                Cancellation = cancellation,
+                Connection = connection,
+                Request = CreateRequest(connection, contract, action),
+                ResponseTimeout = DefaultResponseTimeout,
+                Parameters = parameters
+            };
         }
 
-        public virtual async Task<T> SendCoreAsync<T, TParameters>(
-            TParameters parameters,
-            ActionDescriptor descriptor,
+        public virtual async Task<object> SendAsync(
+            Type contract,
+            MethodInfo action,
+            Type responseType,
+            IObjectSerializer parameters,
             CancellationToken cancellation)
         {
             EnsureNotClosed();
-            ValidateParameters(parameters, descriptor);
 
-            Uri server = await GetRemoteConnectionAsync();
+            var connection = await GetConnectionAsync();
 
-            using (ClientActionContext ctxt = CreateContext(server, descriptor, cancellation, parameters))
+            using (ClientActionContext ctxt = CreateContext(connection, contract, action, cancellation, responseType, parameters))
             {
-                BeforeSending(ctxt);
-                ResponseDescriptor<T> result = await RequestForwarder.GetResponseAsync<T, TParameters>(ctxt, parameters);
-                AfterReceived(ctxt);
-                return result.GetResultOrThrow();
+                CoreClientAction clientAction = new CoreClientAction(Filters);
+                await clientAction.ExecuteAsync(ctxt, ExecuteCoreAsync);
+                return ctxt.Result.GetResultOrThrow();
             }
         }
+
+        public virtual object Send(Type contract, MethodInfo action, Type resultType, IObjectSerializer parameters,
+            CancellationToken cancellation)
+        {
+            if (resultType == typeof (void) || resultType == typeof (Empty))
+            {
+                TaskHelpers.Execute(() => SendAsync(contract, action, resultType, parameters, cancellation) as Task);
+                return Empty.Instance;
+            }
+
+            return TaskHelpers.Execute(() => SendAsync(contract, action, resultType, parameters, cancellation));
+        }
+
+        public ISerializer Serializer { get; }
 
         protected virtual void BeforeSending(ClientActionContext context)
         {
@@ -179,12 +176,15 @@ namespace Bolt.Client.Channels
         {
         }
 
-        protected virtual HttpWebRequest CreateWebRequest(Uri server, ActionDescriptor descriptor)
+        protected virtual HttpRequestMessage CreateRequest(ConnectionDescriptor connection,Type contract, MethodInfo action)
         {
-            Uri uri = EndpointProvider.GetEndpoint(server, descriptor);
-            HttpWebRequest request = WebRequest.CreateHttp(uri);
-            request.Method = "Post";
-            return request;
+            Uri uri = EndpointProvider.GetEndpoint(connection.Server, contract, action);
+
+            return new HttpRequestMessage
+            {
+                RequestUri = uri,
+                Method = HttpMethod.Post
+            };
         }
 
         protected virtual void OnClosed()
@@ -199,43 +199,22 @@ namespace Bolt.Client.Channels
             }
         }
 
-        private void ValidateParameters<TParams>(TParams parameters, ActionDescriptor action)
-        {
-            if (!action.HasParameters)
-            {
-                if (action.Parameters != typeof(Empty))
-                {
-                    throw new InvalidOperationException(
-                        string.Format(
-                            "Invalid parameters type provided for action '{0}'. Expected parameter type object should be '{1}', but was '{2}' instead.",
-                            action.Name,
-                            typeof(Empty).FullName,
-                            typeof(TParams).FullName));
-                }
-            }
-            else
-            {
-                if (Equals(parameters, default(TParams)))
-                {
-                    throw new InvalidOperationException(string.Format("Parameters must not be null. Action '{0}'.", action.Name));
-                }
-
-                if (action.Parameters != typeof(TParams))
-                {
-                    throw new InvalidOperationException(
-                        string.Format(
-                            "Invalid parameters type provided for action '{0}'. Expected parameter type object should be '{1}', but was '{2}' instead.",
-                            action.Name,
-                            typeof(TParams).FullName,
-                            typeof(TParams).FullName));
-                }
-            }
-        }
-
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        protected async Task ExecuteCoreAsync(ClientActionContext ctxt)
+        {
+            BeforeSending(ctxt);
+
+            if (ctxt.Result == null)
+            {
+                ctxt.Result = await RequestHandler.GetResponseAsync(ctxt, ctxt.Parameters);
+            }
+
+            AfterReceived(ctxt);
         }
 
         private void Dispose(bool disposeManagedResources)

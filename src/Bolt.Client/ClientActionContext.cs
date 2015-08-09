@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading;
+using Bolt.Core;
+using Bolt.Session;
 
 namespace Bolt.Client
 {
@@ -9,48 +12,43 @@ namespace Bolt.Client
     /// </summary>
     public class ClientActionContext : ActionContextBase, IDisposable
     {
-        public ClientActionContext(ActionDescriptor action, HttpWebRequest request, Uri server, CancellationToken cancellation)
-            : base(action)
-        {
-            if (request == null)
-            {
-                throw new ArgumentNullException("request");
-            }
+        public IObjectSerializer Parameters { get; set; }
 
-            if (server == null)
-            {
-                throw new ArgumentNullException("server");
-            }
+        public SessionParametersBase SessionParameters { get; set; }
 
-            Request = request;
-            Server = server;
-            Cancellation = cancellation;
-        }
+        public bool ParametersHandled { get; set; }
 
         /// <summary>
         /// The Uri of destination server where the request will be processed.
         /// </summary>
-        public Uri Server { get; private set; }
+        public ConnectionDescriptor Connection { get; set; }
 
         /// <summary>
         /// The raw <see cref="HttpWebRequest"/>.
         /// </summary>
-        public HttpWebRequest Request { get; private set; }
+        public HttpRequestMessage Request { get; set; }
 
         /// <summary>
         /// Cancellation token for current request.
         /// </summary>
-        public CancellationToken Cancellation { get; private set; }
+        public CancellationToken Cancellation { get; set; }
 
         /// <summary>
         /// The server response or null if the request has not been send yet.
         /// </summary>
-        public HttpWebResponse Response { get; set; }
+        public HttpResponseMessage Response { get; set; }
 
+        /// <summary>
+        /// Gets or sets the final parsed result.
+        /// </summary>
+        public ResponseDescriptor Result { get; set; }
+        
         /// <summary>
         /// The timeout for the request.
         /// </summary>
         public TimeSpan ResponseTimeout { get; set; }
+
+        public Type ResponseType { get; set; }
 
         public void Dispose()
         {

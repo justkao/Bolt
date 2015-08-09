@@ -21,8 +21,8 @@ namespace Bolt.Generators
         {
         }
 
-        public ClassDescriptor(string name, string ns)
-            : this(name, ns, new string[0])
+        public ClassDescriptor(string name, string @namespace)
+            : this(name, @namespace, new string[0])
         {
         }
 
@@ -37,16 +37,15 @@ namespace Bolt.Generators
 
         public string Namespace { get; set; }
 
-        public string FullName
-        {
-            get
-            {
-                return string.Format("{0}.{1}", Namespace, Name);
-            }
-        }
+        public string FullName => $"{Namespace}.{Name}";
 
         public IEnumerable<string> BaseClasses { get; set; }
 
         public bool IsInterface { get; set; }
+
+        public override string ToString()
+        {
+            return FullName;
+        }
     }
 }

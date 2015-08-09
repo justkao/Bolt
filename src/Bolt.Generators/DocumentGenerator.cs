@@ -31,7 +31,7 @@ namespace Bolt.Generators
 
         public static DocumentGenerator Create(ContractDefinition contract = null)
         {
-            return new DocumentGenerator()
+            return new DocumentGenerator
             {
                 ContractDefinition = contract
             };
@@ -96,55 +96,23 @@ namespace Bolt.Generators
             });
         }
 
-        public DocumentGenerator Descriptor(ContractDefinition definition = null, ClassDescriptor descriptor = null)
+        public DocumentGenerator Proxy(ContractDefinition definition = null, ClassDescriptor descriptor = null, bool forceAsync = false)
         {
-            return
-                AddContractGenerator(
-                    new ContractDescriptorGenerator(Output, Formatter, IntendProvider)
-                        {
-                            ContractDefinition = definition ?? ContractDefinition,
-                            ContractDescriptor = descriptor
-                        });
-        }
-
-        public DocumentGenerator Contract(ContractDefinition definition = null, ClassDescriptor descriptor = null)
-        {
-            return
-                AddContractGenerator(
-                    new ContractGenerator(Output, Formatter, IntendProvider)
-                        {
-                            ContractDefinition = definition ?? ContractDefinition,
-                            ContractDescriptor = descriptor
-                        });
-        }
-
-        public DocumentGenerator Server(ContractDefinition definition = null, ClassDescriptor descriptor = null)
-        {
-            return
-                AddContractGenerator(
-                    new ServerGenerator(Output, Formatter, IntendProvider)
-                        {
-                            ContractDefinition = definition ?? ContractDefinition,
-                            ContractDescriptor = descriptor
-                        });
-        }
-
-        public DocumentGenerator Client(ContractDefinition definition = null, ClassDescriptor descriptor = null, bool forceAsync = false)
-        {
-            return AddContractGenerator(new ClientGenerator(Output, Formatter, IntendProvider)
+            return AddContractGenerator(new ProxyGenerator(Output, Formatter, IntendProvider)
             {
                 ContractDefinition = definition ?? ContractDefinition,
                 ContractDescriptor = descriptor,
-                ForceAsync = forceAsync,
+                ForceAsync = forceAsync
             });
         }
 
         public void Add(GeneratorBase generator)
         {
-            if (generator is ContractGeneratorBase)
+            var generatorBase = generator as ContractGeneratorBase;
+            if (generatorBase != null)
             {
-                (generator as ContractGeneratorBase).MetadataProvider = MetadataProvider;
-                Formatter.AddNamespace((generator as ContractGeneratorBase).ContractDefinition.Namespace);
+                generatorBase.MetadataProvider = MetadataProvider;
+                Formatter.AddNamespace(generatorBase.ContractDefinition.Namespace);
             }
 
             generator.Output = Output;

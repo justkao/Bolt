@@ -1,0 +1,27 @@
+{
+  "version": "0.13.0-alpha",
+  "authors": [ "Martin Tomka" ],
+  "description": "Bolt portable client library used to access Bolt based services.",
+  "dependencies": {
+    "Bolt.Common": { "type": "build" },
+    "Bolt.Core": ""
+  },
+  "frameworks": {
+    "net45": {
+      "frameworkAssemblies": {
+        "System.Net.Http": ""
+      }
+    },
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.Net.Http": ""
+      }
+    },
+    "dotnet": {
+      "dependencies": {
+        "System.Net.Http": "4.0.0-*",
+        "System.Threading": "4.0.11-*"
+      }
+    }
+  }
+}

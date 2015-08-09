@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Bolt.Common;
 
 namespace Bolt.Client
 {
@@ -11,8 +12,10 @@ namespace Bolt.Client
     public class MultipleServersProvider : IServerProvider
     {
         private readonly List<Uri> _servers;
-        private readonly Random _random = new Random();
+        private int _server;
         private Uri _lastServer;
+        private ConnectionDescriptor _lastConnection;
+
         private Uri _lastUnavailableServer;
 
         public MultipleServersProvider()
@@ -24,18 +27,20 @@ namespace Bolt.Client
             _servers = servers.EmptyIfNull().ToList();
         }
 
-        public Uri GetServer()
+        public ConnectionDescriptor GetServer()
         {
-            Uri server = _lastServer;
+            ConnectionDescriptor connection = _lastConnection;
 
-            if (server != null)
+            if (connection != null)
             {
-                return server;
+                return connection;
             }
 
-            server = PickNewServer(_lastUnavailableServer, GetAvailableServers().ToList());
-            _lastServer = server;
-            return server;
+            connection = new ConnectionDescriptor(PickNewServer(_lastUnavailableServer, GetAvailableServers().ToList())) { KeepAlive = true };
+            _lastServer = connection.Server;
+            _lastConnection = connection;
+
+            return connection;
         }
 
         public void OnServerUnavailable(Uri server)
@@ -84,8 +89,9 @@ namespace Bolt.Client
                 return serverPool[0];
             }
 
-            int index = _random.Next(0, serverPool.Count - 1);
-            return serverPool[index];
+            _server++;
+            int index = _server;
+            return serverPool[index % serverPool.Count];
         }
     }
 }

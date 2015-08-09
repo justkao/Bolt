@@ -2,7 +2,6 @@
 
 namespace Bolt.Client
 {
-
     /// <summary>
     /// Exception indicating that the client is trying to make request from closed <see cref="IChannel"/>.
     /// </summary>

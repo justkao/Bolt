@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace Bolt.Generators
 {
@@ -20,26 +19,18 @@ namespace Bolt.Generators
                 return generator;
             }
 
-            foreach (KeyValuePair<string, string> pair in properties)
+            /*
+            foreach (var prop in PropertyHelper.GetProperties(generator))
             {
-                PropertyInfo property =
-                    generator.GetType()
-                        .GetRuntimeProperties()
-                        .FirstOrDefault(
-                            p => string.Equals(p.Name, pair.Key, StringComparison.OrdinalIgnoreCase));
-
-                if (property == null)
+                if (!properties.ContainsKey(prop.Name))
                 {
-                    System.Diagnostics.Debug.WriteLine(
-                        "Property '{0}' not found on generator '{1}'.",
-                        pair.Key,
-                        generator.GetType().Name);
-
                     continue;
                 }
 
-                property.SetValue(generator, Convert.ChangeType(pair.Value, property.PropertyType));
+                // TODO:
+                // prop.SetValue(generator, Convert.ChangeType(properties[prop.Name], prop.Property.PropertyType));
             }
+            */
 
             return generator;
         }

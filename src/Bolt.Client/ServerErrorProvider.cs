@@ -3,15 +3,15 @@ using System.Net;
 
 namespace Bolt.Client
 {
-    public class ServerErrorProvider : IServerErrorProvider
+    public class ClientErrorProvider : IClientErrorProvider
     {
         private readonly string _errorCodeHeader;
 
-        public ServerErrorProvider(string errorCodeHeader)
+        public ClientErrorProvider(string errorCodeHeader)
         {
             if (errorCodeHeader == null)
             {
-                throw new ArgumentNullException("errorCodeHeader");
+                throw new ArgumentNullException(nameof(errorCodeHeader));
             }
 
             _errorCodeHeader = errorCodeHeader;
@@ -31,15 +31,12 @@ namespace Bolt.Client
                 return new BoltServerException(code.Value, context.Action, context.Request.RequestUri.ToString());
             }
 
-            if (context.Response != null)
+            if (context.Response?.StatusCode == HttpStatusCode.NotFound)
             {
-                if (context.Response.StatusCode == HttpStatusCode.NotFound)
-                {
-                    return new BoltServerException(
-                        ServerErrorCode.BoltUnavailable,
-                        context.Action,
-                        context.Request.RequestUri.ToString());
-                }
+                return new BoltServerException(
+                    ServerErrorCode.BoltUnavailable,
+                    context.Action,
+                    context.Request.RequestUri.ToString());
             }
 
             return null;
@@ -47,7 +44,7 @@ namespace Bolt.Client
 
         protected virtual ServerErrorCode? TryReadBoltError(ClientActionContext context)
         {
-            string value = context.Response.Headers[_errorCodeHeader];
+            string value = context.Response.Headers.GetHeaderValue(_errorCodeHeader);
             if (string.IsNullOrEmpty(value))
             {
                 return null;
@@ -64,7 +61,7 @@ namespace Bolt.Client
 
         protected virtual int? TryReadErrorCode(ClientActionContext context)
         {
-            string value = context.Response.Headers[_errorCodeHeader];
+            string value = context.Response.Headers.GetHeaderValue(_errorCodeHeader);
             if (string.IsNullOrEmpty(value))
             {
                 return null;

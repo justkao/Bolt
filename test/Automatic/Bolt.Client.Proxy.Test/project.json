@@ -1,0 +1,16 @@
+﻿{
+  "dependencies": {
+    "Bolt.Client": "",
+    "Bolt.Client.Proxy": "",
+    "Bolt.Common": "",
+    "Bolt.Test.Common": "",
+    "xunit.runner.aspnet": "2.0.0-aspnet-*",
+    "Moq": "4.2.1502.911"
+  },
+  "frameworks": {
+    "dnx451": { }
+  },
+  "commands": {
+    "test": "xunit.runner.aspnet"
+  }
+}

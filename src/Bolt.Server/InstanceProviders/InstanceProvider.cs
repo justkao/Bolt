@@ -1,25 +1,31 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using Microsoft.Framework.DependencyInjection;
+using System.Threading.Tasks;
+using Bolt.Common;
 
-namespace Bolt.Server
+namespace Bolt.Server.InstanceProviders
 {
     public class InstanceProvider : IInstanceProvider
     {
-        public virtual T GetInstance<T>(ServerActionContext context)
+        private readonly ConcurrentDictionary<Type, ObjectFactory> _typeActivatorCache =
+               new ConcurrentDictionary<Type, ObjectFactory>();
+
+        public virtual Task<object> GetInstanceAsync(ServerActionContext context, Type type)
         {
-            return (T)CreateInstance(typeof(T));
+            return Task.FromResult(CreateInstance(context, type));
         }
 
-        public virtual void ReleaseInstance(ServerActionContext context, object obj, Exception error)
+        public virtual Task ReleaseInstanceAsync(ServerActionContext context, object obj, Exception error)
         {
-            if (obj is IDisposable)
-            {
-                (obj as IDisposable).Dispose();
-            }
+            (obj as IDisposable)?.Dispose();
+            return CompletedTask.Done;
         }
 
-        protected virtual object CreateInstance(Type type)
+        protected virtual object CreateInstance(ServerActionContext context, Type type)
         {
-            return Activator.CreateInstance(type);
+            var createFactory = _typeActivatorCache.GetOrAdd(type, t => ActivatorUtilities.CreateFactory(type, new Type[] { }));
+            return createFactory(context.HttpContext.ApplicationServices, null);
         }
     }
 }

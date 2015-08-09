@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 namespace Bolt.Console
 {
@@ -9,7 +8,7 @@ namespace Bolt.Console
         {
             if (defaultPath == null)
             {
-                defaultPath = Environment.CurrentDirectory;
+                defaultPath = Directory.GetCurrentDirectory();
             }
 
             if (string.IsNullOrEmpty(userDefinedPath))

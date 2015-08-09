@@ -1,35 +1,39 @@
-﻿using System;
-using System.Net;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Bolt.Server
 {
     public class ResponseHandler : IResponseHandler
     {
-        private readonly IDataHandler _dataHandler;
-
-        public ResponseHandler(IDataHandler dataHandler)
+        public virtual async Task HandleAsync(ServerActionContext context)
         {
-            if (dataHandler == null)
+            context.EnsureNotSend();
+
+            context.RequestAborted.ThrowIfCancellationRequested();
+            var feature = context.HttpContext.GetFeature<IBoltFeature>();
+            context.HttpContext.Response.StatusCode = 200;
+
+            if (context.Result != null)
             {
-                throw new ArgumentNullException("dataHandler");
+                byte[] raw = feature.Configuration.Serializer.SerializeResponse(context.Result, context.Action).ToArray();
+                if (raw.Length > 0)
+                {
+                    context.HttpContext.Response.ContentLength = raw.Length;
+                    context.HttpContext.Response.ContentType = feature.Configuration.Serializer.ContentType;
+
+                    await context.HttpContext.Response.Body.WriteAsync(raw, 0, raw.Length, context.RequestAborted);
+                }
+                else
+                {
+                    context.HttpContext.Response.ContentLength = 0;
+                }
+            }
+            else
+            {
+                context.HttpContext.Response.ContentLength = 0;
             }
 
-            _dataHandler = dataHandler;
-        }
-
-        public virtual Task Handle(ServerActionContext context)
-        {
-            context.Context.Response.StatusCode = 200;
-            context.Context.Response.ContentLength = 0;
-
-            return Task.FromResult(0);
-        }
-
-        public virtual Task Handle<TResult>(ServerActionContext context, TResult result)
-        {
-            context.Context.Response.StatusCode = 200;
-            return _dataHandler.WriteResponseAsync(context, result);
+            context.HttpContext.Response.Body.Dispose();
+            context.IsResponseSend = true;
         }
     }
 }

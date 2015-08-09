@@ -1,6 +1,8 @@
+using Bolt.Common;
 using System;
+using System.Threading.Tasks;
 
-namespace Bolt.Server
+namespace Bolt.Server.InstanceProviders
 {
     public sealed class DelegatedInstanceProvider<TImplementation> : IInstanceProvider
     {
@@ -10,23 +12,21 @@ namespace Bolt.Server
         {
             if (factory == null)
             {
-                throw new ArgumentNullException("factory");
+                throw new ArgumentNullException(nameof(factory));
             }
 
             _factory = factory;
         }
 
-        public T GetInstance<T>(ServerActionContext context)
+        public Task<object> GetInstanceAsync(ServerActionContext context, Type type)
         {
-            return (T)(object)_factory(context);
+            return Task.FromResult((object)_factory(context));
         }
 
-        public void ReleaseInstance(ServerActionContext context, object obj, Exception error)
+        public Task ReleaseInstanceAsync(ServerActionContext context, object obj, Exception error)
         {
-            if (obj is IDisposable)
-            {
-                (obj as IDisposable).Dispose();
-            }
+            (obj as IDisposable)?.Dispose();
+            return CompletedTask.Done;
         }
     }
 }

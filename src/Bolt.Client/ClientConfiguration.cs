@@ -1,44 +1,55 @@
 using System;
+using System.Collections.Generic;
+using Bolt.Client.Channels;
+using Bolt.Client.Filters;
 
 namespace Bolt.Client
 {
     /// <summary>
     /// The Bolt configuration of the client. 
     /// </summary>
-    public class ClientConfiguration : Configuration
+    public class ClientConfiguration
     {
-        public ClientConfiguration()
+        public ClientConfiguration(BoltOptions options = null)
         {
-            IWebRequestHandler requestHandler = new DefaultWebRequestHandler();
-            DataHandler = new DataHandler(Serializer, ExceptionSerializer, requestHandler);
-            RequestForwarder = new RequestForwarder(DataHandler, requestHandler, new ServerErrorProvider(ServerErrorCodesHeader));
+            Options = options ?? new BoltOptions();
+            Serializer = new JsonSerializer();
+            ExceptionWrapper = new JsonExceptionWrapper();
+            DataHandler = new ClientDataHandler(Serializer, ExceptionWrapper);
+            RequestHandler = new RequestHandler(DataHandler, new ClientErrorProvider(Options.ServerErrorHeader));
+            EndpointProvider = new EndpointProvider(Options);
+            SessionHandler = new ClientSessionHandler(Options);
+            ProxyFactory = new ProxyFactory();
+            Filters = new List<IClientExecutionFilter>();
         }
 
-        public ClientConfiguration(ISerializer serializer, IExceptionSerializer exceptionSerializer, IWebRequestHandler webRequestHandler = null)
-            : base(serializer, exceptionSerializer)
-        {
-            if (webRequestHandler == null)
-            {
-                webRequestHandler = new DefaultWebRequestHandler();
-            }
-
-            DataHandler = new DataHandler(serializer, ExceptionSerializer, webRequestHandler);
-            RequestForwarder = new RequestForwarder(DataHandler, webRequestHandler, new ServerErrorProvider(ServerErrorCodesHeader));
-        }
+        /// <summary>
+        /// Gets or sets the Bolt options.
+        /// </summary>
+        public BoltOptions Options { get; }
 
         /// <summary>
         /// Gets or sets the request forwarder that is used by channels to send and receive the requests.
         /// </summary>
-        public IRequestForwarder RequestForwarder { get; set; }
+        public IRequestHandler RequestHandler { get; set; }
 
         /// <summary>
         /// Gets or sets the data handler used to serialize the client request data and deserialize the server response.
         /// </summary>
-        public IDataHandler DataHandler { get; set; }
+        public IClientDataHandler DataHandler { get; set; }
 
-        /// <summary>
-        /// Gets or sets the default response timeout.
-        /// </summary>
         public TimeSpan DefaultResponseTimeout { get; set; }
+
+        public ISerializer Serializer { get; set; }
+
+        public IExceptionWrapper ExceptionWrapper { get; set; }
+
+        public IEndpointProvider EndpointProvider { get; set; }
+
+        public IProxyFactory ProxyFactory { get; set; }
+
+        public IClientSessionHandler SessionHandler { get; set; }
+
+        public List<IClientExecutionFilter> Filters { get; set; }
     }
 }

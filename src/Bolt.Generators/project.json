@@ -1,0 +1,25 @@
+﻿{
+  "version": "0.13.0-alpha",
+  "authors": [ "Martin Tomka" ],
+  "description": "Bolt library containing helper classes for code generation.",
+  "dependencies": {
+    "Bolt.Common": { "type": "build" }
+  },
+  "frameworks": {
+    "net45": {
+      "frameworkAssemblies": {
+      }
+    },
+    "dnx451": {
+      "frameworkAssemblies": {
+      }
+    },
+    "dotnet": {
+      "dependencies": {
+        "System.Collections": "4.0.11-*",
+        "System.Reflection.Extensions": "4.0.0-*",
+        "System.Linq": "4.0.1-*"
+      }
+    }
+  }
+}

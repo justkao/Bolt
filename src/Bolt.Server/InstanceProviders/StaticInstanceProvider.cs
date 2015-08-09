@@ -1,6 +1,8 @@
+using Bolt.Common;
 using System;
+using System.Threading.Tasks;
 
-namespace Bolt.Server
+namespace Bolt.Server.InstanceProviders
 {
     public sealed class StaticInstanceProvider : IInstanceProvider
     {
@@ -10,19 +12,20 @@ namespace Bolt.Server
         {
             if (instance == null)
             {
-                throw new ArgumentNullException("instance");
+                throw new ArgumentNullException(nameof(instance));
             }
 
             _instance = instance;
         }
 
-        public T GetInstance<T>(ServerActionContext context)
+        public Task<object> GetInstanceAsync(ServerActionContext context, Type type)
         {
-            return (T)_instance;
+            return Task.FromResult(_instance);
         }
 
-        public void ReleaseInstance(ServerActionContext context, object obj, Exception error)
+        public Task ReleaseInstanceAsync(ServerActionContext context, object obj, Exception error)
         {
+            return CompletedTask.Done;
         }
     }
 }

@@ -1,0 +1,17 @@
+﻿{
+  "version": "1.0.0-*",
+  "dependencies": {
+    "Bolt.Core": "",
+    "Bolt.Test.Common": "",
+    "Bolt.Console": ""
+  },
+  "compileExclude": "Generated\\*.*",
+  "frameworks": {
+    "dnx451": {
+      "frameworkAssemblies": { "System.ServiceModel": "" }
+    }
+  },
+  "commands": {
+    "gen": "Bolt.Console code --contract ITestContract --output ../TestService/Generated/ --mode Proxy"
+  }
+}

@@ -1,0 +1,16 @@
+﻿{
+  "shared": "*.cs",
+  "version": "0.13.0-alpha",
+  "authors": [ "Martin Tomka" ],
+  "dependencies": {
+  },
+  "frameworks": {
+    "net45": { },
+    "dnx451": { },
+    "dotnet": {
+      "dependencies": {
+      "System.Runtime": "4.0.0-*"
+      }
+    }
+  }
+}

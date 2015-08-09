@@ -1,7 +1,11 @@
 using System;
-using System.Net;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using Bolt.Client.Filters;
+using Bolt.Core;
 
 namespace Bolt.Client.Channels
 {
@@ -21,17 +25,32 @@ namespace Bolt.Client.Channels
         public RecoverableChannel(Uri server, ClientConfiguration clientConfiguration)
             : base(clientConfiguration)
         {
-            ServerProvider = new UriServerProvider(server);
+            if (server == null)
+            {
+                throw new ArgumentNullException(nameof(server));
+            }
+
+            ServerProvider = new SingleServerProvider(server);
         }
 
         public RecoverableChannel(IServerProvider serverProvider, ClientConfiguration clientConfiguration)
             : base(clientConfiguration)
         {
+            if (serverProvider == null)
+            {
+                throw new ArgumentNullException(nameof(serverProvider));
+            }
+
             ServerProvider = serverProvider;
         }
 
-        public RecoverableChannel(IServerProvider serverProvider, IRequestForwarder requestForwarder, IEndpointProvider endpointProvider)
-            : base(requestForwarder, endpointProvider)
+        public RecoverableChannel(
+            ISerializer serializer,
+            IServerProvider serverProvider,
+            IRequestHandler requestHandler,
+            IEndpointProvider endpointProvider,
+            IReadOnlyCollection<IClientExecutionFilter> filters)
+            : base(serializer, requestHandler, endpointProvider, filters)
         {
             ServerProvider = serverProvider;
         }
@@ -40,11 +59,13 @@ namespace Bolt.Client.Channels
 
         public TimeSpan RetryDelay { get; set; }
 
-        public IServerProvider ServerProvider { get; private set; }
+        public IServerProvider ServerProvider { get; }
 
-        public override sealed T SendCore<T, TParameters>(
-            TParameters parameters,
-            ActionDescriptor descriptor,
+        public sealed override async Task<object> SendAsync(
+            Type contract,
+            MethodInfo action,
+            Type responseType,
+            IObjectSerializer parameters,
             CancellationToken cancellation)
         {
             EnsureNotClosed();
@@ -54,10 +75,10 @@ namespace Bolt.Client.Channels
             while (true)
             {
                 Exception error = null;
-                Uri connection = null;
+                ConnectionDescriptor connection = null;
                 try
                 {
-                    connection = GetRemoteConnection();
+                    connection = await GetConnectionAsync();
                 }
                 catch (Exception e)
                 {
@@ -65,7 +86,7 @@ namespace Bolt.Client.Channels
 
                     if (!HandleOpenConnectionError(e))
                     {
-                        throw;
+                        throw new BoltConnectionException("Failed to open connection to server.", e);
                     }
 
                     error = e;
@@ -73,14 +94,13 @@ namespace Bolt.Client.Channels
 
                 if (connection != null)
                 {
-                    using (ClientActionContext ctxt = CreateContext(connection, descriptor, cancellation, parameters))
+                    using (ClientActionContext ctxt = CreateContext(connection, contract, action, cancellation, responseType, parameters))
                     {
                         try
                         {
-                            BeforeSending(ctxt);
-                            ResponseDescriptor<T> result = RequestForwarder.GetResponse<T, TParameters>(ctxt, parameters);
-                            AfterReceived(ctxt);
-                            return result.GetResultOrThrow();
+                            CoreClientAction clientAction = new CoreClientAction(Filters);
+                            await clientAction.ExecuteAsync(ctxt, ExecuteCoreAsync);
+                            return ctxt.Result.GetResultOrThrow();
                         }
                         catch (Exception e)
                         {
@@ -102,87 +122,18 @@ namespace Bolt.Client.Channels
                     throw error;
                 }
 
-                TaskExtensions.Sleep(RetryDelay, cancellation);
-            }
-        }
-
-        public sealed override async Task<T> SendCoreAsync<T, TParameters>(TParameters parameters, ActionDescriptor descriptor, CancellationToken cancellation)
-        {
-            EnsureNotClosed();
-
-            int tries = 0;
-
-            while (true)
-            {
-                Exception error = null;
-                Uri connection = null;
-                try
-                {
-                    connection = await GetRemoteConnectionAsync();
-                }
-                catch (Exception e)
-                {
-                    e.EnsureNotCancelled();
-
-                    if (!HandleOpenConnectionError(e))
-                    {
-                        throw;
-                    }
-
-                    error = e;
-                }
-
-                if (connection != null)
-                {
-                    using (ClientActionContext ctxt = CreateContext(connection, descriptor, cancellation, parameters))
-                    {
-                        try
-                        {
-                            BeforeSending(ctxt);
-                            ResponseDescriptor<T> result = await RequestForwarder.GetResponseAsync<T, TParameters>(ctxt, parameters);
-                            AfterReceived(ctxt);
-                            return result.GetResultOrThrow();
-                        }
-                        catch (Exception e)
-                        {
-                            e.EnsureNotCancelled();
-                            error = e;
-                        }
-
-                        if (!await HandleErrorAsync(ctxt, error))
-                        {
-                            throw error;
-                        }
-                    }
-                }
-
-                tries++;
-                if (tries > Retries)
-                {
-                    IsClosed = true;
-                    throw error;
-                }
-
                 await Task.Delay(RetryDelay, cancellation);
             }
         }
 
         protected virtual bool HandleError(ClientActionContext context, Exception error)
         {
-            if (error is WebException)
+            if (error is HttpRequestException)
             {
-                if ((error as WebException).Response == null)
-                {
-                    ServerProvider.OnServerUnavailable(context.Server);
-                }
+                ServerProvider.OnServerUnavailable(context.Connection.Server);
             }
 
             return HandleErrorCore(error);
-        }
-
-        protected virtual Task<bool> HandleErrorAsync(ClientActionContext context, Exception error)
-        {
-            return Task.FromResult(HandleError(context, error));
         }
 
         protected virtual bool HandleOpenConnectionError(Exception error)
@@ -190,9 +141,9 @@ namespace Bolt.Client.Channels
             return HandleErrorCore(error);
         }
 
-        protected override Uri GetRemoteConnection()
+        protected override async Task<ConnectionDescriptor> GetConnectionAsync()
         {
-            Open();
+            await OpenAsync();
             return ServerProvider.GetServer();
         }
 
@@ -208,27 +159,20 @@ namespace Bolt.Client.Channels
                 throw error;
             }
 
-            if (error is BoltServerException)
+            var exception = error as BoltServerException;
+            if (exception == null)
             {
-                switch (((BoltServerException)error).Error)
-                {
-                    case ServerErrorCode.ContractNotFound:
-                        IsClosed = true;
-                        throw error;
-                    default:
-                        throw error;
-                }
+                return error is HttpRequestException;
             }
 
-            if (error is WebException)
+            switch (exception.Error)
             {
-                if ((error as WebException).Response == null)
-                {
-                    return true;
-                }
+                case ServerErrorCode.ContractNotFound:
+                    IsClosed = true;
+                    throw error;
+                default:
+                    throw error;
             }
-
-            return false;
         }
     }
 }

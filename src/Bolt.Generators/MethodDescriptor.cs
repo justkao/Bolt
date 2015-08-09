@@ -7,26 +7,18 @@ namespace Bolt.Generators
 {
     public class MethodDescriptor
     {
-        public MethodDescriptor(ContractDefinition contract, MethodInfo method, string name, ClassDescriptor parameters)
+        public MethodDescriptor(ContractDefinition contract, MethodInfo method, string name)
         {
             Contract = contract;
             Method = method;
             Name = name;
-            Parameters = parameters;
         }
 
         public ContractDefinition Contract { get; private set; }
 
-        public MethodInfo Method { get; private set; }
+        public MethodInfo Method { get; }
 
         public string Name { get; private set; }
-
-        public ClassDescriptor Parameters { get; private set; }
-
-        public bool HasParameterClass()
-        {
-            return Parameters != null && Parameters.FullName != typeof(Empty).FullName;
-        }
 
         public IEnumerable<ParameterInfo> GetAllParameters()
         {
@@ -40,8 +32,7 @@ namespace Bolt.Generators
 
         public ParameterInfo GetCancellationTokenParameter()
         {
-            return
-                Method.GetParameters().FirstOrDefault(p => typeof(CancellationToken).GetTypeInfo().IsAssignableFrom(p.ParameterType.GetTypeInfo()));
+            return  Method.GetParameters().FirstOrDefault(p => typeof(CancellationToken).GetTypeInfo().IsAssignableFrom(p.ParameterType.GetTypeInfo()));
         }
     }
 }

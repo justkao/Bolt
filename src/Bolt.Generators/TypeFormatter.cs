@@ -5,11 +5,13 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
+using Bolt.Common;
+
 namespace Bolt.Generators
 {
     public class TypeFormatter
     {
-        private readonly List<string> _namespaces = new List<string>()
+        private readonly List<string> _namespaces = new List<string>
         {
             "System",
             "System.Collections.Generic",
@@ -17,18 +19,18 @@ namespace Bolt.Generators
             "System.Text",
             "System",
             "System.Threading.Tasks",
-            "System.IO",
+            "System.IO"
         };
 
-        private readonly Dictionary<Type, string> _aliases = new Dictionary<Type, string>()
-                                                                 {
+        private readonly Dictionary<Type, string> _aliases = new Dictionary<Type, string>
+        {
                                                                      { typeof(string), "string" },
                                                                      { typeof(bool), "bool" },
                                                                      { typeof(int), "int" },
                                                                      { typeof(short), "short" },
                                                                      { typeof(long), "long" },
                                                                      { typeof(double), "double" },
-                                                                     { typeof(Task), "Task" },
+                                                                     { typeof(Task), "Task" }
                                                                  };
 
         public TypeFormatter()
@@ -37,6 +39,16 @@ namespace Bolt.Generators
         }
 
         public bool ForceFullTypeNames { get; set; }
+
+        public virtual string FormatType(ClassDescriptor descriptor)
+        {
+            if (_namespaces.Contains(descriptor.Namespace))
+            {
+                return descriptor.Name;
+            }
+
+            return descriptor.FullName;
+        }
 
         public virtual string FormatType(Type type)
         {
