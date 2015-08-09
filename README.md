@@ -17,7 +17,7 @@ public interface IFooService
 * Create proxy to your service and call remote method
 ```c#
 var configuration = new ClientConfiguration().UseDynamicProxy();
-var proxy = configuration.CreateProxy<FooServiceProxy>(<service url>);
+IFooService proxy = configuration.CreateProxy<IFooService>(<service url>);
 proxy.DoYourThing();
 ```
 
