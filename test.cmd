@@ -1,15 +1,20 @@
 @ECHO OFF
 
 rem tests
-call dnx test\Automatic\Bolt.Core.Test\project.json test
+
+call dnx -p "test\Automatic\Bolt.Core.Test" test
 if %errorlevel% neq 0 exit /b %errorlevel%
-call dnx test\Automatic\Bolt.Client.Test\project.json test
+
+call dnx -p "test\Automatic\Bolt.Client.Test" test
 if %errorlevel% neq 0 exit /b %errorlevel%
-call dnx test\Automatic\Bolt.Client.Proxy.Test\project.json test
+
+call dnx -p "test\Automatic\Bolt.Client.Proxy.Test" test
 if %errorlevel% neq 0 exit /b %errorlevel%
-call dnx test\Automatic\Bolt.Core.Test\project.json test
+
+call dnx -p "test\Automatic\Bolt.Server.Test" test
 if %errorlevel% neq 0 exit /b %errorlevel%
-call dnx test\Integration\Bolt.Server.IntegrationTest\project.json test
+
+call dnx -p "test\Integration\Bolt.Server.IntegrationTest" test
 if %errorlevel% neq 0 exit /b %errorlevel%
 
 

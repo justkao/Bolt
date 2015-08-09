@@ -9,69 +9,18 @@
   "frameworks": {
     "net45": {
       "frameworkAssemblies": {
-        "System.Collections": {
-          "version": "",
-          "type": "build"
-        },
-        "System.Diagnostics.Debug": {
-          "version": "",
-          "type": "build"
-        },
-        "System.Linq": {
-          "version": "",
-          "type": "build"
-        },
-        "System.Net.Http": {
-          "version": "",
-          "type": "build"
-        },
-        "System.Reflection": {
-          "version": "",
-          "type": "build"
-        },
-        "System.Reflection.Extensions": {
-          "version": "",
-          "type": "build"
-        },
-        "System.Runtime": {
-          "version": "",
-          "type": "build"
-        },
-        "System.Runtime.Serialization": {
-          "version": "",
-          "type": "build"
-        },
-        "System.Threading": {
-          "version": "",
-          "type": "build"
-        }
+        "System.Net.Http": ""
       }
     },
     "dnx451": {
       "frameworkAssemblies": {
-        "System.Collections": "",
-        "System.Net.Http": "",
-        "System.Runtime": "",
-        "System.Runtime.Serialization": "",
-        "System.Xml": ""
+        "System.Net.Http": ""
       }
     },
     "dotnet": {
       "dependencies": {
-        "System.Runtime": "4.0.20-*",
-        "System.Collections": "4.0.10-*",
-        "System.Linq": "4.0.0-*",
-        "System.Threading.Timer": "4.0.0-*",
-        "System.Diagnostics.Debug": "4.0.10-*",
-        "System.Threading": "4.0.10-*",
-        "System.Net.Primitives": "4.0.10-*",
         "System.Net.Http": "4.0.0-*",
-        "System.IO": "4.0.10.0-*",
-        "System.Reflection": "4.0.10-*",
-        "System.Reflection.Extensions": "4.0.0-*",
-        "System.Runtime.Serialization.Primitives": "4.0.10-*",
-        "System.Text.Encoding": "4.0.10-*",
-        "System.Threading.Tasks": "4.0.10-*"
+        "System.Threading": "4.0.11-*"
       }
     }
   }

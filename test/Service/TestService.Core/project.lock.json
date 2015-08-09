@@ -3,6 +3,26 @@
   "version": 1,
   "targets": {
     "DNX,Version=v4.5.1": {
+      "Bolt.Core/0.13.0-alpha": {
+        "dependencies": {
+          "Newtonsoft.Json": "6.0.8"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Collections",
+          "System.Core",
+          "System.Runtime",
+          "System.Runtime.Serialization"
+        ],
+        "compile": {
+          "lib/dnx451/Bolt.Core.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Bolt.Core.dll": {}
+        }
+      },
       "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12330": {
         "frameworkAssemblies": [
           "Microsoft.CSharp",
@@ -42,6 +62,20 @@
     }
   },
   "libraries": {
+    "Bolt.Core/0.13.0-alpha": {
+      "sha512": "9UrcE3KWeBg7/YRjHJ247yO0TCuCmMZJX3iJ8WUswoPAphaiax0A2wc2Hhm2i7NSpuBISTWSLoHqzvxz7iAFPQ==",
+      "files": [
+        "Bolt.Core.0.13.0-alpha.nupkg",
+        "Bolt.Core.0.13.0-alpha.nupkg.sha512",
+        "Bolt.Core.nuspec",
+        "lib/dnx451/Bolt.Core.dll",
+        "lib/dnx451/Bolt.Core.xml",
+        "lib/dotnet/Bolt.Core.dll",
+        "lib/dotnet/Bolt.Core.xml",
+        "lib/net45/Bolt.Core.dll",
+        "lib/net45/Bolt.Core.xml"
+      ]
+    },
     "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12330": {
       "serviceable": true,
       "sha512": "qX+EWZ8S0BzkM3aUkGFAcqHiNPGJorRkFyQZpXaCCpwl4K4Zjp0wEibW7QlIAZPlLByIKBSRH/rKZT+olsOw6Q==",

@@ -3,6 +3,60 @@
   "version": 1,
   "targets": {
     "DNX,Version=v4.5.1": {
+      "Bolt.Core/0.13.0-alpha": {
+        "dependencies": {
+          "Newtonsoft.Json": "6.0.8"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Collections",
+          "System.Core",
+          "System.Runtime",
+          "System.Runtime.Serialization"
+        ],
+        "compile": {
+          "lib/dnx451/Bolt.Core.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Bolt.Core.dll": {}
+        }
+      },
+      "Bolt.Server/0.13.0-alpha": {
+        "dependencies": {
+          "Bolt.Core": "0.13.0-alpha",
+          "Microsoft.AspNet.Hosting.Abstractions": "1.0.0-beta7-12226",
+          "Microsoft.AspNet.Http.Abstractions": "1.0.0-beta7-11788",
+          "Microsoft.AspNet.Http.Extensions": "1.0.0-beta7-11788",
+          "Microsoft.AspNet.Routing": "1.0.0-beta7-12064",
+          "Microsoft.Framework.Caching.Abstractions": "1.0.0-beta7-11692",
+          "Microsoft.Framework.Configuration.Abstractions": "1.0.0-beta7-11638",
+          "Microsoft.Framework.DependencyInjection.Abstractions": "1.0.0-beta7-11645",
+          "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta7-11651",
+          "Microsoft.Framework.OptionsModel": "1.0.0-beta7-11614",
+          "Newtonsoft.Json": "6.0.8"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Collections",
+          "System.Core",
+          "System.Diagnostics.Debug",
+          "System.IO",
+          "System.Net.Http",
+          "System.Runtime",
+          "System.Runtime.Serialization",
+          "System.Xml"
+        ],
+        "compile": {
+          "lib/dnx451/Bolt.Server.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Bolt.Server.dll": {}
+        }
+      },
       "Castle.Core/3.3.3": {
         "compile": {
           "lib/net45/Castle.Core.dll": {}
@@ -718,6 +772,32 @@
     }
   },
   "libraries": {
+    "Bolt.Core/0.13.0-alpha": {
+      "sha512": "9UrcE3KWeBg7/YRjHJ247yO0TCuCmMZJX3iJ8WUswoPAphaiax0A2wc2Hhm2i7NSpuBISTWSLoHqzvxz7iAFPQ==",
+      "files": [
+        "Bolt.Core.0.13.0-alpha.nupkg",
+        "Bolt.Core.0.13.0-alpha.nupkg.sha512",
+        "Bolt.Core.nuspec",
+        "lib/dnx451/Bolt.Core.dll",
+        "lib/dnx451/Bolt.Core.xml",
+        "lib/dotnet/Bolt.Core.dll",
+        "lib/dotnet/Bolt.Core.xml",
+        "lib/net45/Bolt.Core.dll",
+        "lib/net45/Bolt.Core.xml"
+      ]
+    },
+    "Bolt.Server/0.13.0-alpha": {
+      "sha512": "L7fDJiOU29PAesIxOKDZa1Uf/8vfsBcxfpJwBz6j05LsiahJ73NnItlbD4EWIUlufCdKyRlzTpGrMbhdzBXUKQ==",
+      "files": [
+        "Bolt.Server.0.13.0-alpha.nupkg",
+        "Bolt.Server.0.13.0-alpha.nupkg.sha512",
+        "Bolt.Server.nuspec",
+        "lib/dnx451/Bolt.Server.dll",
+        "lib/dnx451/Bolt.Server.xml",
+        "lib/dnxcore50/Bolt.Server.dll",
+        "lib/dnxcore50/Bolt.Server.xml"
+      ]
+    },
     "Castle.Core/3.3.3": {
       "sha512": "tvVrLbHhtAGubUUDbEkH9JlivdlJOTI25u3hlyHpPxuJdTVi/yVQKWCYvGpafGPm7G1ibdWj4brqhtSQkAmN+g==",
       "files": [
