@@ -16,8 +16,7 @@ public interface IFooService
 * Add *Bolt.Client.Proxy* package to project (`Install-Package Bolt.Client.Proxy -pre`)
 * Create proxy to your service and call remote method
 ```c#
-var configuration = new ClientConfiguration();
-configuration.ProxyFactory = new DynamicProxyFactory();
+var configuration = new ClientConfiguration().UseDynamicProxy();
 var proxy = configuration.CreateProxy<FooServiceProxy>(<service url>);
 proxy.DoYourThing();
 ```
