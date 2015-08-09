@@ -51,10 +51,10 @@ Bolt also supports:
 * Configuration Based Generation - define Configuration.json file to describe how contracts should be generated
 
 #### Bolt Packages
-* **[Bolt.Core](https://www.nuget.org/packages/Bolt.Core/)** - contains common interfaces and helpers shared by both client and server. Multiple platforms are supported for this package. Portable Class Libray(PCL) 
+* **[Bolt.Core](https://www.nuget.org/packages/Bolt.Core/)** - contains common interfaces and helpers shared by both client and server. Multiple platforms are supported for this package. Portable Class Library(PCL) 
 * **[Bolt.Client](https://www.nuget.org/packages/Bolt.Client/)** - contains client side code required to communicate with Bolt service.(PCL)
-* **[Bolt.Client.Proxy](https://www.nuget.org/packages/Bolt.Client/)** - factory for dyanmic proxy generation
-* **[Bolt.Server](https://www.nuget.org/packages/Bolt.Server/)** - server side code required to integrate Bolt into Katana pipeline. The support for ASP.NET 5 is planned.
+* **[Bolt.Client.Proxy](https://www.nuget.org/packages/Bolt.Client/)** - factory for dynamic proxy generation
+* **[Bolt.Server](https://www.nuget.org/packages/Bolt.Server/)** - server side code required to integrate Bolt into ASP.NET 5
 * **[Bolt.Generators](https://www.nuget.org/packages/Bolt.Generators/)** - classes and helpers used by Bolt.Console for code generation. Reference it if you need to generate async proxies and interfaces.(PCL)
 * **[Bolt.Console](https://www.nuget.org/packages/Bolt.Tool/)** - tool used to generate Bolt proxies.
 
