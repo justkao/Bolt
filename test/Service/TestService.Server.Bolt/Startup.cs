@@ -28,9 +28,9 @@ namespace TestService.Server.Bolt
             app.ApplicationServices.GetRequiredService<ILoggerFactory>().AddConsole(LogLevel.Information);
             app.UseBolt(
                 b =>
-                    {
-                        b.UseStateLess<ITestContract, TestContractImplementation>();
-                    });
+                {
+                    b.Use<ITestContract, TestContractImplementation>();
+                });
         }
     }
 }
