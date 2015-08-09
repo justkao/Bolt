@@ -2,6 +2,8 @@
  
 set version="0.13.0-alpha"
 
+call validate.cmd
+if %errorlevel% neq 0 exit /b %errorlevel%
 
 .nuget\nuget.exe push packages\Bolt.Common.%version%.nupkg
 
