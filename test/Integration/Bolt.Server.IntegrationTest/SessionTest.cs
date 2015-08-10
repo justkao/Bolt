@@ -174,7 +174,7 @@ namespace Bolt.Server.IntegrationTest
             await client.GetStateAsync();
             await (client as IChannel).CloseAsync();
 
-            Assert.Throws<ChannelClosedException>(() => client.GetState());
+            Assert.Throws<ProxyClosedException>(() => client.GetState());
         }
 
         [Fact]
@@ -185,7 +185,7 @@ namespace Bolt.Server.IntegrationTest
             client.GetState();
             (client as IChannel).Close();
 
-            Assert.Throws<ChannelClosedException>(() => client.GetState());
+            Assert.Throws<ProxyClosedException>(() => client.GetState());
         }
 
         [Fact]
@@ -243,7 +243,7 @@ namespace Bolt.Server.IntegrationTest
             channel.GetState();
             ((IChannel) channel).Close();
 
-            Assert.Throws<ChannelClosedException>(() => channel.GetState());
+            Assert.Throws<ProxyClosedException>(() => channel.GetState());
         }
 
         [Fact]
@@ -254,7 +254,7 @@ namespace Bolt.Server.IntegrationTest
             await channel.GetStateAsync();
             await ((IChannel)channel).CloseAsync();
 
-            await Assert.ThrowsAsync<ChannelClosedException>(() => channel.GetStateAsync());
+            await Assert.ThrowsAsync<ProxyClosedException>(() => channel.GetStateAsync());
         }
 
         [Fact]

@@ -75,7 +75,7 @@ namespace Bolt.Server.Metadata
                 }
                 else
                 {
-                    List<ParameterInfo> actionParameters = BoltFramework.GetEffectiveParameters(action).ToList();
+                    List<ParameterInfo> actionParameters = BoltFramework.GetSerializableParameters(action).ToList();
                     if (actionParameters.Any())
                     {
                         JsonSchemaGenerator generator = new JsonSchemaGenerator();

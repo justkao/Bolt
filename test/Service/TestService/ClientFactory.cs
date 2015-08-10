@@ -37,7 +37,7 @@ namespace TestService
             return channel;
         }
 
-        private class LoggingFilter : IClientExecutionFilter
+        private class LoggingFilter : IClientContextHandler
         {
             public async Task ExecuteAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
             {
@@ -47,7 +47,7 @@ namespace TestService
             }
         }
 
-        private class DelayFilter : IClientExecutionFilter
+        private class DelayFilter : IClientContextHandler
         {
             public async Task ExecuteAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
             {
@@ -57,7 +57,7 @@ namespace TestService
             }
         }
 
-        private class ErrorFilter : IClientExecutionFilter
+        private class ErrorFilter : IClientContextHandler
         {
             public async Task ExecuteAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
             {
@@ -65,7 +65,7 @@ namespace TestService
             }
         }
 
-        private class NewlineFilter : IClientExecutionFilter
+        private class NewlineFilter : IClientContextHandler
         {
             public async Task ExecuteAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
             {

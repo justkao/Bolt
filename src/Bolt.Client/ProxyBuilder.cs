@@ -11,7 +11,7 @@ namespace Bolt.Client
     public class ProxyBuilder
     {
         private readonly ClientConfiguration _configuration;
-        private readonly List<IClientExecutionFilter> _filters = new List<IClientExecutionFilter>();
+        private readonly List<IClientContextHandler> _filters = new List<IClientContextHandler>();
         private IServerProvider _serverProvider;
         private Action<ConfigureSessionContext> _configureSession;
         private int _retries;
@@ -96,13 +96,13 @@ namespace Bolt.Client
             return this;
         }
 
-        public virtual ProxyBuilder Filter<T>() where T:IClientExecutionFilter, new()
+        public virtual ProxyBuilder Filter<T>() where T:IClientContextHandler, new()
         {
             _filters.Add(Activator.CreateInstance<T>());
             return this;
         }
 
-        public virtual ProxyBuilder Filter(params IClientExecutionFilter[] filters)
+        public virtual ProxyBuilder Filter(params IClientContextHandler[] filters)
         {
             if (filters == null)
             {
@@ -122,7 +122,7 @@ namespace Bolt.Client
 
             RecoverableChannel channel;
 
-            List<IClientExecutionFilter> filters = _configuration.Filters.ToList();
+            List<IClientContextHandler> filters = _configuration.Filters.ToList();
             filters.AddRange(_filters);
 
             if (!_useSession)

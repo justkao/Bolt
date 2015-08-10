@@ -36,7 +36,7 @@ namespace Bolt.Client.Channels
             DefaultResponseTimeout = configuration.DefaultResponseTimeout;
         }
 
-        protected ChannelBase(ISerializer serializer, IRequestHandler requestHandler, IEndpointProvider endpointProvider, IReadOnlyCollection<IClientExecutionFilter> filters)
+        protected ChannelBase(ISerializer serializer, IRequestHandler requestHandler, IEndpointProvider endpointProvider, IReadOnlyCollection<IClientContextHandler> filters)
         {
             if (requestHandler == null)
             {
@@ -48,7 +48,7 @@ namespace Bolt.Client.Channels
                 throw new ArgumentNullException(nameof(endpointProvider));
             }
 
-            Filters = filters ?? new List<IClientExecutionFilter>();
+            Filters = filters ?? new List<IClientContextHandler>();
             Serializer = serializer;
             RequestHandler = requestHandler;
             EndpointProvider = endpointProvider;
@@ -58,7 +58,7 @@ namespace Bolt.Client.Channels
 
         public IEndpointProvider EndpointProvider { get; }
 
-        public IReadOnlyCollection<IClientExecutionFilter> Filters { get; }
+        public IReadOnlyCollection<IClientContextHandler> Filters { get; }
 
         public bool IsClosed { get; protected set; }
 
@@ -196,7 +196,7 @@ namespace Bolt.Client.Channels
         {
             if (IsClosed)
             {
-                throw new ChannelClosedException("Channel is already closed.");
+                throw new ProxyClosedException("Channel is already closed.");
             }
         }
 

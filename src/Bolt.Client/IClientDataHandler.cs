@@ -9,20 +9,6 @@ namespace Bolt.Client
     public interface IClientDataHandler
     {
         /// <summary>
-        /// Gets the type of content handler is able to process.
-        /// </summary>
-        string ContentType { get; }
-
-        /// <summary>
-        /// Serializes the request parameters and writes them into the request body.
-        /// </summary>
-        /// <param name="context">Request context of action.</param>
-        /// <exception cref="SerializeParametersException">Thrown if there is problem to serialize the parameters.</exception>
-        /// <exception cref="OperationCanceledException">Throw if request was cancelled.</exception>
-        /// <exception cref="TimeoutException">Thrown if request timeouted.</exception>
-        void WriteParameters(ClientActionContext context);
-
-        /// <summary>
         /// Reads and parses the response send from Bolt server.
         /// </summary>
         /// <typeparam name="T">The type of data that are to be read.</typeparam>

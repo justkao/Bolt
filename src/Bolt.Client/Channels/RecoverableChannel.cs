@@ -49,7 +49,7 @@ namespace Bolt.Client.Channels
             IServerProvider serverProvider,
             IRequestHandler requestHandler,
             IEndpointProvider endpointProvider,
-            IReadOnlyCollection<IClientExecutionFilter> filters)
+            IReadOnlyCollection<IClientContextHandler> filters)
             : base(serializer, requestHandler, endpointProvider, filters)
         {
             ServerProvider = serverProvider;

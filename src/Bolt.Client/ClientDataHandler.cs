@@ -23,42 +23,12 @@ namespace Bolt.Client
             ExceptionWrapper = exceptionWrapper;
         }
 
-        public virtual string ContentType => Serializer.ContentType;
-
         public ISerializer Serializer { get; }
 
         public IExceptionWrapper ExceptionWrapper { get; }
 
-        public virtual void WriteParameters(ClientActionContext context)
-        {
-            if (context.Action == BoltFramework.InitSessionAction)
-            {
-                context.Request.Content = new StreamContent(Serializer.Serialize((InitSessionParameters) context.SessionParameters));
-                return;
-            }
-
-            if (context.Action == BoltFramework.DestroySessionAction)
-            {
-                context.Request.Content = new StreamContent(Serializer.Serialize((DestroySessionParameters) context.SessionParameters));
-                return;
-            }
-
-            if (context.Parameters == null || context.Parameters.IsEmpty)
-            {
-                // auto set content length to 0
-                return;
-            }
-
-            context.Request.Content = new StreamContent(context.Parameters.SerializeParameters(context.Action));
-        }
-
         public virtual async Task<object> ReadResponseAsync(ClientActionContext context)
         {
-            if (context.ResponseType == typeof(Empty))
-            {
-                return Empty.Instance;
-            }
-
             using (Stream stream = new MemoryStream(await context.Response.Content.ReadAsByteArrayAsync()))
             {
                 if (stream.Length == 0)

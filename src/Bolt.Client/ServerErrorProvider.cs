@@ -17,7 +17,7 @@ namespace Bolt.Client
             _errorCodeHeader = errorCodeHeader;
         }
 
-        public virtual Exception TryReadServerError(ClientActionContext context)
+        public virtual BoltServerException TryReadServerError(ClientActionContext context)
         {
             ServerErrorCode? result = TryReadBoltError(context);
             if (result != null)

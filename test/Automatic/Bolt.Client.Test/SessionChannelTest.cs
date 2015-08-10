@@ -84,7 +84,7 @@ namespace Bolt.Client.Test
             public Exception Error { get; set; }
 
             public TestRecoverableChannel(ISerializer serializer, IServerProvider serverProvider, IRequestHandler requestHandler, IEndpointProvider endpointProvider)
-                : base(serializer, serverProvider, requestHandler, endpointProvider, new List<IClientExecutionFilter>())
+                : base(serializer, serverProvider, requestHandler, endpointProvider, new List<IClientContextHandler>())
             {
             }
 

@@ -16,7 +16,7 @@ namespace Bolt.Server.IntegrationTest
         public AcceptLanguageFilterTest()
         {
             ClientConfiguration
-                .AddFilter<AcceptLanguageExecutionFilter>()
+                .AddFilter<AcceptLanguageContextHandler>()
                 .UseDynamicProxy();
         }
 

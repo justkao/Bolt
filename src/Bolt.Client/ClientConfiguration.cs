@@ -20,7 +20,7 @@ namespace Bolt.Client
             EndpointProvider = new EndpointProvider(Options);
             SessionHandler = new ClientSessionHandler(Options);
             ProxyFactory = new ProxyFactory();
-            Filters = new List<IClientExecutionFilter>();
+            Filters = new List<IClientContextHandler>();
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Bolt.Client
 
         public IClientSessionHandler SessionHandler { get; set; }
 
-        public List<IClientExecutionFilter> Filters { get; set; }
+        public List<IClientContextHandler> Filters { get; set; }
 
         public virtual ProxyBuilder ProxyBuilder()
         {

@@ -110,7 +110,7 @@ namespace Bolt
             return true;
         }
 
-        public static IEnumerable<ParameterInfo> GetEffectiveParameters(MethodInfo method)
+        public static IEnumerable<ParameterInfo> GetSerializableParameters(MethodInfo method)
         {
             ParameterInfo[] p = method.GetParameters();
             if (p.Length == 0)
@@ -121,12 +121,14 @@ namespace Bolt
             return method.GetParameters().Where(info => info.ParameterType != typeof (CancellationToken) && info.ParameterType != typeof (CancellationToken?));
         }
 
-        private static void InitBoltSession()
+        private static InitSessionResult InitBoltSession(InitSessionParameters parameters)
         {
+            return null;
         }
 
-        private static void DestroyBoltSession()
+        private static DestroySessionResult DestroyBoltSession(DestroySessionParameters parameters)
         {
+            return null;
         }
     }
 }

@@ -12,6 +12,6 @@ namespace Bolt.Client
         /// </summary>
         /// <param name="context">The context action with Bolt server response.</param>
         /// <returns>The instance of <see cref="Exception"/> class or null.</returns>
-        Exception TryReadServerError(ClientActionContext context);
+        BoltServerException TryReadServerError(ClientActionContext context);
     }
 }

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace Bolt.Client.Filters
 {
-    public class AcceptLanguageExecutionFilter : IClientExecutionFilter
+    public class AcceptLanguageContextHandler : IClientContextHandler
     {
         public Task ExecuteAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
         {

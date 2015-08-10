@@ -24,7 +24,7 @@ namespace Bolt.Client.Channels
         {
         }
 
-        public DirectChannel(Uri server, ISerializer serializer, IRequestHandler requestHandler, IEndpointProvider endpointProvider, IReadOnlyCollection<IClientExecutionFilter> filters, Action<ClientActionContext> beforeSending = null, Action<ClientActionContext> afterReceived = null)
+        public DirectChannel(Uri server, ISerializer serializer, IRequestHandler requestHandler, IEndpointProvider endpointProvider, IReadOnlyCollection<IClientContextHandler> filters, Action<ClientActionContext> beforeSending = null, Action<ClientActionContext> afterReceived = null)
             : base(serializer, requestHandler, endpointProvider, filters)
         {
             _server = server;

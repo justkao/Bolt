@@ -66,7 +66,7 @@ namespace Bolt.Client.Channels
             IRequestHandler requestHandler,
             IEndpointProvider endpointProvider,
             IClientSessionHandler sessionHandler,
-            IReadOnlyCollection<IClientExecutionFilter> filters)
+            IReadOnlyCollection<IClientContextHandler> filters)
             : base(serializer, serverProvider, requestHandler, endpointProvider, filters)
         {
             if (contract == null)

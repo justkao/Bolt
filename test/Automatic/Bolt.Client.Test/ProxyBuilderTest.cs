@@ -77,10 +77,10 @@ namespace Bolt.Client.Test
             TestContractProxy result =
                 ClientConfiguration.ProxyBuilder()
                     .Url("http://localhost:8080")
-                    .Filter<AcceptLanguageExecutionFilter>()
+                    .Filter<AcceptLanguageContextHandler>()
                     .Build<TestContractProxy>();
 
-            Assert.True(result.GetChannel<ChannelBase>().Filters.Any(f=>f is AcceptLanguageExecutionFilter));
+            Assert.True(result.GetChannel<ChannelBase>().Filters.Any(f=>f is AcceptLanguageContextHandler));
         }
 
         [Fact]
@@ -90,10 +90,10 @@ namespace Bolt.Client.Test
                 ClientConfiguration.ProxyBuilder()
                     .Url("http://localhost:8080")
                     .UseSession(true)
-                    .Filter<AcceptLanguageExecutionFilter>()
+                    .Filter<AcceptLanguageContextHandler>()
                     .Build<TestContractProxy>();
 
-            Assert.True(result.GetChannel<ChannelBase>().Filters.Any(f => f is AcceptLanguageExecutionFilter));
+            Assert.True(result.GetChannel<ChannelBase>().Filters.Any(f => f is AcceptLanguageContextHandler));
         }
 
         public class TestContractProxy : ContractProxy, ITestContract

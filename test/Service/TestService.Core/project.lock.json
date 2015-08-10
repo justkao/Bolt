@@ -3,22 +3,12 @@
   "version": 1,
   "targets": {
     "DNX,Version=v4.5.1": {
-      "Bolt.Core/0.13.0-alpha1": {
-        "dependencies": {
-          "Newtonsoft.Json": "6.0.8"
-        },
-        "frameworkAssemblies": [
-          "Microsoft.CSharp",
-          "mscorlib",
-          "System",
-          "System.Core",
-          "System.Runtime.Serialization"
-        ],
+      "Castle.Core/3.3.3": {
         "compile": {
-          "lib/dnx451/Bolt.Core.dll": {}
+          "lib/net45/Castle.Core.dll": {}
         },
         "runtime": {
-          "lib/dnx451/Bolt.Core.dll": {}
+          "lib/net45/Castle.Core.dll": {}
         }
       },
       "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12330": {
@@ -60,18 +50,27 @@
     }
   },
   "libraries": {
-    "Bolt.Core/0.13.0-alpha1": {
-      "sha512": "Q+HTjHODCbKFAtRhhNI7ARKSRp8Xizf5COG3BryAw/7Tr9uiDB9rpMVE1WW1XZpskiiCGwKdFQBREKGFn+mcVQ==",
+    "Castle.Core/3.3.3": {
+      "sha512": "tvVrLbHhtAGubUUDbEkH9JlivdlJOTI25u3hlyHpPxuJdTVi/yVQKWCYvGpafGPm7G1ibdWj4brqhtSQkAmN+g==",
       "files": [
-        "Bolt.Core.0.13.0-alpha1.nupkg",
-        "Bolt.Core.0.13.0-alpha1.nupkg.sha512",
-        "Bolt.Core.nuspec",
-        "lib/dnx451/Bolt.Core.dll",
-        "lib/dnx451/Bolt.Core.xml",
-        "lib/dotnet/Bolt.Core.dll",
-        "lib/dotnet/Bolt.Core.xml",
-        "lib/net45/Bolt.Core.dll",
-        "lib/net45/Bolt.Core.xml"
+        "ASL - Apache Software Foundation License.txt",
+        "BreakingChanges.txt",
+        "Castle.Core.3.3.3.nupkg",
+        "Castle.Core.3.3.3.nupkg.sha512",
+        "Castle.Core.nuspec",
+        "Changes.txt",
+        "lib/net35/Castle.Core.dll",
+        "lib/net35/Castle.Core.xml",
+        "lib/net40-client/Castle.Core.dll",
+        "lib/net40-client/Castle.Core.xml",
+        "lib/net45/Castle.Core.dll",
+        "lib/net45/Castle.Core.xml",
+        "lib/sl4/Castle.Core.dll",
+        "lib/sl4/Castle.Core.xml",
+        "lib/sl5/Castle.Core.dll",
+        "lib/sl5/Castle.Core.xml",
+        "License.txt",
+        "readme.txt"
       ]
     },
     "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12330": {

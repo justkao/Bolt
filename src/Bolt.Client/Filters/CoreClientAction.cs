@@ -5,16 +5,16 @@ using System.Threading.Tasks;
 
 namespace Bolt.Client.Filters
 {
-    public class CoreClientAction : IClientExecutionFilter
+    public class CoreClientAction : IClientContextHandler
     {
-        private readonly IReadOnlyCollection<IClientExecutionFilter> _filters;
+        private readonly IReadOnlyCollection<IClientContextHandler> _filters;
         private ClientActionContext _context;
         private Func<ClientActionContext, Task> _coreAction;
-        private IEnumerator<IClientExecutionFilter> _currentFilter;
+        private IEnumerator<IClientContextHandler> _currentFilter;
 
         public int Order => int.MaxValue;
 
-        public CoreClientAction(IReadOnlyCollection<IClientExecutionFilter> filters)
+        public CoreClientAction(IReadOnlyCollection<IClientContextHandler> filters)
         {
             _filters = filters;
         }

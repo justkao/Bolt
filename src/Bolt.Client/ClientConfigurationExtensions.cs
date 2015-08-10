@@ -65,22 +65,22 @@ namespace Bolt.Client
             return clientConfiguration.ProxyFactory.CreateProxy<TContract>(channel);
         }
 
-        public static ClientConfiguration AddFilter<T>(this ClientConfiguration clientConfiguration) where T: IClientExecutionFilter, new()
+        public static ClientConfiguration AddFilter<T>(this ClientConfiguration clientConfiguration) where T: IClientContextHandler, new()
         {
             return clientConfiguration.AddFilter(Activator.CreateInstance<T>());
         }
 
-        public static ClientConfiguration AddFilter(this ClientConfiguration clientConfiguration, IClientExecutionFilter executionFilter)
+        public static ClientConfiguration AddFilter(this ClientConfiguration clientConfiguration, IClientContextHandler contextHandler)
         {
             if (clientConfiguration == null) throw new ArgumentNullException(nameof(clientConfiguration));
-            if (executionFilter == null) throw new ArgumentNullException(nameof(executionFilter));
+            if (contextHandler == null) throw new ArgumentNullException(nameof(contextHandler));
 
             if (clientConfiguration.Filters == null)
             {
-                clientConfiguration.Filters = new List<IClientExecutionFilter>();
+                clientConfiguration.Filters = new List<IClientContextHandler>();
             }
 
-            clientConfiguration.Filters.Add(executionFilter);
+            clientConfiguration.Filters.Add(contextHandler);
             return clientConfiguration;
         }
     }
