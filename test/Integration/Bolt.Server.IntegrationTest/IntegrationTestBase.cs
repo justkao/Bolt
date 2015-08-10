@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Reflection;
+
 using Bolt.Client;
+
+using Microsoft.AspNet.Builder;
+using Microsoft.AspNet.TestHost;
 using Microsoft.Framework.DependencyInjection;
 
 namespace Bolt.Server.IntegrationTest
 {
-    using Microsoft.AspNet.TestHost;
-
     public abstract class IntegrationTestBase : IDisposable
     {
         private readonly TestServer _runningServer;
@@ -28,7 +29,7 @@ namespace Bolt.Server.IntegrationTest
 
         protected ClientConfiguration ClientConfiguration { get; }
 
-        protected abstract void Configure(Microsoft.AspNet.Builder.IApplicationBuilder appBuilder);
+        protected abstract void Configure(IApplicationBuilder appBuilder);
 
         protected virtual void ConfigureServices(IServiceCollection services)
         {

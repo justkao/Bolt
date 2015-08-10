@@ -3,6 +3,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Common;
 using Bolt.Server.InstanceProviders;
+using Bolt.Server.Session;
+
 using Microsoft.AspNet.Http.Internal;
 using Moq;
 
@@ -19,7 +21,7 @@ namespace Bolt.Server.Test
             Subject = CreateSubject();
         }
 
-        protected MockStateFullInstanceProvider Subject { get; set; }
+        protected MockSessionInstanceProvider Subject { get; set; }
 
         protected Mock<IInstanceProviderActions> Mock { get; set; }
 
@@ -34,12 +36,12 @@ namespace Bolt.Server.Test
             string GenerateSessionid();
         }
 
-        protected class MockStateFullInstanceProvider : StateFullInstanceProvider
+        protected class MockSessionInstanceProvider : SessionInstanceProvider
         {
             private readonly Mock<IInstanceProviderActions> _actions;
             private readonly MemorySessionFactory _factory;
 
-            public MockStateFullInstanceProvider(MockContractDescriptor contract,
+            public MockSessionInstanceProvider(MockContractDescriptor contract,
                 Mock<IInstanceProviderActions> actions)
                 : this(
                     contract, actions,
@@ -49,7 +51,7 @@ namespace Bolt.Server.Test
             {
             }
 
-            private MockStateFullInstanceProvider(MockContractDescriptor contract, Mock<IInstanceProviderActions> actions, MemorySessionFactory factory) : base(factory)
+            private MockSessionInstanceProvider(MockContractDescriptor contract, Mock<IInstanceProviderActions> actions, MemorySessionFactory factory) : base(factory)
             {
                 _factory = factory;
                 _actions = actions;
@@ -99,9 +101,9 @@ namespace Bolt.Server.Test
             };
         }
 
-        protected virtual MockStateFullInstanceProvider CreateSubject()
+        protected virtual MockSessionInstanceProvider CreateSubject()
         {
-            return new MockStateFullInstanceProvider(Contract, Mock);
+            return new MockSessionInstanceProvider(Contract, Mock);
         }
 
         protected MockContractDescriptor Contract { get; }

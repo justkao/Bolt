@@ -1,6 +1,7 @@
 using System;
 using Bolt.Server;
 
+// ReSharper disable once CheckNamespace
 namespace Bolt.Session
 {
     public static class BoltServerSessionExtensions

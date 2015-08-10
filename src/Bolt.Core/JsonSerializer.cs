@@ -79,7 +79,7 @@ namespace Bolt
             public JsonObjectSerializer(JsonSerializer parent, Dictionary<string, string> data)
             {
                 _parent = parent;
-                _data = data;
+                _data = data ?? new Dictionary<string, string>();
             }
 
             public bool IsEmpty => _data.Count == 0;

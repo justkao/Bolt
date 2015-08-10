@@ -1,5 +1,8 @@
 using System;
 using Bolt.Server.InstanceProviders;
+using Bolt.Server.Session;
+
+using Microsoft.AspNet.Session;
 using Microsoft.Framework.DependencyInjection;
 
 namespace Bolt.Server
@@ -13,16 +16,32 @@ namespace Bolt.Server
             return bolt.Use<TContract>(new InstanceProvider<TContractImplementation>(), configure);
         }
 
-        public static IContractInvoker UseSession<TContract, TContractImplementation>(
+        public static IContractInvoker UseMemorySession<TContract, TContractImplementation>(
             this IBoltRouteHandler bolt,
             BoltServerOptions options = null,
             Action<IContractInvoker> configure = null) where TContractImplementation : TContract
         {
             BoltFramework.ValidateContract(typeof (TContract));
 
-            return bolt.UseSession<TContract, TContractImplementation>(
-                new MemorySessionFactory(options ?? bolt.Configuration.Options),
-                configure);
+            var factory = new MemorySessionFactory(
+                options ?? bolt.Configuration.Options,
+                bolt.ApplicationServices.GetRequiredService<IServerSessionHandler>());
+
+            return bolt.UseSession<TContract, TContractImplementation>(factory, configure);
+        }
+
+        public static IContractInvoker UseDistributedSession<TContract, TContractImplementation>(
+            this IBoltRouteHandler bolt,
+            ISessionStore sessionStore,
+            BoltServerOptions options = null,
+            Action<IContractInvoker> configure = null) where TContractImplementation : TContract
+        {
+            var factory = new DistributedSessionFactory(
+                options ?? bolt.Configuration.Options,
+                sessionStore,
+                bolt.ApplicationServices.GetRequiredService<IServerSessionHandler>());
+
+            return bolt.UseSession<TContract, TContractImplementation>(factory, configure);
         }
 
         public static IContractInvoker UseSession<TContract, TContractImplementation>(
@@ -30,9 +49,7 @@ namespace Bolt.Server
             ISessionFactory sessionFactory,
             Action<IContractInvoker> configure = null) where TContractImplementation : TContract
         {
-            return
-                bolt.Use<TContract>(
-                    new StateFullInstanceProvider<TContractImplementation>(sessionFactory), configure);
+            return bolt.Use<TContract>(new SessionInstanceProvider<TContractImplementation>(sessionFactory), configure);
         }
 
         public static IContractInvoker Use<TContract>(

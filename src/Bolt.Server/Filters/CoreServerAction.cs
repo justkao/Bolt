@@ -55,38 +55,40 @@ namespace Bolt.Server.Filters
             {
                 await _coreAction(context);
                 context.IsExecuted = true;
-
-                if (instanceCreated)
-                {
-                    await ReleaseInstanceSafeAsync(context, null);
-                }
             }
             catch (Exception e)
             {
                 if (instanceCreated)
                 {
-                    await ReleaseInstanceSafeAsync(context, e);
+                    await ReleaseInstanceSafeAsync(context, e, false);
                 }
+
                 throw;
+            }
+
+            if (instanceCreated)
+            {
+                await ReleaseInstanceSafeAsync(context, null, true);
             }
         }
 
-        private Task ReleaseInstanceSafeAsync(ServerActionContext context, Exception exception)
+        private async Task ReleaseInstanceSafeAsync(ServerActionContext context, Exception exception, bool throwError)
         {
             try
             {
-                return context.ContractInvoker.InstanceProvider.ReleaseInstanceAsync(context, context.ContractInstance, exception);
+                await context.ContractInvoker.InstanceProvider.ReleaseInstanceAsync(context, context.ContractInstance, exception);
             }
             catch (Exception)
             {
-                // TODO: log ? 
+                if (throwError)
+                {
+                    throw;
+                }
             }
             finally
             {
                 context.ContractInstance = null;
             }
-
-            return CompletedTask.Done;
         }
 
         private async Task ExecuteAsync(ServerActionContext context)

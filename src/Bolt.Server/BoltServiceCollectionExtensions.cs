@@ -1,12 +1,13 @@
 ﻿using System;
+
 using Bolt;
 using Bolt.Server;
 using Bolt.Server.Filters;
 using Bolt.Server.Metadata;
-using Bolt.Server.InstanceProviders;
+using Bolt.Server.Session;
 using Bolt.Session;
-using Newtonsoft.Json;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.Framework.DependencyInjection
 {
     public static class BoltServiceCollectionExtensions
@@ -22,7 +23,7 @@ namespace Microsoft.Framework.DependencyInjection
         {
             services.ConfigureOptions<ConfigureServerRuntimeConfiguration>();
 
-            services.AddTransient<ISerializer, Bolt.JsonSerializer>();
+            services.AddTransient<ISerializer, JsonSerializer>();
             services.AddTransient<IExceptionWrapper, JsonExceptionWrapper>();
             services.AddTransient<IResponseHandler, ResponseHandler>();
             services.AddTransient<IBoltRouteHandler, BoltRouteHandler>();
@@ -36,7 +37,8 @@ namespace Microsoft.Framework.DependencyInjection
             services.AddTransient<IParameterHandler, ParameterHandler>();
             services.AddTransient<ISessionHandler, SessionHandler>();
             services.AddTransient<IServerSessionHandler, ServerSessionHandler>();
-            services.AddScoped<ISessionProvider, HttpContextSessionProvider>();
+            services.AddTransient<ISessionProvider, HttpContextSessionProvider>();
+            services.AddTransient<IHttpSessionProvider, HttpContextSessionProvider>();
             services.AddSingleton<IContractInvokerFactory, ContractInvokerFactory>();
 
             return services;

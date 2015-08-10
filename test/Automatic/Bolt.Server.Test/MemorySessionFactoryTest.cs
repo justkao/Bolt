@@ -2,6 +2,8 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Server.InstanceProviders;
+using Bolt.Server.Session;
+
 using Microsoft.AspNet.Http.Internal;
 using Moq;
 using Xunit;
@@ -122,6 +124,7 @@ namespace Bolt.Server.Test
             Assert.True(((InstanceInternal)instance).Disposed);
         }
 
+        /*
         [Fact]
         public async Task Timeout_EnsureEventCalled()
         {
@@ -142,7 +145,6 @@ namespace Bolt.Server.Test
 
             Assert.True(eventCalled, "Timeouted event should be called on instance timeout.");
         }
-
 
         [Fact]
         public async Task Timeout_EnsureEventCalledWithValidSession()
@@ -166,6 +168,7 @@ namespace Bolt.Server.Test
 
             Assert.True(validId, "Timeouted event should be called with valid session id.");
         }
+        */
 
         private async Task<IContractSession> CreateNew(DefaultHttpContext ctxt, string sessionId)
         {

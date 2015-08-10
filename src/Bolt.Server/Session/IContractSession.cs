@@ -1,7 +1,8 @@
 ﻿using System.Threading.Tasks;
+
 using Bolt.Session;
 
-namespace Bolt.Server.InstanceProviders
+namespace Bolt.Server.Session
 {
     public interface IContractSession : ISessionProvider
     {

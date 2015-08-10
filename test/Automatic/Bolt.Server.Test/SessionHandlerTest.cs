@@ -1,4 +1,6 @@
 ﻿using Bolt.Server.InstanceProviders;
+using Bolt.Server.Session;
+
 using Microsoft.AspNet.Http.Internal;
 using Xunit;
 

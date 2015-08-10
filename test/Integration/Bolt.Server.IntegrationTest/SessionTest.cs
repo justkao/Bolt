@@ -8,6 +8,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Bolt.Server.Session;
 using Bolt.Session;
 using Bolt.Test.Common;
 using Microsoft.Framework.DependencyInjection;
@@ -18,7 +20,7 @@ namespace Bolt.Server.IntegrationTest
 {
     public class SessionTest : IntegrationTestBase, ITestState
     {
-        private StateFullInstanceProvider InstanceProvider { get; set; }
+        private SessionInstanceProvider InstanceProvider { get; set; }
 
         private MemorySessionFactory Factory { get; set; }
 
@@ -75,7 +77,7 @@ namespace Bolt.Server.IntegrationTest
             await client.GetStateAsync();
             string session = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
 
-            StateFullInstanceProvider instanceProvider = InstanceProvider;
+            SessionInstanceProvider instanceProvider = InstanceProvider;
             Factory.Destroy(session);
 
             await client.GetStateAsync();
@@ -134,7 +136,7 @@ namespace Bolt.Server.IntegrationTest
             client.GetState();
             string session = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
 
-            StateFullInstanceProvider instanceProvider = InstanceProvider;
+            SessionInstanceProvider instanceProvider = InstanceProvider;
             Factory.Destroy(session);
 
             client.GetState();
@@ -148,7 +150,7 @@ namespace Bolt.Server.IntegrationTest
             client.GetState();
             string session = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
             (client as IDisposable).Dispose();
-            StateFullInstanceProvider instanceProvider = InstanceProvider;
+            SessionInstanceProvider instanceProvider = InstanceProvider;
             Assert.False(Factory.Destroy(session));
         }
 
@@ -160,7 +162,7 @@ namespace Bolt.Server.IntegrationTest
             await client.GetStateAsync();
             string session = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
             await (client as IChannel).CloseAsync();
-            StateFullInstanceProvider instanceProvider = InstanceProvider;
+            SessionInstanceProvider instanceProvider = InstanceProvider;
             Assert.False(Factory.Destroy(session));
         }
 
@@ -464,7 +466,7 @@ namespace Bolt.Server.IntegrationTest
             {
                 Factory = new MemorySessionFactory(h.Configuration.Options);
                 IContractInvoker contract = h.UseSession<ITestContractStateFull, TestContractStateFull>(Factory);
-                InstanceProvider = (StateFullInstanceProvider)contract.InstanceProvider;
+                InstanceProvider = (SessionInstanceProvider)contract.InstanceProvider;
             });
         }
 

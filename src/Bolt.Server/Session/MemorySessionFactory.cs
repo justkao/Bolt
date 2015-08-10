@@ -1,11 +1,13 @@
-﻿using Bolt.Common;
+﻿using System;
 using System.Collections.Concurrent;
-using System.Threading.Tasks;
-using System;
-using Microsoft.AspNet.Http;
 using System.Threading;
+using System.Threading.Tasks;
 
-namespace Bolt.Server.InstanceProviders
+using Bolt.Common;
+
+using Microsoft.AspNet.Http;
+
+namespace Bolt.Server.Session
 {
     public class MemorySessionFactory : ISessionFactory, IDisposable
     {
@@ -24,8 +26,6 @@ namespace Bolt.Server.InstanceProviders
         }
 
         public int Count => _items.Count;
-
-        public event EventHandler<SessionTimeoutEventArgs> SessionTimeouted;
 
         public TimeSpan TimeoutCheckInterval
         {
@@ -69,7 +69,7 @@ namespace Bolt.Server.InstanceProviders
             return Task.FromResult((IContractSession)contractSession);
         }
 
-        public Task<IContractSession> GetExistingAsync(HttpContext context)
+        public Task<IContractSession> GetExistingAsync(HttpContext context, Func<Task<object>> instanceFactory)
         {
             var session = _sessionHandler.GetIdentifier(context);
 
@@ -135,7 +135,6 @@ namespace Bolt.Server.InstanceProviders
                 if (ShouldTimeout(pair.Value.TimeStamp))
                 {
                     pair.Value.Destroy();
-                    SessionTimeouted?.Invoke(this, new SessionTimeoutEventArgs(pair.Key));
                 }
             }
         }

@@ -100,8 +100,6 @@ namespace Bolt.Server
                         context.Result = result;
                     }
                 }
-
-                await boltFeature.Configuration.ResponseHandler.HandleAsync(context);
             }
 
             private IEnumerable<object> BuildParameters(ServerActionContext actionContext)

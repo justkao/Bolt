@@ -1,10 +1,11 @@
 ﻿using System;
-using Bolt.Session;
-using Microsoft.AspNet.Hosting;
 
-namespace Bolt.Server.InstanceProviders
+using Microsoft.AspNet.Hosting;
+using Microsoft.AspNet.Http.Features;
+
+namespace Bolt.Server.Session
 {
-    public class HttpContextSessionProvider : ISessionProvider
+    public class HttpContextSessionProvider : IHttpSessionProvider
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -20,11 +21,12 @@ namespace Bolt.Server.InstanceProviders
 
         public string SessionId
         {
-            get
-            {
-                IContractSession session = _httpContextAccessor.HttpContext?.GetFeature<IContractSession>();
-                return session?.SessionId;
-            }
+            get { return _httpContextAccessor.HttpContext?.GetFeature<IContractSession>()?.SessionId; }
+        }
+
+        public ISession Session
+        {
+            get { return _httpContextAccessor.HttpContext?.GetFeature<ISessionFeature>()?.Session; }
         }
     }
 }

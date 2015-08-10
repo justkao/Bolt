@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNet.Http;
 
-namespace Bolt.Server.InstanceProviders
+namespace Bolt.Server.Session
 {
     public interface IServerSessionHandler
     {

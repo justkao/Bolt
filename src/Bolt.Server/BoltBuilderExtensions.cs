@@ -3,6 +3,7 @@ using Bolt.Server;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 
+// ReSharper disable once CheckNamespace
 namespace Microsoft.AspNet.Builder
 {
     public static class BoltBuilderExtensions

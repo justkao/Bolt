@@ -2,6 +2,8 @@ using System;
 using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Server.InstanceProviders;
+using Bolt.Server.Session;
+
 using Moq;
 using Xunit;
 

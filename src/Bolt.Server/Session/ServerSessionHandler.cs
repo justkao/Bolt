@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNet.Http;
-using System;
+﻿using System;
 
-namespace Bolt.Server.InstanceProviders
+using Microsoft.AspNet.Http;
+using Microsoft.Framework.OptionsModel;
+
+namespace Bolt.Server.Session
 {
     public class ServerSessionHandler : IServerSessionHandler
     {
@@ -9,14 +11,14 @@ namespace Bolt.Server.InstanceProviders
 
         private readonly BoltServerOptions _options;
 
-        public ServerSessionHandler(BoltServerOptions options)
+        public ServerSessionHandler(IOptions<BoltServerOptions> options)
         {
             if (options == null)
             {
                 throw new ArgumentNullException(nameof(options));
             }
 
-            _options = options;
+            _options = options.Options;
         }
 
         public virtual string GetIdentifier(HttpContext context)

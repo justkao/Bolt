@@ -10,11 +10,6 @@ namespace Bolt.Server
     {
         public static IObjectSerializer DeserializeParameters(this ISerializer serializer, Stream stream, MethodInfo action)
         {
-            if (stream == null || stream.Length == 0)
-            {
-                throw new DeserializeParametersException($"The data required to deserialize  parameters for action '{action.Name}' are not available in request.");
-            }
-
             try
             {
                 return serializer.CreateSerializer(stream);
