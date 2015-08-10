@@ -4,6 +4,7 @@ using System.Linq;
 
 using Bolt.Client.Channels;
 using Bolt.Client.Filters;
+using Bolt.Common;
 
 namespace Bolt.Client
 {
@@ -66,9 +67,19 @@ namespace Bolt.Client
             return this;
         }
 
+        public virtual ProxyBuilder Url(params string[] servers)
+        {
+            if (servers == null)
+            {
+                throw new ArgumentNullException(nameof(servers));
+            }
+
+            return Url(servers.Select(s => new Uri(s)).ToArray());
+        }
+
         public virtual ProxyBuilder Url(params Uri[] servers)
         {
-            if (servers == null || servers.Any())
+            if (servers == null || !servers.Any())
             {
                 throw new ArgumentNullException(nameof(servers));
             }
@@ -104,8 +115,6 @@ namespace Bolt.Client
 
         public virtual TContract Build<TContract>() where TContract : class
         {
-            BoltFramework.ValidateContract(typeof(TContract));
-
             if (_serverProvider == null)
             {
                 throw new InvalidOperationException("Server provider or target url was not configured.");
