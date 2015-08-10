@@ -33,27 +33,50 @@ namespace Bolt.Client.Channels
             return new RecoverableChannel(serverProvider, configuration);
         }
 
-        public static void ConfigureSession(this IChannel proxy, Action<ConfigureSessionContext> configure)
+        public static SessionChannel ConfigureSession(this IChannel proxy, Action<ConfigureSessionContext> configure)
         {
-            SessionChannel channel = null;
-            if (proxy is SessionChannel)
-            {
-                channel = proxy as SessionChannel;
-            }
-            else if (proxy is IChannelProvider)
-            {
-                channel = (proxy as IChannelProvider).Channel as SessionChannel;
-            }
-
-            if (channel == null)
-            {
-                throw new InvalidOperationException($"Unable to configure session initialization becase '{nameof(SessionChannel)}' was not extracted.");
-            }
-
+            SessionChannel channel = GetSessionChannel(proxy);
             InitSessionParameters parameters = channel.InitSessionParameters ?? new InitSessionParameters();
             ConfigureSessionContext ctxt = new ConfigureSessionContext(channel, parameters);
             configure(ctxt);
             channel.InitSessionParameters = parameters;
+            return channel;
+        }
+
+        public static SessionChannel WithDistributedSession(this SessionChannel sessionChannel)
+        {
+            sessionChannel.UseDistributedSession = true;
+            return sessionChannel;
+        }
+
+        public static SessionChannel GetSessionChannel(this IChannel proxy)
+        {
+            return proxy.GetChannel<SessionChannel>();
+        }
+
+        public static RecoverableChannel Recoverable(this IChannel proxy, int retries, TimeSpan retryDelay)
+        {
+            RecoverableChannel channel = proxy.GetChannel<RecoverableChannel>();
+            channel.Retries = retries;
+            channel.RetryDelay = retryDelay;
+            return channel;
+        }
+
+        public static T GetChannel<T>(this IChannel proxy) where T:IChannel
+        {
+            SessionChannel channel = null;
+            if (proxy is T)
+            {
+                return (T)proxy;
+            }
+
+            if (proxy is IChannelProvider)
+            {
+                return (proxy as IChannelProvider).Channel.GetChannel<T>();
+            }
+
+            throw new InvalidOperationException($"Unable to retrieve channel {typeof(T).Name}' from proxy.");
+
         }
     }
 }

@@ -3,7 +3,9 @@ using Bolt.Server.InstanceProviders;
 using Bolt.Server.Session;
 
 using Microsoft.AspNet.Session;
+using Microsoft.Framework.Caching.Distributed;
 using Microsoft.Framework.DependencyInjection;
+using Microsoft.Framework.Logging;
 
 namespace Bolt.Server
 {
@@ -25,6 +27,21 @@ namespace Bolt.Server
 
             var factory = new MemorySessionFactory(
                 options ?? bolt.Configuration.Options,
+                bolt.ApplicationServices.GetRequiredService<IServerSessionHandler>());
+
+            return bolt.UseSession<TContract, TContractImplementation>(factory, configure);
+        }
+
+        public static IContractInvoker UseDistributedSession<TContract, TContractImplementation>(
+            this IBoltRouteHandler bolt,
+            BoltServerOptions options = null,
+            Action<IContractInvoker> configure = null) where TContractImplementation : TContract
+        {
+            DistributedSessionFactory factory = new DistributedSessionFactory(
+                options ?? bolt.Configuration.Options,
+                new DistributedSessionStore(
+                    bolt.ApplicationServices.GetRequiredService<IDistributedCache>(),
+                    bolt.ApplicationServices.GetRequiredService<ILoggerFactory>()),
                 bolt.ApplicationServices.GetRequiredService<IServerSessionHandler>());
 
             return bolt.UseSession<TContract, TContractImplementation>(factory, configure);

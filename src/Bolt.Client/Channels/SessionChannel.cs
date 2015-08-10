@@ -97,6 +97,8 @@ namespace Bolt.Client.Channels
 
         public DestroySessionResult DestroySessionResult { get; set; }
 
+        public bool UseDistributedSession { get; set; }
+
         public override void Open()
         {
             TaskHelpers.Execute(OpenAsync);
@@ -218,6 +220,13 @@ namespace Bolt.Client.Channels
 
             ConnectionDescriptor uri = await EnsureConnectionAsync();
             IsOpened = true;
+
+            if (UseDistributedSession)
+            {
+                // we are using distributed sessions, so we can choose whatever server we want
+                return ServerProvider.GetServer();
+            }
+
             return uri;
         }
 
@@ -249,6 +258,11 @@ namespace Bolt.Client.Channels
                         ctxt.SessionParameters = InitSessionParameters;
                         CoreClientAction clientAction = new CoreClientAction(Filters);
                         await clientAction.ExecuteAsync(ctxt, ExecuteCoreAsync);
+
+                        if (ctxt.Response == null)
+                        {
+                            throw ctxt.Result.Error;
+                        }
 
                         var sessionId = _sessionHandler.GetSessionIdentifier(ctxt.Response);
                         if (sessionId == null)

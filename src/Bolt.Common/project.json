@@ -1,6 +1,6 @@
 ﻿{
   "shared": "*.cs",
-  "version": "0.13.0-alpha",
+  "version": "0.13.0-alpha1",
   "authors": [ "Martin Tomka" ],
   "dependencies": {
   },

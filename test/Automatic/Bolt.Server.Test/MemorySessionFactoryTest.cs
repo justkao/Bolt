@@ -62,7 +62,7 @@ namespace Bolt.Server.Test
             var ctxt = new DefaultHttpContext();
             SesionHandler.Setup(v => v.GetIdentifier(ctxt)).Returns("anything").Verifiable();
 
-            await Assert.ThrowsAsync<SessionNotFoundException>(() => Subject.GetExistingAsync(ctxt));
+            await Assert.ThrowsAsync<SessionNotFoundException>(() => Subject.GetExistingAsync(ctxt, null));
 
             SesionHandler.Verify();
         }

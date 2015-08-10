@@ -212,6 +212,7 @@ namespace Bolt.Client.Channels
             if (ctxt.Result == null)
             {
                 ctxt.Result = await RequestHandler.GetResponseAsync(ctxt, ctxt.Parameters);
+                ctxt.Result.GetResultOrThrow();
             }
 
             AfterReceived(ctxt);

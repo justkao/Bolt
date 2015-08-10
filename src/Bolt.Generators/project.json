@@ -1,5 +1,5 @@
 ﻿{
-  "version": "0.13.0-alpha",
+  "version": "0.13.0-alpha1",
   "authors": [ "Martin Tomka" ],
   "description": "Bolt library containing helper classes for code generation.",
   "dependencies": {
