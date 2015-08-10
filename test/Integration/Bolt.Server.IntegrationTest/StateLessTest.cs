@@ -122,6 +122,18 @@ namespace Bolt.Server.IntegrationTest
         }
 
         [Fact]
+        public void Client_NullArgument_Ok()
+        {
+            Mock<ITestContract> server = Server();
+            server.Setup(v => v.MethodWithNullableArguments(null)).Verifiable();
+
+            ITestContract client = CreateChannel();
+            client.MethodWithNullableArguments(null);
+
+            server.Verify();
+        }
+
+        [Fact]
         public void Server_Throws_EnsureSameExceptionOnClient()
         {
             var client = CreateChannel();

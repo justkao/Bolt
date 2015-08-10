@@ -57,6 +57,8 @@ namespace Bolt.Server.IntegrationTest.Core
 
         Task SimpleMethodAsync();
 
+        Task MethodWithNullableArgumentsAsync(string arg);
+
         Task SimpleMethodWithCancellationAsync(System.Threading.CancellationToken cancellation);
 
         Task<Bolt.Test.Common.CompositeType> ComplexFunctionAsync();
@@ -97,6 +99,20 @@ namespace Bolt.Server.IntegrationTest.Core
         public virtual Task SimpleMethodAsync()
         {
             return SendAsync(__SimpleMethodAction, null, CancellationToken.None);
+        }
+
+        public virtual void MethodWithNullableArguments(string arg)
+        {
+            var bolt_Params = Channel.Serializer.CreateSerializer();
+            bolt_Params.WriteParameter(__MethodWithNullableArgumentsAction, "arg", typeof(string), arg);
+            Send(__MethodWithNullableArgumentsAction, bolt_Params, CancellationToken.None);
+        }
+
+        public virtual Task MethodWithNullableArgumentsAsync(string arg)
+        {
+            var bolt_Params = Channel.Serializer.CreateSerializer();
+            bolt_Params.WriteParameter(__MethodWithNullableArgumentsAction, "arg", typeof(string), arg);
+            return SendAsync(__MethodWithNullableArgumentsAction, bolt_Params, CancellationToken.None);
         }
 
         public virtual Task SimpleMethodExAsync()
@@ -232,6 +248,7 @@ namespace Bolt.Server.IntegrationTest.Core
 
         private static readonly MethodInfo __SimpleMethodWithSimpleArgumentsAction = typeof(ITestContract).GetMethod(nameof(ITestContract.SimpleMethodWithSimpleArguments));
         private static readonly MethodInfo __SimpleMethodAction = typeof(ITestContract).GetMethod(nameof(ITestContract.SimpleMethod));
+        private static readonly MethodInfo __MethodWithNullableArgumentsAction = typeof(ITestContract).GetMethod(nameof(ITestContract.MethodWithNullableArguments));
         private static readonly MethodInfo __SimpleMethodExAsyncAction = typeof(ITestContract).GetMethod(nameof(ITestContract.SimpleMethodExAsync));
         private static readonly MethodInfo __SimpleMethodWithCancellationAction = typeof(ITestContract).GetMethod(nameof(ITestContract.SimpleMethodWithCancellation));
         private static readonly MethodInfo __ComplexFunctionAction = typeof(ITestContract).GetMethod(nameof(ITestContract.ComplexFunction));

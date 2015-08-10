@@ -40,6 +40,8 @@ namespace Bolt.Server.IntegrationTest.Core
         [AsyncOperation]
         void SimpleMethod();
 
+        void MethodWithNullableArguments(string arg);
+
         Task SimpleMethodExAsync();
 
         void SimpleMethodWithCancellation(CancellationToken cancellation);
