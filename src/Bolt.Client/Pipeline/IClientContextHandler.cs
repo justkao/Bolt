@@ -1,4 +1,4 @@
-﻿namespace Bolt.Client.Filters
+﻿namespace Bolt.Client.Pipeline
 {
     public interface IClientContextHandler : IContextHandler<ClientActionContext>
     {

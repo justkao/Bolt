@@ -2,14 +2,14 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Bolt.Client.Filters;
 using Bolt.Core;
 
 namespace Bolt.Client.Pipeline
 {
     public class CommunicationHandler : DelegatingHandler, IClientContextHandler
     {
-        public CommunicationHandler(HttpMessageHandler messageHandler) : base(messageHandler)
+        public CommunicationHandler(HttpMessageHandler messageHandler) 
+            : base(messageHandler)
         {
         }
 

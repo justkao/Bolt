@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Bolt.Client.Filters;
+using Bolt.Client.Pipeline;
 
 namespace Bolt.Client.Channels
 {

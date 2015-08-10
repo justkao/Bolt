@@ -5,7 +5,6 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Bolt.Client.Filters;
 using Bolt.Core;
 
 namespace Bolt.Client.Pipeline
@@ -25,7 +24,7 @@ namespace Bolt.Client.Pipeline
 
         public virtual Task HandleAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
         {
-            if (context.Request.Content != null && context.HasSerializableParameters)
+            if (context.Request.Content == null && context.HasSerializableParameters)
             {
                 context.Request.Content = BuildRequestContent(context);
             }

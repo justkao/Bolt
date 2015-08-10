@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client.Filters;
 using Bolt.Client.Helpers;
+using Bolt.Client.Pipeline;
 using Bolt.Common;
 using Bolt.Session;
 

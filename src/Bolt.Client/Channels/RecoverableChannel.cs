@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client.Filters;
+using Bolt.Client.Pipeline;
 using Bolt.Core;
 
 namespace Bolt.Client.Channels

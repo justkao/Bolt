@@ -1,18 +1,18 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Bolt.Core;
 
 namespace Bolt
 {
-    public abstract class PipelineContextHandler<T> : IContextHandler<T> where T : ActionContextBase
+    public class ContextExecutor<T> : IContextHandler<T> where T : ActionContextBase
     {
         private readonly IReadOnlyCollection<IContextHandler<T>> _handlers;
         private T _context;
         private IEnumerator<IContextHandler<T>> _currentFilter;
         private bool _handled;
 
-        protected PipelineContextHandler(IReadOnlyCollection<IContextHandler<T>> handlers)
+        public ContextExecutor(IReadOnlyCollection<IContextHandler<T>> handlers)
         {
             if (handlers == null)
             {
@@ -21,6 +21,8 @@ namespace Bolt
 
             _handlers = handlers;
         }
+
+        public HandleContextStage Stage  => HandleContextStage.Execute; 
 
         public async Task HandleAsync(T context, Func<T, Task> next)
         {
@@ -33,30 +35,16 @@ namespace Bolt
 
             _handled = true;
             _context = context;
-
-            if (!_handlers.Any())
-            {
-                await ExecuteCoreAsync(context);
-            }
-            else
-            {
-                _currentFilter = _handlers.GetEnumerator();
-                await ExecuteInternalAsync(_context);
-            }
+            _currentFilter = _handlers.GetEnumerator();
+            await ExecuteInternalAsync(_context);
         }
 
         private async Task ExecuteInternalAsync(T context)
         {
-            if (!_currentFilter.MoveNext())
-            {
-                await ExecuteCoreAsync(_context);
-            }
-            else
+            if (_currentFilter.MoveNext())
             {
                 await _currentFilter.Current.HandleAsync(context, ExecuteInternalAsync);
             }
         }
-
-        protected abstract Task ExecuteCoreAsync(T context);
     }
 }

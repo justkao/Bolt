@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using Bolt.Client.Pipeline;
 
 namespace Bolt.Client.Filters
 {
