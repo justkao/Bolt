@@ -9,12 +9,12 @@ using Bolt.Core;
 
 namespace Bolt.Client.Pipeline
 {
-    public class WriteParametersHandler : IClientContextHandler
+    public class WriteParametersMiddleware : MiddlewareBase<ClientActionContext>
     {
-        public WriteParametersHandler(ISerializer serializer)
+        public WriteParametersMiddleware(ActionDelegate<ClientActionContext> next, ISerializer serializer)
+            : base(next)
         {
             if (serializer == null) throw new ArgumentNullException(nameof(serializer));
-
             Serializer = serializer;
         }
 
@@ -22,14 +22,14 @@ namespace Bolt.Client.Pipeline
 
         public ISerializer Serializer { get; }
 
-        public virtual Task HandleAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
+        public override Task Invoke(ClientActionContext context)
         {
             if (context.Request.Content == null && context.HasSerializableParameters)
             {
                 context.Request.Content = BuildRequestContent(context);
             }
 
-            return next(context);
+            return Next(context);
         }
 
         private HttpContent BuildRequestContent(ClientActionContext context)
@@ -58,7 +58,7 @@ namespace Bolt.Client.Pipeline
             }
 
             Stream resultStream = parameterSerializer.GetOutputStream();
-            byte[] rawData = null;
+            byte[] rawData;
             if (resultStream is MemoryStream)
             {
                 rawData = (resultStream as MemoryStream).ToArray();

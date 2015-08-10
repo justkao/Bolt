@@ -1,14 +1,14 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Bolt.Client.Filters;
 using Bolt.Core;
 
 namespace Bolt.Client.Pipeline
 {
-    public class ServerConnectionHandler : IClientContextHandler
+    public class PickConnectionMiddleware : ClientMiddlewareBase
     {
-        public ServerConnectionHandler(IServerProvider serverProvider, IEndpointProvider endpointProvider)
+        public PickConnectionMiddleware(ActionDelegate<ClientActionContext> next, IServerProvider serverProvider,
+            IEndpointProvider endpointProvider) : base(next)
         {
             if (serverProvider == null) throw new ArgumentNullException(nameof(serverProvider));
             if (endpointProvider == null) throw new ArgumentNullException(nameof(endpointProvider));
@@ -23,7 +23,7 @@ namespace Bolt.Client.Pipeline
 
         public HandleContextStage Stage => HandleContextStage.Before;
 
-        public async Task HandleAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
+        public override async Task Invoke(ClientActionContext context)
         {
             if (context.Connection == null)
             {
@@ -37,7 +37,7 @@ namespace Bolt.Client.Pipeline
 
             try
             {
-                await next(context);
+                await Next(context);
             }
             catch (HttpRequestException)
             {

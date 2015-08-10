@@ -1,14 +1,12 @@
 using System;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Bolt.Client.Filters;
 using Bolt.Core;
 
 namespace Bolt.Client.Pipeline
 {
-    public class RetryRequestHandler : IClientContextHandler
+    public class RetryRequestMiddleware : ClientMiddlewareBase
     {
-        public RetryRequestHandler(IErrorRecovery errorRecovery)
+        public RetryRequestMiddleware(ActionDelegate<ClientActionContext> next, IErrorRecovery errorRecovery) : base(next)
         {
             ErrorRecovery = errorRecovery;
         }
@@ -21,7 +19,7 @@ namespace Bolt.Client.Pipeline
 
         public HandleContextStage Stage => HandleContextStage.After;
 
-        public virtual async Task HandleAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
+        public override async Task Invoke(ClientActionContext context)
         {
             int tries = 0;
 
@@ -29,7 +27,7 @@ namespace Bolt.Client.Pipeline
             {
                 try
                 {
-                    await next(context);
+                    await Next(context);
                     return;
                 }
                 catch (OperationCanceledException)

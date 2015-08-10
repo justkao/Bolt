@@ -6,18 +6,22 @@ using Bolt.Core;
 
 namespace Bolt.Client.Pipeline
 {
-    public class CommunicationHandler : DelegatingHandler, IClientContextHandler
+    public class CommunicationMiddleware : DelegatingHandler, IMiddleware<ClientActionContext>
     {
-        public CommunicationHandler(HttpMessageHandler messageHandler) 
+        private readonly ActionDelegate<ClientActionContext> _next;
+
+        public CommunicationMiddleware(ActionDelegate<ClientActionContext> next, HttpMessageHandler messageHandler) 
             : base(messageHandler)
         {
+            if (next == null) throw new ArgumentNullException(nameof(next));
+            _next = next;
         }
 
         public HandleContextStage Stage => HandleContextStage.Execute;
 
         public TimeSpan ResponseTimeout { get; set; }
 
-        public async Task HandleAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
+        public async Task Invoke(ClientActionContext context)
         {
             context.Request.Headers.Connection.Add("Keep-Alive");
 
@@ -46,6 +50,8 @@ namespace Bolt.Client.Pipeline
 
                 throw;
             }
+
+            await _next(context);
         }
     }
 }

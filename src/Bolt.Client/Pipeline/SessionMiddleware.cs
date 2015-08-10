@@ -3,20 +3,19 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Bolt.Client.Channels;
-using Bolt.Client.Filters;
 using Bolt.Client.Helpers;
 using Bolt.Core;
 using Bolt.Session;
 
 namespace Bolt.Client.Pipeline
 {
-    public class SessionHandler : IClientContextHandler
+    public class SessionMiddleware : ClientMiddlewareBase
     {
         private readonly AwaitableCriticalSection _syncRoot = new AwaitableCriticalSection();
 
         private string _sessionId;
 
-        public SessionHandler(ISerializer serializer, IClientSessionHandler sessionHandler)
+        public SessionMiddleware(ActionDelegate<ClientActionContext> next, ISerializer serializer, IClientSessionHandler sessionHandler) : base(next)
         {
             Serializer = serializer;
             ClientSessionHandler = sessionHandler;
@@ -42,13 +41,13 @@ namespace Bolt.Client.Pipeline
 
         public bool IsOpened { get; set; }
 
-        public async Task HandleAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
+        public override async Task Invoke(ClientActionContext context)
         {
             EnsureNotClosed();
 
             if (!IsOpened)
             {
-                Connection = await EnsureConnectionAsync(context, next);
+                Connection = await EnsureConnectionAsync(context);
             }
 
             if (IsOpened && (!Equals(context.Action, BoltFramework.DestroySessionAction)))
@@ -57,13 +56,13 @@ namespace Bolt.Client.Pipeline
 
                 if (!UseDistributedSession)
                 {
-                    // we stick to active connection otherwise new connection will be picked using ServerConnectionHandler
+                    // we stick to active connection otherwise new connection will be picked using PickConnectionMiddleware
                     context.Connection = Connection;
                 }
 
                 try
                 {
-                    await next(context);
+                    await Next(context);
                 }
                 catch (Exception e)
                 {
@@ -84,17 +83,16 @@ namespace Bolt.Client.Pipeline
                 context.Request.Content = new ByteArrayContent(raw);
                 context.Request.Content.Headers.ContentLength = raw.Length;
 
-                await next(context);
+                await Next(context);
                 DestroySessionResult = (DestroySessionResult) context.ActionResult;
                 IsOpened = false;
                 return;
             }
 
-
-            await next(context);
+            await Next(context);
         }
 
-        private async Task<ConnectionDescriptor> EnsureConnectionAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
+        private async Task<ConnectionDescriptor> EnsureConnectionAsync(ClientActionContext context)
         {
             EnsureNotClosed();
 
@@ -128,7 +126,7 @@ namespace Bolt.Client.Pipeline
                         context.Request.Content = new ByteArrayContent(raw);
                         context.Request.Content.Headers.ContentLength = raw.Length;
 
-                        await next(initSessionContext);
+                        await Next(initSessionContext);
 
                         string sessionId = ClientSessionHandler.GetSessionIdentifier(initSessionContext.Response);
                         if (sessionId == null)

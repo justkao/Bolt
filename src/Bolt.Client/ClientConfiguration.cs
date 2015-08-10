@@ -9,7 +9,7 @@ namespace Bolt.Client
     /// <summary>
     /// The Bolt configuration of the client. 
     /// </summary>
-    public class ClientConfiguration
+    public class ClientConfiguration : IServiceProvider
     {
         public ClientConfiguration(BoltOptions options = null)
         {
@@ -56,6 +56,11 @@ namespace Bolt.Client
         public virtual ProxyBuilder ProxyBuilder()
         {
             return new ProxyBuilder(this);
+        }
+
+        public object GetService(Type serviceType)
+        {
+            throw new NotImplementedException();
         }
     }
 }

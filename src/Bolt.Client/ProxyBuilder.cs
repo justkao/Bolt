@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Bolt.Client.Channels;
-using Bolt.Client.Filters;
 using Bolt.Client.Pipeline;
 
 namespace Bolt.Client
@@ -95,7 +94,7 @@ namespace Bolt.Client
             return this;
         }
 
-        public virtual ProxyBuilder Filter<T>() where T:IClientContextHandler, new()
+        public virtual ProxyBuilder Filter<T>() where T : IClientContextHandler, new()
         {
             _userFilters.Add(Activator.CreateInstance<T>());
             return this;
@@ -132,23 +131,26 @@ namespace Bolt.Client
                     _configuration.RequestHandler,
                     _configuration.EndpointProvider,
                     filters)
-                              {
-                                  Retries = _retries, RetryDelay = _retryDelay
-                              };
+                {
+                    Retries = _retries,
+                    RetryDelay = _retryDelay
+                };
             }
             else
             {
                 channel = new SessionChannel(
-                    typeof(TContract),
+                    typeof (TContract),
                     _configuration.Serializer,
                     _serverProvider,
                     _configuration.RequestHandler,
                     _configuration.EndpointProvider,
                     _configuration.SessionHandler,
                     filters)
-                              {
-                                  Retries = _retries, RetryDelay = _retryDelay, UseDistributedSession = _distributedSession
-                              };
+                {
+                    Retries = _retries,
+                    RetryDelay = _retryDelay,
+                    UseDistributedSession = _distributedSession
+                };
 
                 if (_configureSession != null)
                 {

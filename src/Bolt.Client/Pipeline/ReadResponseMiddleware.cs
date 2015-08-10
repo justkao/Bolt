@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Threading.Tasks;
-using Bolt.Client.Filters;
 using Bolt.Core;
 
 namespace Bolt.Client.Pipeline
 {
-    public class ReadResponseHandler : IClientContextHandler
+    public class ReadResponseMiddleware : ClientMiddlewareBase
     {
-        public ReadResponseHandler(ISerializer serializer, IClientDataHandler dataHandler, IClientErrorProvider errorProvider)
+        public ReadResponseMiddleware(ActionDelegate<ClientActionContext> next, ISerializer serializer,
+            IClientDataHandler dataHandler, IClientErrorProvider errorProvider) : base(next)
         {
             if (serializer == null) throw new ArgumentNullException(nameof(serializer));
             if (dataHandler == null) throw new ArgumentNullException(nameof(dataHandler));
@@ -26,7 +26,7 @@ namespace Bolt.Client.Pipeline
 
         public IClientErrorProvider ErrorProvider { get; }
 
-        public virtual async Task HandleAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
+        public override async Task Invoke(ClientActionContext context)
         {
             if (context.Response == null)
             {
@@ -34,7 +34,7 @@ namespace Bolt.Client.Pipeline
             }
 
             await HandleResponseAsync(context);
-            await next(context);
+            await Next(context);
         }
 
         protected virtual async Task HandleResponseAsync(ClientActionContext context)
@@ -69,6 +69,5 @@ namespace Bolt.Client.Pipeline
         {
             return ErrorProvider.TryReadServerError(context);
         }
-
     }
 }
