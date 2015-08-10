@@ -20,6 +20,11 @@ namespace Bolt.Client
 
         public ProxyBuilder(ClientConfiguration configuration)
         {
+            if (configuration == null)
+            {
+                throw new ArgumentNullException(nameof(configuration));
+            }
+
             _configuration = configuration;
         }
 
@@ -40,6 +45,11 @@ namespace Bolt.Client
 
         public virtual ProxyBuilder ConfigureSession(Action<ConfigureSessionContext> configureSession)
         {
+            if (configureSession == null)
+            {
+                throw new ArgumentNullException(nameof(configureSession));
+            }
+
             _useSession = true;
             _configureSession = configureSession;
             return this;
@@ -47,6 +57,11 @@ namespace Bolt.Client
 
         public virtual ProxyBuilder Url(IServerProvider serverProvider)
         {
+            if (serverProvider == null)
+            {
+                throw new ArgumentNullException(nameof(serverProvider));
+            }
+
             _serverProvider = serverProvider;
             return this;
         }
@@ -57,6 +72,7 @@ namespace Bolt.Client
             {
                 throw new ArgumentNullException(nameof(servers));
             }
+
             if (servers.Length == 1)
             {
                 _serverProvider = new SingleServerProvider(servers[0]);
@@ -102,31 +118,33 @@ namespace Bolt.Client
 
             if (!_useSession)
             {
-                channel = new RecoverableChannel(_serverProvider, _configuration)
-                                                 {
-                                                     Retries = _retries,
-                                                     RetryDelay = _retryDelay
-                                                 };
+                channel = new RecoverableChannel(
+                    _configuration.Serializer,
+                    _serverProvider,
+                    _configuration.RequestHandler,
+                    _configuration.EndpointProvider,
+                    filters)
+                              {
+                                  Retries = _retries, RetryDelay = _retryDelay
+                              };
             }
             else
             {
-                channel = new SessionChannel(typeof(TContract), _serverProvider, _configuration)
-                                                 {
-                                                     Retries = _retries,
-                                                     RetryDelay = _retryDelay,
-                                                     UseDistributedSession = _distributedSession
-                                                 };
+                channel = new SessionChannel(
+                    typeof(TContract),
+                    _configuration.Serializer,
+                    _serverProvider,
+                    _configuration.RequestHandler,
+                    _configuration.EndpointProvider,
+                    _configuration.SessionHandler,
+                    filters)
+                              {
+                                  Retries = _retries, RetryDelay = _retryDelay, UseDistributedSession = _distributedSession
+                              };
+
                 if (_configureSession != null)
                 {
                     channel.ConfigureSession(_configureSession);
-                }
-            }
-
-            if (_filters.Any())
-            {
-                foreach (IClientExecutionFilter filter in _filters)
-                {
-                    ((IList<IClientExecutionFilter>)channel.Filters).Add(filter);
                 }
             }
 

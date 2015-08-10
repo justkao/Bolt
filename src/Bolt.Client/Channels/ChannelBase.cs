@@ -48,7 +48,7 @@ namespace Bolt.Client.Channels
                 throw new ArgumentNullException(nameof(endpointProvider));
             }
 
-            Filters = filters?.ToList() ?? new List<IClientExecutionFilter>();
+            Filters = filters ?? new List<IClientExecutionFilter>();
             Serializer = serializer;
             RequestHandler = requestHandler;
             EndpointProvider = endpointProvider;

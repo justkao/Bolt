@@ -59,7 +59,7 @@ namespace Bolt.Client.Channels
             Contract = proxy.Contract;
         }
 
-        protected SessionChannel(
+        public SessionChannel(
             Type contract,
             ISerializer serializer,
             IServerProvider serverProvider,
