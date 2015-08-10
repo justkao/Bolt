@@ -51,5 +51,10 @@ namespace Bolt.Client
         public IClientSessionHandler SessionHandler { get; set; }
 
         public List<IClientExecutionFilter> Filters { get; set; }
+
+        public virtual ProxyBuilder ProxyBuilder()
+        {
+            return new ProxyBuilder(this);
+        }
     }
 }

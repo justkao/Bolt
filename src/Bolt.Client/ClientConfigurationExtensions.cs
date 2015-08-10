@@ -50,7 +50,7 @@ namespace Bolt.Client
             IServerProvider serverProvider)
             where TContract : class
         {
-            return clientConfiguration.CreateProxy<TContract>(clientConfiguration.CreateRecoverable(serverProvider));
+            return clientConfiguration.CreateProxy<TContract>(new RecoverableChannel(serverProvider, clientConfiguration));
         }
 
         public static TContract CreateProxy<TContract>(this ClientConfiguration clientConfiguration, IChannel channel)

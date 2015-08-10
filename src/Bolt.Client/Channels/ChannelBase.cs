@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
@@ -47,7 +48,7 @@ namespace Bolt.Client.Channels
                 throw new ArgumentNullException(nameof(endpointProvider));
             }
 
-            Filters = filters ?? new List<IClientExecutionFilter>();
+            Filters = filters?.ToList() ?? new List<IClientExecutionFilter>();
             Serializer = serializer;
             RequestHandler = requestHandler;
             EndpointProvider = endpointProvider;
