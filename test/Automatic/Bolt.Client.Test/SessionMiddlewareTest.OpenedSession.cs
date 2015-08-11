@@ -27,7 +27,7 @@ namespace Bolt.Client.Test
                     (next, ctxt) =>
                     {
                         Callback.Object.Handle(ctxt);
-                        ctxt.Connection = DefaultDescriptor;
+                        ctxt.ServerConnection = DefaultDescriptor;
                         return next(ctxt);
                     });
 
@@ -104,13 +104,13 @@ namespace Bolt.Client.Test
             [Fact]
             public async Task Close_EnsureProperConnection()
             {
-                var connection = Pipeline.Find<SessionMiddleware>().Connection;
+                var connection = Pipeline.Find<SessionMiddleware>().ServerConnection;
                 Assert.NotNull(connection);
 
                 Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
                     c =>
                     {
-                        Assert.Equal(connection, c.Connection);
+                        Assert.Equal(connection, c.ServerConnection);
                     }).Verifiable();
 
                 await Proxy.CloseAsync();

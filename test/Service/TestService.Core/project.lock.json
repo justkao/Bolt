@@ -3,15 +3,7 @@
   "version": 1,
   "targets": {
     "DNX,Version=v4.5.1": {
-      "Castle.Core/3.3.3": {
-        "compile": {
-          "lib/net45/Castle.Core.dll": {}
-        },
-        "runtime": {
-          "lib/net45/Castle.Core.dll": {}
-        }
-      },
-      "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12330": {
+      "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12335": {
         "frameworkAssemblies": [
           "Microsoft.CSharp",
           "mscorlib",
@@ -25,7 +17,7 @@
           "lib/dnx451/Microsoft.Dnx.Runtime.Abstractions.dll": {}
         }
       },
-      "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta7-12330": {
+      "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta7-12335": {
         "frameworkAssemblies": [
           "Microsoft.CSharp",
           "mscorlib",
@@ -50,51 +42,28 @@
     }
   },
   "libraries": {
-    "Castle.Core/3.3.3": {
-      "sha512": "tvVrLbHhtAGubUUDbEkH9JlivdlJOTI25u3hlyHpPxuJdTVi/yVQKWCYvGpafGPm7G1ibdWj4brqhtSQkAmN+g==",
-      "files": [
-        "ASL - Apache Software Foundation License.txt",
-        "BreakingChanges.txt",
-        "Castle.Core.3.3.3.nupkg",
-        "Castle.Core.3.3.3.nupkg.sha512",
-        "Castle.Core.nuspec",
-        "Changes.txt",
-        "lib/net35/Castle.Core.dll",
-        "lib/net35/Castle.Core.xml",
-        "lib/net40-client/Castle.Core.dll",
-        "lib/net40-client/Castle.Core.xml",
-        "lib/net45/Castle.Core.dll",
-        "lib/net45/Castle.Core.xml",
-        "lib/sl4/Castle.Core.dll",
-        "lib/sl4/Castle.Core.xml",
-        "lib/sl5/Castle.Core.dll",
-        "lib/sl5/Castle.Core.xml",
-        "License.txt",
-        "readme.txt"
-      ]
-    },
-    "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12330": {
+    "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12335": {
       "serviceable": true,
-      "sha512": "qX+EWZ8S0BzkM3aUkGFAcqHiNPGJorRkFyQZpXaCCpwl4K4Zjp0wEibW7QlIAZPlLByIKBSRH/rKZT+olsOw6Q==",
+      "sha512": "Rx8ixaGJatLp8gyUJfoYvP8JZoXytbhLo0ACWGA99geiYf2yohghFvSXUUv5X5WDzUCm+HDWefWGnjawGbsHGg==",
       "files": [
         "lib/dnx451/Microsoft.Dnx.Runtime.Abstractions.dll",
         "lib/dnx451/Microsoft.Dnx.Runtime.Abstractions.xml",
         "lib/dnxcore50/Microsoft.Dnx.Runtime.Abstractions.dll",
         "lib/dnxcore50/Microsoft.Dnx.Runtime.Abstractions.xml",
-        "Microsoft.Dnx.Runtime.Abstractions.1.0.0-beta7-12330.nupkg",
-        "Microsoft.Dnx.Runtime.Abstractions.1.0.0-beta7-12330.nupkg.sha512",
+        "Microsoft.Dnx.Runtime.Abstractions.1.0.0-beta7-12335.nupkg",
+        "Microsoft.Dnx.Runtime.Abstractions.1.0.0-beta7-12335.nupkg.sha512",
         "Microsoft.Dnx.Runtime.Abstractions.nuspec"
       ]
     },
-    "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta7-12330": {
-      "sha512": "X0iB9ZlrcL7TNA5lr5ZRdCohp40OyIzuqA+zyBJHebGBMhc0S38o+2ahdFwOQyEWQzomotzfMWz9cx7yLU+6tA==",
+    "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta7-12335": {
+      "sha512": "oFC6hckDaYKGJrByOwFEkPZdPG89YUnXUqgfa1Lfr5fclSQEnFbtFRlpv0XmmRixz6hv6N0OfhNfNd0E7QKYYw==",
       "files": [
         "lib/dnx451/Microsoft.Framework.CommandLineUtils.Sources.dll",
         "lib/dnx451/Microsoft.Framework.CommandLineUtils.Sources.xml",
         "lib/dnxcore50/Microsoft.Framework.CommandLineUtils.Sources.dll",
         "lib/dnxcore50/Microsoft.Framework.CommandLineUtils.Sources.xml",
-        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta7-12330.nupkg",
-        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta7-12330.nupkg.sha512",
+        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta7-12335.nupkg",
+        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta7-12335.nupkg.sha512",
         "Microsoft.Framework.CommandLineUtils.Sources.nuspec",
         "shared/AnsiConsole.cs",
         "shared/CommandArgument.cs",

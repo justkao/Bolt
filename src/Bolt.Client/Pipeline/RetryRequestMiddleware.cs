@@ -50,7 +50,7 @@ namespace Bolt.Client.Pipeline
                     }
                 }
 
-                context.Connection = null;
+                context.ServerConnection = null;
                 tries++;
                 await Task.Delay(RetryDelay, context.RequestAborted);
             }

@@ -2,7 +2,7 @@ using System.Reflection;
 
 using Bolt.Core;
 
-namespace Bolt.Client
+namespace Bolt
 {
     public class BoltClientException : BoltException
     {

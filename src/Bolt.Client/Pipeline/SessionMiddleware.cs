@@ -32,7 +32,7 @@ namespace Bolt.Client.Pipeline
 
         public bool UseDistributedSession { get; set; }
 
-        public ConnectionDescriptor Connection { get; set; }
+        public ConnectionDescriptor ServerConnection { get; set; }
 
         public bool Recoverable { get; set; }
 
@@ -40,16 +40,16 @@ namespace Bolt.Client.Pipeline
 
         public override async Task Invoke(ClientActionContext context)
         {
-            if (Connection == null)
+            if (ServerConnection == null)
             {
-                Connection = await EnsureConnectionAsync(context);
+                ServerConnection = await EnsureConnectionAsync(context);
                 (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Open);
             }
 
             if (!UseDistributedSession)
             {
                 // we stick to active connection otherwise new connection will be picked using PickConnectionMiddleware
-                context.Connection = Connection;
+                context.ServerConnection = ServerConnection;
             }
 
             if (!Equals(context.Action, BoltFramework.DestroySessionAction))
@@ -68,7 +68,7 @@ namespace Bolt.Client.Pipeline
                             (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
                             break;
                         case ErrorHandlingResult.Recover:
-                            Connection = null;
+                            ServerConnection = null;
                             SessionId = null;
                             (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Uninitialized);
                             if (!Recoverable)
@@ -103,12 +103,13 @@ namespace Bolt.Client.Pipeline
 
                 try
                 {
+                    ClientSessionHandler.EnsureSession(context.Request, SessionId);
                     await Next(context);
                     DestroySessionResult = (DestroySessionResult)context.ActionResult;
                 }
                 finally
                 {
-                    Connection = null;
+                    ServerConnection = null;
                     SessionId = null;
                     (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
                 }
@@ -119,25 +120,18 @@ namespace Bolt.Client.Pipeline
         {
             if (context.Proxy.State == ProxyState.Open)
             {
-                return Connection;
+                return ServerConnection;
             }
 
             using (await _syncRoot.EnterAsync())
             {
                 if (context.Proxy.State == ProxyState.Open)
                 {
-                    return Connection;
+                    return ServerConnection;
                 }
 
                 InitSessionParameters initSessionParameters = InitSessionParameters ?? new InitSessionParameters();
-                ClientActionContext initSessionContext = new ClientActionContext(context)
-                                                             {
-                                                                 Connection = null,
-                                                                 Action = BoltFramework.InitSessionAction,
-                                                                 Parameters =
-                                                                     new[] { (object)initSessionParameters },
-                                                             };
-
+                ClientActionContext initSessionContext = new ClientActionContext(context.Proxy, context.Contract, BoltFramework.InitSessionAction, new[] {initSessionParameters});
                 using (initSessionContext)
                 {
                     try
@@ -153,7 +147,7 @@ namespace Bolt.Client.Pipeline
                                 initSessionContext.Request?.RequestUri?.ToString());
                         }
 
-                        if (initSessionContext.Connection == null)
+                        if (initSessionContext.ServerConnection == null)
                         {
                             throw new BoltClientException(
                                 ClientErrorCode.ConnectionUnavailable,
@@ -162,12 +156,12 @@ namespace Bolt.Client.Pipeline
                         }
 
                         InitSessionResult = (InitSessionResult)initSessionContext.ActionResult;
-                        Connection = initSessionContext.Connection;
+                        ServerConnection = initSessionContext.ServerConnection;
                         SessionId = sessionId;
                     }
                     catch (Exception e)
                     {
-                        Connection = null;
+                        ServerConnection = null;
                         SessionId = null;
 
                         ErrorHandlingResult handlingResult = ErrorHandling.Handle(initSessionContext, e);
@@ -188,7 +182,7 @@ namespace Bolt.Client.Pipeline
                     }
                 }
 
-                return Connection;
+                return ServerConnection;
             }
         }
     }

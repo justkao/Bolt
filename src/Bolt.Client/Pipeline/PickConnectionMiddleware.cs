@@ -23,16 +23,12 @@ namespace Bolt.Client.Pipeline
 
         public override async Task Invoke(ClientActionContext context)
         {
-            if (context.Connection == null)
+            if (context.ServerConnection == null)
             {
-                ConnectionDescriptor serverUri = ServerProvider.GetServer();
-                context.Connection =
-                    new ConnectionDescriptor(EndpointProvider.GetEndpoint(serverUri.Server, context.Contract,
-                        context.Action));
+                context.ServerConnection = ServerProvider.GetServer();
             }
 
-            context.Request.RequestUri = context.Connection.Server;
-
+            context.Request.RequestUri = EndpointProvider.GetEndpoint(context.ServerConnection.Server, context.Contract, context.Action);
             try
             {
                 await Next(context);

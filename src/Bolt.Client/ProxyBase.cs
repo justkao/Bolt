@@ -9,6 +9,8 @@ namespace Bolt.Client
 {
     public abstract class ProxyBase : IProxy, IPipelineCallback
     {
+        private IPipeline<ClientActionContext> _pipeline;
+
         protected ProxyBase()
         {
         }
@@ -19,7 +21,7 @@ namespace Bolt.Client
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
 
             Contract = contract;
-            Pipeline = pipeline;
+            _pipeline = pipeline;
         }
 
         protected ProxyBase(ProxyBase proxy)
@@ -30,7 +32,7 @@ namespace Bolt.Client
             }
 
             Contract = proxy.Contract;
-            Pipeline = proxy.Pipeline;
+            _pipeline = proxy.Pipeline;
             State = proxy.State;
         }
 
@@ -38,7 +40,20 @@ namespace Bolt.Client
 
         public ProxyState State { get; private set; }
 
-        protected IPipeline<ClientActionContext> Pipeline { get; set; }
+        protected IPipeline<ClientActionContext> Pipeline
+        {
+            get
+            {
+                if (_pipeline == null)
+                {
+                    throw new ProxyClosedException();
+                }
+
+                return _pipeline;
+            }
+
+            set { _pipeline = value; }
+        }
 
         public async Task OpenAsync()
         {
@@ -83,8 +98,8 @@ namespace Bolt.Client
                 this.Close();
             }
 
-            Pipeline?.Dispose();
-            Pipeline = null;
+            _pipeline?.Dispose();
+            _pipeline = null;
         }
 
         void IPipelineCallback.ChangeState(ProxyState newState)

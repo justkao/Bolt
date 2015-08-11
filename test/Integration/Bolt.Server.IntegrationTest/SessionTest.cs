@@ -41,7 +41,11 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public async Task Async_RecoverProxy_EnsureNewSession()
         {
-            var pipeline = CreatePipeline();
+            Mock<IErrorHandling> errorHandling = new Mock<IErrorHandling>();
+            errorHandling.Setup(e => e.Handle(It.IsAny<ClientActionContext>(), It.IsAny<Exception>()))
+                .Returns(ErrorHandlingResult.Recover);
+
+            var pipeline = CreatePipeline(1, errorHandling.Object);
             var session = pipeline.Find<SessionMiddleware>();
             var client = GetChannel(pipeline);
 
@@ -77,7 +81,11 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public async Task Async_SessionNotFound_RetriesEnabled_EnsureNewSession()
         {
-            var pipeline = CreatePipeline(1);
+            Mock<IErrorHandling> errorHandling = new Mock<IErrorHandling>();
+            errorHandling.Setup(e => e.Handle(It.IsAny<ClientActionContext>(), It.IsAny<Exception>()))
+                .Returns(ErrorHandlingResult.Recover);
+
+            var pipeline = CreatePipeline(1, errorHandling.Object);
             var session = pipeline.Find<SessionMiddleware>();
             var client = GetChannel(pipeline);
 
@@ -105,7 +113,11 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public void RecoverProxy_EnsureNewSession()
         {
-            var pipeline = CreatePipeline();
+            Mock<IErrorHandling> errorHandling = new Mock<IErrorHandling>();
+            errorHandling.Setup(e => e.Handle(It.IsAny<ClientActionContext>(), It.IsAny<Exception>()))
+                .Returns(ErrorHandlingResult.Recover);
+
+            var pipeline = CreatePipeline(1, errorHandling.Object);
             var session = pipeline.Find<SessionMiddleware>();
             var client = GetChannel(pipeline);
 
@@ -483,12 +495,12 @@ namespace Bolt.Server.IntegrationTest
             return new TestContractStateFullProxy(pipeline ?? CreatePipeline());
         }
 
-        protected IPipeline<ClientActionContext> CreatePipeline(int recoveries = 0)
+        protected IPipeline<ClientActionContext> CreatePipeline(int recoveries = 0, IErrorHandling errorHandling = null)
         {
-            var builder = ClientConfiguration.ProxyBuilder().Url(ServerUrl).UseSession();
+            var builder = ClientConfiguration.ProxyBuilder().Url(ServerUrl).UseSession(errorHandling: errorHandling);
             if (recoveries > 0)
             {
-                builder.Recoverable(recoveries, TimeSpan.FromMilliseconds(10));
+                builder.Recoverable(recoveries, TimeSpan.FromMilliseconds(10), errorHandling);
             }
 
             return builder.BuildPipeline<ITestContractStateFull>();

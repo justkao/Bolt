@@ -24,7 +24,7 @@ namespace Bolt.Client.Test
                     (next, ctxt) =>
                         {
                             Callback.Object.Handle(ctxt);
-                            ctxt.Connection = DefaultDescriptor;
+                            ctxt.ServerConnection = DefaultDescriptor;
                             return next(ctxt);
                         });
 

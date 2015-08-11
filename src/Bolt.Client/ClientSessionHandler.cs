@@ -30,6 +30,11 @@ namespace Bolt.Client.Channels
                 {
                     request.Headers.Add(_options.SessionHeader, session);
                 }
+                else
+                {
+                    request.Headers.Remove(_options.SessionHeader);
+                    request.Headers.Add(_options.SessionHeader, session);
+                }
             }
         }
 

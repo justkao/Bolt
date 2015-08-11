@@ -14,7 +14,7 @@ namespace Bolt.Server.IntegrationTest
 
         public override ITestContractAsync CreateChannel(IPipeline<ClientActionContext> pipeline = null)
         {
-            return ClientConfiguration.CreateProxy<ITestContractAsync>(ServerUrl);
+            return ClientConfiguration.ProxyFactory.CreateProxy<ITestContractAsync>(pipeline ?? CreatePipeline());
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Bolt.Client
     /// </summary>
     public class ProxyClosedException : BoltException
     {
-        public ProxyClosedException()
+        public ProxyClosedException() : base("Proxy is already closed.")
         {
         }
 

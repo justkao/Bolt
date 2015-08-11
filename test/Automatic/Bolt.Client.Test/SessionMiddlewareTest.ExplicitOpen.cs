@@ -51,7 +51,7 @@ namespace Bolt.Client.Test
                         {
                             Assert.Equal(BoltFramework.InitSessionAction, ctxt.Action);
                             ctxt.ActionResult = result;
-                            ctxt.Connection = DefaultDescriptor;
+                            ctxt.ServerConnection = DefaultDescriptor;
                             return next(ctxt);
                         });
 
@@ -61,7 +61,7 @@ namespace Bolt.Client.Test
 
                 await proxy.OpenAsync();
 
-                Assert.Equal(DefaultDescriptor, pipeline.Find<SessionMiddleware>().Connection);
+                Assert.Equal(DefaultDescriptor, pipeline.Find<SessionMiddleware>().ServerConnection);
                 Assert.Equal(result, pipeline.Find<SessionMiddleware>().InitSessionResult);
                 Assert.Equal(ProxyState.Open, ProxyState.Open);
                 SessionHandler.Verify();
@@ -77,7 +77,7 @@ namespace Bolt.Client.Test
                 var pipeline = CreatePipeline(
                     (next, ctxt) =>
                         {
-                            ctxt.Connection = descriptor;
+                            ctxt.ServerConnection = descriptor;
                             ctxt.ActionResult = result;
                             return next(ctxt);
                         });
@@ -131,7 +131,7 @@ namespace Bolt.Client.Test
                 IPipeline<ClientActionContext> pipeline = CreatePipeline(
                     (next, ctxt) =>
                         {
-                            ctxt.Connection = DefaultDescriptor;
+                            ctxt.ServerConnection = DefaultDescriptor;
                             return next(ctxt);
                         });
 

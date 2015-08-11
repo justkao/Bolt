@@ -27,9 +27,9 @@ namespace Bolt.Client
             _configuration = configuration;
         }
 
-        public virtual ProxyBuilder Recoverable(int retries, TimeSpan retryDelay)
+        public virtual ProxyBuilder Recoverable(int retries, TimeSpan retryDelay, IErrorHandling errorHandling = null)
         {
-            _retryRequest = new RetryRequestMiddleware(_configuration.ErrorHandling)
+            _retryRequest = new RetryRequestMiddleware(errorHandling ?? _configuration.ErrorHandling)
             {
                 Retries = retries,
                 RetryDelay = retryDelay

@@ -11,15 +11,6 @@ namespace Bolt.Client
     /// </summary>
     public class ClientActionContext : ActionContextBase
     {
-        public ClientActionContext(ClientActionContext context) : base(context)
-        {
-            Request = context.Request;
-            Response = context.Response;
-            Connection = context.Connection;
-            ErrorResult = context.ErrorResult;
-            Proxy = context.Proxy;
-        }
-
         public ClientActionContext(IProxy proxy, Type contract, MethodInfo action, object[] parameters)
             : base(contract, action, parameters)
         {
@@ -31,7 +22,7 @@ namespace Bolt.Client
             }
         }
 
-        public ConnectionDescriptor Connection { get; set; }
+        public ConnectionDescriptor ServerConnection { get; set; }
 
         /// <summary>
         /// The raw <see cref="HttpRequestMessage"/>.

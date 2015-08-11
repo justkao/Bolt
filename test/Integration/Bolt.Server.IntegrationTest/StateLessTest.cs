@@ -332,9 +332,10 @@ namespace Bolt.Server.IntegrationTest
         public void LongOperation_TimeoutSet_EnsureCallTimeouted()
         {
             IPipeline<ClientActionContext> pipeline = CreatePipeline();
+            pipeline.Find<CommunicationMiddleware>().ResponseTimeout = TimeSpan.FromSeconds(0.1);
+
             ITestContractAsync client = CreateChannel(pipeline);
 
-            pipeline.Find<CommunicationMiddleware>().ResponseTimeout= TimeSpan.FromSeconds(0.1);
             CompositeType arg = CompositeType.CreateRandom();
 
             Mock<ITestContract> server = Server();

@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Core;
+using Bolt.Pipeline;
 using Moq;
 using Xunit;
 
@@ -22,43 +23,43 @@ namespace Bolt.Client.Proxy.Test
         [Fact]
         public void Create_EnsureDerivesFromContractProxy()
         {
+            Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
             ProxyFactory factory = Create();
 
-            Mock<IProxy> contract = new Mock<IProxy>();
-
-            ITestContract proxy = factory.CreateProxy<ITestContract>(contract.Object);
-            Assert.True(proxy is ContractProxy);
+            ITestContract proxy = factory.CreateProxy<ITestContract>(pipeline.Object);
+            Assert.True(proxy is ProxyBase);
         }
 
         [Fact]
         public void Create_EnsureIsChannel()
         {
             ProxyFactory factory = Create();
+            Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
+            ITestContract proxy = factory.CreateProxy<ITestContract>(pipeline.Object);
 
-            Mock<IProxy> contract = new Mock<IProxy>();
-
-            ITestContract proxy = factory.CreateProxy<ITestContract>(contract.Object);
             Assert.True(proxy is IProxy);
         }
 
         [Fact]
-        public void ExecuteAction_EnsureChannelCalled()
+        public void ExecuteMethod_EnsureChannelCalled()
         {
             ProxyFactory factory = Create();
-            
-            Mock<IProxy> contract = new Mock<IProxy>();
-            var contractType = typeof (ITestContract);
-            var resultType = typeof(void);
 
-            contract.Setup(c => c.Serializer).Returns(new JsonSerializer());
-            contract.Setup(
-                c => c.Send(contractType, Action, resultType, null, CancellationToken.None))
-                .Verifiable();
+            Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
+            pipeline.Setup(p => p.Instance).Returns((ctxt) =>
+            {
+                ctxt.ActionResult = "some value";
+                Assert.Equal(MethodWithParameters, ctxt.Action);
+                Assert.Equal("val", ctxt.Parameters[0]);
+                Assert.Equal(10, ctxt.Parameters[1]);
+                Assert.Equal(CancellationToken.None, ctxt.Parameters[2]);
 
-            ITestContract proxy = factory.CreateProxy<ITestContract>(contract.Object);
-            proxy.Action();
+                return Task.FromResult(0);
+            });
 
-            contract.Verify();
+            ITestContract proxy = factory.CreateProxy<ITestContract>(pipeline.Object);
+            proxy.MethodWithParameters("val", 10, CancellationToken.None);
+            pipeline.Verify();
         }
 
         [Fact]
@@ -66,19 +67,17 @@ namespace Bolt.Client.Proxy.Test
         {
             ProxyFactory factory = Create();
 
-            Mock<IProxy> contract = new Mock<IProxy>();
-            var contractType = typeof(ITestContract);
-            var resultType = typeof(void);
+            Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
+            pipeline.Setup(p => p.Instance).Returns((ctxt) =>
+            {
+                ctxt.ActionResult = "some value";
+                Assert.Equal(AsyncMethod, ctxt.Action);
+                return Task.FromResult(0);
+            });
 
-            contract.Setup(c => c.Serializer).Returns(new JsonSerializer());
-            contract.Setup(
-                c => c.SendAsync(contractType, AsyncMethod, resultType, null, CancellationToken.None)).Returns(Task.FromResult((object)Empty.Instance))
-                .Verifiable();
-
-            ITestContract proxy = factory.CreateProxy<ITestContract>(contract.Object);
+            ITestContract proxy = factory.CreateProxy<ITestContract>(pipeline.Object);
             await proxy.AsyncMethod();
-
-            contract.Verify();
+            pipeline.Verify();
         }
 
         [Fact]
@@ -86,19 +85,17 @@ namespace Bolt.Client.Proxy.Test
         {
             ProxyFactory factory = Create();
 
-            Mock<IProxy> contract = new Mock<IProxy>();
-            var contractType = typeof(ITestContract);
-            var resultType = typeof(string);
+            Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
+            pipeline.Setup(p => p.Instance).Returns((ctxt) =>
+            {
+                ctxt.ActionResult = "some value";
+                Assert.Equal(Function, ctxt.Action);
+                return Task.FromResult(0);
+            });
 
-            contract.Setup(c => c.Serializer).Returns(new JsonSerializer());
-            contract.Setup(
-                c => c.Send(contractType, Function, resultType, null, CancellationToken.None))
-                .Returns("some value")
-                .Verifiable();
-
-            ITestContract proxy = factory.CreateProxy<ITestContract>(contract.Object);
+            ITestContract proxy = factory.CreateProxy<ITestContract>(pipeline.Object);
             string result = proxy.Function();
-            contract.Verify();
+            pipeline.Verify();
 
             Assert.Equal("some value", result);
         }
@@ -108,58 +105,19 @@ namespace Bolt.Client.Proxy.Test
         {
             ProxyFactory factory = Create();
 
-            Mock<IProxy> contract = new Mock<IProxy>(MockBehavior.Strict);
-            var contractType = typeof(ITestContract);
-            var resultType = typeof(int);
+            Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
+            pipeline.Setup(p => p.Instance).Returns((ctxt) =>
+            {
+                ctxt.ActionResult = 10;
+                Assert.Equal(AsyncFunction, ctxt.Action);
+                return Task.FromResult(0);
+            });
 
-            contract.Setup(c => c.Serializer).Returns(new JsonSerializer());
-            contract.Setup(
-                c => c.SendAsync(contractType, AsyncFunction, resultType, null, CancellationToken.None))
-                .Returns(() => Task.FromResult((object) 99))
-                .Verifiable();
+            ITestContract proxy = factory.CreateProxy<ITestContract>(pipeline.Object);
+            int result = await proxy.AsyncFunction();
+            pipeline.Verify();
 
-            ITestContract proxy = factory.CreateProxy<ITestContract>(contract.Object);
-            var result = await proxy.AsyncFunction();
-            contract.Verify();
-
-            Assert.Equal(99, result);
-        }
-
-        [Fact]
-        public async Task ExecuteMethodWithParameters_EnsureSerialized()
-        {
-            ProxyFactory factory = Create();
-
-            Mock<IObjectSerializer> objectSerializer = new Mock<IObjectSerializer>(MockBehavior.Strict);
-            Mock<ISerializer> jsonSerializer = new Mock<ISerializer>(MockBehavior.Strict);
-            jsonSerializer.Setup(s => s.CreateSerializer()).Returns(objectSerializer.Object);
-
-            Mock<IProxy> contract = new Mock<IProxy>(MockBehavior.Strict);
-
-            var contractType = typeof (ITestContract);
-            var resultType = typeof (void);
-
-            string param1 = "val";
-            int param2 = 10;
-            CancellationToken cancellationToken = new CancellationTokenSource().Token;
-
-            objectSerializer.Setup(s => s.Write(nameof(param1), typeof (string), param1)).Verifiable();
-            objectSerializer.Setup(s => s.Write(nameof(param2), typeof (int), param2)).Verifiable();
-
-            contract.Setup(c => c.Serializer).Returns(jsonSerializer.Object);
-            contract.Setup(
-                c =>
-                    c.Send(contractType, MethodWithParameters, resultType, objectSerializer.Object,
-                        cancellationToken)).Returns(true)
-                .Verifiable();
-
-            ITestContract proxy = factory.CreateProxy<ITestContract>(contract.Object);
-
-            proxy.MethodWithParameters(param1, param2, cancellationToken);
-
-            contract.Verify();
-            objectSerializer.Verify();
-            jsonSerializer.Verify();
+            Assert.Equal(10, result);
         }
 
         public interface ITestContract
