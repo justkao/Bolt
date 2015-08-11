@@ -57,7 +57,7 @@ namespace Bolt.Client
 
         public async Task OpenAsync()
         {
-            using (ClientActionContext ctxt = new ClientActionContext(this, Contract, BoltFramework.InitSessionAction, new object[] { null }))
+            using (ClientActionContext ctxt = new ClientActionContext(this, Contract, BoltFramework.GetSessionDescriptor(Contract).InitSession, new object[] { null }))
             {
                 await Pipeline.Instance(ctxt);
                 State = ProxyState.Open;
@@ -68,7 +68,7 @@ namespace Bolt.Client
         {
             if (State == ProxyState.Open)
             {
-                using (ClientActionContext ctxt = new ClientActionContext(this, Contract, BoltFramework.DestroySessionAction, new object[] { null }))
+                using (ClientActionContext ctxt = new ClientActionContext(this, Contract, BoltFramework.GetSessionDescriptor(Contract).DestroySession, new object[] { null }))
                 {
                     await Pipeline.Instance(ctxt);
                     State = ProxyState.Closed;

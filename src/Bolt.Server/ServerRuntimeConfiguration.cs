@@ -1,5 +1,5 @@
-﻿using Bolt.Server.InstanceProviders;
-using System;
+﻿using System;
+using Bolt.Server.Pipeline;
 
 namespace Bolt.Server
 {
@@ -20,39 +20,18 @@ namespace Bolt.Server
             ExceptionWrapper = other.ExceptionWrapper;
             Options = other.Options;
             ErrorHandler = other.ErrorHandler;
-            ResponseHandler = other.ResponseHandler;
-            ParameterHandler = other.ParameterHandler;
+            ErrorProvider = other.ErrorProvider;
         }
 
-        /// <summary>
-        /// Gets or sets <see cref="ISerializer"/> assigned to current context.
-        /// </summary>
         public ISerializer Serializer { get; set; }
 
-        /// <summary>
-        /// Gets or sets <see cref="ISerializer"/> assigned to current context.
-        /// </summary>
         public IExceptionWrapper ExceptionWrapper { get; set; }
 
-        /// <summary>
-        /// Gets or sets <see cref="BoltServerOptions"/> assigned to current context.
-        /// </summary>
         public BoltServerOptions Options { get; set; }
 
-        /// <summary>
-        /// Gets or sets <see cref="BoltServerOptions"/> assigned to current context.
-        /// </summary>
         public IServerErrorHandler ErrorHandler { get; set; }
 
-        /// <summary>
-        /// Gets or sets <see cref="IResponseHandler"/> assigned to current context.
-        /// </summary>
-        public IResponseHandler ResponseHandler { get; set; }
-
-        /// <summary>
-        /// Gets or sets <see cref="IParameterHandler"/> assigned to current context.
-        /// </summary>
-        public IParameterHandler ParameterHandler { get; set; }
+        public IServerErrorProvider ErrorProvider { get; set; }
 
         public void Merge(ServerRuntimeConfiguration other)
         {
@@ -80,14 +59,6 @@ namespace Bolt.Server
             if (other.Serializer != null)
             {
                 Serializer = other.Serializer;
-            }
-            if (other.ResponseHandler != null)
-            {
-                ResponseHandler = other.ResponseHandler;
-            }
-            if (other.ParameterHandler != null)
-            {
-                ParameterHandler = other.ParameterHandler;
             }
         }
     }

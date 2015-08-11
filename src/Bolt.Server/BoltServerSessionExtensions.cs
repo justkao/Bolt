@@ -13,7 +13,7 @@ namespace Bolt.Session
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
             ServerActionContext ctxt = (ServerActionContext) context;
-            ISerializer serializer = ctxt.HttpContext.GetFeature<IBoltFeature>().Configuration.Serializer;
+            ISerializer serializer = ctxt.HttpContext.GetFeature<IBoltFeature>().ActionContext.Configuration.Serializer;
 
             return parameters.Read<T>(serializer, key);
         }
@@ -25,7 +25,7 @@ namespace Bolt.Session
             if (string.IsNullOrEmpty(key)) throw new ArgumentNullException(nameof(key));
 
             ServerActionContext ctxt = (ServerActionContext)context;
-            ISerializer serializer = ctxt.HttpContext.GetFeature<IBoltFeature>().Configuration.Serializer;
+            ISerializer serializer = ctxt.HttpContext.GetFeature<IBoltFeature>().ActionContext.Configuration.Serializer;
             parameters.Write(serializer, key, value);
         }
     }

@@ -1,9 +1,8 @@
 ﻿using System;
-
 using Bolt;
 using Bolt.Server;
-using Bolt.Server.Filters;
 using Bolt.Server.Metadata;
+using Bolt.Server.Pipeline;
 using Bolt.Server.Session;
 using Bolt.Session;
 
@@ -25,21 +24,17 @@ namespace Microsoft.Framework.DependencyInjection
 
             services.AddTransient<ISerializer, JsonSerializer>();
             services.AddTransient<IExceptionWrapper, JsonExceptionWrapper>();
-            services.AddTransient<IResponseHandler, ResponseHandler>();
             services.AddTransient<IBoltRouteHandler, BoltRouteHandler>();
-            services.AddTransient<IServerErrorHandler, ServerErrorHandler>();
+            services.AddTransient<IServerErrorHandler, HandleErrorMiddleware>();
             services.AddTransient<IBoltMetadataHandler, BoltMetadataHandler>();
-            services.AddTransient<IFilterProvider, DefaultFilterProvider>();
             services.AddTransient<IContractInvoker, ContractInvoker>();
-            services.AddTransient<IActionInvoker, ActionInvoker>();
             services.AddTransient<IActionResolver, ActionResolver>();
             services.AddTransient<IContractResolver, ContractResolver>();
-            services.AddTransient<IParameterHandler, ParameterHandler>();
-            services.AddTransient<ISessionHandler, SessionHandler>();
             services.AddTransient<IServerSessionHandler, ServerSessionHandler>();
             services.AddTransient<ISessionProvider, HttpContextSessionProvider>();
             services.AddTransient<IHttpSessionProvider, HttpContextSessionProvider>();
             services.AddSingleton<IContractInvokerFactory, ContractInvokerFactory>();
+            services.AddSingleton<IServerPipelineBuilder, ServerPipelineBuilder>();
 
             return services;
         }

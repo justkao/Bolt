@@ -1,20 +1,18 @@
 using System;
+using Bolt.Server.Pipeline;
 
 namespace Bolt.Server
 {
     public class ContractInvokerFactory : IContractInvokerFactory
     {
-        private readonly IActionInvoker _actionInvoker;
-
-        public ContractInvokerFactory(IActionInvoker actionInvoker)
+        public ContractInvokerFactory(IServerPipelineBuilder pipelineBuilder)
         {
-            if (actionInvoker == null)
-            {
-                throw new ArgumentNullException(nameof(actionInvoker));
-            }
+            if (pipelineBuilder == null) throw new ArgumentNullException(nameof(pipelineBuilder));
 
-            _actionInvoker = actionInvoker;
+            PipelineBuilder = pipelineBuilder;
         }
+
+        public IServerPipelineBuilder PipelineBuilder { get; }
 
         public IContractInvoker Create(Type contract, IInstanceProvider instanceProvider)
         {
@@ -30,7 +28,7 @@ namespace Bolt.Server
 
             BoltFramework.ValidateContract(contract);
 
-            ContractInvoker invoker = new ContractInvoker(_actionInvoker) { Contract = contract, InstanceProvider = instanceProvider };
+            ContractInvoker invoker = new ContractInvoker(PipelineBuilder.Build(contract)) { Contract = contract, InstanceProvider = instanceProvider };
             return invoker;
         }
     }

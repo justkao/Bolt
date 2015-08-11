@@ -1,8 +1,8 @@
 ﻿using System;
+using Bolt.Server.Pipeline;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;
-using Bolt.Server.InstanceProviders;
 
 namespace Bolt.Server
 {
@@ -33,10 +33,9 @@ namespace Bolt.Server
 
             options.Options = _provider.GetRequiredService<IOptions<BoltServerOptions>>().Options;
             options.ErrorHandler = _provider.GetRequiredService<IServerErrorHandler>();
-            options.ResponseHandler = _provider.GetRequiredService<IResponseHandler>();
             options.Serializer = _provider.GetRequiredService<ISerializer>();
             options.ExceptionWrapper = _provider.GetRequiredService<IExceptionWrapper>();
-            options.ParameterHandler = _provider.GetRequiredService<IParameterHandler>();
+            options.ErrorProvider = _provider.GetRequiredService<IServerErrorProvider>();
         }
     }
 }

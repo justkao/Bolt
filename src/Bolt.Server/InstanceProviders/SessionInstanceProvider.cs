@@ -20,12 +20,11 @@ namespace Bolt.Server.InstanceProviders
             _sessionFactory = factory;
         }
 
-
         public sealed override async Task<object> GetInstanceAsync(ServerActionContext context, Type type)
         {
             IContractSession contractSession;
 
-            if (context.Action == BoltFramework.InitSessionAction)
+            if (context.Action == context.SessionContract.InitSession)
             {
                 contractSession = await _sessionFactory.CreateAsync(context.HttpContext, await base.GetInstanceAsync(context, type));
                 context.ContractInstance = contractSession.Instance;
@@ -48,7 +47,7 @@ namespace Bolt.Server.InstanceProviders
                 return;
             }
 
-            if (context.Action == BoltFramework.InitSessionAction)
+            if (context.Action == context.SessionContract.InitSession)
             {
                 if (error != null)
                 {
@@ -66,7 +65,7 @@ namespace Bolt.Server.InstanceProviders
                     }
                 }
             }
-            else if (context.Action == BoltFramework.DestroySessionAction)
+            else if (context.Action == context.SessionContract.DestroySession)
             {
                 await session.DestroyAsync();
                 await OnInstanceReleasedAsync(context, session.SessionId);

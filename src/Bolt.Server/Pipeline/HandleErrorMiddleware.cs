@@ -3,20 +3,67 @@ using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using Bolt.Common;
-using Microsoft.AspNet.Http;
+using Bolt.Pipeline;
 
-namespace Bolt.Server
+namespace Bolt.Server.Pipeline
 {
-    public class ServerErrorHandler : IServerErrorHandler
+    public interface IServerErrorProvider
     {
+        BoltServerException TryCreate(ServerActionContext context, Exception error);
+    }
+
+    public class ServerErrorProvider : IServerErrorProvider
+    {
+        public BoltServerException TryCreate(ServerActionContext context, Exception error)
+        {
+            if (error is DeserializeParametersException)
+            {
+                return new BoltServerException(ServerErrorCode.Deserialization,  context.Action, context.RequestUrl);
+            }
+
+            if (error is SerializeParametersException)
+            {
+                return new BoltServerException(ServerErrorCode.Serialization, context.Action, context.RequestUrl);
+            }
+
+            if (error is SessionHeaderNotFoundException)
+            {
+                return new BoltServerException(ServerErrorCode.NoSessionHeader, context.Action, context.RequestUrl);
+            }
+
+            if (error is SessionNotFoundException)
+            {
+                return new BoltServerException(ServerErrorCode.SessionNotFound, context.Action, context.RequestUrl);
+            }
+
+            return null;
+        }
+    }
+
+    public class HandleErrorMiddleware : MiddlewareBase<ServerActionContext>
+    {
+        public override async Task Invoke(ServerActionContext context)
+        {
+            try
+            {
+                await Next(context);
+            }
+            catch (Exception e)
+            {
+                BoltServerException serverError = context.Configuration.ErrorProvider.TryCreate(context, e);
+                if (serverError != null)
+                {
+                    Handle(context, serverError);
+                }
+            }
+        }
+
         public virtual Task HandleErrorAsync(HandleErrorContext context)
         {
             if (context == null)
             {
                 throw new ArgumentNullException(nameof(context));
             }
-
-            context.ActionContext.EnsureNotSend();
 
             if (context.ErrorCode != null)
             {
@@ -80,26 +127,20 @@ namespace Bolt.Server
             return false;
         }
 
-        protected virtual void CloseWithError(HttpContext context, ServerErrorCode code, string errorHeader)
+        protected virtual void Handle(ServerActionContext actionContext, BoltServerException error)
         {
             int statusCode = 500;
 
-            switch (code)
+            var response = actionContext.HttpContext.Response;
+            response.StatusCode = statusCode;
+            if (error.ErrorCode != null)
             {
-                case ServerErrorCode.ActionNotFound:
-                case ServerErrorCode.ContractNotFound:
-                    statusCode = 404;
-                    break;
+                response.Headers[Options.Options.ServerErrorHeader] = error.ErrorCode.Value.ToString(CultureInfo.InvariantCulture);
             }
-
-            context.Response.StatusCode = statusCode;
-            context.Response.Headers[errorHeader] = code.ToString();
-        }
-
-        protected virtual void CloseWithError(HttpContext context, int code, string errorHeader)
-        {
-            context.Response.StatusCode = 500;
-            context.Response.Headers[errorHeader] = code.ToString(CultureInfo.InvariantCulture);
+            else if (error.Error != null)
+            {
+                response.Headers[Options.Options.ServerErrorHeader] = error.Error.Value.ToString();
+            }
         }
 
         protected virtual Task WriteExceptionAsync(HandleErrorContext context)
@@ -129,5 +170,7 @@ namespace Bolt.Server
 
             return raw.CopyToAsync(httpContext.Response.Body, 4096, httpContext.RequestAborted);
         }
+
+
     }
 }

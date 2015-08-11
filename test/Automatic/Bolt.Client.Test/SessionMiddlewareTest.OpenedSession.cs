@@ -1,14 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-using System.Net.Http;
-using System.Threading.Tasks;
-
+﻿using System.Threading.Tasks;
 using Bolt.Client.Pipeline;
 using Bolt.Pipeline;
-using Bolt.Session;
-
 using Moq;
-
 using Xunit;
 
 namespace Bolt.Client.Test

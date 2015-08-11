@@ -1,32 +1,24 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-
-using Bolt.Server.Filters;
+using Bolt.Pipeline;
 
 namespace Bolt.Server
 {
     public class ContractInvoker : IContractInvoker
     {
-        private readonly IActionInvoker _actionInvoker;
-
-        public ContractInvoker(IActionInvoker actionInvoker)
+        public ContractInvoker(IPipeline<ServerActionContext> pipeline)
         {
-            if (actionInvoker == null)
-            {
-                throw new ArgumentNullException(nameof(actionInvoker));
-            }
+            if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
 
-            _actionInvoker = actionInvoker;
-            Filters = new List<IServerExecutionFilter>();
+            Pipeline = pipeline;
             Configuration = new ServerRuntimeConfiguration();
         }
+
+        public IPipeline<ServerActionContext> Pipeline { get; }
 
         public Type Contract { get; set; }
 
         public IInstanceProvider InstanceProvider { get; set; }
-
-        public IList<IServerExecutionFilter> Filters { get; set; }
 
         public ServerRuntimeConfiguration Configuration { get; }
 
@@ -37,30 +29,12 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(context));
             }
 
-            context.EnsureNotExecuted();
-
-            var feature = context.HttpContext.GetFeature<IBoltFeature>();
-            OverrideFeature(feature);
-
-            return _actionInvoker.InvokeAsync(context);
-        }
-
-        protected virtual void OverrideFeature(IBoltFeature feature)
-        {
-            if (feature.Configuration == null)
+            if (Configuration != null)
             {
-                feature.Configuration = Configuration;
+                context.Configuration.Merge(Configuration);
             }
-            else
-            {
-                if (Configuration != null)
-                {
-                    ServerRuntimeConfiguration copy = new ServerRuntimeConfiguration(feature.Configuration);
-                    copy.Merge(Configuration);
-                    feature.Configuration.Merge(copy);
-                }
-            }
+
+            return Pipeline.Instance(context);
         }
     }
-
 }

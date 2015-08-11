@@ -30,7 +30,7 @@ namespace Bolt.Client.Pipeline
             }
             finally
             {
-                if (proxyState == ProxyState.Open && context.Action == BoltFramework.DestroySessionAction)
+                if (proxyState == ProxyState.Open && context.Action == context.SessionContract.DestroySession)
                 {
                     (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
                 }

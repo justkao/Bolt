@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using Bolt.Server.Filters;
 using Microsoft.AspNet.Routing;
 
 namespace Bolt.Server
@@ -12,8 +10,6 @@ namespace Bolt.Server
         void Add(IContractInvoker contractInvoker);
 
         IContractInvoker Get(Type contract);
-
-        IList<IServerExecutionFilter> Filters { get; }
 
         IServiceProvider ApplicationServices { get; }
     }

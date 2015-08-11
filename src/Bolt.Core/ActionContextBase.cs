@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Common;
+using Bolt.Session;
 
 namespace Bolt
 {
@@ -56,6 +57,8 @@ namespace Bolt
         public bool HasSerializableActionResult => ResponseType != typeof (void);
 
         public string ContractName => this.GetContractName();
+
+        public SessionContractDescriptor SessionContract => BoltFramework.SessionContractDescriptorProvider.Resolve(Contract);
 
         public Type ResponseType
         {

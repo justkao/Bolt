@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Net.Http;
-
 using Bolt.Client.Pipeline;
 using Bolt.Pipeline;
-using Bolt.Session;
 
 namespace Bolt.Client
 {
@@ -38,17 +36,15 @@ namespace Bolt.Client
             return this;
         }
 
-        public virtual ProxyBuilder UseSession(Action<ConfigureSessionContext> configureSession = null, bool distributed = false, IErrorHandling errorHandling = null)
+        public virtual ProxyBuilder UseSession(ISessionCallback sessionCallback = null, bool distributed = false, IErrorHandling errorHandling = null)
         {
             _sessionMiddleware = new SessionMiddleware(
                 _configuration.SessionHandler,
                 errorHandling ?? _configuration.ErrorHandling)
             {
                 UseDistributedSession = distributed,
-                InitSessionParameters = new InitSessionParameters()
+                SessionCallback = sessionCallback
             };
-
-            configureSession?.Invoke(new ConfigureSessionContext(_configuration.Serializer, _sessionMiddleware.InitSessionParameters));
 
             return this;
         }

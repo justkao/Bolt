@@ -3,13 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-using Bolt.Server.Filters;
 using Bolt.Server.Metadata;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
-using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;
 
@@ -51,14 +50,11 @@ namespace Bolt.Server
 
             Logger = factory.CreateLogger<BoltRouteHandler>();
             MetadataHandler = metadataHandler;
-            Filters = new List<IServerExecutionFilter>();
             ApplicationServices = applicationServices;
             Configuration = defaultConfiguration.Options;
             _actionResolver = actionResolver;
             _contractResolver = contractResolver;
         }
-
-        public IList<IServerExecutionFilter> Filters { get; }
 
         public IServiceProvider ApplicationServices { get; }
 
@@ -106,16 +102,13 @@ namespace Bolt.Server
             return GetEnumerator();
         }
 
-        public virtual async Task RouteAsync(RouteContext context)
+        public virtual async Task RouteAsync(RouteContext routeContext)
         {
-            IBoltFeature feature = AssignBoltFeature(context.HttpContext,
-                new ServerActionContext()
-                {
-                    HttpContext = context.HttpContext,
-                    RouteContext = context
-                });
+            ServerActionContext actionContext = new ServerActionContext(routeContext);
+            actionContext.Configuration = new ServerRuntimeConfiguration(Configuration);
+            AssignBoltFeature(actionContext);
 
-            var path = context.HttpContext.Request.Path;
+            var path = routeContext.HttpContext.Request.Path;
             if (!string.IsNullOrEmpty(Options.Prefix))
             {
                 if (!path.StartsWithSegments(new PathString("/" + Options.Prefix), out path))
@@ -131,7 +124,7 @@ namespace Bolt.Server
             {
                 if (!string.IsNullOrEmpty(Options.Prefix))
                 {
-                    await HandleBoltRootAsync(context);
+                    await HandleBoltRootAsync(routeContext);
                 }
 
                 return;
@@ -143,62 +136,48 @@ namespace Bolt.Server
                 if (!string.IsNullOrEmpty(Options.Prefix))
                 {
                     Logger.LogWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", result[0], path);
-
-                    // we have defined bolt prefix, report error about contract not found
-                    await feature.Configuration.ErrorHandler.HandleErrorAsync(new HandleErrorContext
-                    {
-                        Options = feature.Configuration.Options,
-                        ExceptionWrapper = feature.Configuration.ExceptionWrapper,
-                        ActionContext = feature.ActionContext,
-                        Serializer = feature.Configuration.Serializer,
-                        ErrorCode = ServerErrorCode.ContractNotFound
-                    });
-
-                    context.IsHandled = true;
+                    actionContext.HttpContext.Response.StatusCode = (int) HttpStatusCode.NotFound;
+                    actionContext.HttpContext.Response.Headers.Set(Options.ServerErrorHeader, ServerErrorCode.ContractNotFound.ToString());
+                    routeContext.IsHandled = true;
                 }
 
                 // just pass to next middleware in chain
                 return;
             }
 
-            feature.ActionContext.ContractInvoker = found;
+            actionContext.ContractInvoker = found;
+            actionContext.Contract = found.Contract;
 
             if (result.Length == 1)
             {
                 if (!string.IsNullOrEmpty(Options.Prefix))
                 {
-                    await HandleContractRootAsync(context, found);
+                    await HandleContractRootAsync(routeContext, found);
                 }
 
                 return;
             }
 
             // at this point Bolt will handle the request
-            context.IsHandled = true;
+            routeContext.IsHandled = true;
             var actionName = result[1];
-            var actionDescriptor = FindAction(feature.ActionContext, actionName);
+            var actionDescriptor = FindAction(actionContext, actionName);
             if (actionDescriptor == null)
             {
-                await feature.Configuration.ErrorHandler.HandleErrorAsync(new HandleErrorContext
-                {
-                    Options = feature.Configuration.Options,
-                    ExceptionWrapper = feature.Configuration.ExceptionWrapper,
-                    ActionContext = feature.ActionContext,
-                    Serializer = feature.Configuration.Serializer,
-                    ErrorCode = ServerErrorCode.ActionNotFound
-                });
+                Logger.LogWarning(BoltLogId.ContractNotFound, "Action with name '{0}' not found on contract '{1}'", actionName, actionContext.ContractName);
 
+                actionContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                actionContext.HttpContext.Response.Headers.Set(Options.ServerErrorHeader, ServerErrorCode.ActionNotFound.ToString());
+                routeContext.IsHandled = true;
                 return;
             }
 
-            feature.ActionContext.Action = actionDescriptor;
-            await Execute(feature.ActionContext, found);
+            actionContext.Action = actionDescriptor;
+            await Execute(actionContext);
         }
 
-        protected virtual async Task Execute(ServerActionContext ctxt, IContractInvoker invoker)
+        protected virtual async Task Execute(ServerActionContext ctxt)
         {
-            IBoltFeature feature = ctxt.HttpContext.GetFeature<IBoltFeature>();
-
             using (Logger.BeginScope("Execute"))
             {
                 Stopwatch watch = null;
@@ -207,16 +186,9 @@ namespace Bolt.Server
                     watch = Stopwatch.StartNew();
                 }
 
-                feature.FilterProviders = ctxt.HttpContext.ApplicationServices.GetService<IEnumerable<IFilterProvider>>().ToList();
-
                 try
                 {
-                    await invoker.ExecuteAsync(ctxt);
-                    if (!ctxt.IsResponseSend)
-                    {
-                        await feature.Configuration.ResponseHandler.HandleAsync(ctxt);
-                    }
-
+                    await ctxt.ContractInvoker.ExecuteAsync(ctxt);
                 }
                 catch (OperationCanceledException)
                 {
@@ -229,19 +201,8 @@ namespace Bolt.Server
                 }
                 catch (Exception e)
                 {
-                    if (!ctxt.IsResponseSend)
-                    {
-                        await feature.Configuration.ErrorHandler.HandleErrorAsync(new HandleErrorContext
-                        {
-                            Options = feature.Configuration.Options,
-                            ExceptionWrapper = feature.Configuration.ExceptionWrapper,
-                            ActionContext = feature.ActionContext,
-                            Serializer = feature.Configuration.Serializer,
-                            Error = e
-                        });
-                    }
-
                     Logger.LogError(BoltLogId.RequestExecutionError, "Execution of '{0}' failed with error '{1}'", ctxt.Action, e);
+                    throw;
                 }
                 finally
                 {
@@ -253,10 +214,10 @@ namespace Bolt.Server
             }
         }
 
-        protected virtual IBoltFeature AssignBoltFeature(HttpContext context, ServerActionContext actionContext)
+        protected virtual IBoltFeature AssignBoltFeature( ServerActionContext actionContext)
         {
-            var boltFeature = new BoltFeature(this) { ActionContext = actionContext, Configuration = Configuration };
-            context.SetFeature<IBoltFeature>(boltFeature);
+            BoltFeature boltFeature = new BoltFeature(actionContext);
+            actionContext.HttpContext.SetFeature<IBoltFeature>(boltFeature);
             return boltFeature;
         }
 

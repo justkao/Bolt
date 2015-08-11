@@ -4,7 +4,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Bolt.Common;
 using Bolt.Session;
 
@@ -14,13 +13,7 @@ namespace Bolt
     {
         public const string AsyncPostFix = "Async";
 
-        public static readonly MethodInfo InitSessionAction =
-            typeof(BoltFramework).GetTypeInfo()
-                .DeclaredMethods.First(m => m.IsStatic && m.Name == nameof(InitBoltSession));
-
-        public static readonly MethodInfo DestroySessionAction =
-            typeof (BoltFramework).GetTypeInfo()
-                .DeclaredMethods.First(m => m.IsStatic && m.Name == nameof(DestroyBoltSession));
+        public static readonly ISessionContractDescriptorProvider SessionContractDescriptorProvider = new SessionContractDescriptorProvider();
 
         public static IEnumerable<MethodInfo> GetContractActions(Type contract)
         {
@@ -121,14 +114,9 @@ namespace Bolt
             return method.GetParameters().Where(info => info.ParameterType != typeof (CancellationToken) && info.ParameterType != typeof (CancellationToken?));
         }
 
-        private static InitSessionResult InitBoltSession(InitSessionParameters parameters)
+        public static SessionContractDescriptor GetSessionDescriptor(Type contract)
         {
-            return null;
-        }
-
-        private static DestroySessionResult DestroyBoltSession(DestroySessionParameters parameters)
-        {
-            return null;
+            return SessionContractDescriptorProvider.Resolve(contract);
         }
     }
 }

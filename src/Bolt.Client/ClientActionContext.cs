@@ -3,6 +3,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
+using Bolt.Session;
 
 namespace Bolt.Client
 {
