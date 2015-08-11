@@ -45,24 +45,6 @@ namespace Bolt.Client.Test
             return builder.Build();
         } 
 
-        public interface ITestContract
-        {
-            Task Execute();
-        }
-
-        public class TestContractProxy : ProxyBase, ITestContract
-        {
-            public TestContractProxy( IPipeline<ClientActionContext> pipeline)
-                : base(typeof(ITestContract), pipeline)
-            {
-            }
-
-            public Task Execute()
-            {
-                return SendAsync(Contract.GetMethod(nameof(Execute)));
-            }
-        }
-
         public interface IInvokeCallback
         {
             void Handle(ClientActionContext context);

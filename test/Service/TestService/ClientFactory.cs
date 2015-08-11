@@ -1,9 +1,10 @@
 ﻿using System;
 using System.ServiceModel;
 using System.Threading.Tasks;
+
 using Bolt.Client;
-using Bolt.Client.Filters;
 using Bolt.Client.Proxy;
+
 using TestService.Core;
 
 namespace TestService
@@ -35,44 +36,6 @@ namespace TestService
             ChannelFactory<ITestContract> respository = new ChannelFactory<ITestContract>(new BasicHttpBinding());
             ITestContract channel = respository.CreateChannel(new EndpointAddress(Servers.WcfServer));
             return channel;
-        }
-
-        private class LoggingFilter : IClientContextHandler
-        {
-            public async Task ExecuteAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
-            {
-                Console.WriteLine($"Begin execution of {GetType().Name}");
-                await next(context);
-                Console.WriteLine($"Execution of {GetType().Name} finished.");
-            }
-        }
-
-        private class DelayFilter : IClientContextHandler
-        {
-            public async Task ExecuteAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
-            {
-                Console.WriteLine($"Begin execution of {GetType().Name}");
-                await next(context);
-                Console.WriteLine($"Execution of {GetType().Name} finished.");
-            }
-        }
-
-        private class ErrorFilter : IClientContextHandler
-        {
-            public async Task ExecuteAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
-            {
-                await next(context);
-            }
-        }
-
-        private class NewlineFilter : IClientContextHandler
-        {
-            public async Task ExecuteAsync(ClientActionContext context, Func<ClientActionContext, Task> next)
-            {
-                Console.WriteLine($"Begin execution of {GetType().Name}");
-                await next(context);
-                Console.WriteLine($"Execution of {GetType().Name} finished.");
-            }
         }
     }
 }

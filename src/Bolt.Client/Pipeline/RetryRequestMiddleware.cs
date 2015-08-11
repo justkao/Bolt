@@ -25,24 +25,26 @@ namespace Bolt.Client.Pipeline
                 try
                 {
                     await Next(context);
+                    (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Open);
                     return;
                 }
                 catch (Exception e)
                 {
-                    SessionHandlingResult errorHandlingResult = ErrorHandling.Handle(context, e);
+                    ErrorHandlingResult errorHandlingResult = ErrorHandling.Handle(context, e);
                     switch (errorHandlingResult)
                     {
-                        case SessionHandlingResult.Close:
+                        case ErrorHandlingResult.Close:
                             (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
                             throw;
-                        case SessionHandlingResult.Recover:
-                            if (tries > Retries)
+                        case ErrorHandlingResult.Recover:
+                            if (tries >= Retries)
                             {
                                 throw;
                             }
                             break;
-                        case SessionHandlingResult.Rethrow:
-                            break;
+                        case ErrorHandlingResult.Rethrow:
+                            (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Open);
+                            throw;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }

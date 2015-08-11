@@ -36,58 +36,54 @@ namespace Bolt.Server.IntegrationTest.Core
 
 namespace Bolt.Server.IntegrationTest.Core
 {
-    public partial class TestContractStateFullProxy : ContractProxy, Bolt.Server.IntegrationTest.Core.ITestContractStateFull, ITestContractStateFullAsync
+    public partial class TestContractStateFullProxy : Bolt.Client.ProxyBase, Bolt.Server.IntegrationTest.Core.ITestContractStateFull, ITestContractStateFullAsync
     {
         public TestContractStateFullProxy(Bolt.Server.IntegrationTest.Core.TestContractStateFullProxy proxy) : base(proxy)
         {
         }
 
-        public TestContractStateFullProxy(IProxy proxy) : base(typeof(Bolt.Server.IntegrationTest.Core.ITestContractStateFull), proxy)
+        public TestContractStateFullProxy(Bolt.Pipeline.IPipeline<ClientActionContext> channel) : base(typeof(Bolt.Server.IntegrationTest.Core.ITestContractStateFull), channel)
         {
         }
 
         public virtual void SetState(string state)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__SetStateAction, "state", typeof(string), state);
-            Send(__SetStateAction, bolt_Params, CancellationToken.None);
+            this.Send(__SetStateAction, state);
         }
 
         public virtual Task SetStateAsync(string state)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__SetStateAction, "state", typeof(string), state);
-            return SendAsync(__SetStateAction, bolt_Params, CancellationToken.None);
+            return this.SendAsync(__SetStateAction, state);
         }
 
         public virtual string GetState()
         {
-            return Send<string>(__GetStateAction, null, CancellationToken.None);
+            return this.Send<string>(__GetStateAction);
         }
 
         public virtual Task<string> GetStateAsync()
         {
-            return SendAsync<string>(__GetStateAction, null, CancellationToken.None);
+            return this.SendAsync<string>(__GetStateAction);
         }
 
         public virtual void NextCallWillFailProxy()
         {
-            Send(__NextCallWillFailProxyAction, null, CancellationToken.None);
+            this.Send(__NextCallWillFailProxyAction);
         }
 
         public virtual Task NextCallWillFailProxyAsync()
         {
-            return SendAsync(__NextCallWillFailProxyAction, null, CancellationToken.None);
+            return this.SendAsync(__NextCallWillFailProxyAction);
         }
 
         public virtual string GetSessionId()
         {
-            return Send<string>(__GetSessionIdAction, null, CancellationToken.None);
+            return this.Send<string>(__GetSessionIdAction);
         }
 
         public virtual Task<string> GetSessionIdAsync()
         {
-            return SendAsync<string>(__GetSessionIdAction, null, CancellationToken.None);
+            return this.SendAsync<string>(__GetSessionIdAction);
         }
 
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net.Http;
 
 using Bolt.Client;
 
@@ -17,12 +18,8 @@ namespace Bolt.Server.IntegrationTest
             ServerUrl = new Uri("http://localhost");
             _runningServer = TestServer.Create(Configure, ConfigureServices);
             ClientConfiguration = new ClientConfiguration();
-            var handler = _runningServer.CreateHandler();
-
-            ClientConfiguration.RequestHandler = new RequestHandler(
-                ClientConfiguration.DataHandler,
-                new ClientErrorProvider(ClientConfiguration.Options.ServerErrorHeader),
-                handler);
+            HttpMessageHandler handler = _runningServer.CreateHandler();
+            ClientConfiguration.HttpMessageHandler = handler;
         }
 
         public Uri ServerUrl { get; private set; }

@@ -6,6 +6,8 @@
         {
             public const string Namespace = "Bolt";
 
+            public const string PipelineNamespace = "Bolt.Pipeline";
+
             public static readonly ClassDescriptor AsyncOperationAttribute = new ClassDescriptor("AsyncOperationAttribute", Namespace);
 
             public static readonly ClassDescriptor InitSessionAttribute = new ClassDescriptor("InitSessionAttribute", Namespace);
@@ -19,7 +21,7 @@
         {
             public const string Namespace = "Bolt.Client";
 
-            public static readonly ClassDescriptor Channel = new ClassDescriptor("IChannel", Namespace) { IsInterface = true };
+            public static readonly ClassDescriptor Pipeline = new ClassDescriptor("IPipeline<ClientActionContext>", Core.PipelineNamespace) { IsInterface = true };
 
             public static readonly ClassDescriptor ProxyBase = new ClassDescriptor("ProxyBase", Namespace) { IsInterface = false };
         }

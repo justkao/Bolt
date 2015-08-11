@@ -63,7 +63,7 @@ namespace Bolt.Client.Pipeline
                     continue;
                 }
 
-                parameterSerializer.WriteParameter(context.Action, parameters[i].Name, parameters[i].GetType(), parameters[i]);
+                parameterSerializer.WriteParameter(context.Action, parameters[i].Name, context.Parameters[i].GetType(), context.Parameters[i]);
             }
 
             if (parameterSerializer.IsEmpty)

@@ -31,7 +31,7 @@ namespace Bolt.Client.Pipeline
                         context.Action));
             }
 
-            Uri server = context.Connection.Server;
+            context.Request.RequestUri = context.Connection.Server;
 
             try
             {
@@ -39,7 +39,7 @@ namespace Bolt.Client.Pipeline
             }
             catch (HttpRequestException)
             {
-                ServerProvider.OnServerUnavailable(server);
+                ServerProvider.OnServerUnavailable(context.Request.RequestUri);
                 throw;
             }
         }

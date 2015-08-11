@@ -22,189 +22,163 @@ using TestService.Core;
 
 namespace TestService.Core
 {
-    public partial class TestContractProxy : ProxyBase, TestService.Core.ITestContract
+    public partial class TestContractProxy : Bolt.Client.ProxyBase, TestService.Core.ITestContract
     {
         public TestContractProxy(TestService.Core.TestContractProxy proxy) : base(proxy)
         {
         }
 
-        public TestContractProxy(IProxy proxy) : base(typeof(TestService.Core.ITestContract), proxy)
+        public TestContractProxy(Bolt.Pipeline.IPipeline<ClientActionContext> channel) : base(typeof(TestService.Core.ITestContract), channel)
         {
         }
 
         public virtual Person UpdatePerson(Person person, CancellationToken cancellation)
         {
-            return this.Send<Person>(__UpdatePersonAction, cancellation);
+            return this.Send<Person>(__UpdatePersonAction, person, cancellation);
         }
 
         public virtual Task<Person> UpdatePersonAsync(Person person, CancellationToken cancellation)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__UpdatePersonAction, "person", typeof(Person), person);
-            return SendAsync<Person>(__UpdatePersonAction, bolt_Params, cancellation);
+            return this.SendAsync<Person>(__UpdatePersonAction, person, cancellation);
         }
 
         public virtual Person UpdatePersonThatThrowsInvalidOperationException(Person person)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__UpdatePersonThatThrowsInvalidOperationExceptionAction, "person", typeof(Person), person);
-            return Send<Person>(__UpdatePersonThatThrowsInvalidOperationExceptionAction, bolt_Params, CancellationToken.None);
+            return this.Send<Person>(__UpdatePersonThatThrowsInvalidOperationExceptionAction, person);
         }
 
         public virtual Task<Person> UpdatePersonThatThrowsInvalidOperationExceptionAsync(Person person)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__UpdatePersonThatThrowsInvalidOperationExceptionAction, "person", typeof(Person), person);
-            return SendAsync<Person>(__UpdatePersonThatThrowsInvalidOperationExceptionAction, bolt_Params, CancellationToken.None);
+            return this.SendAsync<Person>(__UpdatePersonThatThrowsInvalidOperationExceptionAction, person);
         }
 
         public virtual Task DoNothingAsAsync()
         {
-            return SendAsync(__DoNothingAsAsyncAction, null, CancellationToken.None);
+            return this.SendAsync(__DoNothingAsAsyncAction);
         }
 
         public virtual void DoNothing()
         {
-            Send(__DoNothingAction, null, CancellationToken.None);
+            this.Send(__DoNothingAction);
         }
 
         public virtual Task DoNothingAsync()
         {
-            return SendAsync(__DoNothingAction, null, CancellationToken.None);
+            return this.SendAsync(__DoNothingAction);
         }
 
         public virtual Task DoNothingWithComplexParameterAsAsync(List<Person> person)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__DoNothingWithComplexParameterAsAsyncAction, "person", typeof(List<Person>), person);
-            return SendAsync(__DoNothingWithComplexParameterAsAsyncAction, bolt_Params, CancellationToken.None);
+            return this.SendAsync(__DoNothingWithComplexParameterAsAsyncAction, person);
         }
 
         public virtual void DoNothingWithComplexParameter(List<Person> person)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__DoNothingWithComplexParameterAction, "person", typeof(List<Person>), person);
-            Send(__DoNothingWithComplexParameterAction, bolt_Params, CancellationToken.None);
+            this.Send(__DoNothingWithComplexParameterAction, person);
         }
 
         public virtual Task DoNothingWithComplexParameterAsync(List<Person> person)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__DoNothingWithComplexParameterAction, "person", typeof(List<Person>), person);
-            return SendAsync(__DoNothingWithComplexParameterAction, bolt_Params, CancellationToken.None);
+            return this.SendAsync(__DoNothingWithComplexParameterAction, person);
         }
 
         public virtual int GetSimpleType(int arg)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__GetSimpleTypeAction, "arg", typeof(int), arg);
-            return Send<int>(__GetSimpleTypeAction, bolt_Params, CancellationToken.None);
+            return this.Send<int>(__GetSimpleTypeAction, arg);
         }
 
         public virtual Task<int> GetSimpleTypeAsync(int arg)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__GetSimpleTypeAction, "arg", typeof(int), arg);
-            return SendAsync<int>(__GetSimpleTypeAction, bolt_Params, CancellationToken.None);
+            return this.SendAsync<int>(__GetSimpleTypeAction, arg);
         }
 
         public virtual Task GetSimpleTypeAsAsync(int arg)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__GetSimpleTypeAsAsyncAction, "arg", typeof(int), arg);
-            return SendAsync(__GetSimpleTypeAsAsyncAction, bolt_Params, CancellationToken.None);
+            return this.SendAsync(__GetSimpleTypeAsAsyncAction, arg);
         }
 
         public virtual Person GetSinglePerson(Person person)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__GetSinglePersonAction, "person", typeof(Person), person);
-            return Send<Person>(__GetSinglePersonAction, bolt_Params, CancellationToken.None);
+            return this.Send<Person>(__GetSinglePersonAction, person);
         }
 
         public virtual Task<Person> GetSinglePersonAsync(Person person)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__GetSinglePersonAction, "person", typeof(Person), person);
-            return SendAsync<Person>(__GetSinglePersonAction, bolt_Params, CancellationToken.None);
+            return this.SendAsync<Person>(__GetSinglePersonAction, person);
         }
 
         public virtual Task<Person> GetSinglePersonAsAsync(Person person)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__GetSinglePersonAsAsyncAction, "person", typeof(Person), person);
-            return SendAsync<Person>(__GetSinglePersonAsAsyncAction, bolt_Params, CancellationToken.None);
+            return this.SendAsync<Person>(__GetSinglePersonAsAsyncAction, person);
         }
 
         public virtual List<Person> GetManyPersons()
         {
-            return Send<List<Person>>(__GetManyPersonsAction, null, CancellationToken.None);
+            return this.Send<List<Person>>(__GetManyPersonsAction);
         }
 
         public virtual Task<List<Person>> GetManyPersonsAsync()
         {
-            return SendAsync<List<Person>>(__GetManyPersonsAction, null, CancellationToken.None);
+            return this.SendAsync<List<Person>>(__GetManyPersonsAction);
         }
 
         public virtual Task<List<Person>> GetManyPersonsAsAsync(Person person)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__GetManyPersonsAsAsyncAction, "person", typeof(Person), person);
-            return SendAsync<List<Person>>(__GetManyPersonsAsAsyncAction, bolt_Params, CancellationToken.None);
+            return this.SendAsync<List<Person>>(__GetManyPersonsAsAsyncAction, person);
         }
 
         public virtual void Throws()
         {
-            Send(__ThrowsAction, null, CancellationToken.None);
+            this.Send(__ThrowsAction);
         }
 
         public virtual Task ThrowsAsync()
         {
-            return SendAsync(__ThrowsAction, null, CancellationToken.None);
+            return this.SendAsync(__ThrowsAction);
         }
 
         public virtual void ThrowsCustom()
         {
-            Send(__ThrowsCustomAction, null, CancellationToken.None);
+            this.Send(__ThrowsCustomAction);
         }
 
         public virtual Task ThrowsCustomAsync()
         {
-            return SendAsync(__ThrowsCustomAction, null, CancellationToken.None);
+            return this.SendAsync(__ThrowsCustomAction);
         }
 
         public virtual void InnerOperation()
         {
-            Send(__InnerOperationAction, null, CancellationToken.None);
+            this.Send(__InnerOperationAction);
         }
 
         public virtual Task InnerOperationAsync()
         {
-            return SendAsync(__InnerOperationAction, null, CancellationToken.None);
+            return this.SendAsync(__InnerOperationAction);
         }
 
         public virtual Task<string> InnerOperation3()
         {
-            return SendAsync<string>(__InnerOperation3Action, null, CancellationToken.None);
+            return this.SendAsync<string>(__InnerOperation3Action);
         }
 
         public virtual Task InnerOperationExAsync()
         {
-            return SendAsync(__InnerOperationExAsyncAction, null, CancellationToken.None);
+            return this.SendAsync(__InnerOperationExAsyncAction);
         }
         public virtual void InnerOperation2()
         {
-            Send(__InnerOperation2Action, null, CancellationToken.None);
+            this.Send(__InnerOperation2Action);
         }
 
         public virtual Task InnerOperation2Async()
         {
-            return SendAsync(__InnerOperation2Action, null, CancellationToken.None);
+            return this.SendAsync(__InnerOperation2Action);
         }
 
         public virtual Task InnerOperationExAsync2()
         {
-            return SendAsync(__InnerOperationExAsync2Action, null, CancellationToken.None);
+            return this.SendAsync(__InnerOperationExAsync2Action);
         }
 
         private static readonly MethodInfo __UpdatePersonAction = typeof(ITestContract).GetMethod(nameof(ITestContract.UpdatePerson));

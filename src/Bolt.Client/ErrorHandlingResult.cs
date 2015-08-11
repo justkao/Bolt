@@ -1,6 +1,6 @@
 namespace Bolt.Client
 {
-    public enum SessionHandlingResult
+    public enum ErrorHandlingResult
     {
         Close,
         Recover,

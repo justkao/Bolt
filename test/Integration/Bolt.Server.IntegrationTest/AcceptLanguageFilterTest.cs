@@ -1,12 +1,14 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using Bolt.Client;
-using Bolt.Client.Filters;
+
 using Bolt.Client.Proxy;
+
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Localization;
+
 using Moq;
+
 using Xunit;
 
 namespace Bolt.Server.IntegrationTest
@@ -15,9 +17,7 @@ namespace Bolt.Server.IntegrationTest
     {
         public AcceptLanguageFilterTest()
         {
-            ClientConfiguration
-                .AddFilter<AcceptLanguageContextHandler>()
-                .UseDynamicProxy();
+            ClientConfiguration.UseDynamicProxy();
         }
 
         [Fact]
@@ -60,6 +60,11 @@ namespace Bolt.Server.IntegrationTest
         {
             appBuilder.UseRequestLocalization(new RequestLocalizationOptions());
             base.Configure(appBuilder);
+        }
+
+        protected override IFiltersContract CreateChannel()
+        {
+            return ClientConfiguration.ProxyBuilder().Url(ServerUrl).PreserveCultureInfo().Build<IFiltersContract>();
         }
     }
 }

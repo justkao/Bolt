@@ -11,8 +11,6 @@ namespace Bolt.Client.Pipeline
     {
         private readonly AwaitableCriticalSection _syncRoot = new AwaitableCriticalSection();
 
-        private string _sessionId;
-
         public SessionMiddleware(IClientSessionHandler sessionHandler, IErrorHandling errorHandling)
         {
             ClientSessionHandler = sessionHandler;
@@ -38,6 +36,8 @@ namespace Bolt.Client.Pipeline
 
         public bool Recoverable { get; set; }
 
+        public string SessionId { get; private set; }
+
         public override async Task Invoke(ClientActionContext context)
         {
             if (Connection == null)
@@ -54,29 +54,29 @@ namespace Bolt.Client.Pipeline
 
             if (!Equals(context.Action, BoltFramework.DestroySessionAction))
             {
-                ClientSessionHandler.EnsureSession(context.Request, _sessionId);
+                ClientSessionHandler.EnsureSession(context.Request, SessionId);
                 try
                 {
                     await Next(context);
                 }
                 catch (Exception e)
                 {
-                    SessionHandlingResult handlingResult = ErrorHandling.Handle(context, e);
+                    ErrorHandlingResult handlingResult = ErrorHandling.Handle(context, e);
                     switch (handlingResult)
                     {
-                        case SessionHandlingResult.Close:
+                        case ErrorHandlingResult.Close:
                             (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
                             break;
-                        case SessionHandlingResult.Recover:
+                        case ErrorHandlingResult.Recover:
                             Connection = null;
-                            _sessionId = null;
+                            SessionId = null;
                             (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Uninitialized);
                             if (!Recoverable)
                             {
                                 (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
                             }
                             break;
-                        case SessionHandlingResult.Rethrow:
+                        case ErrorHandlingResult.Rethrow:
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
@@ -109,7 +109,7 @@ namespace Bolt.Client.Pipeline
                 finally
                 {
                     Connection = null;
-                    _sessionId = null;
+                    SessionId = null;
                     (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
                 }
             }
@@ -163,21 +163,21 @@ namespace Bolt.Client.Pipeline
 
                         InitSessionResult = (InitSessionResult)initSessionContext.ActionResult;
                         Connection = initSessionContext.Connection;
-                        _sessionId = sessionId;
+                        SessionId = sessionId;
                     }
                     catch (Exception e)
                     {
                         Connection = null;
-                        _sessionId = null;
+                        SessionId = null;
 
-                        SessionHandlingResult handlingResult = ErrorHandling.Handle(initSessionContext, e);
+                        ErrorHandlingResult handlingResult = ErrorHandling.Handle(initSessionContext, e);
                         switch (handlingResult)
                         {
-                            case SessionHandlingResult.Close:
+                            case ErrorHandlingResult.Close:
                                 (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
                                 break;
-                            case SessionHandlingResult.Recover:
-                            case SessionHandlingResult.Rethrow:
+                            case ErrorHandlingResult.Recover:
+                            case ErrorHandlingResult.Rethrow:
                                 (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Uninitialized);
                                 break;
                             default:

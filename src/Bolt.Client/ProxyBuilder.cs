@@ -15,6 +15,7 @@ namespace Bolt.Client
         private SessionMiddleware _sessionMiddleware;
         private IServerProvider _serverProvider;
         private HttpMessageHandler _messageHandler;
+        private AcceptLanguageMiddleware _acceptLanguageMiddleware;
 
         public ProxyBuilder(ClientConfiguration configuration)
         {
@@ -99,6 +100,13 @@ namespace Bolt.Client
             return this;
         }
 
+        public virtual ProxyBuilder PreserveCultureInfo()
+        {
+            _acceptLanguageMiddleware = new AcceptLanguageMiddleware();
+
+            return this;
+        }
+
         public virtual IPipeline<ClientActionContext> BuildPipeline<TContract>() where TContract : class
         {
             if (_serverProvider == null)
@@ -120,7 +128,13 @@ namespace Bolt.Client
             }
 
             context.Use(new SerializationMiddleware(_configuration.Serializer, _configuration.ExceptionWrapper, _configuration.ErrorProvider));
-            context.Use(new CommunicationMiddleware(_messageHandler ?? new HttpClientHandler()));
+            if (_acceptLanguageMiddleware != null)
+            {
+                context.Use(_acceptLanguageMiddleware);
+            }
+
+            context.Use(new PickConnectionMiddleware(_serverProvider, _configuration.EndpointProvider));
+            context.Use(new CommunicationMiddleware(_messageHandler ?? _configuration.HttpMessageHandler ?? new HttpClientHandler()));
             return context.Build();
         }
 

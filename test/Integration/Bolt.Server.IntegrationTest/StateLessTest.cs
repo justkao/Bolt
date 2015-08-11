@@ -9,7 +9,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Bolt.Client.Pipeline;
 using Bolt.Client.Proxy;
+using Bolt.Pipeline;
+
 using Xunit;
 
 namespace Bolt.Server.IntegrationTest
@@ -242,41 +246,40 @@ namespace Bolt.Server.IntegrationTest
             }
         }
 
-        [Fact]
-        public void CreateProxyPerformance()
+        [InlineData(true)]
+        [InlineData(false)]
+        [Theory]
+        public void CreateProxyPerformance(bool useDynamicProxy)
         {
+            ClientConfiguration.UseDynamicProxy();
+
             int cnt = 10000;
 
             Stopwatch watch = Stopwatch.StartNew();
 
             for (int i = 0; i < cnt; i++)
             {
-                using (ClientConfiguration.CreateProxy<TestContractProxy>(ServerUrl))
+                if (useDynamicProxy)
                 {
+                    using (
+                        ClientConfiguration.ProxyBuilder().Url(ServerUrl).Recoverable(10, TimeSpan.FromSeconds(1)).Build<ITestContract>() as
+                        IDisposable)
+                    {
+                    }
+                }
+                else
+                {
+                    using (
+                        ClientConfiguration.ProxyBuilder()
+                            .Url(ServerUrl)
+                            .Recoverable(10, TimeSpan.FromSeconds(1))
+                            .Build<TestContractProxy>())
+                    {
+                    }
                 }
             }
 
-            System.Console.WriteLine("Creating {0} proxies by helpers has taken {1}ms", 10000, watch.ElapsedMilliseconds);
-
-            watch.Restart();
-            for (int i = 0; i < cnt; i++)
-            {
-                using (new TestContractProxy(new RecoverableChannel(new SingleServerProvider(ServerUrl), ClientConfiguration)))
-                {
-                }
-            }
-
-            System.Console.WriteLine("Creating {0} proxies manually has taken {1}ms", 10000, watch.ElapsedMilliseconds);
-
-            DynamicProxyFactory factory = new DynamicProxyFactory();
-
-            watch.Restart();
-            for (int i = 0; i < cnt; i++)
-            {
-                factory.CreateProxy<ITestCollectionOrderer>(new RecoverableChannel(new SingleServerProvider(ServerUrl), ClientConfiguration));
-            }
-
-            System.Console.WriteLine("Creating dynamic {0} proxies manually has taken {1}ms", 10000, watch.ElapsedMilliseconds);
+            System.Console.WriteLine("Creating {0} proxies by ProxyBuilder has taken {1}ms", 10000, watch.ElapsedMilliseconds);
         }
 
         [Fact]
@@ -328,33 +331,16 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public void LongOperation_TimeoutSet_EnsureCallTimeouted()
         {
-            ITestContractAsync client = CreateChannel();
-            ((ProxyBase)((ContractProxy) client).Channel).DefaultResponseTimeout = TimeSpan.FromSeconds(0.1);
+            IPipeline<ClientActionContext> pipeline = CreatePipeline();
+            ITestContractAsync client = CreateChannel(pipeline);
+
+            pipeline.Find<CommunicationMiddleware>().ResponseTimeout= TimeSpan.FromSeconds(0.1);
             CompositeType arg = CompositeType.CreateRandom();
 
             Mock<ITestContract> server = Server();
             server.Setup(v => v.SimpleMethodWithComplexParameter(arg)).Callback(() => Thread.Sleep(TimeSpan.FromSeconds(1)));
             Assert.Throws<TimeoutException>(() => client.SimpleMethodWithComplexParameter(arg));
         }
-
-        /*
-        [Fact]
-        public void Request_Recoverable_EnsureExecuted()
-        {
-            Uri server1 = new Uri("http://localhost:1111");
-            Mock<ITestContract> server = Server();
-            server.Setup(m => m.SimpleMethod());
-            TestContractProxy channel = CreateChannel(10, TimeSpan.FromSeconds(0.2), server1);
-            Task ongoing = channel.SimpleMethodAsync();
-
-            Thread.Sleep(TimeSpan.FromSeconds(0.5));
-
-            IDisposable running = StartServer(server1, ConfigureDefaultServer);
-
-            ongoing.GetAwaiter().GetResult();
-            running.Dispose();
-        }
-        */
 
         [Fact]
         public void ServerReturnsBigData_EnsureReceivedOnClient()
@@ -390,9 +376,20 @@ namespace Bolt.Server.IntegrationTest
             return mock;
         }
 
-        public virtual ITestContractAsync CreateChannel(int retries = 0)
+        public virtual ITestContractAsync CreateChannel(IPipeline<ClientActionContext> pipeline = null)
         {
-            return ClientConfiguration.CreateProxy<TestContractProxy>(ServerUrl);
+            return new TestContractProxy(pipeline ?? CreatePipeline());
+        }
+
+        protected IPipeline<ClientActionContext> CreatePipeline(int recoveries = 0)
+        {
+            var builder = ClientConfiguration.ProxyBuilder().Url(ServerUrl);
+            if (recoveries > 0)
+            {
+                builder.Recoverable(recoveries, TimeSpan.FromMilliseconds(10));
+            }
+
+            return builder.BuildPipeline<ITestContractStateFull>();
         }
 
         public MockInstanceProvider InstanceProvider = new MockInstanceProvider();

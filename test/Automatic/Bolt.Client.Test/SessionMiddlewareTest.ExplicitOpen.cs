@@ -31,7 +31,7 @@ namespace Bolt.Client.Test
             {
                 var pipeline = CreatePipeline();
                 SessionHandler.Setup(s => s.GetSessionIdentifier(It.IsAny<HttpResponseMessage>())).Returns((string)null).Verifiable();
-                SessionErrorHandling.Setup(r => r.Handle(It.IsAny<ClientActionContext>(), It.IsAny<Exception>())).Returns(SessionHandlingResult.Recover);
+                SessionErrorHandling.Setup(r => r.Handle(It.IsAny<ClientActionContext>(), It.IsAny<Exception>())).Returns(ErrorHandlingResult.Recover);
 
                 var proxy = CreateProxy(pipeline);
 
@@ -99,7 +99,7 @@ namespace Bolt.Client.Test
             {
                 string sessionid = "temp session";
                 SessionErrorHandling.Setup(e => e.Handle(It.IsAny<ClientActionContext>(), It.IsAny<InvalidOperationException>()))
-                    .Returns(canRecover ? SessionHandlingResult.Recover : SessionHandlingResult.Close);
+                    .Returns(canRecover ? ErrorHandlingResult.Recover : ErrorHandlingResult.Close);
 
                 var pipeline = CreatePipeline(
                     (next, ctxt) =>
@@ -140,7 +140,7 @@ namespace Bolt.Client.Test
 
                 var proxy = CreateProxy(pipeline);
                 await proxy.OpenAsync();
-                await proxy.Execute();
+                await proxy.ExecuteAsync();
 
                 SessionHandler.Verify();
             }

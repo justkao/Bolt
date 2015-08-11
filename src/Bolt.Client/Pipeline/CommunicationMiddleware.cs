@@ -21,7 +21,7 @@ namespace Bolt.Client.Pipeline
         public async Task Invoke(ClientActionContext context)
         {
             context.Request.Headers.Connection.Add("Keep-Alive");
-
+            context.Request.Method = HttpMethod.Post;
             CancellationToken timeoutToken = CancellationToken.None;
 
             try

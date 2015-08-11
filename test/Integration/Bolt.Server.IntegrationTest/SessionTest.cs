@@ -5,9 +5,12 @@ using Microsoft.AspNet.Builder;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Bolt.Client.Pipeline;
+using Bolt.Pipeline;
 using Bolt.Server.Session;
 using Bolt.Session;
 using Bolt.Test.Common;
@@ -38,23 +41,27 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public async Task Async_RecoverProxy_EnsureNewSession()
         {
-            var client = GetChannel();
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
+
             await client.GetStateAsync();
-            string sessionId1 = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
+            string sessionId1 = session.SessionId;
             await client.NextCallWillFailProxyAsync();
             await client.GetStateAsync();
-            string sessionId2 = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
+            string sessionId2 = session.SessionId;
             Assert.NotEqual(sessionId1, sessionId2);
         }
 
         [Fact]
         public async Task Async_SessionNotFound_EnsureBoltServerExceptionIsThrown()
         {
-            var client = GetChannel();
-            ((TestContractSessionChannel)GetInnerChannel(client)).Retries = 0;
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
 
             await client.GetStateAsync();
-            string sessionId1 = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
+            string sessionId1 = session.SessionId;
             Factory.Destroy(sessionId1);
 
             try
@@ -70,14 +77,15 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public async Task Async_SessionNotFound_RetriesEnabled_EnsureNewSession()
         {
-            var client = GetChannel();
-            ((TestContractSessionChannel)GetInnerChannel(client)).Retries = 1;
+            var pipeline = CreatePipeline(1);
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
 
             await client.GetStateAsync();
-            string session = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
+            string sessionId = session.SessionId;
 
             SessionInstanceProvider instanceProvider = InstanceProvider;
-            Factory.Destroy(session);
+            Factory.Destroy(sessionId);
 
             await client.GetStateAsync();
         }
@@ -97,23 +105,27 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public void RecoverProxy_EnsureNewSession()
         {
-            var client = GetChannel();
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
+
             client.GetState();
-            string sessionId1 = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
+            string sessionId1 = session.SessionId;
             client.NextCallWillFailProxy();
             client.GetState();
-            string sessionId2 = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
+            string sessionId2 = session.SessionId;
             Assert.NotEqual(sessionId1, sessionId2);
         }
 
         [Fact]
         public void SessionNotFound_EnsureBoltServerExceptionIsThrown()
         {
-            var client = GetChannel();
-            ((TestContractSessionChannel)GetInnerChannel(client)).Retries = 0;
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
 
             client.GetState();
-            string sessionId1 = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
+            string sessionId1 = session.SessionId;
             Factory.Destroy(sessionId1);
 
             try
@@ -129,14 +141,15 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public void SessionNotFound_RetriesEnabled_EnsureNewSession()
         {
-            var client = GetChannel();
-            ((TestContractSessionChannel)GetInnerChannel(client)).Retries = 1;
+            var pipeline = CreatePipeline(1);
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
 
             client.GetState();
-            string session = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
+            string sessionId = session.SessionId;
 
             SessionInstanceProvider instanceProvider = InstanceProvider;
-            Factory.Destroy(session);
+            Factory.Destroy(sessionId);
 
             client.GetState();
         }
@@ -144,32 +157,37 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public void CloseSession_EnsureInstanceReleasedOnServer()
         {
-            var client = GetChannel();
-            ((TestContractSessionChannel)GetInnerChannel(client)).Retries = 0;
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
+
             client.GetState();
-            string session = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
+            string sessionId = session.SessionId;
             (client as IDisposable).Dispose();
             SessionInstanceProvider instanceProvider = InstanceProvider;
-            Assert.False(Factory.Destroy(session));
+            Assert.False(Factory.Destroy(sessionId));
         }
 
         [Fact]
         public async Task Async_Request_EnsureInstanceReleasedOnServer()
         {
-            var client = GetChannel();
-            ((TestContractSessionChannel)GetInnerChannel(client)).Retries = 0;
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
+
             await client.GetStateAsync();
-            string session = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
+            string sessionId = session.SessionId;
             await (client as IProxy).CloseAsync();
             SessionInstanceProvider instanceProvider = InstanceProvider;
-            Assert.False(Factory.Destroy(session));
+            Assert.False(Factory.Destroy(sessionId));
         }
 
         [Fact]
         public async Task Async_Request_ClosedProxy_EnsureSessionClosedException()
         {
-            var client = GetChannel();
-            ((TestContractSessionChannel)GetInnerChannel(client)).Retries = 0;
+            var pipeline = CreatePipeline();
+            var client = GetChannel(pipeline);
+
             await client.GetStateAsync();
             await (client as IProxy).CloseAsync();
 
@@ -179,8 +197,9 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public void Request_ClosedProxy_EnsureSessionClosedException()
         {
-            var client = GetChannel();
-            ((TestContractSessionChannel)GetInnerChannel(client)).Retries = 0;
+            var pipeline = CreatePipeline();
+            var client = GetChannel(pipeline);
+
             client.GetState();
             (client as IProxy).Close();
 
@@ -237,42 +256,44 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public void CloseSession_EnsureNextRequestFails()
         {
-            var channel = GetChannel();
-            (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
-            channel.GetState();
-            ((IProxy) channel).Close();
+            var pipeline = CreatePipeline();
+            var client = GetChannel(pipeline);
 
-            Assert.Throws<ProxyClosedException>(() => channel.GetState());
+            client.GetState();
+            ((IProxy)client).Close();
+
+            Assert.Throws<ProxyClosedException>(() => client.GetState());
         }
 
         [Fact]
         public async Task Async_CloseSession_EnsureNextRequestFails()
         {
-            var channel = GetChannel();
-            (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
-            await channel.GetStateAsync();
-            await ((IProxy)channel).CloseAsync();
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
 
-            await Assert.ThrowsAsync<ProxyClosedException>(() => channel.GetStateAsync());
+            await client.GetStateAsync();
+            await ((IProxy)client).CloseAsync();
+
+            await Assert.ThrowsAsync<ProxyClosedException>(() => client.GetStateAsync());
         }
 
         [Fact]
         public async Task OpenSession_EnsureCallbackCalled()
         {
-            ITestContractStateFullAsync channel = GetChannel();
-            SessionChannel recoverable = GetInnerChannel(channel);
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
 
-            recoverable.InitSessionParameters = new InitSessionParameters();
-            recoverable.InitSessionParameters.UserData["temp"] = "temp";
+            session.InitSessionParameters = new InitSessionParameters();
+            session.InitSessionParameters.UserData["temp"] = "temp";
 
             SessionCallback = new Mock<ISessionCallback>();
             SessionCallback.Setup(c => c.InitSessionAsync(It.IsAny<InitSessionParameters>(), It.IsAny<ActionContextBase>(), It.IsAny<CancellationToken>()))
                 .Returns(
                     () => Task.FromResult(new InitSessionResult())).Verifiable();
 
-
-            (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
-            await channel.GetStateAsync();
+            await client.GetStateAsync();
 
             SessionCallback.Verify();
         }
@@ -280,9 +301,9 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public async Task CloseSession_EnsureCallbackCalled()
         {
-            ITestContractStateFullAsync channel = GetChannel();
-            SessionChannel recoverable = GetInnerChannel(channel);
-
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
 
             SessionCallback = new Mock<ISessionCallback>();
             SessionCallback.Setup(c => c.DestroySessionAsync(It.IsAny<DestroySessionParameters>(), It.IsAny<ActionContextBase>(), It.IsAny<CancellationToken>()))
@@ -290,9 +311,8 @@ namespace Bolt.Server.IntegrationTest
                     () => Task.FromResult(new DestroySessionResult())).Verifiable();
 
 
-            (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
-            await channel.GetStateAsync();
-            await recoverable.CloseAsync();
+            await client.GetStateAsync();
+            await (client as IProxy).CloseAsync();
 
             SessionCallback.Verify();
         }
@@ -300,11 +320,12 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public async Task OpenSession_EnsureProperResult()
         {
-            ITestContractStateFullAsync channel = GetChannel();
-            SessionChannel recoverable = GetInnerChannel(channel);
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
 
-            recoverable.InitSessionParameters = new InitSessionParameters();
-            recoverable.InitSessionParameters.UserData["temp"] = "temp";
+            session.InitSessionParameters = new InitSessionParameters();
+            session.InitSessionParameters.UserData["temp"] = "temp";
 
             SessionCallback = new Mock<ISessionCallback>();
             SessionCallback.Setup(
@@ -321,23 +342,24 @@ namespace Bolt.Server.IntegrationTest
                     }).Verifiable();
 
 
-            (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
-            await channel.GetStateAsync();
+            await client.GetStateAsync();
             SessionCallback.Verify();
 
-            Assert.Equal("temp", recoverable.InitSessionResult.UserData["temp"]);
+            Assert.Equal("temp", session.InitSessionResult.UserData["temp"]);
         }
 
         [Fact]
         public async Task OpenSession_WriteCustomValues_EnsureProperResult()
         {
-            ITestContractStateFullAsync channel = GetChannel();
-            SessionChannel recoverable = GetInnerChannel(channel);
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            session.InitSessionParameters = new InitSessionParameters(); 
+            var client = GetChannel(pipeline);
+
             CompositeType obj = CompositeType.CreateRandom();
-            recoverable.ConfigureSession((ctxt) =>
-            {
-                ctxt.Write("composite", obj);
-            });
+            ConfigureSessionContext context= new ConfigureSessionContext(ClientConfiguration.Serializer, session.InitSessionParameters);
+
+            context.Write("composite", obj);
 
             SessionCallback = new Mock<ISessionCallback>();
             SessionCallback.Setup(
@@ -356,21 +378,21 @@ namespace Bolt.Server.IntegrationTest
                     }).Verifiable();
 
 
-            (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
-            await channel.GetStateAsync();
+            await client.GetStateAsync();
             SessionCallback.Verify();
 
-            Assert.Equal(obj, recoverable.InitSessionResult.Read<CompositeType>(recoverable.Serializer, "composite"));
+            Assert.Equal(obj, session.InitSessionResult.Read<CompositeType>(ClientConfiguration.Serializer, "composite"));
         }
 
         [Fact]
         public async Task CloseSession_EnsureProperResult()
         {
-            ITestContractStateFullAsync channel = GetChannel();
-            SessionChannel recoverable = GetInnerChannel(channel);
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
 
-            recoverable.DestroySessionParameters = new DestroySessionParameters();
-            recoverable.DestroySessionParameters.UserData["temp"] = "temp";
+            session.DestroySessionParameters = new DestroySessionParameters();
+            session.DestroySessionParameters.UserData["temp"] = "temp";
 
             SessionCallback = new Mock<ISessionCallback>();
             SessionCallback.Setup(
@@ -387,13 +409,12 @@ namespace Bolt.Server.IntegrationTest
                     }).Verifiable();
 
 
-            (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
-            await channel.GetStateAsync();
-            await recoverable.CloseAsync();
+            await client.GetStateAsync();
+            await (client as IProxy).CloseAsync();
 
             SessionCallback.Verify();
 
-            Assert.Equal("temp", recoverable.DestroySessionResult.UserData["temp"]);
+            Assert.Equal("temp", session.DestroySessionResult.UserData["temp"]);
         }
 
         [Fact]
@@ -408,48 +429,69 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public async Task Async_GetSessionId_EnsureCorrect()
         {
-            var channel = GetChannel();
-            var sesionId = await channel.GetSessionIdAsync();
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
+
+            var sesionId = await client.GetSessionIdAsync();
             Assert.NotNull(sesionId);
 
-            Assert.Equal(((ISessionProvider)GetInnerChannel(channel)).SessionId, sesionId);
+            Assert.Equal(session.SessionId, sesionId);
         }
 
         [Fact]
         public void GetSessionId_EnsureCorrect()
         {
-            var channel = GetChannel();
-            var sesionId = channel.GetSessionId();
-            Assert.NotNull(sesionId);
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
 
-            Assert.Equal(((ISessionProvider)GetInnerChannel(channel)).SessionId, sesionId);
+            var sesionId = client.GetSessionId();
+
+            Assert.NotNull(sesionId);
+            Assert.Equal(session.SessionId, sesionId);
         }
 
         [Fact]
         public void CloseSession_EnsureSessionIdNull()
         {
-            var proxy = GetChannel();
-            proxy.GetState();
-            ((IProxy) proxy).Dispose();
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
 
-            Assert.Null(((SessionChannel)(((ContractProxy)proxy).Channel)).SessionId);
+            client.GetState();
+            ((IProxy)client).Dispose();
+
+            Assert.Null(session.SessionId);
         }
 
         [Fact]
         public async Task Async_CloseSession_EnsureSessionIdNull()
         {
-            var channel = GetChannel();
-            await channel.GetStateAsync();
-            await (channel as ICloseable).CloseAsync();
+            var pipeline = CreatePipeline();
+            var session = pipeline.Find<SessionMiddleware>();
+            var client = GetChannel(pipeline);
 
-            Assert.Null(((SessionChannel)GetInnerChannel(channel)).SessionId);
+            await client.GetStateAsync();
+            await (client as IProxy).CloseAsync();
+
+            Assert.Null(session.SessionId);
         }
 
-        public virtual ITestContractStateFullAsync GetChannel()
+        public virtual ITestContractStateFullAsync GetChannel(IPipeline<ClientActionContext> pipeline = null)
         {
-            return
-                ClientConfiguration.CreateProxy<TestContractStateFullProxy>(
-                    new TestContractSessionChannel(ServerUrl, ClientConfiguration));
+            return new TestContractStateFullProxy(pipeline ?? CreatePipeline());
+        }
+
+        protected IPipeline<ClientActionContext> CreatePipeline(int recoveries = 0)
+        {
+            var builder = ClientConfiguration.ProxyBuilder().Url(ServerUrl).UseSession();
+            if (recoveries > 0)
+            {
+                builder.Recoverable(recoveries, TimeSpan.FromMilliseconds(10));
+            }
+
+            return builder.BuildPipeline<ITestContractStateFull>();
         }
 
         protected override void ConfigureServices(IServiceCollection services)
@@ -467,11 +509,6 @@ namespace Bolt.Server.IntegrationTest
                 IContractInvoker contract = h.UseSession<ITestContractStateFull, TestContractStateFull>(Factory);
                 InstanceProvider = (SessionInstanceProvider)contract.InstanceProvider;
             });
-        }
-
-        private SessionChannel GetInnerChannel(object proxy)
-        {
-            return (SessionChannel) ((IChannelProvider) proxy).Channel;
         }
 
         public Mock<ISessionCallback> SessionCallback { get; set; }

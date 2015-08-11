@@ -39,26 +39,26 @@ namespace Bolt.Client.Test
             [Fact]
             public async Task Execute_EnsureSessionOpened()
             {
-                await Proxy.Execute();
+                await Proxy.ExecuteAsync();
                 Assert.Equal(ProxyState.Open, Proxy.State);
             }
 
             [Fact]
             public async Task Execute_EnsureOpenedAndExecuted()
             {
-                await Proxy.Execute();
+                await Proxy.ExecuteAsync();
 
                 Callback.Verify(s => s.Handle(It.IsAny<ClientActionContext>()), Times.Exactly(2));
             }
 
-            [InlineData(true, SessionHandlingResult.Close)]
-            [InlineData(true, SessionHandlingResult.Rethrow)]
-            [InlineData(true, SessionHandlingResult.Recover)]
-            [InlineData(false, SessionHandlingResult.Close)]
-            [InlineData(false, SessionHandlingResult.Rethrow)]
-            [InlineData(false, SessionHandlingResult.Recover)]
+            [InlineData(true, ErrorHandlingResult.Close)]
+            [InlineData(true, ErrorHandlingResult.Rethrow)]
+            [InlineData(true, ErrorHandlingResult.Recover)]
+            [InlineData(false, ErrorHandlingResult.Close)]
+            [InlineData(false, ErrorHandlingResult.Rethrow)]
+            [InlineData(false, ErrorHandlingResult.Recover)]
             [Theory]
-            public async Task Execute_ThrowsError_Handle(bool recoverableProxy, SessionHandlingResult  handlingResult)
+            public async Task Execute_ThrowsError_Handle(bool recoverableProxy, ErrorHandlingResult  handlingResult)
             {
                 Pipeline.Find<SessionMiddleware>().Recoverable = recoverableProxy;
                 Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
@@ -75,18 +75,18 @@ namespace Bolt.Client.Test
                             return handlingResult;
                         });
 
-                await Assert.ThrowsAsync<InvalidOperationException>(Proxy.Execute);
+                await Assert.ThrowsAsync<InvalidOperationException>(Proxy.ExecuteAsync);
                 if (recoverableProxy)
                 {
                     switch (handlingResult)
                     {
-                        case SessionHandlingResult.Close:
+                        case ErrorHandlingResult.Close:
                             Assert.Equal(ProxyState.Closed, Proxy.State);
                             break;
-                        case SessionHandlingResult.Recover:
+                        case ErrorHandlingResult.Recover:
                             Assert.Equal(ProxyState.Uninitialized, Proxy.State);
                             break;
-                        case SessionHandlingResult.Rethrow:
+                        case ErrorHandlingResult.Rethrow:
                             Assert.Equal(ProxyState.Open, Proxy.State);
                             break;
                         default:
@@ -97,13 +97,13 @@ namespace Bolt.Client.Test
                 {
                     switch (handlingResult)
                     {
-                        case SessionHandlingResult.Close:
+                        case ErrorHandlingResult.Close:
                             Assert.Equal(ProxyState.Closed, Proxy.State);
                             break;
-                        case SessionHandlingResult.Recover:
+                        case ErrorHandlingResult.Recover:
                             Assert.Equal(ProxyState.Closed, Proxy.State);
                             break;
-                        case SessionHandlingResult.Rethrow:
+                        case ErrorHandlingResult.Rethrow:
                             Assert.Equal(ProxyState.Open, Proxy.State);
                             break;
                         default:

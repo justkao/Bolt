@@ -44,7 +44,7 @@ namespace Bolt.Generators
             generator.GenerateBodyAction = g =>
                 {
                     g.GenerateConstructor(g.Descriptor.FullName + " proxy", "proxy");
-                    g.GenerateConstructor($"{FormatType(BoltConstants.Client.Channel)} channel", $"typeof({ContractDefinition.Root.FullName}), channel");
+                    g.GenerateConstructor($"{FormatType(BoltConstants.Client.Pipeline)} channel", $"typeof({ContractDefinition.Root.FullName}), channel");
 
                     List<Type> contracts = ContractDefinition.GetEffectiveContracts().ToList();
                     foreach (Type type in contracts)
@@ -99,13 +99,16 @@ namespace Bolt.Generators
                 {
                     MethodInfo method = descriptor.Method;
                     string parameters = g.FormatMethodParameters(method, false);
-
+                    if (!string.IsNullOrEmpty(parameters))
+                    {
+                        parameters = ", " + parameters;
+                    }
                     if (HasReturnValue(method))
                     {
                         if (IsAsync(method))
                         {
                             WriteLine(
-                                "return this.SendAsync<{0}>({1}, {2});",
+                                "return this.SendAsync<{0}>({1}{2});",
                                 FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType),
                                 GetStaticActionName(method),
                                 parameters);
@@ -113,7 +116,7 @@ namespace Bolt.Generators
                         else if (forceAsync)
                         {
                             WriteLine(
-                                "return this.SendAsync<{0}>({1}, {2});",
+                                "return this.SendAsync<{0}>({1}{2});",
                                 FormatType(method.ReturnType),
                                 GetStaticActionName(method),
                                 parameters);
@@ -121,7 +124,7 @@ namespace Bolt.Generators
                         else
                         {
                             WriteLine(
-                                "return this.Send<{0}>({1}, {2});",
+                                "return this.Send<{0}>({1}{2});",
                                 FormatType(method.ReturnType),
                                 GetStaticActionName(method),
                                 parameters);
@@ -131,15 +134,15 @@ namespace Bolt.Generators
                     {
                         if (IsAsync(method))
                         {
-                            WriteLine("return this.SendAsync({0}, {1});", GetStaticActionName(method), parameters);
+                            WriteLine("return this.SendAsync({0}{1});", GetStaticActionName(method), parameters);
                         }
                         else if (forceAsync)
                         {
-                            WriteLine("return this.SendAsync({0}, {1});", GetStaticActionName(method), parameters);
+                            WriteLine("return this.SendAsync({0}{1});", GetStaticActionName(method), parameters);
                         }
                         else
                         {
-                            WriteLine("this.Send({0}, {1});", GetStaticActionName(method), parameters);
+                            WriteLine("this.Send({0}{1});", GetStaticActionName(method), parameters);
                         }
                     }
                 });
