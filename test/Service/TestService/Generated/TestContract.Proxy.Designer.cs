@@ -17,13 +17,12 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Bolt.Client;
-using Bolt.Client.Channels;
 using TestService.Core;
 
 
 namespace TestService.Core
 {
-    public partial class TestContractProxy : ContractProxy, TestService.Core.ITestContract
+    public partial class TestContractProxy : ProxyBase, TestService.Core.ITestContract
     {
         public TestContractProxy(TestService.Core.TestContractProxy proxy) : base(proxy)
         {
@@ -35,9 +34,7 @@ namespace TestService.Core
 
         public virtual Person UpdatePerson(Person person, CancellationToken cancellation)
         {
-            var bolt_Params = Channel.Serializer.CreateSerializer();
-            bolt_Params.WriteParameter(__UpdatePersonAction, "person", typeof(Person), person);
-            return Send<Person>(__UpdatePersonAction, bolt_Params, cancellation);
+            return this.Send<Person>(__UpdatePersonAction, cancellation);
         }
 
         public virtual Task<Person> UpdatePersonAsync(Person person, CancellationToken cancellation)

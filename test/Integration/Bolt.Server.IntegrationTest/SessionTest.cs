@@ -1,5 +1,4 @@
 ﻿using Bolt.Client;
-using Bolt.Client.Channels;
 using Bolt.Server.InstanceProviders;
 using Bolt.Server.IntegrationTest.Core;
 using Microsoft.AspNet.Builder;

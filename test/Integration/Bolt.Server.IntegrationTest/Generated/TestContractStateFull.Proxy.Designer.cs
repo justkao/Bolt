@@ -17,7 +17,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Bolt.Client;
-using Bolt.Client.Channels;
 using Bolt.Server.IntegrationTest.Core;
 
 

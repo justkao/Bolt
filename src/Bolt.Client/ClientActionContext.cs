@@ -16,12 +16,14 @@ namespace Bolt.Client
             Request = context.Request;
             Response = context.Response;
             Connection = context.Connection;
-            ErrorResult = ErrorResult;
+            ErrorResult = context.ErrorResult;
+            Proxy = context.Proxy;
         }
 
-        public ClientActionContext(Type contract, MethodInfo action, object[] parameters)
+        public ClientActionContext(IChannel proxy, Type contract, MethodInfo action, object[] parameters)
             : base(contract, action, parameters)
         {
+            Proxy = proxy;
             Request = new HttpRequestMessage();
             if (Parameters != null)
             {
@@ -42,6 +44,8 @@ namespace Bolt.Client
         public HttpResponseMessage Response { get; set; }
 
         public Exception ErrorResult { get; set; }
+
+        public IChannel Proxy { get; set; }
 
         protected override void Disposing(bool dispose)
         {

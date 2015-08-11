@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Net.Http;
-using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using Bolt.Client.Channels;
 using Bolt.Client.Helpers;
-using Bolt.Core;
 using Bolt.Session;
 
 namespace Bolt.Client.Pipeline
@@ -15,7 +12,7 @@ namespace Bolt.Client.Pipeline
 
         private string _sessionId;
 
-        public SessionMiddleware(ActionDelegate<ClientActionContext> next, ISerializer serializer, IClientSessionHandler sessionHandler) : base(next)
+        public SessionMiddleware(ISerializer serializer, IClientSessionHandler sessionHandler)
         {
             Serializer = serializer;
             ClientSessionHandler = sessionHandler;
@@ -24,8 +21,6 @@ namespace Bolt.Client.Pipeline
         public ISerializer Serializer { get;  }
 
         public IClientSessionHandler ClientSessionHandler { get;  }
-
-        public HandleContextStage Stage => HandleContextStage.Before;
 
         public InitSessionParameters InitSessionParameters { get; set; }
 
@@ -78,11 +73,7 @@ namespace Bolt.Client.Pipeline
 
             if (Equals(context.Action, BoltFramework.DestroySessionAction))
             {
-                byte[] raw = Serializer.Serialize(DestroySessionParameters ?? new DestroySessionParameters()).ToArray();
-                context.Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Serializer.ContentType));
-                context.Request.Content = new ByteArrayContent(raw);
-                context.Request.Content.Headers.ContentLength = raw.Length;
-
+                context.Parameters = new object[] {DestroySessionParameters ?? new DestroySessionParameters()};
                 await Next(context);
                 DestroySessionResult = (DestroySessionResult) context.ActionResult;
                 IsOpened = false;
@@ -114,17 +105,13 @@ namespace Bolt.Client.Pipeline
                     ClientActionContext initSessionContext = new ClientActionContext(context)
                     {
                         Connection = null,
-                        Action = BoltFramework.InitSessionAction
+                        Action = BoltFramework.InitSessionAction,
+                        Parameters = new[] {(object) initSessionParameters}
                     };
 
                     using (initSessionContext)
                     {
                         ClientSessionHandler.EnsureSession(initSessionContext.Request, _sessionId);
-
-                        byte[] raw = Serializer.Serialize(initSessionParameters).ToArray();
-                        context.Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Serializer.ContentType));
-                        context.Request.Content = new ByteArrayContent(raw);
-                        context.Request.Content.Headers.ContentLength = raw.Length;
 
                         await Next(initSessionContext);
 

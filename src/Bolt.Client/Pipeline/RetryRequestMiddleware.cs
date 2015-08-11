@@ -6,7 +6,7 @@ namespace Bolt.Client.Pipeline
 {
     public class RetryRequestMiddleware : ClientMiddlewareBase
     {
-        public RetryRequestMiddleware(ActionDelegate<ClientActionContext> next, IErrorRecovery errorRecovery) : base(next)
+        public RetryRequestMiddleware(IErrorRecovery errorRecovery)
         {
             ErrorRecovery = errorRecovery;
         }
@@ -16,8 +16,6 @@ namespace Bolt.Client.Pipeline
         public int Retries { get; set; }
 
         public TimeSpan RetryDelay { get; set; }
-
-        public HandleContextStage Stage => HandleContextStage.After;
 
         public override async Task Invoke(ClientActionContext context)
         {

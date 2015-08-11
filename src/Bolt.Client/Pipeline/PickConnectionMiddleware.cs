@@ -7,8 +7,8 @@ namespace Bolt.Client.Pipeline
 {
     public class PickConnectionMiddleware : ClientMiddlewareBase
     {
-        public PickConnectionMiddleware(ActionDelegate<ClientActionContext> next, IServerProvider serverProvider,
-            IEndpointProvider endpointProvider) : base(next)
+        public PickConnectionMiddleware(IServerProvider serverProvider,
+            IEndpointProvider endpointProvider)
         {
             if (serverProvider == null) throw new ArgumentNullException(nameof(serverProvider));
             if (endpointProvider == null) throw new ArgumentNullException(nameof(endpointProvider));
@@ -20,8 +20,6 @@ namespace Bolt.Client.Pipeline
         public IServerProvider ServerProvider { get; }
 
         public IEndpointProvider EndpointProvider { get; }
-
-        public HandleContextStage Stage => HandleContextStage.Before;
 
         public override async Task Invoke(ClientActionContext context)
         {

@@ -2,7 +2,6 @@
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Bolt.Client.Channels;
 using Bolt.Core;
 using Moq;
 using Xunit;

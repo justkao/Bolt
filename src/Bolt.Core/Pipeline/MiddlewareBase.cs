@@ -1,14 +1,13 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Bolt.Core
+namespace Bolt.Pipeline
 {
     public abstract class MiddlewareBase<T> : IMiddleware<T> where T : ActionContextBase
     {
-        protected MiddlewareBase(ActionDelegate<T> next)
+        public void Init(ActionDelegate<T> next)
         {
             if (next == null) throw new ArgumentNullException(nameof(next));
-
             Next = next;
         }
 

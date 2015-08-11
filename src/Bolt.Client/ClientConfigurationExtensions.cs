@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using Bolt.Client.Channels;
-using Bolt.Client.Filters;
-using Bolt.Client.Pipeline;
 
 namespace Bolt.Client
 {
@@ -24,15 +20,7 @@ namespace Bolt.Client
             IServerProvider serverProvider)
             where TContract : class
         {
-            SessionChannel channel = new SessionChannel(typeof(TContract), serverProvider, clientConfiguration);
-            TContract result = clientConfiguration.CreateProxy<TContract>(channel);
-
-            if (result is IContractProvider)
-            {
-                channel.Contract = (result as IContractProvider).Contract;
-            }
-
-            return result;
+            return clientConfiguration.ProxyBuilder().UseSession().Url(serverProvider).Build<TContract>();
         }
 
         public static TContract CreateProxy<TContract>(this ClientConfiguration clientConfiguration, string uri)
@@ -51,38 +39,7 @@ namespace Bolt.Client
             IServerProvider serverProvider)
             where TContract : class
         {
-            return clientConfiguration.CreateProxy<TContract>(new RecoverableChannel(serverProvider, clientConfiguration));
-        }
-
-        public static TContract CreateProxy<TContract>(this ClientConfiguration clientConfiguration, IChannel channel)
-            where TContract : class
-        {
-            if (clientConfiguration.ProxyFactory == null)
-            {
-                throw new InvalidOperationException(
-                    $"Unable to create proxy for contract '{typeof(TContract).Name}' becasue proxy factory is not initialized.");
-            }
-
-            return clientConfiguration.ProxyFactory.CreateProxy<TContract>(channel);
-        }
-
-        public static ClientConfiguration AddFilter<T>(this ClientConfiguration clientConfiguration) where T: IClientContextHandler, new()
-        {
-            return clientConfiguration.AddFilter(Activator.CreateInstance<T>());
-        }
-
-        public static ClientConfiguration AddFilter(this ClientConfiguration clientConfiguration, IClientContextHandler contextHandler)
-        {
-            if (clientConfiguration == null) throw new ArgumentNullException(nameof(clientConfiguration));
-            if (contextHandler == null) throw new ArgumentNullException(nameof(contextHandler));
-
-            if (clientConfiguration.Filters == null)
-            {
-                clientConfiguration.Filters = new List<IClientContextHandler>();
-            }
-
-            clientConfiguration.Filters.Add(contextHandler);
-            return clientConfiguration;
+            return clientConfiguration.ProxyBuilder().Url(serverProvider).Build<TContract>();
         }
     }
 }

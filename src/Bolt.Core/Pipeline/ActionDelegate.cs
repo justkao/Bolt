@@ -2,7 +2,7 @@
 using System.Threading.Tasks;
 using Bolt.Core;
 
-namespace Bolt
+namespace Bolt.Pipeline
 {
     public delegate Task ActionDelegate<in T>(T context) where T : ActionContextBase;
 }

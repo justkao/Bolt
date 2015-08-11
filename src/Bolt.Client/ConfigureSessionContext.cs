@@ -1,19 +1,21 @@
 ﻿using System;
-using System.IO;
-using System.Text;
+using Bolt.Client.Pipeline;
 using Bolt.Session;
 
-namespace Bolt.Client.Channels
+namespace Bolt.Client
 {
     public class ConfigureSessionContext
     {
-        public ConfigureSessionContext(SessionChannel channel, InitSessionParameters parameters)
+        public ConfigureSessionContext(SessionMiddleware middleware, InitSessionParameters parameters)
         {
-            Channel = channel;
+            if (middleware == null) throw new ArgumentNullException(nameof(middleware));
+            if (parameters == null) throw new ArgumentNullException(nameof(parameters));
+
+            Middleware = middleware;
             Parameters = parameters;
         }
 
-        public SessionChannel Channel { get; }
+        public SessionMiddleware Middleware { get; }
 
         public InitSessionParameters Parameters { get; }
 
@@ -24,7 +26,7 @@ namespace Bolt.Client.Channels
                 throw new ArgumentNullException(nameof(key));
             }
 
-            Parameters.Write(Channel.Serializer, key, value);
+            Parameters.Write(Middleware.Serializer, key, value);
         }
 
         public T Read<T>(string key)
@@ -34,7 +36,7 @@ namespace Bolt.Client.Channels
                 throw new ArgumentNullException(nameof(key));
             }
 
-            return Parameters.Read<T>(Channel.Serializer, key);
+            return Parameters.Read<T>(Middleware.Serializer, key);
         }
     }
 }

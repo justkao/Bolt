@@ -1,5 +1,4 @@
 ﻿using Bolt.Client;
-using Bolt.Client.Channels;
 using Bolt.Server.IntegrationTest.Core;
 using System;
 using System.Threading.Tasks;

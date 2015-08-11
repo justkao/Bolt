@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-
-using Bolt.Client.Channels;
 using Bolt.Client.Filters;
 
 using Xunit;
@@ -80,7 +78,7 @@ namespace Bolt.Client.Test
                     .Filter<AcceptLanguageContextHandler>()
                     .Build<TestContractProxy>();
 
-            Assert.True(result.GetChannel<ChannelBase>().Filters.Any(f=>f is AcceptLanguageContextHandler));
+            Assert.True(result.GetChannel<ProxyBase>().Filters.Any(f=>f is AcceptLanguageContextHandler));
         }
 
         [Fact]
@@ -93,7 +91,7 @@ namespace Bolt.Client.Test
                     .Filter<AcceptLanguageContextHandler>()
                     .Build<TestContractProxy>();
 
-            Assert.True(result.GetChannel<ChannelBase>().Filters.Any(f => f is AcceptLanguageContextHandler));
+            Assert.True(result.GetChannel<ProxyBase>().Filters.Any(f => f is AcceptLanguageContextHandler));
         }
 
         public class TestContractProxy : ContractProxy, ITestContract

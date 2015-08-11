@@ -1,5 +1,4 @@
 ﻿using Bolt.Client;
-using Bolt.Client.Channels;
 using Bolt.Server.IntegrationTest.Core;
 using Bolt.Test.Common;
 using Microsoft.AspNet.Builder;
@@ -330,7 +329,7 @@ namespace Bolt.Server.IntegrationTest
         public void LongOperation_TimeoutSet_EnsureCallTimeouted()
         {
             ITestContractAsync client = CreateChannel();
-            ((ChannelBase)((ContractProxy) client).Channel).DefaultResponseTimeout = TimeSpan.FromSeconds(0.1);
+            ((ProxyBase)((ContractProxy) client).Channel).DefaultResponseTimeout = TimeSpan.FromSeconds(0.1);
             CompositeType arg = CompositeType.CreateRandom();
 
             Mock<ITestContract> server = Server();

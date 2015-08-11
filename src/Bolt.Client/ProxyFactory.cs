@@ -1,17 +1,18 @@
 ﻿using System;
+using Bolt.Pipeline;
 
 namespace Bolt.Client
 {
     public class ProxyFactory : IProxyFactory
     {
-        public virtual T CreateProxy<T>(IChannel channel) where T:class
+        public virtual T CreateProxy<T>(IPipeline<ClientActionContext> pipeline) where T:class
         {
-            if (channel == null)
+            if (pipeline == null)
             {
-                throw new ArgumentNullException(nameof(channel));
+                throw new ArgumentNullException(nameof(pipeline));
             }
 
-            return (T) Activator.CreateInstance(typeof(T), channel);
+            return (T) Activator.CreateInstance(typeof(T), pipeline);
         }
     }
 }

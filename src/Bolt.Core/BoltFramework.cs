@@ -22,6 +22,14 @@ namespace Bolt
             typeof (BoltFramework).GetTypeInfo()
                 .DeclaredMethods.First(m => m.IsStatic && m.Name == nameof(DestroyBoltSession));
 
+        public static readonly MethodInfo InitAction =
+    typeof(BoltFramework).GetTypeInfo()
+        .DeclaredMethods.First(m => m.IsStatic && m.Name == nameof(InitBoltSession));
+
+        public static readonly MethodInfo DestroyAction =
+            typeof(BoltFramework).GetTypeInfo()
+                .DeclaredMethods.First(m => m.IsStatic && m.Name == nameof(DestroyBoltSession));
+
         public static IEnumerable<MethodInfo> GetContractActions(Type contract)
         {
             if (contract == null)

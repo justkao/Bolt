@@ -3,21 +3,18 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Core;
+using Bolt.Pipeline;
 
 namespace Bolt.Client.Pipeline
 {
     public class CommunicationMiddleware : DelegatingHandler, IMiddleware<ClientActionContext>
     {
-        private readonly ActionDelegate<ClientActionContext> _next;
+        private ActionDelegate<ClientActionContext> _next;
 
-        public CommunicationMiddleware(ActionDelegate<ClientActionContext> next, HttpMessageHandler messageHandler) 
+        public CommunicationMiddleware( HttpMessageHandler messageHandler) 
             : base(messageHandler)
         {
-            if (next == null) throw new ArgumentNullException(nameof(next));
-            _next = next;
         }
-
-        public HandleContextStage Stage => HandleContextStage.Execute;
 
         public TimeSpan ResponseTimeout { get; set; }
 
@@ -52,6 +49,11 @@ namespace Bolt.Client.Pipeline
             }
 
             await _next(context);
+        }
+
+        public void Init(ActionDelegate<ClientActionContext> next)
+        {
+            _next = next;
         }
     }
 }

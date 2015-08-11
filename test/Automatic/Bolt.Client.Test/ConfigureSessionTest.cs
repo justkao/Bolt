@@ -1,5 +1,4 @@
 using System.Runtime.Serialization;
-using Bolt.Client.Channels;
 using Moq;
 using Xunit;
 

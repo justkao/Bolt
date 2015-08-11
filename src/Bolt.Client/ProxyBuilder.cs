@@ -1,21 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Bolt.Client.Channels;
+using System.Net.Http;
 using Bolt.Client.Pipeline;
+using Bolt.Pipeline;
+using Bolt.Session;
 
 namespace Bolt.Client
 {
     public class ProxyBuilder
     {
         private readonly ClientConfiguration _configuration;
-        private readonly List<IClientContextHandler> _userFilters = new List<IClientContextHandler>();
+        private RetryRequestMiddleware _retryRequest;
+        private SessionMiddleware _sessionMiddleware;
         private IServerProvider _serverProvider;
-        private Action<ConfigureSessionContext> _configureSession;
-        private int _retries;
-        private TimeSpan _retryDelay;
-        private bool _useSession;
-        private bool _distributedSession;
+        private HttpMessageHandler _messageHandler;
 
         public ProxyBuilder(ClientConfiguration configuration)
         {
@@ -29,28 +28,24 @@ namespace Bolt.Client
 
         public virtual ProxyBuilder Recoverable(int retries, TimeSpan retryDelay)
         {
-            _retries = retries;
-            _retryDelay = retryDelay;
-
-            return this;
-        }
-
-        public virtual ProxyBuilder UseSession(bool distributed = false)
-        {
-            _useSession = true;
-            _distributedSession = distributed;
-            return this;
-        }
-
-        public virtual ProxyBuilder ConfigureSession(Action<ConfigureSessionContext> configureSession)
-        {
-            if (configureSession == null)
+            _retryRequest = new RetryRequestMiddleware(_configuration.ErrorRecovery)
             {
-                throw new ArgumentNullException(nameof(configureSession));
-            }
+                Retries = retries,
+                RetryDelay = retryDelay
+            };
 
-            _useSession = true;
-            _configureSession = configureSession;
+            return this;
+        }
+
+        public virtual ProxyBuilder UseSession(Action<ConfigureSessionContext> configureSession = null, bool distributed = false)
+        {
+            _sessionMiddleware = new SessionMiddleware(_configuration.Serializer, _configuration.SessionHandler)
+            {
+                UseDistributedSession = distributed,
+                InitSessionParameters = new InitSessionParameters()
+            };
+            configureSession?.Invoke(new ConfigureSessionContext(_sessionMiddleware, _sessionMiddleware.InitSessionParameters));
+
             return this;
         }
 
@@ -94,20 +89,10 @@ namespace Bolt.Client
             return this;
         }
 
-        public virtual ProxyBuilder Filter<T>() where T : IClientContextHandler, new()
+        public virtual ProxyBuilder UseHttpMessageHandler(HttpMessageHandler messageHandler)
         {
-            _userFilters.Add(Activator.CreateInstance<T>());
-            return this;
-        }
-
-        public virtual ProxyBuilder Filter(params IClientContextHandler[] filters)
-        {
-            if (filters == null)
-            {
-                throw new ArgumentNullException(nameof(filters));
-            }
-
-            _userFilters.AddRange(filters);
+            if (messageHandler == null) throw new ArgumentNullException(nameof(messageHandler));
+            _messageHandler = messageHandler;
             return this;
         }
 
@@ -118,47 +103,24 @@ namespace Bolt.Client
                 throw new InvalidOperationException("Server provider or target url was not configured.");
             }
 
-            RecoverableChannel channel;
+            PipelineBuilder<ClientActionContext> context = new PipelineBuilder<ClientActionContext>();
 
-            List<IClientContextHandler> filters = _configuration.Filters.ToList();
-            filters.AddRange(_userFilters);
-
-            if (!_useSession)
+            context.Use(new ValidateProxyMiddleware());
+            if (_retryRequest != null)
             {
-                channel = new RecoverableChannel(
-                    _configuration.Serializer,
-                    _serverProvider,
-                    _configuration.RequestHandler,
-                    _configuration.EndpointProvider,
-                    filters)
-                {
-                    Retries = _retries,
-                    RetryDelay = _retryDelay
-                };
-            }
-            else
-            {
-                channel = new SessionChannel(
-                    typeof (TContract),
-                    _configuration.Serializer,
-                    _serverProvider,
-                    _configuration.RequestHandler,
-                    _configuration.EndpointProvider,
-                    _configuration.SessionHandler,
-                    filters)
-                {
-                    Retries = _retries,
-                    RetryDelay = _retryDelay,
-                    UseDistributedSession = _distributedSession
-                };
-
-                if (_configureSession != null)
-                {
-                    channel.ConfigureSession(_configureSession);
-                }
+                context.Use(_retryRequest);
             }
 
-            return _configuration.ProxyFactory.CreateProxy<TContract>(channel);
+            if (_sessionMiddleware != null)
+            {
+                context.Use(_sessionMiddleware);
+            }
+
+            context.Use(new SerializationMiddleware(_configuration.Serializer, _configuration.ExceptionWrapper, _configuration.ErrorProvider));
+            context.Use(new CommunicationMiddleware(_messageHandler ?? new HttpClientHandler()));
+            PipelineResult<ClientActionContext> result = context.Build();
+
+            return _configuration.ProxyFactory.CreateProxy<TContract>(result);
         }
     }
 }
