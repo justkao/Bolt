@@ -16,7 +16,8 @@ namespace Bolt.Client
             EndpointProvider = new EndpointProvider(Options);
             SessionHandler = new ClientSessionHandler(Options);
             ProxyFactory = new ProxyFactory();
-            ErrorRecovery = new ErrorRecovery();
+            ErrorProvider = new ClientErrorProvider(Options.ServerErrorHeader);
+            ErrorHandling = new ErrorHandling();
         }
 
         /// <summary>
@@ -36,7 +37,7 @@ namespace Bolt.Client
 
         public IClientSessionHandler SessionHandler { get; set; }
 
-        public IErrorRecovery ErrorRecovery { get; set; }
+        public IErrorHandling ErrorHandling { get; set; }
 
         public IClientErrorProvider ErrorProvider{ get; set; }
 

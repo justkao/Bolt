@@ -28,7 +28,7 @@ namespace TestService.Core
         {
         }
 
-        public TestContractProxy(IChannel channel) : base(typeof(TestService.Core.ITestContract), channel)
+        public TestContractProxy(IProxy proxy) : base(typeof(TestService.Core.ITestContract), proxy)
         {
         }
 

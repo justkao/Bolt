@@ -5,19 +5,36 @@ namespace Bolt.Client.Pipeline
 {
     public class ValidateProxyMiddleware : ClientMiddlewareBase
     {
-        public override Task Invoke(ClientActionContext context)
+        public override async Task Invoke(ClientActionContext context)
         {
+            ProxyState proxyState = context.Proxy.State;
+
             if (context.Proxy == null)
             {
                 throw new InvalidOperationException("Proxy object is not assigned.");
             }
 
-            if (context.Proxy.State == ChannelState.Closed)
+            if (context.Proxy.State == ProxyState.Closed)
             {
                 throw new ProxyClosedException("Proxy object is already closed.");
             }
 
-            return Next(context);
+            try
+            {
+                await Next(context);
+
+                if (proxyState == ProxyState.Uninitialized)
+                {
+                    (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Open);
+                }
+            }
+            finally
+            {
+                if (proxyState == ProxyState.Open && context.Action == BoltFramework.DestroySessionAction)
+                {
+                    (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
+                }
+            }
         }
     }
 }

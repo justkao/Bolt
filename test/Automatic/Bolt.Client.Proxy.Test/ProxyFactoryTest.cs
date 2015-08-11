@@ -24,7 +24,7 @@ namespace Bolt.Client.Proxy.Test
         {
             ProxyFactory factory = Create();
 
-            Mock<IChannel> contract = new Mock<IChannel>();
+            Mock<IProxy> contract = new Mock<IProxy>();
 
             ITestContract proxy = factory.CreateProxy<ITestContract>(contract.Object);
             Assert.True(proxy is ContractProxy);
@@ -35,10 +35,10 @@ namespace Bolt.Client.Proxy.Test
         {
             ProxyFactory factory = Create();
 
-            Mock<IChannel> contract = new Mock<IChannel>();
+            Mock<IProxy> contract = new Mock<IProxy>();
 
             ITestContract proxy = factory.CreateProxy<ITestContract>(contract.Object);
-            Assert.True(proxy is IChannel);
+            Assert.True(proxy is IProxy);
         }
 
         [Fact]
@@ -46,7 +46,7 @@ namespace Bolt.Client.Proxy.Test
         {
             ProxyFactory factory = Create();
             
-            Mock<IChannel> contract = new Mock<IChannel>();
+            Mock<IProxy> contract = new Mock<IProxy>();
             var contractType = typeof (ITestContract);
             var resultType = typeof(void);
 
@@ -66,7 +66,7 @@ namespace Bolt.Client.Proxy.Test
         {
             ProxyFactory factory = Create();
 
-            Mock<IChannel> contract = new Mock<IChannel>();
+            Mock<IProxy> contract = new Mock<IProxy>();
             var contractType = typeof(ITestContract);
             var resultType = typeof(void);
 
@@ -86,7 +86,7 @@ namespace Bolt.Client.Proxy.Test
         {
             ProxyFactory factory = Create();
 
-            Mock<IChannel> contract = new Mock<IChannel>();
+            Mock<IProxy> contract = new Mock<IProxy>();
             var contractType = typeof(ITestContract);
             var resultType = typeof(string);
 
@@ -108,7 +108,7 @@ namespace Bolt.Client.Proxy.Test
         {
             ProxyFactory factory = Create();
 
-            Mock<IChannel> contract = new Mock<IChannel>(MockBehavior.Strict);
+            Mock<IProxy> contract = new Mock<IProxy>(MockBehavior.Strict);
             var contractType = typeof(ITestContract);
             var resultType = typeof(int);
 
@@ -134,7 +134,7 @@ namespace Bolt.Client.Proxy.Test
             Mock<ISerializer> jsonSerializer = new Mock<ISerializer>(MockBehavior.Strict);
             jsonSerializer.Setup(s => s.CreateSerializer()).Returns(objectSerializer.Object);
 
-            Mock<IChannel> contract = new Mock<IChannel>(MockBehavior.Strict);
+            Mock<IProxy> contract = new Mock<IProxy>(MockBehavior.Strict);
 
             var contractType = typeof (ITestContract);
             var resultType = typeof (void);

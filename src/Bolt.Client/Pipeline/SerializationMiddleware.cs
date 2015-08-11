@@ -40,11 +40,10 @@ namespace Bolt.Client.Pipeline
 
             if (context.Response == null)
             {
-                throw new BoltException($"Unable to process result for action '{context.Action.Name}' because response from server was not received.");
+                throw new BoltException($"Unable to process result for action '{context.Action.Name}' because response from server '{context.Request.RequestUri}' was not received.");
             }
 
             await HandleResponseAsync(context);
-            await Next(context);
         }
 
         protected virtual HttpContent BuildRequestParameters(ClientActionContext context)

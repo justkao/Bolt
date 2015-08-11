@@ -1,5 +1,4 @@
-﻿using Bolt.Core;
-using Bolt.Pipeline;
+﻿using Bolt.Pipeline;
 
 namespace Bolt.Client.Pipeline
 {

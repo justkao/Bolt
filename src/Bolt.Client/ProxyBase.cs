@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
+
+using Bolt.Client.Pipeline;
 using Bolt.Pipeline;
 
 namespace Bolt.Client
 {
-    public abstract class ProxyBase : IChannel
+    public abstract class ProxyBase : IProxy, IPipelineCallback
     {
         protected ProxyBase()
         {
@@ -20,9 +22,21 @@ namespace Bolt.Client
             Pipeline = pipeline;
         }
 
+        protected ProxyBase(ProxyBase proxy)
+        {
+            if (proxy == null)
+            {
+                throw new ArgumentNullException(nameof(proxy));
+            }
+
+            Contract = proxy.Contract;
+            Pipeline = proxy.Pipeline;
+            State = proxy.State;
+        }
+
         public Type Contract { get; protected set; }
 
-        public ChannelState State { get; private set; }
+        public ProxyState State { get; private set; }
 
         protected IPipeline<ClientActionContext> Pipeline { get; set; }
 
@@ -31,25 +45,29 @@ namespace Bolt.Client
             using (ClientActionContext ctxt = new ClientActionContext(this, Contract, BoltFramework.InitSessionAction, new object[] { null }))
             {
                 await Pipeline.Instance(ctxt);
-                State = ChannelState.Open;
+                State = ProxyState.Open;
             }
         }
 
         public async Task CloseAsync()
         {
-            if (State == ChannelState.Open)
+            if (State == ProxyState.Open)
             {
                 using (ClientActionContext ctxt = new ClientActionContext(this, Contract, BoltFramework.DestroySessionAction, new object[] { null }))
                 {
                     await Pipeline.Instance(ctxt);
-                    State = ChannelState.Closed;
+                    State = ProxyState.Closed;
                 }
+            }
+            else
+            {
+                State = ProxyState.Closed;
             }
 
             Dispose();
         }
 
-        public async Task<object> SendAsync(MethodInfo action, object[] parameters)
+        public async Task<object> SendAsync(MethodInfo action, params object[] parameters)
         {
             using (ClientActionContext ctxt = new ClientActionContext(this, Contract, action, parameters))
             {
@@ -60,13 +78,18 @@ namespace Bolt.Client
 
         public void Dispose()
         {
-            if (State == ChannelState.Open)
+            if (State == ProxyState.Open)
             {
                 this.Close();
             }
 
             Pipeline?.Dispose();
             Pipeline = null;
+        }
+
+        void IPipelineCallback.ChangeState(ProxyState newState)
+        {
+            State = newState;
         }
     }
 }

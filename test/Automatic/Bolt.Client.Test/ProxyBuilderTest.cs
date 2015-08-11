@@ -1,6 +1,7 @@
 ﻿using System;
-using System.Linq;
-using Bolt.Client.Filters;
+
+using Bolt.Client.Pipeline;
+using Bolt.Pipeline;
 
 using Xunit;
 
@@ -24,87 +25,46 @@ namespace Bolt.Client.Test
         [Fact]
         public void Recoverable_Ok()
         {
-            TestContractProxy result = ClientConfiguration.ProxyBuilder()
-                .Url("http://localhost:8080")
-                .Recoverable(10, TimeSpan.FromSeconds(5))
-                .Build<TestContractProxy>();
+            var pipeline =
+                ClientConfiguration.ProxyBuilder()
+                    .Url("http://localhost:8080")
+                    .Recoverable(10, TimeSpan.FromSeconds(5))
+                    .BuildPipeline<ITestContract>();
 
-            Assert.Equal(10, result.GetChannel<RecoverableChannel>().Retries);
-            Assert.Equal(TimeSpan.FromSeconds(5), result.GetChannel<RecoverableChannel>().RetryDelay);
+            var middleware = pipeline.Find<RetryRequestMiddleware>();
+            Assert.NotNull(middleware);
+            Assert.Equal(10, middleware.Retries);
+            Assert.Equal(TimeSpan.FromSeconds(5), middleware.RetryDelay);
         }
 
-        [Fact]
-        public void Session_Ok()
+        [InlineData(true)]
+        [InlineData(false)]
+        [Theory]
+        public void Session_Ok(bool useDistributedSession)
         {
-            TestContractProxy result = ClientConfiguration.ProxyBuilder()
-                .Url("http://localhost:8080")
-                .UseSession(false)
-                .Build<TestContractProxy>();
+            IPipeline<ClientActionContext> pipeline =
+                ClientConfiguration.ProxyBuilder()
+                    .Url("http://localhost:8080")
+                    .UseSession(distributed: useDistributedSession)
+                    .BuildPipeline<ITestContract>();
 
-            result.GetChannel<SessionChannel>();
-        }
-
-        [Fact]
-        public void Session_Distributed_Ok()
-        {
-            TestContractProxy result = ClientConfiguration.ProxyBuilder()
-                .Url("http://localhost:8080")
-                .UseSession(true)
-                .Build<TestContractProxy>();
-
-            Assert.True(result.GetChannel<SessionChannel>().UseDistributedSession);
+            var middleware = pipeline.Find<SessionMiddleware>();
+            Assert.NotNull(middleware);
+            Assert.Equal(useDistributedSession, middleware.UseDistributedSession);
         }
 
         [Fact]
         public void RecoverableSession_Ok()
         {
-            TestContractProxy result =
+            IPipeline<ClientActionContext> pipeline =
                 ClientConfiguration.ProxyBuilder()
                     .Url("http://localhost:8080")
                     .Recoverable(45, TimeSpan.FromSeconds(8))
-                    .UseSession(true)
-                    .Build<TestContractProxy>();
+                    .UseSession()
+                    .BuildPipeline<ITestContract>();
 
-            Assert.Equal(45, result.GetChannel<SessionChannel>().Retries);
-            Assert.Equal(TimeSpan.FromSeconds(8), result.GetChannel<SessionChannel>().RetryDelay);
-        }
-
-        [Fact]
-        public void Filter_Ok()
-        {
-            TestContractProxy result =
-                ClientConfiguration.ProxyBuilder()
-                    .Url("http://localhost:8080")
-                    .Filter<AcceptLanguageContextHandler>()
-                    .Build<TestContractProxy>();
-
-            Assert.True(result.GetChannel<ProxyBase>().Filters.Any(f=>f is AcceptLanguageContextHandler));
-        }
-
-        [Fact]
-        public void Filter_Session_Ok()
-        {
-            TestContractProxy result =
-                ClientConfiguration.ProxyBuilder()
-                    .Url("http://localhost:8080")
-                    .UseSession(true)
-                    .Filter<AcceptLanguageContextHandler>()
-                    .Build<TestContractProxy>();
-
-            Assert.True(result.GetChannel<ProxyBase>().Filters.Any(f => f is AcceptLanguageContextHandler));
-        }
-
-        public class TestContractProxy : ContractProxy, ITestContract
-        {
-            public TestContractProxy(IChannel channel)
-                : base(typeof(ITestContract), channel)
-            {
-            }
-
-            public string Execute(string param)
-            {
-                throw new NotSupportedException();
-            }
+            Assert.NotNull(pipeline.Find<SessionMiddleware>());
+            Assert.NotNull(pipeline.Find<RetryRequestMiddleware>());
         }
     }
 }

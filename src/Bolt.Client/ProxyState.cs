@@ -1,6 +1,6 @@
 namespace Bolt.Client
 {
-    public enum ChannelState
+    public enum ProxyState
     {
         Uninitialized,
         Open, 

@@ -1,11 +1,13 @@
 ﻿using System;
 
+using Bolt.Core;
+
 namespace Bolt.Client
 {
     /// <summary>
-    /// Exception indicating that the client is trying to make request from closed <see cref="IChannel"/>.
+    /// Exception indicating that the client is trying to make request from closed <see cref="IProxy"/>.
     /// </summary>
-    public class ProxyClosedException : Exception
+    public class ProxyClosedException : BoltException
     {
         public ProxyClosedException()
         {

@@ -35,8 +35,7 @@ namespace Bolt.Client.Pipeline
                                 : timeoutToken;
                 }
 
-                var response = await SendAsync(context.Request, token);
-                context.Response = response;
+                context.Response = await SendAsync(context.Request, token);
             }
             catch (OperationCanceledException)
             {

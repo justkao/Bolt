@@ -1,17 +1,16 @@
 using System;
 using System.Threading.Tasks;
-using Bolt.Core;
 
 namespace Bolt.Client.Pipeline
 {
     public class RetryRequestMiddleware : ClientMiddlewareBase
     {
-        public RetryRequestMiddleware(IErrorRecovery errorRecovery)
+        public RetryRequestMiddleware(IErrorHandling errorHandling)
         {
-            ErrorRecovery = errorRecovery;
+            ErrorHandling = errorHandling;
         }
 
-        public IErrorRecovery ErrorRecovery { get;  }
+        public IErrorHandling ErrorHandling { get; }
 
         public int Retries { get; set; }
 
@@ -28,20 +27,24 @@ namespace Bolt.Client.Pipeline
                     await Next(context);
                     return;
                 }
-                catch (OperationCanceledException)
-                {
-                    throw;
-                }
                 catch (Exception e)
                 {
-                    if (tries > Retries)
+                    SessionHandlingResult errorHandlingResult = ErrorHandling.Handle(context, e);
+                    switch (errorHandlingResult)
                     {
-                        throw;
-                    }
-
-                    if (!ErrorRecovery.CanRecover(context, e))
-                    {
-                        throw;
+                        case SessionHandlingResult.Close:
+                            (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
+                            throw;
+                        case SessionHandlingResult.Recover:
+                            if (tries > Retries)
+                            {
+                                throw;
+                            }
+                            break;
+                        case SessionHandlingResult.Rethrow:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
                     }
                 }
 

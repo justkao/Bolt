@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+
 using Bolt.Client.Pipeline;
 using Bolt.Pipeline;
 using Bolt.Session;
@@ -28,7 +28,7 @@ namespace Bolt.Client
 
         public virtual ProxyBuilder Recoverable(int retries, TimeSpan retryDelay)
         {
-            _retryRequest = new RetryRequestMiddleware(_configuration.ErrorRecovery)
+            _retryRequest = new RetryRequestMiddleware(_configuration.ErrorHandling)
             {
                 Retries = retries,
                 RetryDelay = retryDelay
@@ -37,14 +37,17 @@ namespace Bolt.Client
             return this;
         }
 
-        public virtual ProxyBuilder UseSession(Action<ConfigureSessionContext> configureSession = null, bool distributed = false)
+        public virtual ProxyBuilder UseSession(Action<ConfigureSessionContext> configureSession = null, bool distributed = false, IErrorHandling errorHandling = null)
         {
-            _sessionMiddleware = new SessionMiddleware(_configuration.Serializer, _configuration.SessionHandler)
+            _sessionMiddleware = new SessionMiddleware(
+                _configuration.SessionHandler,
+                errorHandling ?? _configuration.ErrorHandling)
             {
                 UseDistributedSession = distributed,
                 InitSessionParameters = new InitSessionParameters()
             };
-            configureSession?.Invoke(new ConfigureSessionContext(_sessionMiddleware, _sessionMiddleware.InitSessionParameters));
+
+            configureSession?.Invoke(new ConfigureSessionContext(_configuration.Serializer, _sessionMiddleware.InitSessionParameters));
 
             return this;
         }
@@ -96,7 +99,7 @@ namespace Bolt.Client
             return this;
         }
 
-        public virtual TContract Build<TContract>() where TContract : class
+        public virtual IPipeline<ClientActionContext> BuildPipeline<TContract>() where TContract : class
         {
             if (_serverProvider == null)
             {
@@ -118,9 +121,12 @@ namespace Bolt.Client
 
             context.Use(new SerializationMiddleware(_configuration.Serializer, _configuration.ExceptionWrapper, _configuration.ErrorProvider));
             context.Use(new CommunicationMiddleware(_messageHandler ?? new HttpClientHandler()));
-            PipelineResult<ClientActionContext> result = context.Build();
+            return context.Build();
+        }
 
-            return _configuration.ProxyFactory.CreateProxy<TContract>(result);
+        public virtual TContract Build<TContract>() where TContract : class
+        {
+            return _configuration.ProxyFactory.CreateProxy<TContract>(BuildPipeline<TContract>());
         }
     }
 }

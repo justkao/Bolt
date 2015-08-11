@@ -85,11 +85,6 @@ namespace Bolt.Client
         /// <exception cref="DeserializeResponseException">Thrown if any error occurred during deserialization.</exception>
         public static object DeserializeResponse(this ISerializer serializer, Type resultType, Stream stream, MethodInfo action)
         {
-            if (resultType == typeof (Empty) || resultType == typeof(void))
-            {
-                return Empty.Instance;
-            }
-
             if (stream == null || stream.Length == 0)
             {
                 return null;

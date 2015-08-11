@@ -66,18 +66,20 @@ namespace Bolt.Server.IntegrationTest.Core
 
 namespace Bolt.Server.IntegrationTest.Core
 {
-    public partial class TestContractProxy : ContractProxy, Bolt.Server.IntegrationTest.Core.ITestContract, ITestContractInnerAsync, IExcludedContractAsync, ITestContractAsync
+    public partial class TestContractProxy : ProxyBase, Bolt.Server.IntegrationTest.Core.ITestContract, ITestContractInnerAsync, IExcludedContractAsync, ITestContractAsync
     {
         public TestContractProxy(Bolt.Server.IntegrationTest.Core.TestContractProxy proxy) : base(proxy)
         {
         }
 
-        public TestContractProxy(IChannel channel) : base(typeof(Bolt.Server.IntegrationTest.Core.ITestContract), channel)
+        public TestContractProxy(IProxy proxy) : base(typeof(Bolt.Server.IntegrationTest.Core.ITestContract), proxy)
         {
         }
 
         public virtual void SimpleMethodWithSimpleArguments(int val)
         {
+            this.Send(__SimpleMethodWithSimpleArgumentsAction, val);
+
             var bolt_Params = Channel.Serializer.CreateSerializer();
             bolt_Params.WriteParameter(__SimpleMethodWithSimpleArgumentsAction, "val", typeof(int), val);
             Send(__SimpleMethodWithSimpleArgumentsAction, bolt_Params, CancellationToken.None);

@@ -20,7 +20,7 @@ namespace Bolt.Client
             Proxy = context.Proxy;
         }
 
-        public ClientActionContext(IChannel proxy, Type contract, MethodInfo action, object[] parameters)
+        public ClientActionContext(IProxy proxy, Type contract, MethodInfo action, object[] parameters)
             : base(contract, action, parameters)
         {
             Proxy = proxy;
@@ -45,7 +45,7 @@ namespace Bolt.Client
 
         public Exception ErrorResult { get; set; }
 
-        public IChannel Proxy { get; set; }
+        public IProxy Proxy { get; set; }
 
         protected override void Disposing(bool dispose)
         {

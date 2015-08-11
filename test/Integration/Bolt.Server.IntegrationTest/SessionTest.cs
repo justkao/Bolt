@@ -32,7 +32,7 @@ namespace Bolt.Server.IntegrationTest
             await client.GetStateAsync();
             Assert.Equal("test state", await client.GetStateAsync());
 
-            await (client as IChannel).CloseAsync();
+            await (client as IProxy).CloseAsync();
         }
 
         [Fact]
@@ -160,7 +160,7 @@ namespace Bolt.Server.IntegrationTest
             ((TestContractSessionChannel)GetInnerChannel(client)).Retries = 0;
             await client.GetStateAsync();
             string session = ((TestContractSessionChannel)GetInnerChannel(client)).SessionId;
-            await (client as IChannel).CloseAsync();
+            await (client as IProxy).CloseAsync();
             SessionInstanceProvider instanceProvider = InstanceProvider;
             Assert.False(Factory.Destroy(session));
         }
@@ -171,7 +171,7 @@ namespace Bolt.Server.IntegrationTest
             var client = GetChannel();
             ((TestContractSessionChannel)GetInnerChannel(client)).Retries = 0;
             await client.GetStateAsync();
-            await (client as IChannel).CloseAsync();
+            await (client as IProxy).CloseAsync();
 
             Assert.Throws<ProxyClosedException>(() => client.GetState());
         }
@@ -182,7 +182,7 @@ namespace Bolt.Server.IntegrationTest
             var client = GetChannel();
             ((TestContractSessionChannel)GetInnerChannel(client)).Retries = 0;
             client.GetState();
-            (client as IChannel).Close();
+            (client as IProxy).Close();
 
             Assert.Throws<ProxyClosedException>(() => client.GetState());
         }
@@ -218,7 +218,7 @@ namespace Bolt.Server.IntegrationTest
             int before = Factory.Count;
             Task.WaitAll(Enumerable.Repeat(0, 5).Select(_ => Task.Run(() => channel.GetState())).ToArray());
             Assert.Equal(before + 1, Factory.Count);
-            ((IChannel) channel).Dispose();
+            ((IProxy) channel).Dispose();
             Assert.Equal(before, Factory.Count);
         }
 
@@ -229,7 +229,7 @@ namespace Bolt.Server.IntegrationTest
             int before = Factory.Count;
             await Task.WhenAll(Enumerable.Repeat(0, 100).Select(_ => channel.GetStateAsync()));
             Assert.Equal(before + 1, Factory.Count);
-            await (channel as IChannel).CloseAsync();
+            await (channel as IProxy).CloseAsync();
             Assert.Equal(before, Factory.Count);
         }
 
@@ -240,7 +240,7 @@ namespace Bolt.Server.IntegrationTest
             var channel = GetChannel();
             (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
             channel.GetState();
-            ((IChannel) channel).Close();
+            ((IProxy) channel).Close();
 
             Assert.Throws<ProxyClosedException>(() => channel.GetState());
         }
@@ -251,7 +251,7 @@ namespace Bolt.Server.IntegrationTest
             var channel = GetChannel();
             (channel as ContractProxy).WithRetries(0, TimeSpan.FromMilliseconds(1));
             await channel.GetStateAsync();
-            await ((IChannel)channel).CloseAsync();
+            await ((IProxy)channel).CloseAsync();
 
             await Assert.ThrowsAsync<ProxyClosedException>(() => channel.GetStateAsync());
         }
@@ -400,9 +400,9 @@ namespace Bolt.Server.IntegrationTest
         public async Task Async_InitSession_Explicitely_EnsureInitialized()
         {
             ITestContractStateFullAsync channel = GetChannel();
-            await ((IChannel) channel).OpenAsync();
+            await ((IProxy) channel).OpenAsync();
             await channel.GetStateAsync();
-            await (channel as IChannel).CloseAsync();
+            await (channel as IProxy).CloseAsync();
         }
 
         [Fact]
@@ -430,7 +430,7 @@ namespace Bolt.Server.IntegrationTest
         {
             var proxy = GetChannel();
             proxy.GetState();
-            ((IChannel) proxy).Dispose();
+            ((IProxy) proxy).Dispose();
 
             Assert.Null(((SessionChannel)(((ContractProxy)proxy).Channel)).SessionId);
         }

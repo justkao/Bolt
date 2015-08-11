@@ -8,7 +8,12 @@ namespace Bolt.Pipeline
     public class PipelineBuilder<T> where T : ActionContextBase
     {
         private readonly IList<Func<ActionDelegate<T>, ActionDelegate<T>>> _middlewares = new List<Func<ActionDelegate<T>, ActionDelegate<T>>>();
-        private List<IMiddleware<T>> _instances = new List<IMiddleware<T>>(); 
+        private readonly List<IMiddleware<T>> _instances = new List<IMiddleware<T>>();
+
+        public PipelineBuilder<T> Use(Func<ActionDelegate<T>, T, Task> action)
+        {
+            return Use(new DelegatedMiddleware<T>(action));
+        } 
 
         public PipelineBuilder<T> Use(IMiddleware<T> middleware)
         {

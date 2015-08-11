@@ -6,10 +6,8 @@ using System.Reflection;
 
 namespace Bolt.Generators
 {
-    public partial class ProxyGenerator : ContractGeneratorBase
+    public class ProxyGenerator : ContractGeneratorBase
     {
-        private string _contractDescriptorProperty;
-
         public ProxyGenerator()
             : this(new StringWriter(), new TypeFormatter(), new IntendProvider())
         {
@@ -20,21 +18,6 @@ namespace Bolt.Generators
         {
             Suffix = "Proxy";
             Modifier = "public";
-        }
-
-        public virtual string ContractDescriptorProperty
-        {
-            get
-            {
-                if (_contractDescriptorProperty == null)
-                {
-                    return $"{ContractDefinition.Name}Descriptor";
-                }
-
-                return _contractDescriptorProperty;
-            }
-
-            set { _contractDescriptorProperty = value; }
         }
 
         public bool ForceAsync { get; set; }
@@ -53,7 +36,7 @@ namespace Bolt.Generators
 
         public override void Generate(object context)
         {
-            AddUsings(BoltConstants.Client.Namespace, BoltConstants.Client.ChannelsNamespace, "System.Threading", "System.Reflection");
+            AddUsings(BoltConstants.Client.Namespace, "System.Threading", "System.Reflection");
 
             ClassGenerator generator = CreateClassGenerator(ContractDescriptor);
             generator.Modifier = Modifier;
@@ -115,99 +98,57 @@ namespace Bolt.Generators
                 g =>
                 {
                     MethodInfo method = descriptor.Method;
-                    ParameterInfo cancellation = descriptor.GetCancellationTokenParameter();
-
-                    GenerateRequestCodeResult result = GenerateRequestCode(
-                        descriptor,
-                        descriptor.Method.GetParameters().ToDictionary(p => p, p => p.Name));
+                    string parameters = g.FormatMethodParameters(method, false);
 
                     if (HasReturnValue(method))
                     {
                         if (IsAsync(method))
                         {
                             WriteLine(
-                                "return SendAsync<{0}>({1}, {2});",
+                                "return this.SendAsync<{0}>({1}, {2});",
                                 FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType),
                                 GetStaticActionName(method),
-                                DeclareEndpoint(result.VariableName, cancellation));
+                                parameters);
                         }
                         else if (forceAsync)
                         {
                             WriteLine(
-                                "return SendAsync<{0}>({1}, {2});",
+                                "return this.SendAsync<{0}>({1}, {2});",
                                 FormatType(method.ReturnType),
                                 GetStaticActionName(method),
-                                DeclareEndpoint(result.VariableName, cancellation));
+                                parameters);
                         }
                         else
                         {
                             WriteLine(
-                                "return Send<{0}>({1}, {2});",
+                                "return this.Send<{0}>({1}, {2});",
                                 FormatType(method.ReturnType),
                                 GetStaticActionName(method),
-                                DeclareEndpoint(result.VariableName, cancellation));
+                                parameters);
                         }
                     }
                     else
                     {
                         if (IsAsync(method))
                         {
-                            WriteLine("return SendAsync({0}, {1});", GetStaticActionName(method), DeclareEndpoint(result.VariableName, cancellation));
+                            WriteLine("return this.SendAsync({0}, {1});", GetStaticActionName(method), parameters);
                         }
                         else if (forceAsync)
                         {
-                            WriteLine("return SendAsync({0}, {1});", GetStaticActionName(method), DeclareEndpoint(result.VariableName, cancellation));
+                            WriteLine("return this.SendAsync({0}, {1});", GetStaticActionName(method), parameters);
                         }
                         else
                         {
-                            WriteLine("Send({0}, {1});", GetStaticActionName(method), DeclareEndpoint(result.VariableName, cancellation));
+                            WriteLine("this.Send({0}, {1});", GetStaticActionName(method), parameters);
                         }
                     }
                 });
         }
 
-        protected virtual GenerateRequestCodeResult GenerateRequestCode(MethodDescriptor methodDescriptor, Dictionary<ParameterInfo, string> variables)
-        {
-            if (!methodDescriptor.GetParameters().Any())
-            {
-                return new GenerateRequestCodeResult
-                {
-                    VariableName = "null"
-                };
-            }
-
-            WriteLine("var bolt_Params = Channel.Serializer.CreateSerializer();");
-
-            foreach (ParameterInfo info in methodDescriptor.GetParameters())
-            {
-                WriteLine($"bolt_Params.WriteParameter({GetStaticActionName(methodDescriptor.Method)}, \"{info.Name}\", typeof({FormatType(info.ParameterType)}), {variables[info]});");
-            }
-
-            return new GenerateRequestCodeResult
-            {
-                VariableName = "bolt_Params",
-            };
-        }
-
-        protected class GenerateRequestCodeResult
-        {
-            public string VariableName { get; set; }
-        }
-
-        private string DeclareEndpoint(string parameters, ParameterInfo cancellationTokenParameter)
-        {
-            if (cancellationTokenParameter == null)
-            {
-                return $"{parameters}, CancellationToken.None";
-            }
-
-            return $"{parameters}, {cancellationTokenParameter.Name}";
-        }
-
         protected override ClassDescriptor CreateDefaultDescriptor()
         {
             List<string> baseClasses = new List<string>();
-            string baseClass = $"ContractProxy";
+            string baseClass = BoltConstants.Client.ProxyBase.FullName;
             baseClasses.Add(baseClass);
             baseClasses.Add(ContractDefinition.Root.FullName);
 

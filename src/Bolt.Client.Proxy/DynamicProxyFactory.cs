@@ -36,7 +36,7 @@ namespace Bolt.Client.Proxy
 
             T proxy = _generator.CreateInterfaceProxyWithoutTarget<T>(options, interceptor);
             ((DynamicContractProxy) (object) proxy).Initialize(typeof (T), pipeline);
-            interceptor.Channel = ((DynamicContractProxy) (object) proxy);
+            interceptor.Proxy = ((DynamicContractProxy) (object) proxy);
             return proxy;
         }
 
@@ -51,7 +51,7 @@ namespace Bolt.Client.Proxy
 
         private class ChannelInterceptor : IInterceptor
         {
-            public IChannel Channel { get; set; }
+            public IProxy Proxy { get; set; }
 
             public void Intercept(IInvocation invocation)
             {
@@ -61,11 +61,11 @@ namespace Bolt.Client.Proxy
                     if (innerType == null)
                     {
                         // async method
-                        invocation.ReturnValue = Channel.SendAsync(invocation.Method, invocation.Arguments);
+                        invocation.ReturnValue = Proxy.SendAsync(invocation.Method, invocation.Arguments);
                     }
                     else
                     {
-                        Task<object> result = Channel.SendAsync(invocation.Method, invocation.Arguments);
+                        Task<object> result = Proxy.SendAsync(invocation.Method, invocation.Arguments);
                         if (innerType == typeof (object))
                         {
                             invocation.ReturnValue = result;
@@ -90,7 +90,7 @@ namespace Bolt.Client.Proxy
                 else
                 {
                     // not async method
-                    invocation.ReturnValue = Channel.Send(invocation.Method, invocation.Arguments);
+                    invocation.ReturnValue = Proxy.Send(invocation.Method, invocation.Arguments);
                 }
             }
 

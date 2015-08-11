@@ -19,9 +19,9 @@
         {
             public const string Namespace = "Bolt.Client";
 
-            public const string ChannelsNamespace = Namespace + ".Channels";
-
             public static readonly ClassDescriptor Channel = new ClassDescriptor("IChannel", Namespace) { IsInterface = true };
+
+            public static readonly ClassDescriptor ProxyBase = new ClassDescriptor("ProxyBase", Namespace) { IsInterface = false };
         }
     }
 }

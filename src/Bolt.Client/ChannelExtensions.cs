@@ -7,31 +7,39 @@ namespace Bolt.Client
 {
     public static class ChannelExtensions
     {
-        public static void Open(this IChannel channel)
+        public static void Open(this IProxy proxy)
         {
-            if (channel == null) throw new ArgumentNullException(nameof(channel));
-            TaskHelpers.Execute(channel.OpenAsync);
+            if (proxy == null) throw new ArgumentNullException(nameof(proxy));
+
+            TaskHelpers.Execute(proxy.OpenAsync);
         }
 
-        public static void Close(this IChannel channel)
+        public static void Close(this IProxy proxy)
         {
-            if (channel == null) throw new ArgumentNullException(nameof(channel));
-            TaskHelpers.Execute(channel.CloseAsync);
+            if (proxy == null) throw new ArgumentNullException(nameof(proxy));
+
+            TaskHelpers.Execute(proxy.CloseAsync);
         }
 
-        public static object Send(this IChannel channel, MethodInfo action, params object[] parameters)
+        public static object Send(this IProxy proxy, MethodInfo action, params object[] parameters)
         {
-            return TaskHelpers.Execute(() => channel.SendAsync(action, parameters));
+            if (proxy == null) throw new ArgumentNullException(nameof(proxy));
+
+            return TaskHelpers.Execute(() => proxy.SendAsync(action, parameters));
         }
 
-        public static T Send<T>(this IChannel channel, MethodInfo action, params object[] parameters)
+        public static T Send<T>(this IProxy proxy, MethodInfo action, params object[] parameters)
         {
-            return (T) channel.Send(action, parameters);
+            if (proxy == null) throw new ArgumentNullException(nameof(proxy));
+
+            return (T) proxy.Send(action, parameters);
         }
 
-        public static async Task<T> SendAsync<T>(this IChannel channel, MethodInfo action, params object[] parameters)
+        public static async Task<T> SendAsync<T>(this IProxy proxy, MethodInfo action, params object[] parameters)
         {
-            var result = await channel.SendAsync(action, parameters);
+            if (proxy == null) throw new ArgumentNullException(nameof(proxy));
+
+            var result = await proxy.SendAsync(action, parameters);
             return (T) result;
         }
     }

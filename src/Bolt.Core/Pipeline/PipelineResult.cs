@@ -17,6 +17,11 @@ namespace Bolt.Pipeline
 
         public ActionDelegate<T> Instance { get; }
 
+        public TMiddleware Find<TMiddleware>() where TMiddleware : IMiddleware<T>
+        {
+            return (TMiddleware)Middlewares.FirstOrDefault(m => m is TMiddleware);
+        }
+
         public IReadOnlyCollection<IMiddleware<T>> Middlewares { get; }
 
         public void Dispose()
