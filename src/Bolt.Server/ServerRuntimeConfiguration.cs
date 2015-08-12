@@ -1,4 +1,5 @@
 ﻿using System;
+using Bolt.Server.Pipeline;
 
 namespace Bolt.Server
 {
@@ -26,6 +27,8 @@ namespace Bolt.Server
 
         public BoltServerOptions Options { get; set; }
 
+        public IServerErrorHandler ErrorHandler { get; set; }
+
         public void Merge(ServerRuntimeConfiguration other)
         {
             if (other == null)
@@ -48,6 +51,10 @@ namespace Bolt.Server
             if (other.Serializer != null)
             {
                 Serializer = other.Serializer;
+            }
+            if (other.ErrorHandler != null)
+            {
+                ErrorHandler = other.ErrorHandler;
             }
         }
     }

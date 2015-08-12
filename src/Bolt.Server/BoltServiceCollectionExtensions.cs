@@ -35,6 +35,7 @@ namespace Microsoft.Framework.DependencyInjection
             services.AddTransient<IHttpSessionProvider, HttpContextSessionProvider>();
             services.AddSingleton<IContractInvokerFactory, ContractInvokerFactory>();
             services.AddSingleton<IServerPipelineBuilder, ServerPipelineBuilder>();
+            services.AddSingleton<IServerErrorHandler, ServerErrorHandler>();
 
             return services;
         }

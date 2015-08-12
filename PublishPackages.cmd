@@ -1,6 +1,6 @@
 @ECHO OFF
  
-set version="0.13.0-alpha"
+set version="0.14.0-alpha1"
 
 call validate.cmd
 if %errorlevel% neq 0 exit /b %errorlevel%
