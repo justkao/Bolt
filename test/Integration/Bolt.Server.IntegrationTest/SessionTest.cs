@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Channels;
 using System.Threading.Tasks;
 
 using Bolt.Client;
@@ -25,11 +26,48 @@ namespace Bolt.Server.IntegrationTest
         private MemorySessionFactory Factory { get; set; }
 
         [Fact]
-        public async Task Open_EnsureProperResult()
+        public void NewProxy_EnsureReady()
+        {
+            var client = GetProxy(null, false);
+
+            Assert.Equal(ProxyState.Ready, ((IProxy)client).State);
+        }
+
+        [Fact]
+        public async Task OpenAsync_EnsureProperResult()
         {
             var client = GetProxy(null, false);
 
             Assert.Equal("test", await client.OpenSessionAsync("test"));
+        }
+
+        [Fact]
+        public async Task OpenAsync_EnsureOpened()
+        {
+            var client = GetProxy(null, false);
+            await client.OpenSessionAsync("test");
+
+            Assert.Equal(ProxyState.Open, ((IProxy)client).State);
+        }
+
+        [Fact]
+        public async Task CloseAsync_EnsureClosed()
+        {
+            var client = GetProxy(null, false);
+            await client.OpenSessionAsync("test");
+            await ((IProxy) client).CloseAsync();
+
+            Assert.Equal(ProxyState.Closed, ((IProxy)client).State);
+        }
+
+        [Fact]
+        public async Task UseClosedProxy_EnsureThrows()
+        {
+            var client = GetProxy(null, false);
+            await client.OpenSessionAsync("test");
+            await ((IProxy)client).CloseAsync();
+
+            await Assert.ThrowsAsync<ProxyClosedException>(() => client.GetStateAsync());
         }
 
         [Fact]
@@ -303,147 +341,6 @@ namespace Bolt.Server.IntegrationTest
 
             await Assert.ThrowsAsync<ProxyClosedException>(() => client.GetStateAsync());
         }
-
-        /*
-        [Fact]
-        public async Task OpenSession_EnsureCallbackCalled()
-        {
-            var pipeline = CreatePipeline();
-            var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
-
-            session.InitSessionParameters = new InitSessionParameters();
-            session.InitSessionParameters.UserData["temp"] = "temp";
-
-            SessionCallback = new Mock<ISessionCallback>();
-            SessionCallback.Setup(c => c.InitSessionAsync(It.IsAny<InitSessionParameters>(), It.IsAny<ActionContextBase>(), It.IsAny<CancellationToken>()))
-                .Returns(
-                    () => Task.FromResult(new InitSessionResult())).Verifiable();
-
-            await client.GetStateAsync();
-
-            SessionCallback.Verify();
-        }
-
-        [Fact]
-        public async Task CloseSession_EnsureCallbackCalled()
-        {
-            var pipeline = CreatePipeline();
-            var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
-
-            SessionCallback = new Mock<ISessionCallback>();
-            SessionCallback.Setup(c => c.DestroySessionAsync(It.IsAny<DestroySessionParameters>(), It.IsAny<ActionContextBase>(), It.IsAny<CancellationToken>()))
-                .Returns(
-                    () => Task.FromResult(new DestroySessionResult())).Verifiable();
-
-
-            await client.GetStateAsync();
-            await (client as IProxy).CloseAsync();
-
-            SessionCallback.Verify();
-        }
-
-        [Fact]
-        public async Task OpenSession_EnsureProperResult()
-        {
-            var pipeline = CreatePipeline();
-            var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
-
-            session.InitSessionParameters = new InitSessionParameters();
-            session.InitSessionParameters.UserData["temp"] = "temp";
-
-            SessionCallback = new Mock<ISessionCallback>();
-            SessionCallback.Setup(
-                c =>
-                    c.InitSessionAsync(It.IsAny<InitSessionParameters>(), It.IsAny<ActionContextBase>(),
-                        It.IsAny<CancellationToken>()))
-                .Returns<InitSessionParameters, ActionContextBase, CancellationToken>(
-                    (p, ctxt, c) =>
-                    {
-                        Assert.NotNull(ctxt);
-                        InitSessionResult result = new InitSessionResult();
-                        result.UserData["temp"] = p.UserData["temp"];
-                        return Task.FromResult(result);
-                    }).Verifiable();
-
-
-            await client.GetStateAsync();
-            SessionCallback.Verify();
-
-            Assert.Equal("temp", session.InitSessionResult.UserData["temp"]);
-        }
-
-        [Fact]
-        public async Task OpenSession_WriteCustomValues_EnsureProperResult()
-        {
-            var pipeline = CreatePipeline();
-            var session = pipeline.Find<SessionMiddleware>();
-            session.InitSessionParameters = new InitSessionParameters(); 
-            var client = GetChannel(pipeline);
-
-            CompositeType obj = CompositeType.CreateRandom();
-            ConfigureSessionContext context= new ConfigureSessionContext(ClientConfiguration.Serializer, session.InitSessionParameters);
-
-            context.Write("composite", obj);
-
-            SessionCallback = new Mock<ISessionCallback>();
-            SessionCallback.Setup(
-                c =>
-                    c.InitSessionAsync(It.IsAny<InitSessionParameters>(), It.IsAny<ActionContextBase>(),
-                        It.IsAny<CancellationToken>()))
-                .Returns<InitSessionParameters, ActionContextBase, CancellationToken>(
-                    (p, ctxt, c) =>
-                    {
-                        CompositeType res = p.Read<CompositeType>(ctxt, "composite");
-                        Assert.NotNull(res);
-                        Assert.Equal(obj, res);
-                        InitSessionResult result = new InitSessionResult();
-                        result.Write(ctxt, "composite", res);
-                        return Task.FromResult(result);
-                    }).Verifiable();
-
-
-            await client.GetStateAsync();
-            SessionCallback.Verify();
-
-            Assert.Equal(obj, session.InitSessionResult.Read<CompositeType>(ClientConfiguration.Serializer, "composite"));
-        }
-
-        [Fact]
-        public async Task CloseSession_EnsureProperResult()
-        {
-            var pipeline = CreatePipeline();
-            var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
-
-            session.DestroySessionParameters = new DestroySessionParameters();
-            session.DestroySessionParameters.UserData["temp"] = "temp";
-
-            SessionCallback = new Mock<ISessionCallback>();
-            SessionCallback.Setup(
-                c =>
-                    c.DestroySessionAsync(It.IsAny<DestroySessionParameters>(), It.IsAny<ActionContextBase>(),
-                        It.IsAny<CancellationToken>()))
-                .Returns<DestroySessionParameters, ActionContextBase, CancellationToken>(
-                    (p, ctxt, c) =>
-                    {
-                        Assert.NotNull(ctxt);
-                        DestroySessionResult result = new DestroySessionResult();
-                        result.UserData["temp"] = p.UserData["temp"];
-                        return Task.FromResult(result);
-                    }).Verifiable();
-
-
-            await client.GetStateAsync();
-            await (client as IProxy).CloseAsync();
-
-            SessionCallback.Verify();
-
-            Assert.Equal("temp", session.DestroySessionResult.UserData["temp"]);
-        }
-        */
 
         [Fact]
         public async Task Async_InitSession_Explicitely_EnsureInitialized()

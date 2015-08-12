@@ -23,6 +23,47 @@ namespace Bolt.Server.IntegrationTest
     public class StateLessTest : IntegrationTestBase
     {
         [Fact]
+        public void NewProxy_EnsureReady()
+        {
+            var client = CreateChannel();
+            Assert.Equal(ProxyState.Ready, ((IProxy)client).State);
+        }
+
+        [Fact]
+        public async Task OpenAsync_EnsureOpened()
+        {
+            var client = CreateChannel();
+            Mock<ITestContract> server = Server();
+
+            await ((IProxy) client).OpenAsync();
+            Assert.Equal(ProxyState.Open, ((IProxy)client).State);
+        }
+
+        [Fact]
+        public async Task CloseAsync_EnsureClosed()
+        {
+            var client = CreateChannel();
+            Mock<ITestContract> server = Server();
+
+            await ((IProxy)client).OpenAsync();
+            await ((IProxy)client).CloseAsync();
+
+            Assert.Equal(ProxyState.Closed, ((IProxy)client).State);
+        }
+
+        [Fact]
+        public async Task UseClosedProxy_EnsureThrows()
+        {
+            var client = CreateChannel();
+            Mock<ITestContract> server = Server();
+
+            await ((IProxy)client).OpenAsync();
+            await ((IProxy)client).CloseAsync();
+
+            await Assert.ThrowsAsync<ProxyClosedException>(()=>client.ComplexFunctionAsync());
+        }
+
+        [Fact]
         public void ClientCallsAsyncMethod_AsyncOnClientAndServer_EnsureExecutedOnServer()
         {
             var client = CreateChannel();
@@ -248,12 +289,16 @@ namespace Bolt.Server.IntegrationTest
             }
         }
 
-        [InlineData(true)]
-        [InlineData(false)]
-        [Theory]
-        public void CreateProxyPerformance(bool useDynamicProxy)
+        [Fact]
+        public virtual void CreateProxyPerformance()
         {
-            ClientConfiguration.UseDynamicProxy();
+            for (int i = 0; i < 10; i++)
+            {
+                ClientConfiguration.ProxyBuilder()
+                    .Url(ServerUrl)
+                    .Recoverable(10, TimeSpan.FromSeconds(1))
+                    .Build<TestContractProxy>().Dispose();
+            }
 
             int cnt = 10000;
 
@@ -261,24 +306,10 @@ namespace Bolt.Server.IntegrationTest
 
             for (int i = 0; i < cnt; i++)
             {
-                if (useDynamicProxy)
-                {
-                    using (
-                        ClientConfiguration.ProxyBuilder().Url(ServerUrl).Recoverable(10, TimeSpan.FromSeconds(1)).Build<ITestContract>() as
-                        IDisposable)
-                    {
-                    }
-                }
-                else
-                {
-                    using (
-                        ClientConfiguration.ProxyBuilder()
-                            .Url(ServerUrl)
-                            .Recoverable(10, TimeSpan.FromSeconds(1))
-                            .Build<TestContractProxy>())
-                    {
-                    }
-                }
+                ClientConfiguration.ProxyBuilder()
+                    .Url(ServerUrl)
+                    .Recoverable(10, TimeSpan.FromSeconds(1))
+                    .Build<TestContractProxy>().Dispose();
             }
 
             System.Console.WriteLine("Creating {0} proxies by ProxyBuilder has taken {1}ms", 10000, watch.ElapsedMilliseconds);
@@ -341,7 +372,7 @@ namespace Bolt.Server.IntegrationTest
             CompositeType arg = CompositeType.CreateRandom();
 
             Mock<ITestContract> server = Server();
-            server.Setup(v => v.SimpleMethodWithComplexParameter(arg)).Callback(() => Thread.Sleep(TimeSpan.FromSeconds(1)));
+            server.Setup(v => v.SimpleMethodWithComplexParameter(arg)).Callback(() => Thread.Sleep(TimeSpan.FromSeconds(10)));
             Assert.Throws<TimeoutException>(() => client.SimpleMethodWithComplexParameter(arg));
         }
 
