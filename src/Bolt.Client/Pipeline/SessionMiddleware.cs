@@ -39,12 +39,14 @@ namespace Bolt.Client.Pipeline
 
         public override async Task Invoke(ClientActionContext context)
         {
+            // access or create session assigned to current proxy
             SessionDescriptor session = _sessions.GetOrAdd(
                 context.Proxy,
                 proxy => new SessionDescriptor(BoltFramework.GetSessionDescriptor(proxy.Contract)));
 
             if (session.State != ProxyState.Open)
             {
+                // we need to open proxy
                 await EnsureConnectionAsync(context, session);
             }
 
@@ -54,43 +56,19 @@ namespace Bolt.Client.Pipeline
                 context.ServerConnection = session.ServerConnection;
             }
 
-            if (context.Action != session.Contract.InitSession && context.Action != session.Contract.DestroySession)
-            {
-                ClientSessionHandler.EnsureSession(context.Request, session.SessionId);
-
-                try
-                {
-                    await Next(context);
-                }
-                catch (Exception e)
-                {
-                    Exception handled = HandleError(context, e, session);
-                    if (e == handled)
-                    {
-                        throw;
-                    }
-
-                    if (handled != null)
-                    {
-                        throw handled;
-                    }
-                }
-
-                return;
-            }
-
             if (context.Action == session.Contract.InitSession)
             {
+                // at this point session is opened, assign initialization result just in case
                 if (context.ActionResult == null)
                 {
                     context.ActionResult = session.InitSessionResult;
                 }
             }
-
-            if (context.Action == session.Contract.DestroySession)
+            else if (context.Action == session.Contract.DestroySession)
             {
                 if (context.Proxy.State == ProxyState.Closed)
                 {
+                    // no reason to continue in pipeline, proxy is already closed
                     session.ChangeState(context.Proxy, ProxyState.Closed);
                     context.ActionResult = session.DestroySessionResult;
                     return;
@@ -98,6 +76,7 @@ namespace Bolt.Client.Pipeline
 
                 if (context.Proxy.State == ProxyState.Ready)
                 {
+                    // proxy was never initialized, ignore the rest of pipeline and close it
                     context.ActionResult = session.DestroySessionResult;
                     session.ChangeState(context.Proxy, ProxyState.Closed);
                     return;
@@ -105,6 +84,7 @@ namespace Bolt.Client.Pipeline
 
                 if (session.RequiresDestroyParameters && context.Parameters == null)
                 {
+                    // we are trying to close proxy using IProxy.CloseAsync even when the destroy action requires actual parameters
                     throw new BoltClientException(
                         $"Destroing session requires parameters that were not provided for action '{context.Action.Name}'.",
                         ClientErrorCode.InvalidDestroySessionParameters,
@@ -114,14 +94,40 @@ namespace Bolt.Client.Pipeline
 
                 try
                 {
+                    // execute destroy session and close proxy
                     ClientSessionHandler.EnsureSession(context.Request, session.SessionId);
                     await Next(context);
-                    _sessions.TryRemove(context.Proxy, out session);
                 }
                 finally
                 {
+                    _sessions.TryRemove(context.Proxy, out session);
                     session.ClearSession();
                     session.ChangeState(context.Proxy, ProxyState.Closed);
+                }
+            }
+            else
+            {
+                // prepare the request with session
+                ClientSessionHandler.EnsureSession(context.Request, session.SessionId);
+
+                try
+                {
+                    // execute pipeline
+                    await Next(context);
+                }
+                catch (Exception e)
+                {
+                    Exception handled = HandleError(context, e, session);
+                    if (e == handled)
+                    {
+                        // the handled error is same, so just rethrow
+                        throw;
+                    }
+
+                    if (handled != null)
+                    {
+                        throw handled;
+                    }
                 }
             }
         }
@@ -224,14 +230,18 @@ namespace Bolt.Client.Pipeline
                 }
                 else if (sessionDescriptor.RequiresInitParameters)
                 {
-                    if (initSessionContext.Parameters == null || (initSessionContext.Parameters.Length != initSessionContext.Action.GetParameters().Length))
+                    try
+                    {
+                        BoltFramework.ValidateParameters(sessionDescriptor.Contract.InitSession, initSessionContext.Parameters);
+                    }
+                    catch (Exception e)
                     {
                         // we can not reuse initialization parameters, so throw 
                         throw new BoltClientException(
                             $"Proxy is beeing initialized with invalid parameters. If session initialization has non empty parameters you should initialize it first by calling '{initSessionContext.Action.Name}' with proper parameters.",
                             ClientErrorCode.InvalidInitSessionParameters,
                             context.Action,
-                            null);
+                            e);
                     }
                 }
 
@@ -278,6 +288,7 @@ namespace Bolt.Client.Pipeline
                 }
                 finally
                 {
+                    // we should not dispose original context
                     if (context.Action != sessionDescriptor.Contract.InitSession)
                     {
                         initSessionContext.Dispose();

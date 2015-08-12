@@ -2,19 +2,37 @@
  
 set version="0.14.0-alpha1"
 
-call validate.cmd
-if %errorlevel% neq 0 exit /b %errorlevel%
-
-.nuget\nuget.exe push packages\Bolt.Common.%version%.nupkg
+if %errorlevel% neq 0 goto failure
 
 .nuget\nuget.exe push packages\Bolt.Core.%version%.nupkg
+if %errorlevel% neq 0 goto failure
 
 .nuget\nuget.exe push packages\Bolt.Server.%version%.nupkg
+if %errorlevel% neq 0 goto failure
 
 .nuget\nuget.exe push packages\Bolt.Console.%version%.nupkg
+if %errorlevel% neq 0 goto failure
 
 .nuget\nuget.exe push packages\Bolt.Client.%version%.nupkg
+if %errorlevel% neq 0 goto failure
 
 .nuget\nuget.exe push packages\Bolt.Client.Proxy.%version%.nupkg
+if %errorlevel% neq 0 goto failure
 
 .nuget\nuget.exe push packages\Bolt.Generators.%version%.nupkg
+if %errorlevel% neq 0 goto failure
+
+goto success
+
+:failure
+echo Publish Failed !!!!
+pause
+goto end
+
+:success
+echo Publish Suceeeded !!!!
+goto end
+
+:end
+pause
+exit /B %errorlevel%

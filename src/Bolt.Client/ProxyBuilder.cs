@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-
+using System.Threading.Tasks;
 using Bolt.Client.Pipeline;
 using Bolt.Pipeline;
 
@@ -15,6 +16,7 @@ namespace Bolt.Client
         private IServerProvider _serverProvider;
         private HttpMessageHandler _messageHandler;
         private AcceptLanguageMiddleware _acceptLanguageMiddleware;
+        private List<IMiddleware<ClientActionContext>> _beforeSend = new List<IMiddleware<ClientActionContext>>();
 
         public ProxyBuilder(ClientConfiguration configuration)
         {
@@ -100,6 +102,22 @@ namespace Bolt.Client
             return this;
         }
 
+        public virtual ProxyBuilder OnSending(Func<ActionDelegate<ClientActionContext>, ClientActionContext, Task> handler)
+        {
+            if (handler == null) throw new ArgumentNullException(nameof(handler));
+
+            _beforeSend.Add(new DelegatedMiddleware<ClientActionContext>(handler));
+            return this;
+        }
+
+        public virtual ProxyBuilder OnSending(IMiddleware<ClientActionContext> middleware)
+        {
+            if (middleware == null) throw new ArgumentNullException(nameof(middleware));
+
+            _beforeSend.Add(middleware);
+            return this;
+        }
+
         public virtual IPipeline<ClientActionContext> BuildPipeline<TContract>() where TContract : class
         {
             if (_serverProvider == null)
@@ -127,6 +145,11 @@ namespace Bolt.Client
             }
 
             context.Use(new PickConnectionMiddleware(_serverProvider, _configuration.EndpointProvider));
+            foreach (IMiddleware<ClientActionContext> middleware in _beforeSend)
+            {
+                context.Use(middleware);
+            }
+
             context.Use(new CommunicationMiddleware(_messageHandler ?? _configuration.HttpMessageHandler ?? new HttpClientHandler()));
             return context.Build();
         }

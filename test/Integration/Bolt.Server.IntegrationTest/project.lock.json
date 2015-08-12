@@ -3,6 +3,89 @@
   "version": 1,
   "targets": {
     "DNX,Version=v4.5.1": {
+      "Bolt.Client/0.14.0-alpha1": {
+        "dependencies": {
+          "Bolt.Core": "0.14.0-alpha1"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Collections.Concurrent",
+          "System.Core",
+          "System.Net.Http"
+        ],
+        "compile": {
+          "lib/dnx451/Bolt.Client.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Bolt.Client.dll": {}
+        }
+      },
+      "Bolt.Client.Proxy/0.14.0-alpha1": {
+        "dependencies": {
+          "Bolt.Client": "0.14.0-alpha1",
+          "Castle.Core": "3.3.3"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/dnx451/Bolt.Client.Proxy.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Bolt.Client.Proxy.dll": {}
+        }
+      },
+      "Bolt.Core/0.14.0-alpha1": {
+        "dependencies": {
+          "Newtonsoft.Json": "6.0.8"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core",
+          "System.Runtime.Serialization"
+        ],
+        "compile": {
+          "lib/dnx451/Bolt.Core.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Bolt.Core.dll": {}
+        }
+      },
+      "Bolt.Server/0.14.0-alpha1": {
+        "dependencies": {
+          "Bolt.Core": "0.14.0-alpha1",
+          "Microsoft.AspNet.Hosting.Abstractions": "1.0.0-beta7-12241",
+          "Microsoft.AspNet.Http.Abstractions": "1.0.0-beta7-11800",
+          "Microsoft.AspNet.Http.Extensions": "1.0.0-beta7-11800",
+          "Microsoft.AspNet.Routing": "1.0.0-beta7-12079",
+          "Microsoft.AspNet.Session": "1.0.0-beta7-10762",
+          "Microsoft.Framework.Caching.Abstractions": "1.0.0-beta7-11704",
+          "Microsoft.Framework.Configuration.Abstractions": "1.0.0-beta7-11648",
+          "Microsoft.Framework.DependencyInjection.Abstractions": "1.0.0-beta7-11657",
+          "Microsoft.Framework.Logging.Abstractions": "1.0.0-beta7-11664",
+          "Microsoft.Framework.OptionsModel": "1.0.0-beta7-11625",
+          "Newtonsoft.Json": "6.0.8"
+        },
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/dnx451/Bolt.Server.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Bolt.Server.dll": {}
+        }
+      },
       "Castle.Core/3.3.3": {
         "compile": {
           "lib/net45/Castle.Core.dll": {}
@@ -983,6 +1066,58 @@
     }
   },
   "libraries": {
+    "Bolt.Client/0.14.0-alpha1": {
+      "sha512": "R9FycxMWhvib8o26E0bX9SfZn1yXR855RLgPVqtiOTEQbhZHKxnvDxJopgHzckYBLaJICWjUMgLbMLM2vt2s4Q==",
+      "files": [
+        "Bolt.Client.0.14.0-alpha1.nupkg",
+        "Bolt.Client.0.14.0-alpha1.nupkg.sha512",
+        "Bolt.Client.nuspec",
+        "lib/dnx451/Bolt.Client.dll",
+        "lib/dnx451/Bolt.Client.xml",
+        "lib/dotnet/Bolt.Client.dll",
+        "lib/dotnet/Bolt.Client.xml",
+        "lib/net45/Bolt.Client.dll",
+        "lib/net45/Bolt.Client.xml"
+      ]
+    },
+    "Bolt.Client.Proxy/0.14.0-alpha1": {
+      "sha512": "yf0YejqEHEykFKhuHhAs7SzmNprKUjQmEkvTr47EZUBfmkt9F+LZVAGr4KHRrzqgIcjSmUJEZuoGn3IpaQu65w==",
+      "files": [
+        "Bolt.Client.Proxy.0.14.0-alpha1.nupkg",
+        "Bolt.Client.Proxy.0.14.0-alpha1.nupkg.sha512",
+        "Bolt.Client.Proxy.nuspec",
+        "lib/dnx451/Bolt.Client.Proxy.dll",
+        "lib/dnx451/Bolt.Client.Proxy.xml",
+        "lib/net45/Bolt.Client.Proxy.dll",
+        "lib/net45/Bolt.Client.Proxy.xml"
+      ]
+    },
+    "Bolt.Core/0.14.0-alpha1": {
+      "sha512": "z9Ep6Ycnx1TJ11c4QyZOCg/0awRMeVYbgHyhq4w41v17NS+QFDmTSMNIDm2+E3JFnFPhqUl+UDftRoeDAWOzbA==",
+      "files": [
+        "Bolt.Core.0.14.0-alpha1.nupkg",
+        "Bolt.Core.0.14.0-alpha1.nupkg.sha512",
+        "Bolt.Core.nuspec",
+        "lib/dnx451/Bolt.Core.dll",
+        "lib/dnx451/Bolt.Core.xml",
+        "lib/dotnet/Bolt.Core.dll",
+        "lib/dotnet/Bolt.Core.xml",
+        "lib/net45/Bolt.Core.dll",
+        "lib/net45/Bolt.Core.xml"
+      ]
+    },
+    "Bolt.Server/0.14.0-alpha1": {
+      "sha512": "EEI4xn2UoKv5oU9yaN/lfJEQ6hLF2MEh5q3XxpKMEcUuJpf6xjEUzb+6XAx1gIl8bjsm69UucKguD14iRzfA6g==",
+      "files": [
+        "Bolt.Server.0.14.0-alpha1.nupkg",
+        "Bolt.Server.0.14.0-alpha1.nupkg.sha512",
+        "Bolt.Server.nuspec",
+        "lib/dnx451/Bolt.Server.dll",
+        "lib/dnx451/Bolt.Server.xml",
+        "lib/dnxcore50/Bolt.Server.dll",
+        "lib/dnxcore50/Bolt.Server.xml"
+      ]
+    },
     "Castle.Core/3.3.3": {
       "sha512": "tvVrLbHhtAGubUUDbEkH9JlivdlJOTI25u3hlyHpPxuJdTVi/yVQKWCYvGpafGPm7G1ibdWj4brqhtSQkAmN+g==",
       "files": [
