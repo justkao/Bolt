@@ -198,7 +198,7 @@ namespace TestService.Client
             {
                 while (count > 0)
                 {
-                    Parallel.ForEach(Enumerable.Repeat(channel, count % degree == 0 ? degree : count % degree), new ParallelOptions() { MaxDegreeOfParallelism = degree }, (c) =>
+                    Parallel.ForEach(Enumerable.Repeat(channel, count % degree == 0 ? degree : count % degree), new ParallelOptions { MaxDegreeOfParallelism = degree }, c =>
                     {
                         action(c);
                     });

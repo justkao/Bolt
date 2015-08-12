@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Runtime.Remoting.Channels;
 using System.Threading.Tasks;
 
 using Bolt.Client.Channels;

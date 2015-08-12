@@ -1,7 +1,5 @@
 ﻿using System;
 
-using Bolt.Server.Pipeline;
-
 namespace Bolt.Server
 {
     public class ServerRuntimeConfiguration

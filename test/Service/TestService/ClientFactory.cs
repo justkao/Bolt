@@ -1,6 +1,4 @@
-﻿using System;
-using System.ServiceModel;
-using System.Threading.Tasks;
+﻿using System.ServiceModel;
 
 using Bolt.Client;
 using Bolt.Client.Proxy;
@@ -11,8 +9,7 @@ namespace TestService
 {
     public class ClientFactory
     {
-        public static readonly ClientConfiguration Config = new ClientConfiguration()
-        {
+        public static readonly ClientConfiguration Config = new ClientConfiguration {
             ProxyFactory = new DynamicProxyFactory()
         };
 

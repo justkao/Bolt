@@ -1,18 +1,20 @@
-﻿using Bolt.Client;
-using Bolt.Server.IntegrationTest.Core;
-using Bolt.Test.Common;
-using Microsoft.AspNet.Builder;
-using Moq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Bolt.Client;
 using Bolt.Client.Pipeline;
 using Bolt.Client.Proxy;
 using Bolt.Pipeline;
+using Bolt.Server.IntegrationTest.Core;
+using Bolt.Test.Common;
+
+using Microsoft.AspNet.Builder;
+
+using Moq;
 
 using Xunit;
 
@@ -115,7 +117,7 @@ namespace Bolt.Server.IntegrationTest
             Mock<ITestContract> server = Server();
             CompositeType arg1 = CompositeType.CreateRandom();
 
-            server.Setup(v => v.SimpleMethodWithComplexParameter(arg1)).Callback<CompositeType>((serverArg) =>
+            server.Setup(v => v.SimpleMethodWithComplexParameter(arg1)).Callback<CompositeType>(serverArg =>
             {
                 Assert.NotSame(serverArg, arg1);
                 Assert.Equal(serverArg, arg1);
@@ -397,7 +399,7 @@ namespace Bolt.Server.IntegrationTest
 
         protected override void Configure(IApplicationBuilder appBuilder)
         {
-            appBuilder.UseBolt((h) =>
+            appBuilder.UseBolt(h =>
             {
                 h.Use<ITestContract>(InstanceProvider);
             });

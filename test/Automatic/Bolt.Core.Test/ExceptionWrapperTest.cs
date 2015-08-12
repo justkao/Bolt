@@ -1,6 +1,8 @@
-﻿using Bolt.Test.Common;
-using System;
+﻿using System;
 using System.IO;
+
+using Bolt.Test.Common;
+
 using Xunit;
 
 namespace Bolt.Core.Test
@@ -15,7 +17,7 @@ namespace Bolt.Core.Test
         }
 
         [Fact]
-        [InlineData()]
+        [InlineData]
         public void Wrap_NullArgument_ReturnsNull()
         {
             Assert.Null(_serializer.Wrap(null));

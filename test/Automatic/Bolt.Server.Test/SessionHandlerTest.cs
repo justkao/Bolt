@@ -1,7 +1,7 @@
-﻿using Bolt.Server.InstanceProviders;
-using Bolt.Server.Session;
+﻿using Bolt.Server.Session;
 
 using Microsoft.AspNet.Http.Internal;
+
 using Xunit;
 
 namespace Bolt.Server.Test
@@ -10,7 +10,7 @@ namespace Bolt.Server.Test
     {
         public SessionHandlerTest()
         {
-            Options = new BoltServerOptions() {SessionHeader = "Test"};
+            Options = new BoltServerOptions {SessionHeader = "Test"};
             Subject = new ServerSessionHandler(Options);
         }
 

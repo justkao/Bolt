@@ -154,7 +154,7 @@ namespace Bolt.Server.IntegrationTest
         {
             Callback = new Mock<IDummyContract>();
             DistributedCache.Setup(c => c.SetAsync(It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>()))
-                .Returns((Task)Task.FromResult(true))
+                .Returns(Task.FromResult(true))
                 .Verifiable();
             DistributedCache.Setup(c => c.GetAsync(It.IsAny<string>())).Returns(Task.FromResult((byte[])null)).Verifiable();
 
@@ -177,7 +177,7 @@ namespace Bolt.Server.IntegrationTest
                  
             Callback = new Mock<IDummyContract>();
             DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>())).Returns(Task.FromResult(true)).Callback<string>(
-                (v) =>
+                v =>
                     {
                         sessions.Add(v);
                     }).Verifiable();
@@ -212,7 +212,7 @@ namespace Bolt.Server.IntegrationTest
                 appBuilder.ApplicationServices.GetRequiredService<ILoggerFactory>());
 
             appBuilder.UseBolt(
-                (h) =>
+                h =>
                     {
                         h.UseDistributedSession<IDummyContract, DummyContract>(store);
                     });
@@ -237,7 +237,7 @@ namespace Bolt.Server.IntegrationTest
 
             private readonly ITestContext _context;
 
-            public IHttpSessionProvider HttpSessionProvider { get; private set; }
+            public IHttpSessionProvider HttpSessionProvider { get; }
 
             public void OnExecute(object context)
             {

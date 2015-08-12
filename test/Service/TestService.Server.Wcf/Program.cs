@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ServiceModel;
+
 using TestService.Core;
 
 namespace TestService.Server.Wcf

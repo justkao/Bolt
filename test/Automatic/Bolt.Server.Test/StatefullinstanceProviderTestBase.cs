@@ -1,11 +1,13 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
+
 using Bolt.Common;
 using Bolt.Server.InstanceProviders;
 using Bolt.Server.Session;
 
 using Microsoft.AspNet.Http.Internal;
+
 using Moq;
 
 namespace Bolt.Server.Test
@@ -98,8 +100,7 @@ namespace Bolt.Server.Test
 
         protected virtual ServerActionContext CreateContext(MethodInfo action)
         {
-            return new ServerActionContext()
-            {
+            return new ServerActionContext {
                 HttpContext = new DefaultHttpContext(),
                 Action = action,
                 Contract = typeof(TContract)

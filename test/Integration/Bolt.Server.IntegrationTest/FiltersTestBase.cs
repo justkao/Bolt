@@ -1,7 +1,8 @@
 ﻿using Bolt.Client;
-using Bolt.Server.IntegrationTest.Core;
+
 using Microsoft.AspNet.Builder;
 using Microsoft.Framework.DependencyInjection;
+
 using Moq;
 
 namespace Bolt.Server.IntegrationTest
@@ -16,7 +17,7 @@ namespace Bolt.Server.IntegrationTest
 
         protected override void Configure(IApplicationBuilder appBuilder)
         {
-            appBuilder.UseBolt((h) =>
+            appBuilder.UseBolt(h =>
             {
                 h.Use<IFiltersContract, FiltersContract>();
             });

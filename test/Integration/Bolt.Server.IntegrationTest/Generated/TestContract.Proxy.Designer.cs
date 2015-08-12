@@ -9,34 +9,31 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Bolt.Client;
-using Bolt.Server.IntegrationTest.Core;
-
+using Bolt.Pipeline;
+using Bolt.Test.Common;
 
 namespace Bolt.Server.IntegrationTest.Core
 {
     public partial interface ITestContractInnerAsync : ITestContractInner, IExcludedContractAsync
     {
-        Task SimpleMethodWithComplexParameterAsync(Bolt.Test.Common.CompositeType compositeType);
+        Task SimpleMethodWithComplexParameterAsync(CompositeType compositeType);
 
         Task<int> SimpleFunctionAsync();
 
-        Task<List<Bolt.Test.Common.CompositeType>> FunctionReturningHugeDataAsync();
+        Task<List<CompositeType>> FunctionReturningHugeDataAsync();
 
-        Task MethodTakingHugeDataAsync(List<Bolt.Test.Common.CompositeType> arg);
+        Task MethodTakingHugeDataAsync(List<CompositeType> arg);
 
-        Task MethodWithNotSerializableTypeAsync(Bolt.Test.Common.NotSerializableType arg);
+        Task MethodWithNotSerializableTypeAsync(NotSerializableType arg);
 
-        Task<Bolt.Test.Common.NotSerializableType> FunctionWithNotSerializableTypeAsync();
+        Task<NotSerializableType> FunctionWithNotSerializableTypeAsync();
 
-        Task MethodWithManyArgumentsAsync(Bolt.Test.Common.CompositeType arg1, Bolt.Test.Common.CompositeType arg2, DateTime time);
+        Task MethodWithManyArgumentsAsync(CompositeType arg1, CompositeType arg2, DateTime time);
     }
 }
 
@@ -58,21 +55,21 @@ namespace Bolt.Server.IntegrationTest.Core
 
         Task MethodWithNullableArgumentsAsync(string arg);
 
-        Task SimpleMethodWithCancellationAsync(System.Threading.CancellationToken cancellation);
+        Task SimpleMethodWithCancellationAsync(CancellationToken cancellation);
 
-        Task<Bolt.Test.Common.CompositeType> ComplexFunctionAsync();
+        Task<CompositeType> ComplexFunctionAsync();
     }
 }
 
 namespace Bolt.Server.IntegrationTest.Core
 {
-    public partial class TestContractProxy : Bolt.Client.ProxyBase, Bolt.Server.IntegrationTest.Core.ITestContract, ITestContractInnerAsync, IExcludedContractAsync, ITestContractAsync
+    public partial class TestContractProxy : ProxyBase, ITestContract, ITestContractInnerAsync, IExcludedContractAsync, ITestContractAsync
     {
-        public TestContractProxy(Bolt.Server.IntegrationTest.Core.TestContractProxy proxy) : base(proxy)
+        public TestContractProxy(TestContractProxy proxy) : base(proxy)
         {
         }
 
-        public TestContractProxy(Bolt.Pipeline.IPipeline<ClientActionContext> channel) : base(typeof(Bolt.Server.IntegrationTest.Core.ITestContract), channel)
+        public TestContractProxy(IPipeline<ClientActionContext> channel) : base(typeof(ITestContract), channel)
         {
         }
 
@@ -121,22 +118,22 @@ namespace Bolt.Server.IntegrationTest.Core
             return this.SendAsync(__SimpleMethodWithCancellationAction, cancellation);
         }
 
-        public virtual Bolt.Test.Common.CompositeType ComplexFunction()
+        public virtual CompositeType ComplexFunction()
         {
-            return this.Send<Bolt.Test.Common.CompositeType>(__ComplexFunctionAction);
+            return this.Send<CompositeType>(__ComplexFunctionAction);
         }
 
-        public virtual Task<Bolt.Test.Common.CompositeType> ComplexFunctionAsync()
+        public virtual Task<CompositeType> ComplexFunctionAsync()
         {
-            return this.SendAsync<Bolt.Test.Common.CompositeType>(__ComplexFunctionAction);
+            return this.SendAsync<CompositeType>(__ComplexFunctionAction);
         }
 
-        public virtual void SimpleMethodWithComplexParameter(Bolt.Test.Common.CompositeType compositeType)
+        public virtual void SimpleMethodWithComplexParameter(CompositeType compositeType)
         {
             this.Send(__SimpleMethodWithComplexParameterAction, compositeType);
         }
 
-        public virtual Task SimpleMethodWithComplexParameterAsync(Bolt.Test.Common.CompositeType compositeType)
+        public virtual Task SimpleMethodWithComplexParameterAsync(CompositeType compositeType)
         {
             return this.SendAsync(__SimpleMethodWithComplexParameterAction, compositeType);
         }
@@ -151,44 +148,44 @@ namespace Bolt.Server.IntegrationTest.Core
             return this.SendAsync<int>(__SimpleFunctionAction);
         }
 
-        public virtual List<Bolt.Test.Common.CompositeType> FunctionReturningHugeData()
+        public virtual List<CompositeType> FunctionReturningHugeData()
         {
-            return this.Send<List<Bolt.Test.Common.CompositeType>>(__FunctionReturningHugeDataAction);
+            return this.Send<List<CompositeType>>(__FunctionReturningHugeDataAction);
         }
 
-        public virtual Task<List<Bolt.Test.Common.CompositeType>> FunctionReturningHugeDataAsync()
+        public virtual Task<List<CompositeType>> FunctionReturningHugeDataAsync()
         {
-            return this.SendAsync<List<Bolt.Test.Common.CompositeType>>(__FunctionReturningHugeDataAction);
+            return this.SendAsync<List<CompositeType>>(__FunctionReturningHugeDataAction);
         }
 
-        public virtual void MethodTakingHugeData(List<Bolt.Test.Common.CompositeType> arg)
+        public virtual void MethodTakingHugeData(List<CompositeType> arg)
         {
             this.Send(__MethodTakingHugeDataAction, arg);
         }
 
-        public virtual Task MethodTakingHugeDataAsync(List<Bolt.Test.Common.CompositeType> arg)
+        public virtual Task MethodTakingHugeDataAsync(List<CompositeType> arg)
         {
             return this.SendAsync(__MethodTakingHugeDataAction, arg);
         }
 
-        public virtual void MethodWithNotSerializableType(Bolt.Test.Common.NotSerializableType arg)
+        public virtual void MethodWithNotSerializableType(NotSerializableType arg)
         {
             this.Send(__MethodWithNotSerializableTypeAction, arg);
         }
 
-        public virtual Task MethodWithNotSerializableTypeAsync(Bolt.Test.Common.NotSerializableType arg)
+        public virtual Task MethodWithNotSerializableTypeAsync(NotSerializableType arg)
         {
             return this.SendAsync(__MethodWithNotSerializableTypeAction, arg);
         }
 
-        public virtual Bolt.Test.Common.NotSerializableType FunctionWithNotSerializableType()
+        public virtual NotSerializableType FunctionWithNotSerializableType()
         {
-            return this.Send<Bolt.Test.Common.NotSerializableType>(__FunctionWithNotSerializableTypeAction);
+            return this.Send<NotSerializableType>(__FunctionWithNotSerializableTypeAction);
         }
 
-        public virtual Task<Bolt.Test.Common.NotSerializableType> FunctionWithNotSerializableTypeAsync()
+        public virtual Task<NotSerializableType> FunctionWithNotSerializableTypeAsync()
         {
-            return this.SendAsync<Bolt.Test.Common.NotSerializableType>(__FunctionWithNotSerializableTypeAction);
+            return this.SendAsync<NotSerializableType>(__FunctionWithNotSerializableTypeAction);
         }
 
         public virtual Task<int> SimpleAsyncFunction()
@@ -196,12 +193,12 @@ namespace Bolt.Server.IntegrationTest.Core
             return this.SendAsync<int>(__SimpleAsyncFunctionAction);
         }
 
-        public virtual void MethodWithManyArguments(Bolt.Test.Common.CompositeType arg1, Bolt.Test.Common.CompositeType arg2, DateTime time)
+        public virtual void MethodWithManyArguments(CompositeType arg1, CompositeType arg2, DateTime time)
         {
             this.Send(__MethodWithManyArgumentsAction, arg1, arg2, time);
         }
 
-        public virtual Task MethodWithManyArgumentsAsync(Bolt.Test.Common.CompositeType arg1, Bolt.Test.Common.CompositeType arg2, DateTime time)
+        public virtual Task MethodWithManyArgumentsAsync(CompositeType arg1, CompositeType arg2, DateTime time)
         {
             return this.SendAsync(__MethodWithManyArgumentsAction, arg1, arg2, time);
         }

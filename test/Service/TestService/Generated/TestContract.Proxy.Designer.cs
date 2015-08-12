@@ -7,28 +7,23 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Bolt.Client;
-using TestService.Core;
-
+using Bolt.Pipeline;
 
 namespace TestService.Core
 {
-    public partial class TestContractProxy : Bolt.Client.ProxyBase, TestService.Core.ITestContract
+    public partial class TestContractProxy : ProxyBase, ITestContract
     {
-        public TestContractProxy(TestService.Core.TestContractProxy proxy) : base(proxy)
+        public TestContractProxy(TestContractProxy proxy) : base(proxy)
         {
         }
 
-        public TestContractProxy(Bolt.Pipeline.IPipeline<ClientActionContext> channel) : base(typeof(TestService.Core.ITestContract), channel)
+        public TestContractProxy(IPipeline<ClientActionContext> channel) : base(typeof(ITestContract), channel)
         {
         }
 

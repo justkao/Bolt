@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
+
 using Xunit;
 
 namespace Bolt.Client.Test
@@ -14,7 +12,7 @@ namespace Bolt.Client.Test
         [Theory]
         public void ValidateEndpoint(string server, string expectedResult)
         {
-            EndpointProvider endpointProvider = new EndpointProvider(new BoltOptions() {Prefix = "test"});
+            EndpointProvider endpointProvider = new EndpointProvider(new BoltOptions {Prefix = "test"});
 
             Assert.Equal<string>(expectedResult, endpointProvider.GetEndpoint(new Uri(server), GetType(), MethodInfo).ToString());
         }
@@ -24,7 +22,7 @@ namespace Bolt.Client.Test
         [Theory]
         public void ValidateEndpointOnAsyncPostfix(string server, string expectedResult)
         {
-            EndpointProvider endpointProvider = new EndpointProvider(new BoltOptions() { Prefix = "test" });
+            EndpointProvider endpointProvider = new EndpointProvider(new BoltOptions { Prefix = "test" });
 
             Assert.Equal<string>(expectedResult, endpointProvider.GetEndpoint(new Uri(server), GetType(), MethodAsyncInfo).ToString());
         }

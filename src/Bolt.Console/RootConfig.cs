@@ -4,10 +4,12 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+
 using Bolt.Common;
 using Bolt.Generators;
 
 using Microsoft.Dnx.Runtime.Common.CommandLine;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 

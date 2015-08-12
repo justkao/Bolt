@@ -1,7 +1,5 @@
 ﻿using System;
 
-using Bolt.Server.Pipeline;
-
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;

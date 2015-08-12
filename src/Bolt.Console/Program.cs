@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 
+using Microsoft.Dnx.Runtime;
 using Microsoft.Dnx.Runtime.Common.CommandLine;
 
 namespace Bolt.Console
@@ -16,7 +16,7 @@ namespace Bolt.Console
 
         private readonly AssemblyCache _cache;
 
-        public Program(Microsoft.Dnx.Runtime.ILibraryManager manager, Microsoft.Dnx.Runtime.IAssemblyLoadContextAccessor accessor, Microsoft.Dnx.Runtime.IAssemblyLoaderContainer container, Microsoft.Dnx.Runtime.IApplicationEnvironment environment)
+        public Program(ILibraryManager manager, IAssemblyLoadContextAccessor accessor, IAssemblyLoaderContainer container, IApplicationEnvironment environment)
         {
             _cache = new AssemblyCache(manager, accessor, container, environment);
         }
@@ -258,7 +258,7 @@ namespace Bolt.Console
             {
                 if (contract.EndsWith(".*", StringComparison.OrdinalIgnoreCase))
                 {
-                    var ns = contract.TrimEnd(new[] { '*', '.' });
+                    var ns = contract.TrimEnd('*', '.');
                     try
                     {
                         rootConfig.AddContractsFromNamespace(ns, mode, internalVisibility);

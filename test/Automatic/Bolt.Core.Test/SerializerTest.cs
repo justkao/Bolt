@@ -1,7 +1,9 @@
-﻿using Bolt.Test.Common;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+
+using Bolt.Test.Common;
+
 using Xunit;
 
 namespace Bolt.Core.Test
@@ -13,7 +15,7 @@ namespace Bolt.Core.Test
             Serializer = new JsonSerializer();
         }
 
-        public ISerializer Serializer { get; private set; }
+        public ISerializer Serializer { get; }
 
         [Fact]
         public void Write_NullStream_ThrowsArgumentNullException()
@@ -24,7 +26,7 @@ namespace Bolt.Core.Test
         [Fact]
         public void Read_NullArgument_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => Serializer.Read<string>((Stream)null));
+            Assert.Throws<ArgumentNullException>(() => Serializer.Read<string>(null));
         }
 
         [Fact]
@@ -57,7 +59,7 @@ namespace Bolt.Core.Test
         [Fact]
         public void WriteRead_SpecificType_EnsureDeserializedProperly()
         {
-            SimpleCustomType obj = new SimpleCustomType() { BoolProperty = false };
+            SimpleCustomType obj = new SimpleCustomType { BoolProperty = false };
             MemoryStream stream = new MemoryStream();
             Serializer.Write(stream, obj);
             SimpleCustomType deserialized = Serializer.Read<SimpleCustomType>(new MemoryStream(stream.ToArray()));
@@ -91,7 +93,7 @@ namespace Bolt.Core.Test
         public void ReadWrite_SimpleList_EnsureValidResult()
         {
             MemoryStream stream = new MemoryStream();
-            Serializer.Write(stream, new List<int>() { 1, 2, 3 });
+            Serializer.Write(stream, new List<int> { 1, 2, 3 });
 
             var result = Serializer.Read<List<int>>(new MemoryStream(stream.ToArray()));
             Assert.Equal(result[0], 1);

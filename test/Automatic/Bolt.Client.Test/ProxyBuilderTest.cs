@@ -45,7 +45,7 @@ namespace Bolt.Client.Test
             IPipeline<ClientActionContext> pipeline =
                 ClientConfiguration.ProxyBuilder()
                     .Url("http://localhost:8080")
-                    .UseSession(distributed: useDistributedSession)
+                    .UseSession(useDistributedSession)
                     .BuildPipeline<ITestContract>();
 
             var middleware = pipeline.Find<SessionMiddleware>();

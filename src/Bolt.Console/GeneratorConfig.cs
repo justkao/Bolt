@@ -1,5 +1,7 @@
 using System.Collections.Generic;
+
 using Bolt.Generators;
+
 using Newtonsoft.Json;
 
 namespace Bolt.Console

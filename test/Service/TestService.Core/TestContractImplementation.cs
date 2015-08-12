@@ -8,10 +8,6 @@ namespace TestService.Core
 {
     public class TestContractImplementation : ITestContract
     {
-        public TestContractImplementation()
-        {
-        }
-
         public Person UpdatePerson(Person person, CancellationToken cancellation)
         {
             return null;

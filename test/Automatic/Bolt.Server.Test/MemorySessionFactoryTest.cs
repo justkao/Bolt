@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Bolt.Server.InstanceProviders;
+
 using Bolt.Server.Session;
 
 using Microsoft.AspNet.Http.Internal;
+
 using Moq;
+
 using Xunit;
 
 namespace Bolt.Server.Test
@@ -26,7 +28,7 @@ namespace Bolt.Server.Test
 
         public MemorySessionFactory Subject { get; set; }
 
-        private InstanceInternal Instance { get; set; }
+        private InstanceInternal Instance { get; }
 
         [Fact]
         public async Task Create_EnsureContractSesion()

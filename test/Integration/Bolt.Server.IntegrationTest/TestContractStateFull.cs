@@ -1,6 +1,5 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+
 using Bolt.Server.IntegrationTest.Core;
 using Bolt.Session;
 

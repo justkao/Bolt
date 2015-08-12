@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
+
 using Bolt.Common;
 using Bolt.Pipeline;
+
 using Castle.DynamicProxy;
 
 namespace Bolt.Client.Proxy
@@ -29,9 +31,8 @@ namespace Bolt.Client.Proxy
 
             BoltFramework.ValidateContract(contract);
             var interceptor = new ChannelInterceptor();
-            var options = new ProxyGenerationOptions()
-            {
-                BaseTypeForInterfaceProxy = typeof (DynamicContractProxy),
+            var options = new ProxyGenerationOptions {
+                BaseTypeForInterfaceProxy = typeof (DynamicContractProxy)
             };
 
             T proxy = _generator.CreateInterfaceProxyWithoutTarget<T>(options, interceptor);

@@ -2,9 +2,11 @@
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Bolt.Core;
+
 using Bolt.Pipeline;
+
 using Moq;
+
 using Xunit;
 
 namespace Bolt.Client.Proxy.Test
@@ -18,7 +20,7 @@ namespace Bolt.Client.Proxy.Test
 
         private static readonly MethodInfo MethodWithParameters =
             typeof (ITestContract).GetRuntimeMethod(nameof(ITestContract.MethodWithParameters),
-                new Type[] {typeof (string), typeof (int), typeof (CancellationToken)});
+                new[] {typeof (string), typeof (int), typeof (CancellationToken)});
 
         [Fact]
         public void Create_EnsureDerivesFromContractProxy()
@@ -46,7 +48,7 @@ namespace Bolt.Client.Proxy.Test
             ProxyFactory factory = Create();
 
             Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
-            pipeline.Setup(p => p.Instance).Returns((ctxt) =>
+            pipeline.Setup(p => p.Instance).Returns(ctxt =>
             {
                 ctxt.ActionResult = "some value";
                 Assert.Equal(MethodWithParameters, ctxt.Action);
@@ -68,7 +70,7 @@ namespace Bolt.Client.Proxy.Test
             ProxyFactory factory = Create();
 
             Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
-            pipeline.Setup(p => p.Instance).Returns((ctxt) =>
+            pipeline.Setup(p => p.Instance).Returns(ctxt =>
             {
                 ctxt.ActionResult = "some value";
                 Assert.Equal(AsyncMethod, ctxt.Action);
@@ -86,7 +88,7 @@ namespace Bolt.Client.Proxy.Test
             ProxyFactory factory = Create();
 
             Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
-            pipeline.Setup(p => p.Instance).Returns((ctxt) =>
+            pipeline.Setup(p => p.Instance).Returns(ctxt =>
             {
                 ctxt.ActionResult = "some value";
                 Assert.Equal(Function, ctxt.Action);
@@ -106,7 +108,7 @@ namespace Bolt.Client.Proxy.Test
             ProxyFactory factory = Create();
 
             Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
-            pipeline.Setup(p => p.Instance).Returns((ctxt) =>
+            pipeline.Setup(p => p.Instance).Returns(ctxt =>
             {
                 ctxt.ActionResult = 10;
                 Assert.Equal(AsyncFunction, ctxt.Action);

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using Microsoft.Dnx.Runtime.Common.CommandLine;
 using Microsoft.Dnx.Runtime;
+using Microsoft.Dnx.Runtime.Common.CommandLine;
 
 namespace Bolt.Console
 {
@@ -29,7 +29,7 @@ namespace Bolt.Console
 
         private static readonly AnsiConsole Console = AnsiConsole.GetOutput(true);
 
-        public DirectoryLookupAssemblyLoader Loader { get; private set; }
+        public DirectoryLookupAssemblyLoader Loader { get; }
 
         public Assembly HostedAssembly
         {

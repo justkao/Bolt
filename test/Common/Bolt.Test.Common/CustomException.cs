@@ -1,9 +1,8 @@
 ﻿using System;
+using System.Runtime.Serialization;
 
 namespace Bolt.Test.Common
 {
-    using System.Runtime.Serialization;
-
 #if NET45 || DNX451
     [Serializable]
 #endif
@@ -29,7 +28,7 @@ namespace Bolt.Test.Common
         }
 
 #if NET45 || DNX451
-        public CustomException(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        public CustomException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
             CustomData = info.GetInt32("CustomData");
@@ -41,6 +40,6 @@ namespace Bolt.Test.Common
             base.GetObjectData(info, context);
         }
 #endif
-        public int CustomData { get; private set; }
+        public int CustomData { get; }
     }
 }

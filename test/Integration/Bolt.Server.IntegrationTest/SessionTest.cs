@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 using Bolt.Client;
@@ -10,7 +9,6 @@ using Bolt.Pipeline;
 using Bolt.Server.InstanceProviders;
 using Bolt.Server.IntegrationTest.Core;
 using Bolt.Server.Session;
-using Bolt.Test.Common;
 
 using Microsoft.AspNet.Builder;
 
@@ -532,7 +530,7 @@ namespace Bolt.Server.IntegrationTest
 
         protected override void Configure(IApplicationBuilder appBuilder)
         {
-            appBuilder.UseBolt((h) =>
+            appBuilder.UseBolt(h =>
             {
                 Factory = new MemorySessionFactory(h.Configuration.Options);
                 IContractInvoker contract = h.UseSession<ITestContractStateFull, TestContractStateFull>(Factory);
