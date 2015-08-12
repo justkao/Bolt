@@ -18,6 +18,11 @@ namespace Bolt.Server.IntegrationTest
             _sessionProvider = sessionProvider;
         }
 
+        public Task<string> OpenSessionAsync(string arguments)
+        {
+            return Task.FromResult(arguments);
+        }
+
         public void SetState(string state)
         {
             if (_failProxy)

@@ -12,9 +12,15 @@ namespace Bolt.Server.IntegrationTest
             ClientConfiguration.ProxyFactory = new DynamicProxyFactory();
         }
 
-        public override ITestContractStateFullAsync GetChannel(IPipeline<ClientActionContext> pipeline = null)
+        public override ITestContractStateFullAsync GetProxy(IPipeline<ClientActionContext> pipeline = null, bool open = true)
         {
-            return ClientConfiguration.ProxyFactory.CreateProxy<ITestContractStateFullAsync>(pipeline ?? CreatePipeline());
+            ITestContractStateFullAsync proxy = ClientConfiguration.ProxyFactory.CreateProxy<ITestContractStateFullAsync>(pipeline ?? CreatePipeline());
+            if (open)
+            {
+                proxy.OpenSessionAsync("arg").GetAwaiter().GetResult();
+            }
+
+            return proxy;
         }
     }
 }

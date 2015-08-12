@@ -15,4 +15,12 @@ namespace Bolt
 
         IObjectSerializer CreateSerializer(Stream inputStream);
     }
+
+    public static class SerializerExtensions
+    {
+        public static T Read<T>(this ISerializer serializer, Stream stream)
+        {
+            return (T)serializer.Read(typeof(T), stream);
+        }
+    }
 }

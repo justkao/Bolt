@@ -46,6 +46,11 @@ namespace Bolt.Server.IntegrationTest.Core
         {
         }
 
+        public virtual Task<string> OpenSessionAsync(string arguments)
+        {
+            return this.SendAsync<string>(__OpenSessionAsyncAction, arguments);
+        }
+
         public virtual void SetState(string state)
         {
             this.Send(__SetStateAction, state);
@@ -87,6 +92,7 @@ namespace Bolt.Server.IntegrationTest.Core
         }
 
 
+        private static readonly MethodInfo __OpenSessionAsyncAction = typeof(ITestContractStateFull).GetMethod(nameof(ITestContractStateFull.OpenSessionAsync));
         private static readonly MethodInfo __SetStateAction = typeof(ITestContractStateFull).GetMethod(nameof(ITestContractStateFull.SetState));
         private static readonly MethodInfo __GetStateAction = typeof(ITestContractStateFull).GetMethod(nameof(ITestContractStateFull.GetState));
         private static readonly MethodInfo __NextCallWillFailProxyAction = typeof(ITestContractStateFull).GetMethod(nameof(ITestContractStateFull.NextCallWillFailProxy));

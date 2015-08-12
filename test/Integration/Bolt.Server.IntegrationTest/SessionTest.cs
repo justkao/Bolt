@@ -27,9 +27,26 @@ namespace Bolt.Server.IntegrationTest
         private MemorySessionFactory Factory { get; set; }
 
         [Fact]
+        public async Task Open_EnsureProperResult()
+        {
+            var client = GetProxy(null, false);
+
+            Assert.Equal("test", await client.OpenSessionAsync("test"));
+        }
+
+        [Fact]
+        public async Task Open_Twice_EnsureProperResult()
+        {
+            var client = GetProxy(null, false);
+
+            Assert.Equal("test", await client.OpenSessionAsync("test"));
+            Assert.Equal("test", await client.OpenSessionAsync("test"));
+        }
+
+        [Fact]
         public async Task Async_EnsureStatePersistedBetweenCalls()
         {
-            var client = GetChannel();
+            var client = GetProxy();
 
             await client.SetStateAsync("test state");
             await client.GetStateAsync();
@@ -47,7 +64,7 @@ namespace Bolt.Server.IntegrationTest
 
             var pipeline = CreatePipeline(1, errorHandling.Object);
             var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             await client.GetStateAsync();
             string sessionId1 = session.GetSession(client).SessionId;
@@ -62,7 +79,7 @@ namespace Bolt.Server.IntegrationTest
         {
             var pipeline = CreatePipeline();
             var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             await client.GetStateAsync();
             string sessionId1 = session.GetSession(client).SessionId;
@@ -87,7 +104,7 @@ namespace Bolt.Server.IntegrationTest
 
             var pipeline = CreatePipeline(1, errorHandling.Object);
             var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             await client.GetStateAsync();
             string sessionId = session.GetSession(client).SessionId;
@@ -101,7 +118,7 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public void EnsureStatePersistedBetweenCalls()
         {
-            var client = GetChannel();
+            var client = GetProxy();
 
             client.SetState("test state");
             client.GetState();
@@ -119,7 +136,7 @@ namespace Bolt.Server.IntegrationTest
 
             var pipeline = CreatePipeline(1, errorHandling.Object);
             var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             client.GetState();
             string sessionId1 = session.GetSession(client).SessionId;
@@ -134,7 +151,7 @@ namespace Bolt.Server.IntegrationTest
         {
             var pipeline = CreatePipeline();
             var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             client.GetState();
             string sessionId1 = session.GetSession(client).SessionId;
@@ -155,7 +172,7 @@ namespace Bolt.Server.IntegrationTest
         {
             var pipeline = CreatePipeline(1);
             var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             client.GetState();
             string sessionId = session.GetSession(client).SessionId;
@@ -171,7 +188,7 @@ namespace Bolt.Server.IntegrationTest
         {
             var pipeline = CreatePipeline();
             var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             client.GetState();
             string sessionId = session.GetSession(client).SessionId;
@@ -185,7 +202,7 @@ namespace Bolt.Server.IntegrationTest
         {
             var pipeline = CreatePipeline();
             var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             await client.GetStateAsync();
             string sessionId = session.GetSession(client).SessionId;
@@ -198,7 +215,7 @@ namespace Bolt.Server.IntegrationTest
         public async Task Async_Request_ClosedProxy_EnsureSessionClosedException()
         {
             var pipeline = CreatePipeline();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             await client.GetStateAsync();
             await (client as IProxy).CloseAsync();
@@ -210,7 +227,7 @@ namespace Bolt.Server.IntegrationTest
         public void Request_ClosedProxy_EnsureSessionClosedException()
         {
             var pipeline = CreatePipeline();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             client.GetState();
             (client as IProxy).Close();
@@ -222,7 +239,7 @@ namespace Bolt.Server.IntegrationTest
         public void ManySessions_EnsureStateSaved()
         {
             List<ITestContractStateFullAsync> proxies =
-                Enumerable.Repeat(100, 100).Select(c => GetChannel()).ToList();
+                Enumerable.Repeat(100, 100).Select(c => GetProxy()).ToList();
 
             for (int index = 0; index < proxies.Count; index++)
             {
@@ -245,31 +262,30 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public void ExecuteManyRequests_SingleChannel_EnsureOnlyOneSessionCreated()
         {
-            var channel = GetChannel();
-            int before = Factory.Count;
-            Task.WaitAll(Enumerable.Repeat(0, 5).Select(_ => Task.Run(() => channel.GetState())).ToArray());
-            Assert.Equal(before + 1, Factory.Count);
-            ((IProxy) channel).Dispose();
-            Assert.Equal(before, Factory.Count);
+            var proxy = GetProxy(null, false);
+            Task.WaitAll(Enumerable.Repeat(0, 5).Select(_ => Task.Run(() => proxy.OpenSessionAsync("test").GetAwaiter().GetResult())).ToArray());
+
+            Assert.Equal(1, Factory.Count);
+            ((IProxy) proxy).Dispose();
+            Assert.Equal(0, Factory.Count);
         }
 
         [Fact]
         public async Task Async_ExecuteManyRequests_SingleChannel_EnsureOnlyOneSessionCreated()
         {
-            var channel = GetChannel();
-            int before = Factory.Count;
-            await Task.WhenAll(Enumerable.Repeat(0, 100).Select(_ => channel.GetStateAsync()));
-            Assert.Equal(before + 1, Factory.Count);
-            await (channel as IProxy).CloseAsync();
-            Assert.Equal(before, Factory.Count);
-        }
+            var proxy = GetProxy(null, false);
+            await Task.WhenAll(Enumerable.Repeat(0, 100).Select(_ => proxy.OpenSessionAsync("test")));
 
+            Assert.Equal(1, Factory.Count);
+            ((IProxy)proxy).Dispose();
+            Assert.Equal(0, Factory.Count);
+        }
 
         [Fact]
         public void CloseSession_EnsureNextRequestFails()
         {
             var pipeline = CreatePipeline();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             client.GetState();
             ((IProxy)client).Close();
@@ -282,7 +298,7 @@ namespace Bolt.Server.IntegrationTest
         {
             var pipeline = CreatePipeline();
             var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             await client.GetStateAsync();
             await ((IProxy)client).CloseAsync();
@@ -434,7 +450,7 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public async Task Async_InitSession_Explicitely_EnsureInitialized()
         {
-            ITestContractStateFullAsync channel = GetChannel();
+            ITestContractStateFullAsync channel = GetProxy();
             await ((IProxy) channel).OpenAsync();
             await channel.GetStateAsync();
             await (channel as IProxy).CloseAsync();
@@ -444,7 +460,7 @@ namespace Bolt.Server.IntegrationTest
         public async Task Async_GetSessionId_EnsureCorrect()
         {
             var pipeline = CreatePipeline();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             var sesionId = await client.GetSessionIdAsync();
             Assert.NotNull(sesionId);
@@ -458,7 +474,7 @@ namespace Bolt.Server.IntegrationTest
         {
             var pipeline = CreatePipeline();
             var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             var sesionId = client.GetSessionId();
 
@@ -471,7 +487,7 @@ namespace Bolt.Server.IntegrationTest
         {
             var pipeline = CreatePipeline();
             var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             client.GetState();
             ((IProxy)client).Dispose();
@@ -484,7 +500,7 @@ namespace Bolt.Server.IntegrationTest
         {
             var pipeline = CreatePipeline();
             var session = pipeline.Find<SessionMiddleware>();
-            var client = GetChannel(pipeline);
+            var client = GetProxy(pipeline);
 
             await client.GetStateAsync();
             await (client as IProxy).CloseAsync();
@@ -492,9 +508,15 @@ namespace Bolt.Server.IntegrationTest
             Assert.Null(session.GetSession(client)?.SessionId);
         }
 
-        public virtual ITestContractStateFullAsync GetChannel(IPipeline<ClientActionContext> pipeline = null)
+        public virtual ITestContractStateFullAsync GetProxy(IPipeline<ClientActionContext> pipeline = null, bool open = true)
         {
-            return new TestContractStateFullProxy(pipeline ?? CreatePipeline());
+            var proxy = new TestContractStateFullProxy(pipeline ?? CreatePipeline());
+            if (open)
+            {
+                proxy.OpenSessionAsync("arg").GetAwaiter().GetResult();
+            }
+
+            return proxy;
         }
 
         protected IPipeline<ClientActionContext> CreatePipeline(int recoveries = 0, IErrorHandling errorHandling = null)

@@ -1,7 +1,13 @@
-﻿namespace Bolt.Server.IntegrationTest.Core
+﻿using System.Threading.Tasks;
+
+namespace Bolt.Server.IntegrationTest.Core
 {
     public interface ITestContractStateFull
     {
+        [AsyncOperation]
+        [InitSession]
+        Task<string> OpenSessionAsync(string arguments);
+
         [AsyncOperation]
         void SetState(string state);
 
