@@ -1,7 +1,5 @@
 ﻿using System;
 
-using Bolt.Core;
-
 namespace Bolt.Client
 {
     /// <summary>

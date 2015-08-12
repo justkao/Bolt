@@ -6,6 +6,12 @@ namespace Bolt.Client.Test
 {
     public interface ITestContract
     {
+        [InitSession]
+        Task<string> OpenSession(string param);
+
+        [DestroySession]
+        Task<string> CloseSession(string param);
+
         string Execute(string param);
 
         Task ExecuteAsync();
@@ -16,6 +22,16 @@ namespace Bolt.Client.Test
         public TestContractProxy(IPipeline<ClientActionContext> pipeline)
             : base(typeof(ITestContract), pipeline)
         {
+        }
+
+        public Task<string> OpenSession(string param)
+        {
+            return this.SendAsync<string>(Contract.GetMethod(nameof(OpenSession)), param);
+        }
+
+        public Task<string> CloseSession(string param)
+        {
+            return this.SendAsync<string>(Contract.GetMethod(nameof(CloseSession)), param);
         }
 
         public string Execute(string param)

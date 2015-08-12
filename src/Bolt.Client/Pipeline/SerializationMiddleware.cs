@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Bolt.Core;
+
 using Bolt.Pipeline;
 
 namespace Bolt.Client.Pipeline
@@ -48,9 +48,21 @@ namespace Bolt.Client.Pipeline
 
         protected virtual HttpContent BuildRequestParameters(ClientActionContext context)
         {
-            IObjectSerializer parameterSerializer = Serializer.CreateSerializer();
-            ParameterInfo[] parameters = context.Action.GetParameters();
+            try
+            {
+                BoltFramework.ValidateParameters(context.Action, context.Parameters);
+            }
+            catch (Exception e)
+            {
+                throw new BoltClientException(
+                    $"Parameter validation failed for action '{context.Action.Name}'.",
+                    ClientErrorCode.SerializeParameters,
+                    context.Action,
+                    e);
+            }
 
+            IObjectSerializer parameterSerializer = Serializer.CreateSerializer();
+            ParameterInfo[] parameterTypes = context.Action.GetParameters();
             for (int i = 0; i < context.Parameters.Length; i++)
             {
                 if (context.Parameters[i] == null)
@@ -63,7 +75,22 @@ namespace Bolt.Client.Pipeline
                     continue;
                 }
 
-                parameterSerializer.WriteParameter(context.Action, parameters[i].Name, context.Parameters[i].GetType(), context.Parameters[i]);
+                try
+                {
+                    parameterSerializer.Write(parameterTypes[i].Name, context.Parameters[i].GetType(), context.Parameters[i]);
+                }
+                catch (BoltException)
+                {
+                    throw;
+                }
+                catch (Exception e)
+                {
+                    throw new BoltClientException(
+                        $"Failed to serialize value for parameter '{parameterTypes[i].Name}' and action '{context.Action.Name}'.",
+                        ClientErrorCode.SerializeParameters,
+                        context.Action,
+                        e);
+                }
             }
 
             if (parameterSerializer.IsEmpty)
@@ -71,21 +98,32 @@ namespace Bolt.Client.Pipeline
                 return null;
             }
 
-            Stream resultStream = parameterSerializer.GetOutputStream();
-            byte[] rawData;
-            if (resultStream is MemoryStream)
+            try
             {
-                rawData = (resultStream as MemoryStream).ToArray();
-            }
-            else
-            {
-                rawData = resultStream.Copy().ToArray();
-            }
+                Stream resultStream = parameterSerializer.GetOutputStream();
+                byte[] rawData;
+                if (resultStream is MemoryStream)
+                {
+                    rawData = (resultStream as MemoryStream).ToArray();
+                }
+                else
+                {
+                    rawData = resultStream.Copy().ToArray();
+                }
 
-            ByteArrayContent content = new ByteArrayContent(rawData);
-            content.Headers.ContentLength = rawData.Length;
-            context.Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Serializer.ContentType));
-            return content;
+                ByteArrayContent content = new ByteArrayContent(rawData);
+                content.Headers.ContentLength = rawData.Length;
+                context.Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Serializer.ContentType));
+                return content;
+            }
+            catch (Exception e)
+            {
+                throw new BoltClientException(
+                    $"Failed to serialize parameters for action '{context.Action.Name}'.",
+                    ClientErrorCode.SerializeParameters,
+                    context.Action,
+                    e);
+            }
         }
 
         protected virtual async Task<object> ReadResponseAsync(ClientActionContext context)
@@ -97,7 +135,18 @@ namespace Bolt.Client.Pipeline
                     return null;
                 }
 
-                return Serializer.DeserializeResponse(context.ResponseType, stream, context.Action);
+                try
+                {
+                    return Serializer.Read(context.ResponseType, stream);
+                }
+                catch (Exception e)
+                {
+                    throw new BoltClientException(
+                        $"Failed to deserialize response for action '{context.Action.Name}'.",
+                        ClientErrorCode.DeserializeResponse,
+                        context.Action,
+                        e);
+                }
             }
         }
 
@@ -110,13 +159,24 @@ namespace Bolt.Client.Pipeline
                     return null;
                 }
 
-                object result = Serializer.DeserializeExceptionResponse(ExceptionWrapper.Type, stream, context.Action);
-                if (result == null)
+                try
                 {
-                    return null;
-                }
+                    object result = Serializer.Read(ExceptionWrapper.Type, stream);
+                    if (result == null)
+                    {
+                        return null;
+                    }
 
-                return ExceptionWrapper.Unwrap(result);
+                    return ExceptionWrapper.Unwrap(result);
+                }
+                catch (Exception e)
+                {
+                    throw new BoltClientException(
+                        $"Failed to deserialize exception response for action '{context.Action.Name}'.",
+                        ClientErrorCode.DeserializeExceptionResponse,
+                        context.Action,
+                        e);
+                }
             }
         }
 

@@ -2,8 +2,8 @@ namespace Bolt.Client
 {
     public enum ProxyState
     {
-        Uninitialized,
+        Ready,
         Open, 
-        Closed,
+        Closed
     }
 }

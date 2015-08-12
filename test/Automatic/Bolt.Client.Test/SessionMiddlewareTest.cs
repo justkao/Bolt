@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Bolt.Client.Channels;
 using Bolt.Client.Pipeline;
 using Bolt.Pipeline;
+using Bolt.Session;
 
 using Moq;
 
@@ -20,18 +21,25 @@ namespace Bolt.Client.Test
 
         public Mock<ISerializer> Serializer = new Mock<ISerializer>(MockBehavior.Strict);
 
-        public ConnectionDescriptor DefaultDescriptor = new ConnectionDescriptor(new Uri("http://localhost"));
+        public ConnectionDescriptor ConnectionDescriptor = new ConnectionDescriptor(new Uri("http://localhost"));
 
-        protected void SetupSessionHandler(string sessionid)
+        public SessionContractDescriptor SessionContract => BoltFramework.GetSessionDescriptor(typeof(ITestContract));
+
+        protected void SetupSessionHandler(string sessionid, bool ensuresSession = false)
         {
             SessionHandler.Setup(s => s.GetSessionIdentifier(It.IsAny<HttpResponseMessage>())).Returns(sessionid);
-            SessionHandler.Setup(s => s.EnsureSession(It.IsAny<HttpRequestMessage>(), sessionid)).Verifiable();
+            if (ensuresSession)
+            {
+                SessionHandler.Setup(s => s.EnsureSession(It.IsAny<HttpRequestMessage>(), sessionid)).Verifiable();
+            }
         }
 
         public TestContractProxy CreateProxy(IPipeline<ClientActionContext> pipeline)
         {
             return new TestContractProxy(pipeline);
         }
+
+        public SessionContractDescriptor ContractDescriptor => BoltFramework.GetSessionDescriptor(typeof(ITestContract));
 
         public IPipeline<ClientActionContext> CreatePipeline(Func<ActionDelegate<ClientActionContext>, ClientActionContext, Task> next = null)
         {

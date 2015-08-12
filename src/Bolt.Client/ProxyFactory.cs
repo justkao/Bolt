@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Bolt.Pipeline;
 
 namespace Bolt.Client

@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Bolt;
 using Bolt.Server;
 using Bolt.Server.Metadata;
@@ -25,7 +26,6 @@ namespace Microsoft.Framework.DependencyInjection
             services.AddTransient<ISerializer, JsonSerializer>();
             services.AddTransient<IExceptionWrapper, JsonExceptionWrapper>();
             services.AddTransient<IBoltRouteHandler, BoltRouteHandler>();
-            services.AddTransient<IServerErrorHandler, HandleErrorMiddleware>();
             services.AddTransient<IBoltMetadataHandler, BoltMetadataHandler>();
             services.AddTransient<IContractInvoker, ContractInvoker>();
             services.AddTransient<IActionResolver, ActionResolver>();

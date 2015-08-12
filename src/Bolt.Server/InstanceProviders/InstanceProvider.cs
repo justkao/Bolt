@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using Microsoft.Framework.DependencyInjection;
 using System.Threading.Tasks;
+
 using Bolt.Common;
+
+using Microsoft.Framework.DependencyInjection;
 
 namespace Bolt.Server.InstanceProviders
 {

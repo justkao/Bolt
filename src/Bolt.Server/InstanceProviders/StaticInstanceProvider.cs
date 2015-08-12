@@ -1,6 +1,7 @@
-using Bolt.Common;
 using System;
 using System.Threading.Tasks;
+
+using Bolt.Common;
 
 namespace Bolt.Server.InstanceProviders
 {

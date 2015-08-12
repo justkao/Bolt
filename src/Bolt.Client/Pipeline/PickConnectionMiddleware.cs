@@ -1,7 +1,6 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Bolt.Core;
 
 namespace Bolt.Client.Pipeline
 {

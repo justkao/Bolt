@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+
 using Bolt.Common;
 using Bolt.Session;
 
@@ -91,7 +92,6 @@ namespace Bolt
 
         public static bool TrimAsyncPostfix(string name, out string coercedName)
         {
-            coercedName = null;
             int index = name.IndexOf(AsyncPostFix, StringComparison.OrdinalIgnoreCase);
             if (index <= 0)
             {
@@ -117,6 +117,41 @@ namespace Bolt
         public static SessionContractDescriptor GetSessionDescriptor(Type contract)
         {
             return SessionContractDescriptorProvider.Resolve(contract);
+        }
+
+        public static void ValidateParameters(MethodInfo method, object[] parameters)
+        {
+            if (!GetSerializableParameters(method).Any())
+            {
+                if (parameters != null && parameters.Length > 0)
+                {
+                    throw new BoltException($"Action '{method.Name}' does not require any parameters.");
+                }
+
+                return;
+            }
+
+            var parameterTypes = method.GetParameters();
+            for (int i = 0; i < parameterTypes.Length; i++)
+            {
+                ParameterInfo parameterInfo = parameterTypes[i];
+                object parameter = parameters[i];
+
+                if (parameter == null)
+                {
+                    continue;
+                }
+
+                if (parameter is CancellationToken)
+                {
+                    continue;
+                }
+
+                if (!parameterInfo.ParameterType.IsAssignableFrom(parameter.GetType()))
+                {
+                    throw new BoltException($"Expected value for parameter '{parameterInfo.Name}' should be '{parameterInfo.ParameterType.Name}' instead '{parameter.GetType().Name}' was provided.");
+                }
+            }
         }
     }
 }

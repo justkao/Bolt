@@ -4,8 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+
 using Microsoft.AspNet.Http;
 using Microsoft.Framework.Logging;
+
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema;
 
@@ -119,8 +121,8 @@ namespace Bolt.Server.Metadata
             var m = new ContractMetadata
                         {
                             Actions = BoltFramework.GetContractActions(context.Contract).Select(a => a.Name).ToList(),
-                            ErrorHeader = feature.Configuration.Options.ServerErrorHeader,
-                            ContentType = feature.Configuration.Serializer.ContentType
+                            ErrorHeader = feature.ActionContext.Configuration.Options.ServerErrorHeader,
+                            ContentType = feature.ActionContext.Configuration.Serializer.ContentType
                         };
             return m;
         }

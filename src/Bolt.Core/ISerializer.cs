@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Bolt.Core;
 
 namespace Bolt
 {

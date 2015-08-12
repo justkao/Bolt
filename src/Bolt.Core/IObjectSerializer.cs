@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Bolt.Core
+namespace Bolt
 {
     public interface IObjectSerializer
     {

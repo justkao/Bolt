@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Microsoft.Framework.OptionsModel;
 
 namespace Bolt.Server

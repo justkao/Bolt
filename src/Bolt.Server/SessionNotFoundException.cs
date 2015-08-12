@@ -1,11 +1,9 @@
-﻿using System;
-
-namespace Bolt.Server
+﻿namespace Bolt.Server
 {
-    public class SessionNotFoundException : Exception
+    public class SessionNotFoundException : BoltServerException
     {
         public SessionNotFoundException(string sessionId)
-            : base($"Session object for session '{sessionId}' not found.")
+            : base($"Session object for session '{sessionId}' not found.", ServerErrorCode.SessionNotFound)
         {
         }
     }

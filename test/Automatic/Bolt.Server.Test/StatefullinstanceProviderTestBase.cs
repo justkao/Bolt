@@ -10,7 +10,7 @@ using Moq;
 
 namespace Bolt.Server.Test
 {
-    public abstract class StatefullinstanceProviderTestBase
+    public abstract class StatefullinstanceProviderTestBase<TContract> where TContract:IMockContract
     {
         protected const string SessionHeader = "test-session-id";
 
@@ -20,6 +20,10 @@ namespace Bolt.Server.Test
             Mock = new Mock<IInstanceProviderActions>(MockBehavior.Loose);
             Subject = CreateSubject();
         }
+
+        protected MethodInfo InitSessionAction => BoltFramework.GetSessionDescriptor(typeof(TContract)).InitSession;
+
+        protected MethodInfo DestroySessionAction => BoltFramework.GetSessionDescriptor(typeof(TContract)).DestroySession;
 
         protected MockSessionInstanceProvider Subject { get; set; }
 
@@ -97,7 +101,8 @@ namespace Bolt.Server.Test
             return new ServerActionContext()
             {
                 HttpContext = new DefaultHttpContext(),
-                Action = action
+                Action = action,
+                Contract = typeof(TContract)
             };
         }
 

@@ -1,6 +1,4 @@
-﻿using System;
-using System.Threading.Tasks;
-using Bolt.Core;
+﻿using System.Threading.Tasks;
 
 namespace Bolt.Pipeline
 {

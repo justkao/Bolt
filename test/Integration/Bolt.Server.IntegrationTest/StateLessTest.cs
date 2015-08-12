@@ -161,7 +161,7 @@ namespace Bolt.Server.IntegrationTest
             }
             catch (BoltServerException e)
             {
-                if (e.Error != ServerErrorCode.Serialization)
+                if (e.Error != ServerErrorCode.ResponseSerialization)
                 {
                     throw;
                 }
@@ -183,7 +183,7 @@ namespace Bolt.Server.IntegrationTest
             }
             catch (BoltServerException e)
             {
-                if (e.Error != ServerErrorCode.Serialization)
+                if (e.Error != ServerErrorCode.ResponseSerialization)
                 {
                     throw;
                 }
@@ -203,7 +203,7 @@ namespace Bolt.Server.IntegrationTest
             {
                 client.MethodWithNotSerializableType(arg);
             }
-            catch (SerializeParametersException)
+            catch (BoltClientException e) when (e.Error == ClientErrorCode.SerializeParameters)
             {
                 // ok
             }
@@ -222,7 +222,7 @@ namespace Bolt.Server.IntegrationTest
             {
                 await client.MethodWithNotSerializableTypeAsync(arg);
             }
-            catch (SerializeParametersException)
+            catch (BoltClientException e) when (e.Error == ClientErrorCode.SerializeParameters)
             {
                 // ok
             }

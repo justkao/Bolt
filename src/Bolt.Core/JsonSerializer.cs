@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Bolt.Core;
+
 using Newtonsoft.Json;
 
 namespace Bolt
@@ -30,7 +30,8 @@ namespace Bolt
         public IObjectSerializer CreateSerializer(Stream inputStream)
         {
             if (inputStream == null) throw new ArgumentNullException(nameof(inputStream));
-            return new JsonObjectSerializer(this, this.Read<Dictionary<string, string>>(inputStream));
+            object dictionary = Read(typeof(Dictionary<string, string>), inputStream);
+            return new JsonObjectSerializer(this, (Dictionary<string, string>)dictionary);
         }
 
         public Newtonsoft.Json.JsonSerializer Serializer { get; }
@@ -127,9 +128,11 @@ namespace Bolt
 
             public Stream GetOutputStream()
             {
-                return _parent.Serialize(_data);
+                MemoryStream stream = new MemoryStream();
+                _parent.Write(stream, _data);
+                stream.Seek(0, SeekOrigin.Begin);
+                return stream;
             }
         }
-
     }
 }

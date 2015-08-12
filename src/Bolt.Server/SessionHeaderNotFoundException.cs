@@ -1,11 +1,9 @@
-﻿using System;
-
-namespace Bolt.Server
+﻿namespace Bolt.Server
 {
-    public class SessionHeaderNotFoundException : Exception
+    public class SessionHeaderNotFoundException : BoltServerException
     {
         public SessionHeaderNotFoundException()
-            : base("No session header found in request headers.")
+            : base("No session header found in request headers.", ServerErrorCode.NoSessionHeader)
         {
         }
     }

@@ -12,11 +12,6 @@ namespace Bolt.Client
                 return ErrorHandlingResult.Recover;
             }
 
-            if (e is BoltSerializationException)
-            {
-                return ErrorHandlingResult.Rethrow;
-            }
-
             if ((e as BoltServerException)?.Error == ServerErrorCode.ContractNotFound)
             {
                 return ErrorHandlingResult.Close;

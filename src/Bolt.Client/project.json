@@ -9,12 +9,15 @@
   "frameworks": {
     "net45": {
       "frameworkAssemblies": {
-        "System.Net.Http": ""
+        "System.Net.Http": "",
+        "System.Collections.Concurrent": ""
+        
       }
     },
     "dnx451": {
       "frameworkAssemblies": {
-        "System.Net.Http": ""
+        "System.Net.Http": "",
+        "System.Collections.Concurrent": ""
       }
     },
     "dotnet": {
@@ -22,6 +25,7 @@
         "System.Net.Http": "4.0.0-*",
         "System.Threading": "4.0.11-*",
         "System.Reflection.Extensions": "4.0.0-*",
+        "System.Collections.Concurrent": "4.0.11-*"
       }
     }
   }

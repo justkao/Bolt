@@ -1,14 +1,15 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Runtime.Remoting.Channels;
 using System.Threading.Tasks;
+
 using Bolt.Client.Channels;
-using Bolt.Client.Helpers;
-using Bolt.Session;
 
 namespace Bolt.Client.Pipeline
 {
     public class SessionMiddleware : ClientMiddlewareBase
     {
-        private readonly AwaitableCriticalSection _syncRoot = new AwaitableCriticalSection();
+        private readonly ConcurrentDictionary<IProxy, SessionDescriptor> _sessions = new ConcurrentDictionary<IProxy, SessionDescriptor>();
 
         public SessionMiddleware(IClientSessionHandler sessionHandler, IErrorHandling errorHandling)
         {
@@ -23,173 +24,268 @@ namespace Bolt.Client.Pipeline
 
         public bool UseDistributedSession { get; set; }
 
-        public ConnectionDescriptor ServerConnection { get; set; }
-
         public bool Recoverable { get; set; }
 
-        public string SessionId { get; private set; }
+        public SessionDescriptor GetSession(object proxy)
+        {
+            if (proxy == null)
+            {
+                throw new ArgumentNullException(nameof(proxy));
+            }
 
-        public ISessionCallback SessionCallback { get; set; }
+            SessionDescriptor output;
+            _sessions.TryGetValue((IProxy)proxy, out output);
+            return output;
+        }
 
         public override async Task Invoke(ClientActionContext context)
         {
-            SessionContractDescriptor sessionDescriptor = context.SessionContract;
+            SessionDescriptor session = _sessions.GetOrAdd(
+                context.Proxy,
+                proxy => new SessionDescriptor(BoltFramework.GetSessionDescriptor(proxy.Contract)));
 
-            if (ServerConnection == null)
+            if (session.State != ProxyState.Open)
             {
-                ServerConnection = await EnsureConnectionAsync(context, sessionDescriptor);
-                (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Open);
+                await EnsureConnectionAsync(context, session);
             }
 
             if (!UseDistributedSession)
             {
                 // we stick to active connection otherwise new connection will be picked using PickConnectionMiddleware
-                context.ServerConnection = ServerConnection;
+                context.ServerConnection = session.ServerConnection;
             }
 
-            if (!Equals(context.Action, sessionDescriptor.InitSession))
+            if (context.Action != session.Contract.InitSession && context.Action != session.Contract.DestroySession)
             {
-                ClientSessionHandler.EnsureSession(context.Request, SessionId);
+                ClientSessionHandler.EnsureSession(context.Request, session.SessionId);
+
                 try
                 {
                     await Next(context);
                 }
                 catch (Exception e)
                 {
-                    ErrorHandlingResult handlingResult = ErrorHandling.Handle(context, e);
-                    switch (handlingResult)
+                    Exception handled = HandleError(context, e, session);
+                    if (e == handled)
                     {
-                        case ErrorHandlingResult.Close:
-                            (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
-                            break;
-                        case ErrorHandlingResult.Recover:
-                            ServerConnection = null;
-                            SessionId = null;
-                            (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Uninitialized);
-                            if (!Recoverable)
-                            {
-                                (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
-                            }
-                            break;
-                        case ErrorHandlingResult.Rethrow:
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                        throw;
                     }
 
-                    throw;
+                    if (handled != null)
+                    {
+                        throw handled;
+                    }
                 }
 
                 return;
             }
 
-            if (Equals(context.Action, sessionDescriptor.DestroySession))
+            if (context.Action == session.Contract.InitSession)
             {
-                if (context.Proxy.State == ProxyState.Uninitialized)
+                if (context.ActionResult == null)
                 {
-                    (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
+                    context.ActionResult = session.InitSessionResult;
+                }
+            }
+
+            if (context.Action == session.Contract.DestroySession)
+            {
+                if (context.Proxy.State == ProxyState.Closed)
+                {
+                    session.ChangeState(context.Proxy, ProxyState.Closed);
+                    context.ActionResult = session.DestroySessionResult;
                     return;
                 }
 
-                if (SessionCallback != null)
+                if (context.Proxy.State == ProxyState.Ready)
                 {
-                    context.Parameters = SessionCallback.Closing(context.Proxy, context.Parameters);
+                    context.ActionResult = session.DestroySessionResult;
+                    session.ChangeState(context.Proxy, ProxyState.Closed);
+                    return;
+                }
+
+                if (session.RequiresDestroyParameters && context.Parameters == null)
+                {
+                    throw new BoltClientException(
+                        $"Destroing session requires parameters that were not provided for action '{context.Action.Name}'.",
+                        ClientErrorCode.InvalidDestroySessionParameters,
+                        context.Action,
+                        null);
                 }
 
                 try
                 {
-                    ClientSessionHandler.EnsureSession(context.Request, SessionId);
+                    ClientSessionHandler.EnsureSession(context.Request, session.SessionId);
                     await Next(context);
-                    SessionCallback?.Closed(context.Proxy, context.ActionResult);
+                    _sessions.TryRemove(context.Proxy, out session);
                 }
                 finally
                 {
-                    ServerConnection = null;
-                    SessionId = null;
-                    (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
+                    session.ClearSession();
+                    session.ChangeState(context.Proxy, ProxyState.Closed);
                 }
             }
         }
 
-        private async Task<ConnectionDescriptor> EnsureConnectionAsync(ClientActionContext context, SessionContractDescriptor sessionDescriptor)
+        protected virtual Exception HandleError(ClientActionContext context, Exception error, SessionDescriptor session)
         {
-            if (context.Proxy.State == ProxyState.Open)
+            ErrorHandlingResult handlingResult = ErrorHandling.Handle(context, error);
+            switch (handlingResult)
             {
-                return ServerConnection;
+                case ErrorHandlingResult.Close:
+                    session.ChangeState(context.Proxy, ProxyState.Closed);
+                    break;
+                case ErrorHandlingResult.Recover:
+                    session.ClearSession();
+                    session.ChangeState(context.Proxy, ProxyState.Ready);
+                    if (!Recoverable)
+                    {
+                        session.ChangeState(context.Proxy, ProxyState.Closed);
+                    }
+                    break;
+                case ErrorHandlingResult.Rethrow:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
-            using (await _syncRoot.EnterAsync())
+            return error;
+        }
+
+        protected virtual Exception HandleOpenConnectionError(ClientActionContext context, Exception error, SessionDescriptor session)
+        {
+            session.ClearSession();
+            ErrorHandlingResult handlingResult = ErrorHandling.Handle(context, error);
+            switch (handlingResult)
             {
-                if (context.Proxy.State == ProxyState.Open)
+                case ErrorHandlingResult.Close:
+                    session.ChangeState(context.Proxy, ProxyState.Closed);
+                    break;
+                case ErrorHandlingResult.Recover:
+                case ErrorHandlingResult.Rethrow:
+                    session.ChangeState(context.Proxy, ProxyState.Ready);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return error;
+        }
+
+        private async Task<ConnectionDescriptor> EnsureConnectionAsync(ClientActionContext context, SessionDescriptor sessionDescriptor)
+        {
+            if (sessionDescriptor.State == ProxyState.Open)
+            {
+                context.ActionResult = sessionDescriptor.InitSessionResult;
+                return sessionDescriptor.ServerConnection;
+            }
+
+            if (sessionDescriptor.State == ProxyState.Closed)
+            {
+                throw new ProxyClosedException();
+            }
+
+            using (await sessionDescriptor.LockAsync())
+            {
+                // check connections tate again when under lock
+                if (sessionDescriptor.State == ProxyState.Open)
                 {
-                    return ServerConnection;
+                    context.ActionResult = sessionDescriptor.InitSessionResult;
+                    return sessionDescriptor.ServerConnection;
+                }
+
+                if (sessionDescriptor.State == ProxyState.Closed)
+                {
+                    throw new ProxyClosedException();
                 }
 
                 ClientActionContext initSessionContext = context;
-                if (context.Action != sessionDescriptor.InitSession)
+                if (context.Action != sessionDescriptor.Contract.InitSession)
                 {
-                    initSessionContext = new ClientActionContext(context.Proxy, context.Contract, sessionDescriptor.InitSession, SessionCallback?.Opening(context.Proxy, null));
+                    // we are not initializaing proxy explicitely, so we need to check whether proxy has been initalized before
+                    if (sessionDescriptor.RequiresInitParameters)
+                    {
+                        if (sessionDescriptor.InitSessionParameters == null)
+                        {
+                            // we can not reuse initialization parameters, so throw 
+                            throw new BoltClientException(
+                                "Proxy need to be initialized before it can be used.",
+                                ClientErrorCode.ProxyNotInitialized,
+                                context.Action,
+                                null);
+                        }
+                    }
+
+                    // create init session context and reuse init parameters
+                    initSessionContext = new ClientActionContext(
+                        context.Proxy,
+                        context.Contract,
+                        sessionDescriptor.Contract.InitSession,
+                        sessionDescriptor.InitSessionParameters);
                 }
-                else
+                else if (sessionDescriptor.RequiresInitParameters)
                 {
-                    SessionCallback?.Opening(context.Proxy, context.Parameters);
+                    if (initSessionContext.Parameters == null || (initSessionContext.Parameters.Length != initSessionContext.Action.GetParameters().Length))
+                    {
+                        // we can not reuse initialization parameters, so throw 
+                        throw new BoltClientException(
+                            $"Proxy is beeing initialized with invalid parameters. If session initialization has non empty parameters you should initialize it first by calling '{initSessionContext.Action.Name}' with proper parameters.",
+                            ClientErrorCode.InvalidInitSessionParameters,
+                            context.Action,
+                            null);
+                    }
                 }
 
                 try
                 {
+                    // execute whole pipeline
                     await Next(initSessionContext);
 
+                    // extract connection and session id from response
                     string sessionId = ClientSessionHandler.GetSessionIdentifier(initSessionContext.Response);
                     if (sessionId == null)
                     {
                         throw new BoltServerException(
                             ServerErrorCode.SessionIdNotReceived,
-                            sessionDescriptor.InitSession,
+                            sessionDescriptor.Contract.InitSession,
                             initSessionContext.Request?.RequestUri?.ToString());
                     }
 
                     if (initSessionContext.ServerConnection == null)
                     {
-                        throw new BoltClientException(
-                            ClientErrorCode.ConnectionUnavailable,
-                            initSessionContext.Action,
-                            initSessionContext.Request?.RequestUri?.ToString());
+                        throw new BoltClientException(ClientErrorCode.ConnectionUnavailable, initSessionContext.Action);
                     }
 
-                    SessionCallback?.Opened(context.Proxy, context.ActionResult);
-                    ServerConnection = initSessionContext.ServerConnection;
-                    SessionId = sessionId;
+                    sessionDescriptor.InitSessionResult = initSessionContext.ActionResult;
+                    sessionDescriptor.InitSessionParameters = initSessionContext.Parameters;
+                    sessionDescriptor.SessionId = sessionId;
+                    sessionDescriptor.ServerConnection = initSessionContext.ServerConnection;
+                    sessionDescriptor.ChangeState(context.Proxy, ProxyState.Open);
                 }
                 catch (Exception e)
                 {
-                    ServerConnection = null;
-                    SessionId = null;
-
-                    ErrorHandlingResult handlingResult = ErrorHandling.Handle(initSessionContext, e);
-                    switch (handlingResult)
+                    Exception handled = HandleOpenConnectionError(initSessionContext, e, sessionDescriptor);
+                    if (handled == e)
                     {
-                        case ErrorHandlingResult.Close:
-                            (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
-                            break;
-                        case ErrorHandlingResult.Recover:
-                        case ErrorHandlingResult.Rethrow:
-                            (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Uninitialized);
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                        throw;
+                    }
+
+                    if (handled != null)
+                    {
+                        throw handled;
                     }
 
                     throw;
                 }
                 finally
                 {
-                    if (context.Action != sessionDescriptor.InitSession)
+                    if (context.Action != sessionDescriptor.Contract.InitSession)
                     {
                         initSessionContext.Dispose();
                     }
                 }
 
-                return ServerConnection;
+                return sessionDescriptor.ServerConnection;
             }
         }
     }

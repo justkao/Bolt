@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Bolt.Core
+namespace Bolt
 {
     public class BoltException : Exception
     {

@@ -48,7 +48,7 @@ namespace Bolt.Client
                 }
 
                 string coerced;
-                if (Bolt.BoltFramework.TrimAsyncPostfix(action.Name, out coerced))
+                if (BoltFramework.TrimAsyncPostfix(action.Name, out coerced))
                 {
                     sb.Append("/" + coerced);
                 }
@@ -63,7 +63,7 @@ namespace Bolt.Client
 
         private string CoerceContractName(Type contract)
         {
-            return Bolt.BoltFramework.GetContractName(contract);
+            return BoltFramework.GetContractName(contract);
         }
     }
 }

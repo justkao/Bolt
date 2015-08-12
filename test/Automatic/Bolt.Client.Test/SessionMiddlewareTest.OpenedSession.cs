@@ -20,13 +20,13 @@ namespace Bolt.Client.Test
                     (next, ctxt) =>
                     {
                         Callback.Object.Handle(ctxt);
-                        ctxt.ServerConnection = DefaultDescriptor;
+                        ctxt.ServerConnection = ConnectionDescriptor;
                         return next(ctxt);
                     });
 
-                SetupSessionHandler(SessionId);
+                SetupSessionHandler(SessionId, true);
                 Proxy = CreateProxy(Pipeline);
-                Proxy.Open();
+                Proxy.OpenSession("test").GetAwaiter().GetResult();
             }
 
             public IPipeline<ClientActionContext> Pipeline { get; set; }
@@ -42,7 +42,7 @@ namespace Bolt.Client.Test
             [Fact]
             public async Task Close_Ok()
             {
-                await Proxy.CloseAsync();
+                await Proxy.CloseSession("Test");
 
                 Assert.Equal(ProxyState.Closed, Proxy.State);
             }
@@ -53,10 +53,10 @@ namespace Bolt.Client.Test
                 Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
                     c =>
                         {
-                            Assert.Equal(BoltFramework.DestroySessionAction, c.Action);
+                            Assert.Equal(ContractDescriptor.DestroySession, c.Action);
                         }).Verifiable();
 
-                await Proxy.CloseAsync();
+                await Proxy.CloseSession("Test");
 
                 Callback.Verify();
             }
@@ -64,15 +64,13 @@ namespace Bolt.Client.Test
             [Fact]
             public async Task Close_EnsureProperParameters()
             {
-                Pipeline.Find<SessionMiddleware>().DestroySessionParameters = new DestroySessionParameters();
-
                 Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
                     c =>
                     {
-                        Assert.Equal(Pipeline.Find<SessionMiddleware>().DestroySessionParameters, c.Parameters[0]);
+                        Assert.Equal("temp", c.Parameters[0]);
                     }).Verifiable();
 
-                await Proxy.CloseAsync();
+                await Proxy.CloseSession("temp");
 
                 Callback.Verify();
             }
@@ -80,33 +78,33 @@ namespace Bolt.Client.Test
             [Fact]
             public async Task Close_EnsureProperResult()
             {
-                DestroySessionResult result = new DestroySessionResult();
 
                 Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
                     c =>
                         {
-                            c.ActionResult = result;
+                            c.ActionResult = "test";
                         }).Verifiable();
 
-                await Proxy.CloseAsync();
+                var result = await Proxy.CloseSession("temp");
 
-                Assert.Equal(result, Pipeline.Find<SessionMiddleware>().DestroySessionResult);
+                Assert.Equal(result, "test");
                 Callback.Verify();
             }
 
             [Fact]
             public async Task Close_EnsureProperConnection()
             {
-                var connection = Pipeline.Find<SessionMiddleware>().ServerConnection;
+                var connection = Pipeline.Find<SessionMiddleware>().GetSession(Proxy);
+
                 Assert.NotNull(connection);
 
                 Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
                     c =>
                     {
-                        Assert.Equal(connection, c.ServerConnection);
+                        Assert.Equal(connection.ServerConnection, c.ServerConnection);
                     }).Verifiable();
 
-                await Proxy.CloseAsync();
+                await Proxy.CloseSession("Test");
 
                 Callback.Verify();
             }
@@ -114,25 +112,21 @@ namespace Bolt.Client.Test
             [Fact]
             public async Task Close_Twice_Ok()
             {
-                await Proxy.CloseAsync();
+                await Proxy.CloseSession("Test");
 
                 Assert.Equal(ProxyState.Closed, Proxy.State);
             }
 
             [Fact]
-            public void Dispose_Ok()
+            public Task CloseOnIProxy_FailForRequiredParameters_Ok()
             {
-                Proxy.Dispose();
-
-                Assert.Equal(ProxyState.Closed, Proxy.State);
+               return Assert.ThrowsAsync<BoltClientException>(() => Proxy.CloseAsync());
             }
 
             [Fact]
-            public void Dispose_Twice_Ok()
+            public void Dispose_FailForRequiredParameters_Ok()
             {
-                Proxy.Dispose();
-
-                Assert.Equal(ProxyState.Closed, Proxy.State);
+                Assert.Throws<BoltClientException>(() => Proxy.Dispose());
             }
         }
     }

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+
 using Bolt.Common;
-using Bolt.Core;
 
 namespace Bolt.Session
 {
@@ -29,6 +29,10 @@ namespace Bolt.Session
                 return descriptor;
             }
         }
+
+        public MethodInfo InitSessionDummy => InitSessionAction;
+
+        public MethodInfo DestroySessionDummy => DestroySessionAction;
 
         protected virtual SessionContractDescriptor Analyze(Type contract)
         {
@@ -56,11 +60,11 @@ namespace Bolt.Session
         }
 
         private static readonly MethodInfo InitSessionAction =
-            typeof (BoltFramework).GetTypeInfo()
+            typeof (SessionContractDescriptorProvider).GetTypeInfo()
                 .DeclaredMethods.First(m => m.IsStatic && m.Name == nameof(InitBoltSession));
 
         private static readonly MethodInfo DestroySessionAction =
-            typeof (BoltFramework).GetTypeInfo()
+            typeof (SessionContractDescriptorProvider).GetTypeInfo()
                 .DeclaredMethods.First(m => m.IsStatic && m.Name == nameof(DestroyBoltSession));
 
         private static void InitBoltSession()

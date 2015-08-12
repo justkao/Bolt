@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 using Bolt.Client.Pipeline;
@@ -9,7 +7,6 @@ using Bolt.Pipeline;
 using Moq;
 
 using Xunit;
-using Xunit.Sdk;
 
 namespace Bolt.Client.Test
 {
@@ -18,10 +15,6 @@ namespace Bolt.Client.Test
         public Mock<IErrorHandling> ErrorHandling { get; } = new Mock<IErrorHandling>(MockBehavior.Strict);
 
         public Mock<IInvokeCallback> Callback { get; } = new Mock<IInvokeCallback>(MockBehavior.Strict);
-
-        public RetryMiddlewareTest()
-        {
-        }
 
         [Fact]
         public void Ok_NoRetries()
@@ -92,7 +85,7 @@ namespace Bolt.Client.Test
                     }
                     else
                     {
-                        Assert.Equal(ProxyState.Uninitialized, proxy.State);
+                        Assert.Equal(ProxyState.Ready, proxy.State);
                     }
                     break;
                 case ErrorHandlingResult.Rethrow:

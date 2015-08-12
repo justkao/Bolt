@@ -40,7 +40,7 @@ namespace Bolt.Server.Test
         public void Init_SessionAction_ProperActionResolved(string actionName)
         {
             ActionResolver resolver = new ActionResolver();
-            Assert.Equal(BoltFramework.InitSessionAction, resolver.Resolve(typeof(IContract1), actionName));
+            Assert.Equal(BoltFramework.GetSessionDescriptor(typeof(IContract1)).InitSession, resolver.Resolve(typeof(IContract1), actionName));
         }
 
         [InlineData("destroyboltsession")]
@@ -49,7 +49,7 @@ namespace Bolt.Server.Test
         public void DestroySessionAction_ProperActionResolved(string actionName)
         {
             ActionResolver resolver = new ActionResolver();
-            Assert.Equal(BoltFramework.DestroySessionAction, resolver.Resolve(typeof(IContract1), actionName));
+            Assert.Equal(BoltFramework.GetSessionDescriptor(typeof(IContract1)).DestroySession, resolver.Resolve(typeof(IContract1), actionName));
         }
 
         private  interface IContract1 : IContractInner
@@ -61,7 +61,6 @@ namespace Bolt.Server.Test
         {
             void InnerMethod();
         }
-
 
         private interface IContract2 : IContractInner
         {

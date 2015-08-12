@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Bolt.Core
+namespace Bolt
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class DestroySessionAttribute : Attribute

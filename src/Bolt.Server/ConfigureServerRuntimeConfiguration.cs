@@ -1,5 +1,7 @@
 ﻿using System;
+
 using Bolt.Server.Pipeline;
+
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;
@@ -32,10 +34,8 @@ namespace Bolt.Server
             _logger.LogInformation(BoltLogId.ConfigureDefaultServerRuntimeConfiguration, "Configuring default server runtime configuration.");
 
             options.Options = _provider.GetRequiredService<IOptions<BoltServerOptions>>().Options;
-            options.ErrorHandler = _provider.GetRequiredService<IServerErrorHandler>();
             options.Serializer = _provider.GetRequiredService<ISerializer>();
             options.ExceptionWrapper = _provider.GetRequiredService<IExceptionWrapper>();
-            options.ErrorProvider = _provider.GetRequiredService<IServerErrorProvider>();
         }
     }
 }

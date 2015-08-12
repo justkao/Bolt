@@ -1,23 +1,33 @@
+using System;
 using System.Reflection;
-
-using Bolt.Core;
 
 namespace Bolt
 {
     public class BoltClientException : BoltException
     {
-        public BoltClientException(ClientErrorCode error, MethodInfo action, string url)
-            : base($"Execution of action '{action.Name}' failed on client with error '{error}'. Url - '{url}'")
+        public BoltClientException(string message, ClientErrorCode error, MethodInfo action, Exception innerException)
+            : base(message, innerException)
+        {
+            Error = error;
+            Action = action;
+        }
+
+        public BoltClientException(string message, ClientErrorCode error, MethodInfo action)
+            : base(message)
+        {
+            Error = error;
+            Action = action;
+        }
+
+        public BoltClientException(ClientErrorCode error, MethodInfo action)
+            : base($"Execution of action '{action.Name}' failed on client with error '{error}'.")
         {
             Action = action;
-            Url = url;
             Error = error;
         }
 
         public ClientErrorCode Error { get; private set; }
 
         public MethodInfo Action { get; private set; }
-
-        public string Url { get; set; }
     }
 }

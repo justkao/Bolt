@@ -23,7 +23,7 @@ namespace Bolt.Client.Pipeline
             {
                 await Next(context);
 
-                if (proxyState == ProxyState.Uninitialized)
+                if (proxyState == ProxyState.Ready)
                 {
                     (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Open);
                 }

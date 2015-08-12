@@ -19,6 +19,6 @@
     "dnx451": { }
   },
   "commands": {
-    "test": "xunit.runner.aspnet -parallel all"
+    "test": "xunit.runner.aspnet"
   }
 }

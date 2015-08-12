@@ -13,12 +13,12 @@
         /// <summary>
         /// Error occurred during serialization of response.
         /// </summary>
-        Serialization = 1,
+        ResponseSerialization = 1,
 
         /// <summary>
         /// Error occurred during deserialization of request.
         /// </summary>
-        Deserialization = 2,
+        ParameterDeserialization = 2,
 
         /// <summary>
         /// The action defined in request url for specific contract was not found.
@@ -53,6 +53,10 @@
         /// <summary>
         /// The server is unavailable.
         /// </summary>
-        BoltUnavailable = 8
+        BoltUnavailable = 9,
+
+        ContractInstanceNotFound = 10,
+
+        ExceptionSerialization = 11
     }
 }

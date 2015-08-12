@@ -13,18 +13,7 @@ namespace Bolt
                 return null;
             }
 
-            try
-            {
-                return UnwrapCore((TExceptionDescriptor)wrappedException);
-            }
-            catch (BoltSerializationException)
-            {
-                throw;
-            }
-            catch (Exception e)
-            {
-                throw new BoltSerializationException("Failed to unwrap exception.", e);
-            }
+            return UnwrapCore((TExceptionDescriptor)wrappedException);
         }
 
         public object Wrap(Exception exception)
@@ -34,18 +23,7 @@ namespace Bolt
                 return null;
             }
 
-            try
-            {
-                return WrapCore(exception);
-            }
-            catch (BoltSerializationException)
-            {
-                throw;
-            }
-            catch (Exception e)
-            {
-                throw new BoltSerializationException($"Failed to wrap exception of type '{e.GetType().Name}'.", e);
-            }
+            return WrapCore(exception);
         }
 
         protected abstract Exception UnwrapCore(TExceptionDescriptor wrappedException);

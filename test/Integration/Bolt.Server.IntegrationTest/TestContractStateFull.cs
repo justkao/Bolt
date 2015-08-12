@@ -6,18 +6,16 @@ using Bolt.Session;
 
 namespace Bolt.Server.IntegrationTest
 {
-    public class TestContractStateFull : ITestContractStateFull, ISessionCallback
+    public class TestContractStateFull : ITestContractStateFull
     {
         private readonly ISessionProvider _sessionProvider;
-        private readonly ITestState _testState;
         private bool _initialized;
         private string _state;
         private bool _failProxy;
 
-        public TestContractStateFull(ISessionProvider sessionProvider, ITestState testState)
+        public TestContractStateFull(ISessionProvider sessionProvider)
         {
             _sessionProvider = sessionProvider;
-            _testState = testState;
         }
 
         public void SetState(string state)
@@ -26,11 +24,6 @@ namespace Bolt.Server.IntegrationTest
             {
                 _failProxy = false;
                 throw new TestContractProxyFailedException();
-            }
-
-            if (!_initialized)
-            {
-                throw new InvalidOperationException("Not initialized");
             }
 
             _state = state;
@@ -42,11 +35,6 @@ namespace Bolt.Server.IntegrationTest
             {
                 _failProxy = false;
                 throw new TestContractProxyFailedException();
-            }
-
-            if (!_initialized)
-            {
-                throw new InvalidOperationException("Not initialized");
             }
 
             return _state;
@@ -65,28 +53,6 @@ namespace Bolt.Server.IntegrationTest
         public string GetSessionId()
         {
             return _sessionProvider.SessionId;
-        }
-
-        public Task<InitSessionResult> InitSessionAsync(InitSessionParameters parameters, ActionContextBase context, CancellationToken cancellation)
-        {
-            _initialized = true;
-            if (_testState.SessionCallback == null)
-            {
-                return Task.FromResult(new InitSessionResult());
-            }
-
-            return _testState.SessionCallback.Object.InitSessionAsync(parameters, context, cancellation);
-        }
-
-        public Task<DestroySessionResult> DestroySessionAsync(DestroySessionParameters parameters, ActionContextBase context, CancellationToken cancellation)
-        {
-            _initialized = false;
-            if (_testState.SessionCallback == null)
-            {
-                return Task.FromResult(new DestroySessionResult());
-            }
-
-            return _testState.SessionCallback.Object.DestroySessionAsync(parameters, context, cancellation);
         }
     }
 }

@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Bolt.Core;
+
 using Bolt.Pipeline;
 
 namespace Bolt.Server.Pipeline
@@ -25,30 +24,56 @@ namespace Bolt.Server.Pipeline
 
         protected virtual async Task<object[]> DeserializeParameters(ServerActionContext context)
         {
-            IObjectSerializer rawParameters =
-                context.Configuration.Serializer.DeserializeParameters(
-                    await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted),
-                    context.Action);
+            IObjectSerializer rawParameters = null;
+            try
+            {
+                rawParameters =
+                    context.Configuration.Serializer.CreateSerializer(
+                        await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted));
+            }
+            catch (Exception e)
+            {
+                throw new BoltServerException(
+                    $"Failed to deserialize parameters for action '{context.Action.Name}'.",
+                    ServerErrorCode.ParameterDeserialization,
+                    context.Action,
+                    context.RequestUrl,
+                    e);
+            }
 
             ParameterInfo[] parameters = context.Action.GetParameters();
-            object[] parameterValues =new object[parameters.Length];
+            object[] parameterValues = new object[parameters.Length];
 
 
             for (int i = 0; i < parameters.Length; i++)
             {
                 ParameterInfo parameter = parameters[i];
-                if (parameter.ParameterType == typeof (CancellationToken) ||
-                    parameter.ParameterType == typeof (CancellationToken?))
+                if (parameter.ParameterType == typeof(CancellationToken) || parameter.ParameterType == typeof(CancellationToken?))
                 {
                     parameterValues[i] = context.RequestAborted;
                 }
 
-                parameterValues[i] = rawParameters.ReadParameterValue(context.Action, parameter.Name, parameter.ParameterType);
+                try
+                {
+                    object val;
+                    if (rawParameters.TryRead(parameter.Name, parameter.ParameterType, out val))
+                    {
+                        parameterValues[i] = val;
+                    }
+                }
+                catch (Exception e)
+                {
+                    throw new BoltServerException(
+                        $"Failed to deserialize parameter '{parameter.Name}' for action '{context.Action.Name}'.",
+                        ServerErrorCode.ParameterDeserialization,
+                        context.Action,
+                        context.RequestUrl,
+                        e);
+                }
             }
 
             return parameterValues;
         }
-
 
         protected virtual async Task HandleResponse(ServerActionContext context)
         {
@@ -57,7 +82,23 @@ namespace Bolt.Server.Pipeline
 
             if (context.HasSerializableActionResult && context.ActionResult != null)
             {
-                byte[] raw = context.Configuration.Serializer.SerializeResponse(context.ActionResult, context.Action).ToArray();
+                MemoryStream stream = new MemoryStream();
+
+                try
+                {
+                    context.Configuration.Serializer.Write(stream, context.ActionResult);
+                }
+                catch (Exception e)
+                {
+                    throw new BoltServerException(
+                        $"Failed to serialzie response for action '{context.Action.Name}'.",
+                        ServerErrorCode.ResponseSerialization,
+                        context.Action,
+                        context.RequestUrl,
+                        e);
+                }
+
+                byte[] raw = stream.ToArray();
                 if (raw.Length > 0)
                 {
                     context.HttpContext.Response.ContentLength = raw.Length;

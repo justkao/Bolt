@@ -1,4 +1,5 @@
 ﻿using System;
+
 using Microsoft.Framework.DependencyInjection;
 
 namespace Bolt.Server.InstanceProviders

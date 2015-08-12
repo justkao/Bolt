@@ -1,3 +1,5 @@
+using System;
+
 using Xunit;
 
 namespace Bolt.Core.Test
@@ -5,15 +7,21 @@ namespace Bolt.Core.Test
     public class BoltFrameworkTest
     {
         [Fact]
-        public void InitSession_Ok()
+        public void ValidateInvalidContract_Throws()
         {
-            Assert.NotNull(BoltFramework.InitSessionAction);
+            Assert.Throws<InvalidOperationException>(() => BoltFramework.ValidateContract(typeof(BoltFrameworkTest)));
         }
 
         [Fact]
-        public void DestroySession_Ok()
+        public void Validate_ContractWithSameActions_Throws()
         {
-            Assert.NotNull(BoltFramework.DestroySessionAction);
+            Assert.Throws<InvalidOperationException>(() => BoltFramework.ValidateContract(typeof(IInvalidInterface)));
+        }
+
+        public interface IInvalidInterface
+        {
+            void Method(string arg);
+            void Method();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+
 using Bolt.Pipeline;
 
 namespace Bolt.Server.Pipeline
