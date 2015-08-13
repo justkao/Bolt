@@ -54,5 +54,9 @@ namespace Bolt.Client.Pipeline
         {
             _next = next;
         }
+
+        public virtual void Validate(Type contract)
+        {
+        }
     }
 }

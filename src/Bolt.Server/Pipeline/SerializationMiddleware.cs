@@ -12,14 +12,18 @@ namespace Bolt.Server.Pipeline
     {
         public override async Task Invoke(ServerActionContext context)
         {
-            if (context.HasSerializableParameters)
+            if (context.HasSerializableParameters && context.Parameters == null)
             {
                 context.Parameters = await DeserializeParameters(context);
             }
 
             await Next(context);
 
-            await HandleResponse(context);
+            if (!context.ResponseHandled)
+            {
+                await HandleResponse(context);
+                context.ResponseHandled = true;
+            }
         }
 
         protected virtual async Task<object[]> DeserializeParameters(ServerActionContext context)
@@ -91,7 +95,7 @@ namespace Bolt.Server.Pipeline
                 catch (Exception e)
                 {
                     throw new BoltServerException(
-                        $"Failed to serialzie response for action '{context.Action.Name}'.",
+                        $"Failed to serialize response for action '{context.Action.Name}'.",
                         ServerErrorCode.ResponseSerialization,
                         context.Action,
                         context.RequestUrl,

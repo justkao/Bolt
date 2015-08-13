@@ -29,7 +29,7 @@ namespace Bolt.Client.Test
                 ClientConfiguration.ProxyBuilder()
                     .Url("http://localhost:8080")
                     .Recoverable(10, TimeSpan.FromSeconds(5))
-                    .BuildPipeline<ITestContract>();
+                    .BuildPipeline();
 
             var middleware = pipeline.Find<RetryRequestMiddleware>();
             Assert.NotNull(middleware);
@@ -46,7 +46,7 @@ namespace Bolt.Client.Test
                 ClientConfiguration.ProxyBuilder()
                     .Url("http://localhost:8080")
                     .UseSession(useDistributedSession)
-                    .BuildPipeline<ITestContract>();
+                    .BuildPipeline();
 
             var middleware = pipeline.Find<SessionMiddleware>();
             Assert.NotNull(middleware);
@@ -61,7 +61,7 @@ namespace Bolt.Client.Test
                     .Url("http://localhost:8080")
                     .Recoverable(45, TimeSpan.FromSeconds(8))
                     .UseSession()
-                    .BuildPipeline<ITestContract>();
+                    .BuildPipeline();
 
             Assert.NotNull(pipeline.Find<SessionMiddleware>());
             Assert.NotNull(pipeline.Find<RetryRequestMiddleware>());

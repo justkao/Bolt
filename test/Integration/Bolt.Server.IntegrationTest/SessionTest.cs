@@ -422,7 +422,7 @@ namespace Bolt.Server.IntegrationTest
                 builder.Recoverable(recoveries, TimeSpan.FromMilliseconds(10), errorHandling);
             }
 
-            return builder.BuildPipeline<ITestContractStateFull>();
+            return builder.BuildPipeline();
         }
 
         protected override void Configure(IApplicationBuilder appBuilder)

@@ -554,6 +554,20 @@
           "lib/dnx451/Microsoft.Dnx.TestHost.dll": {}
         }
       },
+      "Microsoft.Framework.ActivatorUtilities.Sources/1.0.0-beta7-10639": {
+        "frameworkAssemblies": [
+          "Microsoft.CSharp",
+          "mscorlib",
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/dnx451/Microsoft.Framework.ActivatorUtilities.Sources.dll": {}
+        },
+        "runtime": {
+          "lib/dnx451/Microsoft.Framework.ActivatorUtilities.Sources.dll": {}
+        }
+      },
       "Microsoft.Framework.Caching.Abstractions/1.0.0-beta7-11704": {
         "frameworkAssemblies": [
           "Microsoft.CSharp",
@@ -1474,6 +1488,23 @@
         "Microsoft.Dnx.TestHost.1.0.0-beta7-11855.nupkg.sha512",
         "Microsoft.Dnx.TestHost.nuspec",
         "repo.json"
+      ]
+    },
+    "Microsoft.Framework.ActivatorUtilities.Sources/1.0.0-beta7-10639": {
+      "sha512": "uWC8xndTZBrulVMwwTaAMjjHOuZc2tGlQ4ozg8V2a9HtXZcDpp3Q6L3iiDWnND/stmG69txmnJRko3qvQ5KKwQ==",
+      "files": [
+        "lib/dnx451/Microsoft.Framework.ActivatorUtilities.Sources.dll",
+        "lib/dnx451/Microsoft.Framework.ActivatorUtilities.Sources.xml",
+        "lib/dnxcore50/Microsoft.Framework.ActivatorUtilities.Sources.dll",
+        "lib/dnxcore50/Microsoft.Framework.ActivatorUtilities.Sources.xml",
+        "lib/dotnet/Microsoft.Framework.ActivatorUtilities.Sources.dll",
+        "lib/dotnet/Microsoft.Framework.ActivatorUtilities.Sources.xml",
+        "lib/net45/Microsoft.Framework.ActivatorUtilities.Sources.dll",
+        "lib/net45/Microsoft.Framework.ActivatorUtilities.Sources.xml",
+        "Microsoft.Framework.ActivatorUtilities.Sources.1.0.0-beta7-10639.nupkg",
+        "Microsoft.Framework.ActivatorUtilities.Sources.1.0.0-beta7-10639.nupkg.sha512",
+        "Microsoft.Framework.ActivatorUtilities.Sources.nuspec",
+        "shared/ActivatorUtilities.cs"
       ]
     },
     "Microsoft.Framework.Caching.Abstractions/1.0.0-beta7-11704": {

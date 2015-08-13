@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 
 namespace Bolt.Pipeline
@@ -7,5 +8,7 @@ namespace Bolt.Pipeline
         Task Invoke(T context);
 
         void Init(ActionDelegate<T> next);
+
+        void Validate(Type contract);
     }
 }

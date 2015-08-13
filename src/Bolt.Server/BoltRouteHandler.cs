@@ -80,6 +80,7 @@ namespace Bolt.Server
                 throw new InvalidOperationException($"Invoker for contract '{invoker.Contract.Name}' already registered.");
             }
 
+            invoker.Pipeline.Validate(invoker.Contract);
             Logger.LogInformation(BoltLogId.ContractAdded, "Adding contract: {0}", invoker.Contract.Name);
             _invokers.Add(invoker);
 

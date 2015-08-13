@@ -15,16 +15,19 @@
     "Microsoft.Framework.DependencyInjection.Abstractions": "1.0.0-*",
     "Microsoft.Framework.Logging.Abstractions": "1.0.0-*",
     "Microsoft.Framework.OptionsModel": "1.0.0-*",
+    "Microsoft.Framework.ActivatorUtilities.Sources": "1.0.0-*",
     "Newtonsoft.Json": "6.0.8"
   },
   "frameworks": {
     "dnx451": {
       "frameworkAssemblies": {
+         "System.Net.Http":"" 
       }
     },
     "dnxcore50": {
       "dependencies": {
-        "System.Threading.Timer": "4.0.0-*"
+        "System.Threading.Timer": "4.0.0-*",
+        "System.Net.Http": "4.0.0-*"
       }
     }
   }

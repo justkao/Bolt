@@ -201,7 +201,7 @@ namespace Bolt.Client.Pipeline
             }
             else
             {
-                if (context.HasSerializableActionResult)
+                if (context.HasSerializableActionResult && context.ActionResult == null)
                 {
                     context.ActionResult = await ReadResponseAsync(context);
                 }

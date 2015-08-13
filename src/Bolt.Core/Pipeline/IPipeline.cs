@@ -1,4 +1,5 @@
 using System;
+using Newtonsoft.Json.Schema;
 
 namespace Bolt.Pipeline
 {
@@ -7,5 +8,7 @@ namespace Bolt.Pipeline
         ActionDelegate<T> Instance { get; }
 
         TMiddleware Find<TMiddleware>() where TMiddleware : IMiddleware<T>;
+
+        void Validate(Type contract);
     }
 }

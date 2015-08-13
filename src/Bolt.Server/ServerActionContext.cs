@@ -25,6 +25,8 @@ namespace Bolt.Server
 
         public RouteContext RouteContext { get; set; }
 
+        public bool ResponseHandled { get; set; }
+
         public object ContractInstance { get; set; }
 
         public IContractInvoker ContractInvoker { get; set; }

@@ -22,6 +22,16 @@ namespace Bolt.Pipeline
             return (TMiddleware)Middlewares.FirstOrDefault(m => m is TMiddleware);
         }
 
+        public void Validate(Type contract)
+        {
+            if (contract == null) throw new ArgumentNullException(nameof(contract));
+
+            foreach (IMiddleware<T> middleware in Middlewares)
+            {
+                middleware.Validate(contract);
+            }
+        }
+
         public IReadOnlyCollection<IMiddleware<T>> Middlewares { get; }
 
         public void Dispose()

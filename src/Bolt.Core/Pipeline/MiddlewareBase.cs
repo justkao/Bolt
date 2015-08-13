@@ -11,6 +11,10 @@ namespace Bolt.Pipeline
             Next = next;
         }
 
+        public virtual void Validate(Type contract)
+        {
+        }
+
         protected ActionDelegate<T> Next { get; private set; }
 
         public abstract Task Invoke(T context);

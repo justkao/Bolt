@@ -12,6 +12,16 @@ namespace Bolt.Common
     {
         private static readonly Type TaskGenericType = typeof(Task<>);
 
+        public static bool CanAssign<T>(this ParameterInfo parameter)
+        {
+            return parameter.ParameterType.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo());
+        }
+
+        public static bool CanAssign<T>(this TypeInfo type)
+        {
+            return type.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo());
+        }
+
         public static Type GetTaskInnerTypeOrNull(Type type)
         {
             if (type.GetTypeInfo().IsGenericType && !type.GetTypeInfo().IsGenericTypeDefinition)

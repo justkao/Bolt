@@ -423,7 +423,7 @@ namespace Bolt.Server.IntegrationTest
                 builder.Recoverable(recoveries, TimeSpan.FromMilliseconds(10));
             }
 
-            return builder.BuildPipeline<ITestContractStateFull>();
+            return builder.BuildPipeline();
         }
 
         public MockInstanceProvider InstanceProvider = new MockInstanceProvider();
