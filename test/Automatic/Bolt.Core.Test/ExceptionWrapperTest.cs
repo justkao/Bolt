@@ -1,8 +1,6 @@
 ﻿using System;
 using System.IO;
-
 using Bolt.Test.Common;
-
 using Xunit;
 
 namespace Bolt.Core.Test

@@ -2,9 +2,6 @@
 using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
-
-using Bolt.Common;
-
 using Microsoft.AspNet.Http;
 
 namespace Bolt.Server.Session

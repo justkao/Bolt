@@ -14,8 +14,6 @@
 
         DeserializeResponse = 5,
 
-        DeserializeExceptionResponse = 6,
-
-        ContractViolation = 7
+        DeserializeExceptionResponse = 6
     }
 }

@@ -1,7 +1,7 @@
 ﻿{
   "dependencies": {
     "Bolt.Server": "",
-    "Bolt.Common": "",
+    "Bolt.Sources": "",
     "Bolt.Test.Common": "",
     "xunit": "2.1.0-beta1-build2945",
     "xunit.runner.aspnet": "2.0.0-aspnet-*",

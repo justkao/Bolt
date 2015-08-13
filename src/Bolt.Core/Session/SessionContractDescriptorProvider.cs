@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-using Bolt.Common;
-
 namespace Bolt.Session
 {
     public class SessionContractDescriptorProvider : ISessionContractDescriptorProvider

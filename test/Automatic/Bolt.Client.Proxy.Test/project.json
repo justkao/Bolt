@@ -2,7 +2,7 @@
   "dependencies": {
     "Bolt.Client": "",
     "Bolt.Client.Proxy": "",
-    "Bolt.Common": "",
+    "Bolt.Sources": "",
     "Bolt.Test.Common": "",
     "xunit.runner.aspnet": "2.0.0-aspnet-*",
     "Moq": "4.2.1502.911"

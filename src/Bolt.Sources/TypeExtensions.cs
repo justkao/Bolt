@@ -4,8 +4,9 @@
 using System;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 
-namespace Bolt.Common
+namespace Bolt
 {
     internal static class TypeExtensions
     {
@@ -88,6 +89,26 @@ namespace Bolt.Common
         public static bool IsValueType(this Type type)
         {
             return type.GetTypeInfo().IsValueType;
+        }
+
+        public static bool IsCancellationToken(this ParameterInfo parameter)
+        {
+            return parameter.CanAssign<CancellationToken>() || parameter.CanAssign<CancellationToken?>();
+        }
+
+        public static bool CanAssign<T>(this ParameterInfo parameter)
+        {
+            return parameter.ParameterType.GetTypeInfo().IsAssignableFrom(typeof(T).GetTypeInfo());
+        }
+
+        public static bool CanAssign<T>(this Type type)
+        {
+            return type.CanAssign(typeof (T));
+        }
+
+        public static bool CanAssign(this Type type, Type other)
+        {
+            return type.GetTypeInfo().IsAssignableFrom(other.GetTypeInfo());
         }
 
         public static bool IsCompatibleWith(this Type type, object value)

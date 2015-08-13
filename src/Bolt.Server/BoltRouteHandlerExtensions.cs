@@ -3,7 +3,6 @@ using Bolt.Pipeline;
 using Bolt.Server.InstanceProviders;
 using Bolt.Server.Pipeline;
 using Bolt.Server.Session;
-
 using Microsoft.AspNet.Session;
 using Microsoft.Framework.Caching.Distributed;
 using Microsoft.Framework.DependencyInjection;

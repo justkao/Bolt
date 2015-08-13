@@ -5,9 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
-
 using Microsoft.Dnx.Runtime.Common.CommandLine;
-
 using TestService.Core;
 
 namespace TestService.Client

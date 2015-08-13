@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-using Bolt.Common;
-
 namespace Bolt.Client
 {
     /// <summary>

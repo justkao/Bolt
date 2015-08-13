@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Bolt;
 using Bolt.Server;
 using Bolt.Server.Metadata;

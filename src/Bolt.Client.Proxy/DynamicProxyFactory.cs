@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
-
-using Bolt.Common;
 using Bolt.Pipeline;
-
 using Castle.DynamicProxy;
 
 namespace Bolt.Client.Proxy

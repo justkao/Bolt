@@ -12,7 +12,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Bolt.Client;
 using Bolt.Pipeline;
 using Bolt.Test.Common;

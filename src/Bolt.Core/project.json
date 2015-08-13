@@ -4,17 +4,17 @@
   "description": "Bolt Core library containing common classes shared by client and server.",
   "dependencies": {
     "Newtonsoft.Json": "6.0.8",
-    "Bolt.Common": { "type": "build" }
+    "Bolt.Sources": { "type": "build" }
   },
   "frameworks": {
     "net45": {
       "frameworkAssemblies": {
-        "System.Runtime.Serialization": "",
+        "System.Runtime.Serialization": ""
       }
     },
     "dnx451": {
       "frameworkAssemblies": {
-        "System.Runtime.Serialization": "",
+        "System.Runtime.Serialization": ""
       }
     },
     "dotnet": {

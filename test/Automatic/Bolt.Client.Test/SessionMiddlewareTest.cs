@@ -1,12 +1,9 @@
 ﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
-
-using Bolt.Client.Channels;
 using Bolt.Client.Pipeline;
 using Bolt.Pipeline;
 using Bolt.Session;
-
 using Moq;
 
 namespace Bolt.Client.Test

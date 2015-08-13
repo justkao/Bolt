@@ -5,8 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 
-using Bolt.Common;
-
 namespace Bolt.Generators
 {
     public class ClassGenerator : GeneratorBase

@@ -1,19 +1,20 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading.Tasks;
-using Bolt.Common;
+using Bolt.Validators;
 
 namespace Bolt.Client.Pipeline
 {
     public class StreamingMiddleware : ClientMiddlewareBase
     {
+        private readonly ConcurrentDictionary<MethodInfo, StreamingValidator.Metadata> _streamingMethods =
+            new ConcurrentDictionary<MethodInfo, StreamingValidator.Metadata>();
+
         public override async Task Invoke(ClientActionContext context)
         {
-            StreamingMethodMetadata metadata;
+            StreamingValidator.Metadata metadata;
             if (!_streamingMethods.TryGetValue(context.Action, out metadata))
             {
                 await Next(context);
@@ -22,81 +23,49 @@ namespace Bolt.Client.Pipeline
 
             BoltFramework.ValidateParameters(context.Action, context.Parameters);
 
-            if (metadata.HasContentResult)
+            if (metadata.ContentResultType != null)
             {
                 // dummy action result, so it will not be processed by SerializationMiddleware
                 context.ActionResult = new object();
             }
 
-            if (metadata.HttpContentParameterIndex != null)
+            if (metadata.HttpContentIndex >= 0)
             {
-                HttpContent content = (HttpContent) context.Parameters[metadata.HttpContentParameterIndex.Value];
-
+                HttpContent content = (HttpContent) context.Parameters[metadata.HttpContentIndex];
                 if (content == null)
                 {
                     throw new BoltClientException(
                         $"Action '{context.Action.Name}' requires not null HttpContent parameter.",
                         ClientErrorCode.SerializeParameters, context.Action);
                 }
-
                 context.Request.Content = content;
             }
 
             await Next(context);
 
             context.Response.EnsureSuccessStatusCode();
-            if (metadata.HasContentResult)
+            if (metadata.ContentResultType != null)
             {
-                context.ActionResult = context.Response.Content;
+                if (typeof (HttpContent).CanAssign(metadata.ContentResultType))
+                {
+                    context.ActionResult = context.Response.Content;
+                }
+
+                if (typeof(HttpResponseMessage).CanAssign(metadata.ContentResultType))
+                {
+                    context.ActionResult = context.Response;
+                }
             }
-        }
-
-        private readonly ConcurrentDictionary<MethodInfo, StreamingMethodMetadata> _streamingMethods = new ConcurrentDictionary<MethodInfo, StreamingMethodMetadata>();
-
-        private class StreamingMethodMetadata
-        {
-            public bool HasContentResult { get; set; }
-
-            public int? HttpContentParameterIndex { get; set; }
         }
 
         public override void Validate(Type contract)
         {
             foreach (MethodInfo method in contract.GetRuntimeMethods())
             {
-                ParameterInfo[] parameters = method.GetParameters();
-                if (parameters.Length > 2)
+                StreamingValidator.Metadata metadata = StreamingValidator.Validate(contract, method);
+                if (metadata != null)
                 {
-                    throw new BoltClientException(
-                        $"Action '{method.Name}' has invalid declaration. Only single parameter of HttpContent type is supported with optional CancellationToken parameter.",
-                        ClientErrorCode.ContractViolation, method);
-                }
-
-                List<ParameterInfo> httpContentParameters = parameters.Where(TypeHelper.CanAssign<HttpContent>).ToList();
-                if (httpContentParameters.Count > 1)
-                {
-                    throw new BoltClientException(
-                        $"Action '{method.Name}' contains multiple parameters of HttpContent type.",
-                        ClientErrorCode.ContractViolation, method);
-                }
-
-                TypeInfo methodResult = BoltFramework.GetResultType(method).GetTypeInfo();
-                bool hasContentResult = typeof (HttpContent).GetTypeInfo().IsAssignableFrom(methodResult) ||
-                                       typeof (HttpResponseMessage).GetTypeInfo().IsAssignableFrom(methodResult);
-
-                int? index = null;
-                if (parameters.Any())
-                {
-                    index = parameters.ToList().IndexOf(parameters.First());
-                }
-
-                if (hasContentResult || index != null)
-                {
-                    _streamingMethods.TryAdd(method, new StreamingMethodMetadata()
-                    {
-                        HasContentResult = hasContentResult,
-                        HttpContentParameterIndex = index
-                    });
+                    _streamingMethods.TryAdd(method, metadata);
                 }
             }
         }

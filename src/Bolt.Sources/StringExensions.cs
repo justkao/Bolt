@@ -1,4 +1,4 @@
-﻿namespace Bolt.Common
+﻿namespace Bolt
 {
     internal static class StringExensions
     {

@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-
-using Bolt.Common;
-
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Features;
 using Microsoft.AspNet.Session;

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-
 using Bolt.Generators;
-
 using Newtonsoft.Json;
 
 namespace Bolt.Console

@@ -1,7 +1,5 @@
 ﻿using System;
-
 using Bolt.Session;
-
 using Xunit;
 
 namespace Bolt.Core.Test

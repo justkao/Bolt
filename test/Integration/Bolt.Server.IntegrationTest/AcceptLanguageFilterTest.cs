@@ -1,14 +1,10 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-
 using Bolt.Client.Proxy;
-
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Localization;
-
 using Moq;
-
 using Xunit;
 
 namespace Bolt.Server.IntegrationTest

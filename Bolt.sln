@@ -13,8 +13,6 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Generators", "src\Bolt
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Console", "src\Bolt.Console\Bolt.Console.xproj", "{114628A3-3C96-44A1-8604-7C7341751C79}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Common", "src\Bolt.Common\Bolt.Common.xproj", "{2C3CE2D5-15F2-4819-B5BC-2574BCD04C95}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{5D2CA858-5B91-4B30-BB27-274BB66F5C42}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Automatic", "Automatic", "{F63AC733-201C-43F7-9C13-FFB262BAB3AE}"
@@ -49,6 +47,10 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Client.Proxy", "src\Bo
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Client.Proxy.Test", "test\Automatic\Bolt.Client.Proxy.Test\Bolt.Client.Proxy.Test.xproj", "{D85DB120-D042-4D13-AC20-AD131DB43D9E}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Validators.Sources", "src\Bolt.Validators.Sources\Bolt.Validators.Sources.xproj", "{9B57B595-F138-4150-83A2-C4B8279CDB5F}"
+EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Sources", "src\Bolt.Sources\Bolt.Sources.xproj", "{542485B1-C4E6-464C-943B-3F8B01D6A3BC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -75,10 +77,6 @@ Global
 		{114628A3-3C96-44A1-8604-7C7341751C79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{114628A3-3C96-44A1-8604-7C7341751C79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{114628A3-3C96-44A1-8604-7C7341751C79}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2C3CE2D5-15F2-4819-B5BC-2574BCD04C95}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2C3CE2D5-15F2-4819-B5BC-2574BCD04C95}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2C3CE2D5-15F2-4819-B5BC-2574BCD04C95}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2C3CE2D5-15F2-4819-B5BC-2574BCD04C95}.Release|Any CPU.Build.0 = Release|Any CPU
 		{18486979-C4ED-4A5E-A16E-403000765774}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{18486979-C4ED-4A5E-A16E-403000765774}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18486979-C4ED-4A5E-A16E-403000765774}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -127,6 +125,14 @@ Global
 		{D85DB120-D042-4D13-AC20-AD131DB43D9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D85DB120-D042-4D13-AC20-AD131DB43D9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D85DB120-D042-4D13-AC20-AD131DB43D9E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9B57B595-F138-4150-83A2-C4B8279CDB5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B57B595-F138-4150-83A2-C4B8279CDB5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B57B595-F138-4150-83A2-C4B8279CDB5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B57B595-F138-4150-83A2-C4B8279CDB5F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{542485B1-C4E6-464C-943B-3F8B01D6A3BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{542485B1-C4E6-464C-943B-3F8B01D6A3BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{542485B1-C4E6-464C-943B-3F8B01D6A3BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{542485B1-C4E6-464C-943B-3F8B01D6A3BC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

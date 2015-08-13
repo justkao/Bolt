@@ -2,8 +2,6 @@
 using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
-using Bolt.Client.Channels;
-
 namespace Bolt.Client.Pipeline
 {
     public class SessionMiddleware : ClientMiddlewareBase

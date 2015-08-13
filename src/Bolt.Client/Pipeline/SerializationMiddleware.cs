@@ -5,7 +5,6 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Bolt.Pipeline;
 
 namespace Bolt.Client.Pipeline

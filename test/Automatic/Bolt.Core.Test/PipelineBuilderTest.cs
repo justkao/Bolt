@@ -1,8 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-
 using Bolt.Pipeline;
-
 using Xunit;
 
 namespace Bolt.Core.Test

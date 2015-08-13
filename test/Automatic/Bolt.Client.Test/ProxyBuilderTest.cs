@@ -1,8 +1,6 @@
 ﻿using System;
-
 using Bolt.Client.Pipeline;
 using Bolt.Pipeline;
-
 using Xunit;
 
 namespace Bolt.Client.Test
