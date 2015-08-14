@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Bolt.Core
+namespace Bolt
 {
     public class ContractViolationException : BoltException
     {

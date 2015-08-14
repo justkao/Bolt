@@ -4,7 +4,6 @@
   "authors": [ "Martin Tomka" ],
   "dependencies": {
     "Bolt.Sources": { "type": "build" },
-    "Bolt.Validators.Sources": { "type": "build" },
     "Bolt.Core": "",
     "Microsoft.AspNet.Hosting.Abstractions": "1.0.0-*",
     "Microsoft.AspNet.Session": "1.0.0-*",

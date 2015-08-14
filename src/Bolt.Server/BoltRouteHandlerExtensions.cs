@@ -24,8 +24,6 @@ namespace Bolt.Server
             BoltServerOptions options = null,
             Action<ConfigureContractContext> configure = null) where TContractImplementation : TContract
         {
-            BoltFramework.ValidateContract(typeof (TContract));
-
             var factory = new MemorySessionFactory(
                 options ?? bolt.Configuration.Options,
                 bolt.ApplicationServices.GetRequiredService<IServerSessionHandler>());

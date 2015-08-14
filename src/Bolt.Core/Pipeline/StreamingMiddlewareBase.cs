@@ -1,13 +1,35 @@
 ﻿using System;
-using System.Net.Http;
+using System.Collections.Concurrent;
 using System.Reflection;
-using Bolt.Core;
+using System.Net.Http;
 
-namespace Bolt.Validators
+namespace Bolt.Pipeline
 {
-    public static class StreamingValidator
+    public abstract class StreamingMiddlewareBase<T> : MiddlewareBase<T> where T : ActionContextBase
     {
-        public class Metadata
+        private readonly ConcurrentDictionary<MethodInfo, Metadata> _streamingMethods =
+            new ConcurrentDictionary<MethodInfo, Metadata>();
+
+        protected Metadata TryGetMetadata(MethodInfo method)
+        {
+            Metadata result;
+            _streamingMethods.TryGetValue(method, out result);
+            return result;
+        }
+
+        public override void Validate(Type contract)
+        {
+            foreach (MethodInfo method in contract.GetRuntimeMethods())
+            {
+                Metadata metadata = Validate(contract, method);
+                if (metadata != null)
+                {
+                    _streamingMethods.TryAdd(method, metadata);
+                }
+            }
+        }
+
+        protected class Metadata
         {
             public Metadata()
             {
@@ -26,7 +48,7 @@ namespace Bolt.Validators
             public int ParametersCount { get; internal set; }
         }
 
-        public static Metadata Validate(Type contract, MethodInfo method)
+        protected static Metadata Validate(Type contract, MethodInfo method)
         {
             if (contract == null) throw new ArgumentNullException(nameof(contract));
             if (method == null) throw new ArgumentNullException(nameof(method));
@@ -40,9 +62,15 @@ namespace Bolt.Validators
             }
 
             Type methodResult = BoltFramework.GetResultType(method);
-            bool hasContentResult = typeof (HttpContent).CanAssign(methodResult) ||
-                                    typeof (HttpResponseMessage).CanAssign(methodResult);
+            if (typeof (HttpResponseMessage).CanAssign(methodResult))
+            {
+                throw new ContractViolationException(
+                    $"Action '{method.Name}' has invalid declaration. The HttpResponseMessage return type is not supported.",
+                    contract, method);
+            }
 
+
+            bool hasContentResult = typeof (HttpContent).CanAssign(methodResult);
             Metadata metadata = new Metadata
             {
                 Action = method,
@@ -75,7 +103,7 @@ namespace Bolt.Validators
                 }
             }
 
-            if (metadata.HttpContentIndex > 0 || metadata.ContentResultType != null)
+            if (metadata.HttpContentIndex >= 0 || metadata.ContentResultType != null)
             {
                 return metadata;
             }

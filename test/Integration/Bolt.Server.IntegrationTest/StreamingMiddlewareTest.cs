@@ -43,6 +43,23 @@ namespace Bolt.Server.IntegrationTest
         }
 
         [Fact]
+        public async Task SendContent_EnsureReceivedOnServer()
+        {
+            var proxy = CreateProxy();
+            var content = new StringContent("test");
+
+            Callback.Setup(s => s.SendAsync(It.IsAny<HttpContent>())).Callback<HttpContent>(c =>
+            {
+                Assert.Equal("test", c.ReadAsStringAsync().GetAwaiter().GetResult());
+
+            }).Returns(Task.FromResult(true));
+
+            await proxy.SendAsync(content);
+
+            Callback.Verify();
+        }
+
+        [Fact]
         public async Task ReceiveHttpContent_EnsureHeaders()
         {
             var proxy = CreateProxy();
@@ -68,7 +85,6 @@ namespace Bolt.Server.IntegrationTest
             BoltClientException error = await Assert.ThrowsAsync<BoltClientException>(() => proxy.SendAsync(null));
             Assert.Equal(ClientErrorCode.SerializeParameters, error.Error);
         }
-
 
         /*
         [Fact]

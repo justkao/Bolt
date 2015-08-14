@@ -1,24 +1,17 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Pipeline;
-using Bolt.Validators;
 
 namespace Bolt.Server.Pipeline
 {
-    public class StreamingMiddleware : MiddlewareBase<ServerActionContext>
+    public class StreamingMiddleware : StreamingMiddlewareBase<ServerActionContext>
     {
-        private readonly ConcurrentDictionary<MethodInfo, StreamingValidator.Metadata> _streamingMethods =
-            new ConcurrentDictionary<MethodInfo, StreamingValidator.Metadata>();
-
         public override async Task Invoke(ServerActionContext context)
         {
-            StreamingValidator.Metadata metadata;
-            if (!_streamingMethods.TryGetValue(context.Action, out metadata))
+            Metadata metadata = TryGetMetadata(context.Action);
+            if (metadata == null)
             {
                 await Next(context);
                 return;
@@ -48,20 +41,6 @@ namespace Bolt.Server.Pipeline
                 {
                     await HandleContent(context, (HttpContent) context.ActionResult);
                 }
-
-                if (typeof (HttpResponseMessage).CanAssign(metadata.ContentResultType))
-                {
-                    HttpResponseMessage responseMessage = (HttpResponseMessage) context.ActionResult;
-                    foreach (KeyValuePair<string, IEnumerable<string>> pair in responseMessage.Headers)
-                    {
-                        context.HttpContext.Response.Headers.Add(pair.Key, pair.Value.ToArray());
-                    }
-
-                    if (responseMessage.Content != null)
-                    {
-                        await HandleContent(context, responseMessage.Content);
-                    }
-                }
             }
         }
 
@@ -84,18 +63,6 @@ namespace Bolt.Server.Pipeline
             }
 
             return streamContent;
-        }
-
-        public override void Validate(Type contract)
-        {
-            foreach (MethodInfo method in contract.GetRuntimeMethods())
-            {
-                StreamingValidator.Metadata metadata = StreamingValidator.Validate(contract, method);
-                if (metadata != null)
-                {
-                    _streamingMethods.TryAdd(method, metadata);
-                }
-            }
         }
     }
 }

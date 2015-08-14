@@ -25,6 +25,7 @@ namespace Bolt.Pipeline
         public void Validate(Type contract)
         {
             if (contract == null) throw new ArgumentNullException(nameof(contract));
+            BoltFramework.ValidateContract(contract);
 
             foreach (IMiddleware<T> middleware in Middlewares)
             {

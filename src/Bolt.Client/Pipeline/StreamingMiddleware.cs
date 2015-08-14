@@ -1,21 +1,16 @@
-﻿using System;
-using System.Collections.Concurrent;
+﻿using System.Collections.Generic;
 using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
-using Bolt.Validators;
+using Bolt.Pipeline;
 
 namespace Bolt.Client.Pipeline
 {
-    public class StreamingMiddleware : ClientMiddlewareBase
+    public class StreamingMiddleware : StreamingMiddlewareBase<ClientActionContext>
     {
-        private readonly ConcurrentDictionary<MethodInfo, StreamingValidator.Metadata> _streamingMethods =
-            new ConcurrentDictionary<MethodInfo, StreamingValidator.Metadata>();
-
         public override async Task Invoke(ClientActionContext context)
         {
-            StreamingValidator.Metadata metadata;
-            if (!_streamingMethods.TryGetValue(context.Action, out metadata))
+            Metadata metadata = TryGetMetadata(context.Action);
+            if (metadata == null)
             {
                 await Next(context);
                 return;
@@ -48,24 +43,13 @@ namespace Bolt.Client.Pipeline
             {
                 if (typeof (HttpContent).CanAssign(metadata.ContentResultType))
                 {
+                    // since we are not supoprting HttpResponseMEssage we will try copy headers to HttpContent
+                    foreach (KeyValuePair<string, IEnumerable<string>> header in context.Response.Headers)
+                    {
+                        context.Response.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                    }
+
                     context.ActionResult = context.Response.Content;
-                }
-
-                if (typeof(HttpResponseMessage).CanAssign(metadata.ContentResultType))
-                {
-                    context.ActionResult = context.Response;
-                }
-            }
-        }
-
-        public override void Validate(Type contract)
-        {
-            foreach (MethodInfo method in contract.GetRuntimeMethods())
-            {
-                StreamingValidator.Metadata metadata = StreamingValidator.Validate(contract, method);
-                if (metadata != null)
-                {
-                    _streamingMethods.TryAdd(method, metadata);
                 }
             }
         }

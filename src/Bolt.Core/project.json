@@ -9,22 +9,26 @@
   "frameworks": {
     "net45": {
       "frameworkAssemblies": {
-        "System.Runtime.Serialization": ""
+        "System.Runtime.Serialization": "",
+        "System.Net.Http": ""
       }
     },
     "dnx451": {
       "frameworkAssemblies": {
-        "System.Runtime.Serialization": ""
+        "System.Runtime.Serialization": "",
+        "System.Net.Http": ""
       }
     },
     "dotnet": {
       "dependencies": {
         "System.Collections": "4.0.11-*",
+        "System.Collections.Concurrent": "4.0.11-*",
         "System.Linq": "4.0.1-*",
         "System.Reflection": "4.0.0-*",
         "System.Reflection.Extensions": "4.0.0-*",
         "System.Runtime.Serialization.Primitives": "4.0.10-*",
         "System.Text.Encoding": "4.0.11-*",
+        "System.Net.Http": "4.0.0-*",
         "System.Threading": "4.0.11-*"
       }
     }
