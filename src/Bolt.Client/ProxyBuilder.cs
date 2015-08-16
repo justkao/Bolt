@@ -170,8 +170,20 @@ namespace Bolt.Client
         public virtual TContract Build<TContract>() where TContract : class
         {
             IPipeline<ClientActionContext> pipeline = BuildPipeline();
-            pipeline.Validate(typeof(TContract));
-            return _configuration.ProxyFactory.CreateProxy<TContract>(pipeline);
+            TContract proxy = _configuration.ProxyFactory.CreateProxy<TContract>(pipeline);
+            if (proxy is IContractProvider)
+            {
+                BoltFramework.ValidateContract((proxy as IContractProvider).Contract);
+                pipeline.Validate((proxy as IContractProvider).Contract);
+            }
+            else
+            {
+                BoltFramework.ValidateContract(typeof(TContract));
+                pipeline.Validate(typeof(TContract));
+            }
+
+
+            return proxy;
         }
     }
 }

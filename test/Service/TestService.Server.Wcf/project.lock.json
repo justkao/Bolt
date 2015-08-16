@@ -20,6 +20,7 @@
           "Newtonsoft.Json": "6.0.8"
         },
         "frameworkAssemblies": [
+          "System.Net.Http",
           "System.Runtime.Serialization"
         ]
       },
@@ -44,7 +45,7 @@
           "System.Runtime.Serialization"
         ]
       },
-      "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12356": {
+      "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12364": {
         "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp",
@@ -59,7 +60,7 @@
           "lib/dnx451/Microsoft.Dnx.Runtime.Abstractions.dll": {}
         }
       },
-      "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta7-12356": {
+      "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta7-12364": {
         "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp",
@@ -121,30 +122,30 @@
       "type": "project",
       "path": "../TestService.Core/project.json"
     },
-    "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12356": {
+    "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12364": {
       "type": "package",
       "serviceable": true,
-      "sha512": "cANB/CDWZkgyfeCoCwOz3DCZp232GXRzW16IluZleWOLqAydDMvmUeNnoL7gFEiwp2ChzavW4mvVMDkebwN1RA==",
+      "sha512": "olzxOCVByDrpprw7qrizpD+6Xv4zY7yKyThzbYhC4YE3aQ5qlR2AYKyD6EJ60EBHkOEgL2x1neo6j0oQbUkdww==",
       "files": [
         "lib/dnx451/Microsoft.Dnx.Runtime.Abstractions.dll",
         "lib/dnx451/Microsoft.Dnx.Runtime.Abstractions.xml",
         "lib/dnxcore50/Microsoft.Dnx.Runtime.Abstractions.dll",
         "lib/dnxcore50/Microsoft.Dnx.Runtime.Abstractions.xml",
-        "Microsoft.Dnx.Runtime.Abstractions.1.0.0-beta7-12356.nupkg",
-        "Microsoft.Dnx.Runtime.Abstractions.1.0.0-beta7-12356.nupkg.sha512",
+        "Microsoft.Dnx.Runtime.Abstractions.1.0.0-beta7-12364.nupkg",
+        "Microsoft.Dnx.Runtime.Abstractions.1.0.0-beta7-12364.nupkg.sha512",
         "Microsoft.Dnx.Runtime.Abstractions.nuspec"
       ]
     },
-    "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta7-12356": {
+    "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta7-12364": {
       "type": "package",
-      "sha512": "oS0LYjOA6psmb3j6lxdiIAOJnX5dJkSfgjLmtS1BT4pC2IkEZ/GPhek1eRQGbT1D/tx7hpKTIAAeVCJ4cAkTsg==",
+      "sha512": "dnDLBXkZo9adNdXakHTRNsJqVBo/Nycvi8i/RiSi6GemexQfm3imAM6YPQet/dkuxlR7NfVHOg8j+WKDRs8WXA==",
       "files": [
         "lib/dnx451/Microsoft.Framework.CommandLineUtils.Sources.dll",
         "lib/dnx451/Microsoft.Framework.CommandLineUtils.Sources.xml",
         "lib/dnxcore50/Microsoft.Framework.CommandLineUtils.Sources.dll",
         "lib/dnxcore50/Microsoft.Framework.CommandLineUtils.Sources.xml",
-        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta7-12356.nupkg",
-        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta7-12356.nupkg.sha512",
+        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta7-12364.nupkg",
+        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta7-12364.nupkg.sha512",
         "Microsoft.Framework.CommandLineUtils.Sources.nuspec",
         "shared/AnsiConsole.cs",
         "shared/CommandArgument.cs",

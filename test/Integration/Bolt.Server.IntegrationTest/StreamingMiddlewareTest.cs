@@ -1,5 +1,9 @@
-﻿using System.Linq;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Net.Http;
+using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client.Proxy;
 using Bolt.Server.Pipeline;
@@ -38,25 +42,112 @@ namespace Bolt.Server.IntegrationTest
             }).Returns(Task.FromResult(true));
 
             await proxy.SendAsync(content);
-
             Callback.Verify();
         }
 
-        [Fact]
-        public async Task SendContent_EnsureReceivedOnServer()
+        [InlineData("")]
+        [InlineData("test")]
+        [InlineData("some other value")]
+        [Theory]
+        public async Task SendString_EnsureReceivedOnServer(string rawContent)
         {
             var proxy = CreateProxy();
-            var content = new StringContent("test");
-
+            HttpContent content = new StringContent(rawContent);
             Callback.Setup(s => s.SendAsync(It.IsAny<HttpContent>())).Callback<HttpContent>(c =>
             {
-                Assert.Equal("test", c.ReadAsStringAsync().GetAwaiter().GetResult());
+                Assert.Equal(rawContent, c.ReadAsStringAsync().GetAwaiter().GetResult());
 
             }).Returns(Task.FromResult(true));
 
             await proxy.SendAsync(content);
 
             Callback.Verify();
+        }
+
+
+        [InlineData(0)]
+        [InlineData(10)]
+        [InlineData(100)]
+        [InlineData(1000)]
+        [Theory]
+        public async Task SendByteArrayContent_EnsureReceivedOnServer(int length)
+        {
+            var proxy = CreateProxy();
+            HttpContent content = new ByteArrayContent(new byte[length]);
+            Callback.Setup(s => s.SendAsync(It.IsAny<HttpContent>())).Callback<HttpContent>(c =>
+            {
+                Assert.Equal(length, c.ReadAsByteArrayAsync().GetAwaiter().GetResult().Length);
+
+            }).Returns(Task.FromResult(true));
+
+            await proxy.SendAsync(content);
+
+            Callback.Verify();
+        }
+
+        [InlineData(0)]
+        [InlineData(10)]
+        [InlineData(100)]
+        [InlineData(1000)]
+        [Theory]
+        public async Task SendStreamContent_EnsureReceivedOnServer(int length)
+        {
+            var proxy = CreateProxy();
+            HttpContent content = new StreamContent(new MemoryStream(new byte[length]));
+            Callback.Setup(s => s.SendAsync(It.IsAny<HttpContent>())).Callback<HttpContent>(c =>
+            {
+                MemoryStream stream = new MemoryStream();
+                c.ReadAsStreamAsync().GetAwaiter().GetResult().CopyTo(stream);
+                Assert.Equal(length, stream.ToArray().Length);
+
+            }).Returns(Task.FromResult(true));
+
+            await proxy.SendAsync(content);
+
+            Callback.Verify();
+        }
+
+        [Fact]
+        public async Task SendStreamContent_EnsureStreamedOnServer()
+        {
+            var proxy = CreateProxy();
+            bool serverReached = false;
+            int reads = 0;
+
+            CancellationTokenSource cancellation = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+            Mock<IStreamCallback> streamCallback = new Mock<IStreamCallback>();
+            streamCallback.Setup(s => s.OnRead()).Returns(() =>
+            {
+                cancellation.Token.WaitHandle.WaitOne();
+                try
+                {
+                    if (reads == 0)
+                    {
+                        return 10;
+                    }
+                    return 0;
+                }
+                finally
+                {
+                    reads++;
+                }
+            });
+
+            Callback.Setup(s => s.SendAsync(It.IsAny<HttpContent>())).Callback<HttpContent>(c =>
+            {
+                cancellation.Cancel();
+                serverReached = true;
+                byte[] bytesRead = c.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+                Assert.Equal(10, bytesRead.Length);
+
+            }).Returns(Task.FromResult(true));
+
+            HttpContent content = new StreamContent(new ValidatingStream(new byte[100], streamCallback.Object), 5);
+            await proxy.SendAsync(content);
+
+            Callback.Verify();
+
+            Assert.True(serverReached, "The content was not streamed.");
         }
 
         [Fact]
@@ -76,6 +167,26 @@ namespace Bolt.Server.IntegrationTest
             Assert.Equal("server-value", result.Headers.GetValues("server-test").First());
 
             Callback.Verify();
+        }
+
+        private class ValidatingStream : MemoryStream
+        {
+            private readonly IStreamCallback _streamCallback;
+
+            public ValidatingStream(byte[] content, IStreamCallback streamCallback) : base(content)
+            {
+                _streamCallback = streamCallback;
+            }
+
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                return _streamCallback.OnRead();
+            }
+        }
+
+        public interface IStreamCallback
+        {
+            int OnRead();
         }
 
         [Fact]

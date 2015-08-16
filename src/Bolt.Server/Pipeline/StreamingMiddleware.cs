@@ -21,7 +21,7 @@ namespace Bolt.Server.Pipeline
             context.Parameters = new object[metadata.ParametersCount];
             if (metadata.HttpContentIndex >= 0)
             {
-                context.Parameters[metadata.HttpContentIndex] = CreateHttpContent(context);
+                context.Parameters[metadata.HttpContentIndex] = CreateHttpContent(context, metadata);
             }
 
             if (metadata.CancellationTokenIndex >= 0)
@@ -54,7 +54,7 @@ namespace Bolt.Server.Pipeline
             await content.CopyToAsync(context.HttpContext.Response.Body);
         }
 
-        protected virtual HttpContent CreateHttpContent(ServerActionContext context)
+        protected virtual HttpContent CreateHttpContent(ServerActionContext context, Metadata actionMetadata)
         {
             StreamContent streamContent = new StreamContent(context.HttpContext.Request.Body);
             foreach (var header in context.HttpContext.Request.Headers)

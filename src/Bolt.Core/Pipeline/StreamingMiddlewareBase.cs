@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Linq;
 using System.Reflection;
 using System.Net.Http;
 
@@ -45,6 +46,8 @@ namespace Bolt.Pipeline
 
             public int HttpContentIndex { get; internal set; }
 
+            public Type ContentRequestType { get; internal set; }
+
             public int ParametersCount { get; internal set; }
         }
 
@@ -71,6 +74,13 @@ namespace Bolt.Pipeline
 
 
             bool hasContentResult = typeof (HttpContent).CanAssign(methodResult);
+            if (hasContentResult && methodResult != typeof (HttpContent))
+            {
+                throw new ContractViolationException(
+                    $"Action '{method.Name}' has invalid declaration. Only HttpContent return type is supported.",
+                    contract, method);
+            }
+
             Metadata metadata = new Metadata
             {
                 Action = method,
@@ -87,6 +97,13 @@ namespace Bolt.Pipeline
                 ParameterInfo info = parameters[i];
                 if (typeof (HttpContent).CanAssign(info.ParameterType))
                 {
+                    if (info.ParameterType != typeof (HttpContent))
+                    {
+                        throw new ContractViolationException(
+                            $"Action '{method.Name}' has invalid declaration. Only HttpContent parameter type is supported.",
+                            contract, method);
+                    }
+
                     if (metadata.HttpContentIndex >= 0)
                     {
                         throw new ContractViolationException(
@@ -94,17 +111,26 @@ namespace Bolt.Pipeline
                             contract, method);
                     }
 
+                    metadata.ContentRequestType = info.ParameterType;
                     metadata.HttpContentIndex = i;
                 }
-
-                if (info.IsCancellationToken())
+                else if (info.IsCancellationToken())
                 {
                     metadata.CancellationTokenIndex = i;
                 }
             }
 
+            if (metadata.HttpContentIndex >= 0 && parameters.Length > 1 && metadata.CancellationTokenIndex < 0)
+            {
+                throw new ContractViolationException(
+                    $"Action '{method.Name}' has invalid declaration. Only HttpContent parameter type witj optional cancellation token is supported.",
+                    contract, method);
+            }
+
             if (metadata.HttpContentIndex >= 0 || metadata.ContentResultType != null)
             {
+
+
                 return metadata;
             }
 
