@@ -3,10 +3,11 @@
     "Bolt.Server": "",
     "Bolt.Sources": "",
     "Bolt.Test.Common": "",
-    "xunit": "2.1.0-beta1-build2945",
-    "xunit.runner.aspnet": "2.0.0-aspnet-*",
     "Microsoft.AspNet.Http": "1.0.0-*",
-    "Moq": "4.2.1502.0911"
+    "Moq": "4.2.1502.0911",
+    "xunit.runner.dnx": "2.1.0-*",
+    "xunit.core": "2.1.0-*",
+    "xunit.assert": "2.1.0-*"
   },
   "frameworks": {
     "dnx451": {
@@ -14,6 +15,6 @@
     }
   },
   "commands": {
-    "test": "xunit.runner.aspnet -parallel none"
+    "test": "xunit.runner.dnx -parallel none"
   }
 }
