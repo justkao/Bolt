@@ -13,12 +13,12 @@
         /// <summary>
         /// Error occurred during serialization of response.
         /// </summary>
-        ResponseSerialization = 1,
+        SerializeResponse = 1,
 
         /// <summary>
         /// Error occurred during deserialization of request.
         /// </summary>
-        ParameterDeserialization = 2,
+        DeserializeParameters = 2,
 
         /// <summary>
         /// The action defined in request url for specific contract was not found.
@@ -55,8 +55,19 @@
         /// </summary>
         BoltUnavailable = 9,
 
-        ContractInstanceNotFound = 10,
+        /// <summary>
+        /// There is no instance of contract that can be used to execute the action.
+        /// </summary>
+        NoContractInstance = 10,
 
-        ExceptionSerialization = 11
+        /// <summary>
+        /// Instance does not implement the contract.
+        /// </summary>
+        InvalidContractInstance = 11,
+
+        /// <summary>
+        /// Serilization of exception failed on server.
+        /// </summary>
+        SerializeException = 12
     }
 }

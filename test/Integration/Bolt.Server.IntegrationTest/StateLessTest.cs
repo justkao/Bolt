@@ -199,7 +199,7 @@ namespace Bolt.Server.IntegrationTest
             }
             catch (BoltServerException e)
             {
-                if (e.Error != ServerErrorCode.ResponseSerialization)
+                if (e.Error != ServerErrorCode.SerializeResponse)
                 {
                     throw;
                 }
@@ -221,7 +221,7 @@ namespace Bolt.Server.IntegrationTest
             }
             catch (BoltServerException e)
             {
-                if (e.Error != ServerErrorCode.ResponseSerialization)
+                if (e.Error != ServerErrorCode.SerializeResponse)
                 {
                     throw;
                 }
