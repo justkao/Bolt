@@ -26,6 +26,16 @@ namespace TestService
             return Config.CreateProxy<ITestContract>(Servers.BoltServer);
         }
 
+        public static ITestContract CreateKestrelBolt()
+        {
+            return Config.CreateProxy<TestContractProxy>(Servers.KestrelBoltServer);
+        }
+
+        public static ITestContract CreateDynamicKestrelBolt()
+        {
+            return Config.CreateProxy<ITestContract>(Servers.KestrelBoltServer);
+        }
+
         public static ITestContract CreateWcf()
         {
             ChannelFactory<ITestContract> respository = new ChannelFactory<ITestContract>(new BasicHttpBinding());

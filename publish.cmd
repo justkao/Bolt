@@ -1,7 +1,10 @@
 @ECHO OFF
  
-set version="0.14.0-alpha1"
+set version="0.15.0-alpha1"
 
+if %errorlevel% neq 0 goto failure
+
+.nuget\nuget.exe push packages\Bolt.Sources.%version%.nupkg
 if %errorlevel% neq 0 goto failure
 
 .nuget\nuget.exe push packages\Bolt.Core.%version%.nupkg

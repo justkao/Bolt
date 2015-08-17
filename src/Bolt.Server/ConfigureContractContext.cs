@@ -37,20 +37,6 @@ namespace Bolt.Server
             return this;
         }
 
-        public IPipeline<ServerActionContext> TryBuild()
-        {
-            if (!_middlewares.Any())
-            {
-                return null;
-            }
-
-            PipelineBuilder<ServerActionContext> builder = new PipelineBuilder<ServerActionContext>();
-            foreach (IMiddleware<ServerActionContext> middleware in _middlewares)
-            {
-                builder.Use(middleware);
-            }
-
-            return builder.Build();
-        } 
+        public IEnumerable<IMiddleware<ServerActionContext>> Middlewares => _middlewares;
     }
 }

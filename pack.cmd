@@ -3,9 +3,9 @@
 if not exist packages mkdir packages
 
 
-call dnu pack src\Bolt.Common\project.json --configuration Release
+call dnu pack src\Bolt.Sources\project.json --configuration Release
 if %errorlevel% neq 0 goto failure
-for /R src\Bolt.Common\ %%f in (*.nupkg) do copy "%%f" packages\
+for /R src\Bolt.Sources\ %%f in (*.nupkg) do copy "%%f" packages\
 
 call dnu pack src\Bolt.Core\project.json --configuration Release
 if %errorlevel% neq 0 goto failure

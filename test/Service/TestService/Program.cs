@@ -91,6 +91,13 @@ namespace TestService.Client
                 yield return new Tuple<string, ITestContract>("Bolt(dynamic proxy)", ClientFactory.CreateDynamicBolt());
             }
 
+            if (IsPortUsed(Servers.KestrelBoltServer.Port))
+            {
+                yield return new Tuple<string, ITestContract>("Bolt(Kestrel)", ClientFactory.CreateBolt());
+
+                yield return new Tuple<string, ITestContract>("Bolt(Kestrel dynamic proxy)", ClientFactory.CreateDynamicBolt());
+            }
+
             if (IsPortUsed(Servers.IISBoltServer.Port))
             {
                 yield return new Tuple<string, ITestContract>("Bolt(IIS)", ClientFactory.CreateIISBolt());

@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Bolt.Pipeline;
 using Bolt.Server.InstanceProviders;
 using Bolt.Server.Pipeline;
@@ -93,7 +94,12 @@ namespace Bolt.Server
             {
                 ConfigureContractContext ctxt = new ConfigureContractContext(invoker, bolt.ApplicationServices);
                 configure.Invoke(ctxt);
-                pipeline = ctxt.TryBuild();
+
+                if (ctxt.Middlewares.Any())
+                {
+                    pipeline =
+                        bolt.ApplicationServices.GetRequiredService<IServerPipelineBuilder>().Build(ctxt.Middlewares);
+                }
             }
 
             if (pipeline != null)
@@ -102,7 +108,8 @@ namespace Bolt.Server
             }
             else if (invoker.Pipeline == null)
             {
-                invoker.Pipeline =  bolt.ApplicationServices.GetRequiredService<IServerPipelineBuilder>().Build(typeof (TContract));
+                // build default pipeline
+                invoker.Pipeline =  bolt.ApplicationServices.GetRequiredService<IServerPipelineBuilder>().Build();
             }
             bolt.Add(invoker);
 
