@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
-
-using Bolt.Common;
 using Bolt.Server.Session;
 
 namespace Bolt.Server.InstanceProviders

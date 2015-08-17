@@ -3,7 +3,7 @@
   "authors": [ "Martin Tomka" ],
   "description": "Contains factory for dynamic Bolt proxy generation.",
   "dependencies": {
-    "Bolt.Common": { "type": "build" },
+    "Bolt.Sources": { "type": "build" },
     "Bolt.Client": "",
     "Castle.Core": "3.3.3"
   },

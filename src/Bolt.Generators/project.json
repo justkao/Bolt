@@ -3,7 +3,7 @@
   "authors": [ "Martin Tomka" ],
   "description": "Bolt library containing helper classes for code generation.",
   "dependencies": {
-    "Bolt.Common": { "type": "build" }
+    "Bolt.Sources": { "type": "build" }
   },
   "frameworks": {
     "net45": {

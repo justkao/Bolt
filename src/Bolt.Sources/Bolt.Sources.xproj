@@ -5,7 +5,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>2c3ce2d5-15f2-4819-b5bc-2574bcd04c95</ProjectGuid>
+    <ProjectGuid>542485b1-c4e6-464c-943b-3f8b01d6a3bc</ProjectGuid>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'" Label="Configuration">
   </PropertyGroup>

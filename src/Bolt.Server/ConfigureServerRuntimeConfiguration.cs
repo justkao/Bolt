@@ -1,5 +1,4 @@
 ﻿using System;
-
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;

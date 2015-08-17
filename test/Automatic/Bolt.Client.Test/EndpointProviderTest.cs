@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Reflection;
-
 using Xunit;
 
 namespace Bolt.Client.Test

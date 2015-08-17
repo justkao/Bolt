@@ -4,7 +4,7 @@
     "Bolt.Core": "",
     "Bolt.Server": "",
     "Bolt.Client": "",
-    "Bolt.Common": "",
+    "Bolt.Sources": "",
     "Bolt.Test.Common": "",
     "Bolt.Generators": "",
     "Bolt.Console": ""

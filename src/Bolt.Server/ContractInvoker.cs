@@ -1,21 +1,17 @@
 using System;
 using System.Threading.Tasks;
-
 using Bolt.Pipeline;
 
 namespace Bolt.Server
 {
     public class ContractInvoker : IContractInvoker
     {
-        public ContractInvoker(IPipeline<ServerActionContext> pipeline)
+        public ContractInvoker()
         {
-            if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
-
-            Pipeline = pipeline;
             Configuration = new ServerRuntimeConfiguration();
         }
 
-        public IPipeline<ServerActionContext> Pipeline { get; }
+        public IPipeline<ServerActionContext> Pipeline { get; set; }
 
         public Type Contract { get; set; }
 

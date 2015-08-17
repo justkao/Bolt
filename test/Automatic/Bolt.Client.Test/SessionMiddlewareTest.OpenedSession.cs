@@ -1,10 +1,7 @@
 ﻿using System.Threading.Tasks;
-
 using Bolt.Client.Pipeline;
 using Bolt.Pipeline;
-
 using Moq;
-
 using Xunit;
 
 namespace Bolt.Client.Test

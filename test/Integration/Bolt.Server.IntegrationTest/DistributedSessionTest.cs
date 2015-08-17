@@ -1,10 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
 using Bolt.Client;
 using Bolt.Client.Proxy;
-
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Features;
@@ -12,9 +10,7 @@ using Microsoft.AspNet.Session;
 using Microsoft.Framework.Caching.Distributed;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
-
 using Moq;
-
 using Xunit;
 
 namespace Bolt.Server.IntegrationTest

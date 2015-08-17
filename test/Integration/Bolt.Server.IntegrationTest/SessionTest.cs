@@ -1,20 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Remoting.Channels;
 using System.Threading.Tasks;
-
 using Bolt.Client;
 using Bolt.Client.Pipeline;
 using Bolt.Pipeline;
 using Bolt.Server.InstanceProviders;
 using Bolt.Server.IntegrationTest.Core;
 using Bolt.Server.Session;
-
 using Microsoft.AspNet.Builder;
-
 using Moq;
-
 using Xunit;
 
 namespace Bolt.Server.IntegrationTest
@@ -422,7 +417,7 @@ namespace Bolt.Server.IntegrationTest
                 builder.Recoverable(recoveries, TimeSpan.FromMilliseconds(10), errorHandling);
             }
 
-            return builder.BuildPipeline<ITestContractStateFull>();
+            return builder.BuildPipeline();
         }
 
         protected override void Configure(IApplicationBuilder appBuilder)

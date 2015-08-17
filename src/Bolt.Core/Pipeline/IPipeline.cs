@@ -7,5 +7,7 @@ namespace Bolt.Pipeline
         ActionDelegate<T> Instance { get; }
 
         TMiddleware Find<TMiddleware>() where TMiddleware : IMiddleware<T>;
+
+        void Validate(Type contract);
     }
 }

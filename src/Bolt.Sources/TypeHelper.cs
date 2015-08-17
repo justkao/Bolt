@@ -6,7 +6,7 @@ using System.Collections;
 using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Bolt.Common
+namespace Bolt
 {
     internal static class TypeHelper
     {

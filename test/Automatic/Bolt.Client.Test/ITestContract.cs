@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-
 using Bolt.Pipeline;
 
 namespace Bolt.Client.Test

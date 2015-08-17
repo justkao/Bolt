@@ -1,7 +1,5 @@
 ﻿using System;
-
 using Bolt.Server.Session;
-
 using Microsoft.Framework.DependencyInjection;
 
 namespace Bolt.Server.InstanceProviders

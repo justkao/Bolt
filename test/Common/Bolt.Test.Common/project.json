@@ -1,40 +1,20 @@
 ﻿{
-  "dependencies": {"Bolt.Common": ""},
+  "dependencies": { "Bolt.Sources": { "type": "build" } },
   "frameworks": {
     "net45": {
       "frameworkAssemblies": {
-        "System.Collections": { "version": "", "type": "build" },
-        "System.Diagnostics.Debug": { "version": "", "type": "build" },
-        "System.Linq": { "version": "", "type": "build" },
-        "System.Reflection": { "version": "", "type": "build" },
-        "System.Reflection.Extensions": { "version": "", "type": "build" },
-        "System.Runtime": { "version": "", "type": "build" },
-        "System.Runtime.Serialization": { "version": "", "type": "build" },
-        "System.Threading": { "version": "", "type": "build" },
-        "System.Net.Http": { "version": "", "type": "build" }
-      }
-    },
-    "dnx451": {
-      "frameworkAssemblies": {
-        "System.Runtime": "",
         "System.Collections": "",
         "System.Runtime.Serialization": "",
         "System.Net": "",
         "System.Net.Http": ""
       }
     },
-    "dnxcore50": {
-      "dependencies": {
-        "System.Runtime": "4.0.20-*",
-        "System.Collections": "4.0.10-*",
-        "System.Linq": "4.0.0-*",
-        "System.Threading.Tasks": "4.0.10-*",
-        "System.Net.Http": "4.0.0-*",
-        "System.Reflection": "4.0.10-*",
-        "System.Runtime.Serialization.Primitives": "4.0.0-*",
-        "System.Diagnostics.Debug": "4.0.10-*",
-        "System.Threading": "4.0.10-*",
-        "System.Runtime.Extensions": "4.0.10-*"
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.Collections": "",
+        "System.Runtime.Serialization": "",
+        "System.Net": "",
+        "System.Net.Http": ""
       }
     }
   }

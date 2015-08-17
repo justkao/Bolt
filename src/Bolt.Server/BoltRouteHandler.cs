@@ -6,9 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
-
 using Bolt.Server.Metadata;
-
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Routing;
 using Microsoft.Framework.Logging;
@@ -80,6 +78,7 @@ namespace Bolt.Server
                 throw new InvalidOperationException($"Invoker for contract '{invoker.Contract.Name}' already registered.");
             }
 
+            invoker.Pipeline.Validate(invoker.Contract);
             Logger.LogInformation(BoltLogId.ContractAdded, "Adding contract: {0}", invoker.Contract.Name);
             _invokers.Add(invoker);
 

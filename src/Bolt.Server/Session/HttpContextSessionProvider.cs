@@ -1,6 +1,5 @@
 ﻿using System;
-
-using Microsoft.AspNet.Hosting;
+using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Features;
 
 namespace Bolt.Server.Session

@@ -1,11 +1,8 @@
 ﻿using System.Threading;
-
 using Bolt.Server;
-
 using Microsoft.AspNet.Builder;
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
-
 using TestService.Core;
 
 namespace TestService.Server.Bolt

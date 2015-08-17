@@ -5,8 +5,6 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-using Bolt.Common;
-
 namespace Bolt.Generators
 {
     public class TypeFormatter

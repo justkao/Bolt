@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
-
 using Bolt.Client.Pipeline;
 using Bolt.Pipeline;
 

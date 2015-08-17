@@ -9,7 +9,6 @@
 
 using System.Reflection;
 using System.Threading.Tasks;
-
 using Bolt.Client;
 using Bolt.Pipeline;
 

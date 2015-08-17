@@ -2,11 +2,8 @@
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Bolt.Pipeline;
-
 using Moq;
-
 using Xunit;
 
 namespace Bolt.Client.Proxy.Test

@@ -1,7 +1,5 @@
 ﻿using Bolt.Server.Session;
-
 using Microsoft.AspNet.Http.Internal;
-
 using Xunit;
 
 namespace Bolt.Server.Test

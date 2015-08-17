@@ -5,7 +5,7 @@
       "type": "build"
     },
     "Newtonsoft.Json": "6.0.8",
-    "Bolt.Common": { "type": "build" },
+    "Bolt.Sources": { "type": "build" },
     "Bolt.Generators": "",
     "Bolt.Client": "",
     "Bolt.Client.Proxy": "",

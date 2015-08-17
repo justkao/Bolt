@@ -1,8 +1,6 @@
 using System;
 using System.Threading.Tasks;
 
-using Bolt.Common;
-
 namespace Bolt.Server.InstanceProviders
 {
     public sealed class DelegatedInstanceProvider<TImplementation> : IInstanceProvider

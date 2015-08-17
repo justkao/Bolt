@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Bolt.Pipeline;
 
 namespace Bolt.Client.Pipeline
@@ -53,6 +52,10 @@ namespace Bolt.Client.Pipeline
         public void Init(ActionDelegate<ClientActionContext> next)
         {
             _next = next;
+        }
+
+        public virtual void Validate(Type contract)
+        {
         }
     }
 }

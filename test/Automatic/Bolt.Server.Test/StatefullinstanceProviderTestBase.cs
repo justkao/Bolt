@@ -1,13 +1,9 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-
-using Bolt.Common;
 using Bolt.Server.InstanceProviders;
 using Bolt.Server.Session;
-
 using Microsoft.AspNet.Http.Internal;
-
 using Moq;
 
 namespace Bolt.Server.Test

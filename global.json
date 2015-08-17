@@ -10,7 +10,7 @@
         "wrap"
     ],
     "sdk": {
-        "version": "1.0.0-beta7-12330",
+        "version": "1.0.0-beta7-12356",
         "runtime": "clr",
         "architecture": "x86"
     }

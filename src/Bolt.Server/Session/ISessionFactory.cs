@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Threading.Tasks;
-
 using Microsoft.AspNet.Http;
 
 namespace Bolt.Server.Session

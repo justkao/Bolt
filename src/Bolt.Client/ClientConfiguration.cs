@@ -1,8 +1,6 @@
 using System;
 using System.Net.Http;
 
-using Bolt.Client.Channels;
-
 namespace Bolt.Client
 {
     /// <summary>

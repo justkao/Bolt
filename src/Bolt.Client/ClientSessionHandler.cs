@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Http;
 
-namespace Bolt.Client.Channels
+namespace Bolt.Client
 {
     public class ClientSessionHandler : IClientSessionHandler
     {

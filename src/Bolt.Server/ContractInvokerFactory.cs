@@ -1,5 +1,4 @@
 using System;
-
 using Bolt.Server.Pipeline;
 
 namespace Bolt.Server
@@ -9,11 +8,7 @@ namespace Bolt.Server
         public ContractInvokerFactory(IServerPipelineBuilder pipelineBuilder)
         {
             if (pipelineBuilder == null) throw new ArgumentNullException(nameof(pipelineBuilder));
-
-            PipelineBuilder = pipelineBuilder;
         }
-
-        public IServerPipelineBuilder PipelineBuilder { get; }
 
         public IContractInvoker Create(Type contract, IInstanceProvider instanceProvider)
         {
@@ -27,9 +22,7 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(instanceProvider));
             }
 
-            BoltFramework.ValidateContract(contract);
-
-            ContractInvoker invoker = new ContractInvoker(PipelineBuilder.Build(contract)) { Contract = contract, InstanceProvider = instanceProvider };
+            ContractInvoker invoker = new ContractInvoker{ Contract = contract, InstanceProvider = instanceProvider };
             return invoker;
         }
     }

@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Bolt.Common
+namespace Bolt
 {
     internal static class CompletedTask
     {

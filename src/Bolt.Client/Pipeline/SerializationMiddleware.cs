@@ -5,7 +5,6 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Bolt.Pipeline;
 
 namespace Bolt.Client.Pipeline
@@ -201,7 +200,7 @@ namespace Bolt.Client.Pipeline
             }
             else
             {
-                if (context.HasSerializableActionResult)
+                if (context.HasSerializableActionResult && context.ActionResult == null)
                 {
                     context.ActionResult = await ReadResponseAsync(context);
                 }

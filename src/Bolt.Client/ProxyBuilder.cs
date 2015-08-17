@@ -16,6 +16,8 @@ namespace Bolt.Client
         private IServerProvider _serverProvider;
         private HttpMessageHandler _messageHandler;
         private AcceptLanguageMiddleware _acceptLanguageMiddleware;
+        private StreamingMiddleware _streamingMiddleware;
+
         private List<IMiddleware<ClientActionContext>> _beforeSend = new List<IMiddleware<ClientActionContext>>();
 
         public ProxyBuilder(ClientConfiguration configuration)
@@ -118,7 +120,13 @@ namespace Bolt.Client
             return this;
         }
 
-        public virtual IPipeline<ClientActionContext> BuildPipeline<TContract>() where TContract : class
+        public virtual ProxyBuilder UseStreaming()
+        {
+            _streamingMiddleware = new StreamingMiddleware();
+            return this;
+        }
+
+        public virtual IPipeline<ClientActionContext> BuildPipeline()
         {
             if (_serverProvider == null)
             {
@@ -136,6 +144,11 @@ namespace Bolt.Client
             if (_sessionMiddleware != null)
             {
                 context.Use(_sessionMiddleware);
+            }
+
+            if (_streamingMiddleware != null)
+            {
+                context.Use(_streamingMiddleware);
             }
 
             context.Use(new SerializationMiddleware(_configuration.Serializer, _configuration.ExceptionWrapper, _configuration.ErrorProvider));
@@ -156,7 +169,21 @@ namespace Bolt.Client
 
         public virtual TContract Build<TContract>() where TContract : class
         {
-            return _configuration.ProxyFactory.CreateProxy<TContract>(BuildPipeline<TContract>());
+            IPipeline<ClientActionContext> pipeline = BuildPipeline();
+            TContract proxy = _configuration.ProxyFactory.CreateProxy<TContract>(pipeline);
+            if (proxy is IContractProvider)
+            {
+                BoltFramework.ValidateContract((proxy as IContractProvider).Contract);
+                pipeline.Validate((proxy as IContractProvider).Contract);
+            }
+            else
+            {
+                BoltFramework.ValidateContract(typeof(TContract));
+                pipeline.Validate(typeof(TContract));
+            }
+
+
+            return proxy;
         }
     }
 }

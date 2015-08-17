@@ -1,7 +1,5 @@
 ﻿using System;
-
 using Bolt.Server;
-
 using Microsoft.Framework.DependencyInjection;
 using Microsoft.Framework.Logging;
 

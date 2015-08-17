@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-
-using Bolt.Common;
 using Bolt.Pipeline;
 
 namespace Bolt.Server.Pipeline

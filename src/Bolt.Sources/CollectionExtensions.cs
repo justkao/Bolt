@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Bolt.Common
+namespace Bolt
 {
     internal static class CollectionExtensions
     {
