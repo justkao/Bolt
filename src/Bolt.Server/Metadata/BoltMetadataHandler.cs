@@ -75,28 +75,45 @@ namespace Bolt.Server.Metadata
                 }
                 else
                 {
+                    context.Action = action;
+                    JsonSchema actionSchema = new JsonSchema
+                                                  {
+                                                      Properties = new Dictionary<string, JsonSchema>(),
+                                                      Description = $"Request and response parameters for action '{actionName}'."
+                                                  };
+
                     List<ParameterInfo> actionParameters = BoltFramework.GetSerializableParameters(action).ToList();
                     if (actionParameters.Any())
                     {
                         JsonSchemaGenerator generator = new JsonSchemaGenerator();
-                        JsonSchema schema = new JsonSchema
-                        {
-                            Properties = actionParameters.ToDictionary(p => p.Name, p => generator.Generate(p.ParameterType)),
-                            Description = $"Arguments for '{actionName}' action",
-                            Required = true,
-                            Type = JsonSchemaType.Object  
-                        };
+                        JsonSchema arguments = new JsonSchema
+                                                   {
+                                                       Properties =
+                                                           actionParameters.ToDictionary(
+                                                               p => p.Name,
+                                                               p => generator.Generate(p.ParameterType)),
+                                                       Required = true,
+                                                       Type = JsonSchemaType.Object,
+                                                   };
 
-                        using (var sw = new StringWriter())
-                        {
-                            using (JsonTextWriter jw = new JsonTextWriter(sw))
-                            {
-                                jw.Formatting = Formatting.Indented;
-                                schema.WriteTo(jw);
-                            }
+                        actionSchema.Properties.Add("request", arguments);
+                    }
 
-                            result = sw.GetStringBuilder().ToString();
+                    if (context.ResponseType != typeof(void))
+                    {
+                        JsonSchemaGenerator generator = new JsonSchemaGenerator();
+                        actionSchema.Properties.Add("response", generator.Generate(context.ResponseType));
+                    }
+
+                    using (var sw = new StringWriter())
+                    {
+                        using (JsonTextWriter jw = new JsonTextWriter(sw))
+                        {
+
+                            jw.Formatting = Formatting.Indented;
+                            actionSchema.WriteTo(jw);
                         }
+                        result = sw.GetStringBuilder().ToString();
                     }
                 }
 
@@ -107,8 +124,11 @@ namespace Bolt.Server.Metadata
             }
             catch (Exception e)
             {
-                Logger.LogWarning(BoltLogId.HandleContractMetadataError,
-                    "Failed to generate Bolt metadata for contract '{0}'. Error: {1}", context.Contract.Name, e);
+                Logger.LogWarning(
+                    BoltLogId.HandleContractMetadataError,
+                    "Failed to generate Bolt metadata for contract '{0}'. Error: {1}",
+                    context.Contract.Name,
+                    e);
                 return false;
             }
         }
