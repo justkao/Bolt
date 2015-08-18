@@ -30,7 +30,7 @@ namespace Bolt.Client.Pipeline
 
         public override async Task Invoke(ClientActionContext context)
         {
-            if (context.Request.Content == null && context.HasSerializableParameters)
+            if (context.Request.Content == null && context.HasParameters)
             {
                 context.Request.Content = BuildRequestParameters(context);
             }

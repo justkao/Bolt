@@ -51,7 +51,7 @@ namespace Bolt
 
         public CancellationToken RequestAborted { get; set; }
 
-        public bool HasSerializableParameters => BoltFramework.GetSerializableParameters(Action).Any();
+        public bool HasParameters => Action.GetParameters().Any();
 
         public bool HasSerializableActionResult => ResponseType != typeof (void);
 

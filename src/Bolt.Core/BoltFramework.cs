@@ -119,7 +119,8 @@ namespace Bolt
 
         public static void ValidateParameters(MethodInfo method, object[] parameters)
         {
-            if (!GetSerializableParameters(method).Any())
+            ParameterInfo[] parameterTypes = method.GetParameters();
+            if (!parameterTypes.Any())
             {
                 if (parameters != null && parameters.Length > 0)
                 {
@@ -129,7 +130,6 @@ namespace Bolt
                 return;
             }
 
-            var parameterTypes = method.GetParameters();
             for (int i = 0; i < parameterTypes.Length; i++)
             {
                 ParameterInfo parameterInfo = parameterTypes[i];

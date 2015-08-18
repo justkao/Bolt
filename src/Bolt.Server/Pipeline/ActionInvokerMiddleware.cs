@@ -14,7 +14,7 @@ namespace Bolt.Server.Pipeline
 
         public override async Task Invoke(ServerActionContext context)
         {
-            if (context.HasSerializableParameters)
+            if (context.HasParameters)
             {
                 try
                 {

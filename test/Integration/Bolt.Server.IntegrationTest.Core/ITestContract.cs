@@ -18,6 +18,8 @@ namespace Bolt.Server.IntegrationTest.Core
 
         int SimpleFunction();
 
+        int SimpleFunctionWithCancellation(CancellationToken cancellation);
+
         List<CompositeType> FunctionReturningHugeData();
 
         void MethodTakingHugeData(List<CompositeType> arg);

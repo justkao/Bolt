@@ -248,6 +248,18 @@ namespace Bolt.Server.IntegrationTest
         }
 
         [Fact]
+        public void CallFunctionWithSingleCancellationParameter_Ok()
+        {
+            var client = CreateChannel();
+            Mock<ITestContract> server = Server();
+
+            server.Setup(v => v.SimpleFunctionWithCancellation(It.IsAny<CancellationToken>())).Returns(10);
+
+            int result = client.SimpleFunctionWithCancellation(CancellationToken.None);
+            Assert.Equal(10, result);
+        }
+
+        [Fact]
         public async Task Async_Client_NotSerializableParameters_EnsureBoltSerializationException()
         {
             var client = CreateChannel();

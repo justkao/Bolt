@@ -197,19 +197,19 @@ namespace Bolt.Server
                     {
                         // TODO: is this ok ? 
                         ctxt.HttpContext.Response.Body.Dispose();
-                        Logger.LogError(BoltLogId.RequestCancelled, "Action '{0}' was cancelled.", ctxt.Action);
+                        Logger.LogError(BoltLogId.RequestCancelled, "Action '{0}' was cancelled.", ctxt.Action.Name);
                     }
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(BoltLogId.RequestExecutionError, "Execution of '{0}' failed with error '{1}'", ctxt.Action, e);
+                    Logger.LogError(BoltLogId.RequestExecutionError, "Execution of '{0}' failed with error '{1}'", ctxt.Action.Name, e);
                     throw;
                 }
                 finally
                 {
                     if (watch != null)
                     {
-                        Logger.LogVerbose(BoltLogId.RequestExecutionTime, "Execution of '{0}' has taken '{1}ms'", ctxt.Action, watch.ElapsedMilliseconds);
+                        Logger.LogVerbose(BoltLogId.RequestExecutionTime, "Execution of '{0}' has taken '{1}ms'", ctxt.Action.Name, watch.ElapsedMilliseconds);
                     }
                 }
             }

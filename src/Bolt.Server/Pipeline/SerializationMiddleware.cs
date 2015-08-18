@@ -11,7 +11,7 @@ namespace Bolt.Server.Pipeline
     {
         public override async Task Invoke(ServerActionContext context)
         {
-            if (context.HasSerializableParameters && context.Parameters == null)
+            if (context.HasParameters && context.Parameters == null)
             {
                 context.Parameters = await DeserializeParameters(context);
             }
@@ -47,11 +47,10 @@ namespace Bolt.Server.Pipeline
             ParameterInfo[] parameters = context.Action.GetParameters();
             object[] parameterValues = new object[parameters.Length];
 
-
             for (int i = 0; i < parameters.Length; i++)
             {
                 ParameterInfo parameter = parameters[i];
-                if (parameter.ParameterType == typeof(CancellationToken) || parameter.ParameterType == typeof(CancellationToken?))
+                if (parameter.IsCancellationToken())
                 {
                     parameterValues[i] = context.RequestAborted;
                 }
