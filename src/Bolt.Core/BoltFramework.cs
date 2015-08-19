@@ -97,6 +97,12 @@ namespace Bolt
                 return false;
             }
 
+            if (index + AsyncPostFix.Length < name.Length)
+            {
+                coercedName = name;
+                return false;
+            }
+
             coercedName = name.Substring(0, index);
             return true;
         }
