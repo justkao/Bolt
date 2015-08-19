@@ -35,6 +35,39 @@ namespace Bolt.Server.IntegrationTest
         }
 
         [Fact]
+        public async Task ReusePipeline_Ok()
+        {
+            var pipeline = CreatePipeline();
+
+            var client1 = CreateChannel(pipeline);
+            var client2 = CreateChannel(pipeline);
+
+            Mock<ITestContract> server = Server();
+            server.Setup(s => s.SimpleMethod());
+
+            await client1.SimpleMethodAsync();
+            await client2.SimpleMethodAsync();
+        }
+
+        [Fact]
+        public async Task DisposeProxy_EnsurePipelineWorking()
+        {
+            var pipeline = CreatePipeline();
+
+            var client1 = CreateChannel(pipeline);
+            var client2 = CreateChannel(pipeline);
+
+            Mock<ITestContract> server = Server();
+            server.Setup(s => s.SimpleMethod());
+
+            await client1.SimpleMethodAsync();
+            await client2.SimpleMethodAsync();
+
+            (client1 as IDisposable)?.Dispose();
+            await client2.SimpleMethodAsync();
+        }
+
+        [Fact]
         public async Task CloseAsync_EnsureClosed()
         {
             var client = CreateChannel();
