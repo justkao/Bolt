@@ -97,7 +97,6 @@ namespace Bolt.Client
                 this.Close();
             }
 
-            _pipeline?.Dispose();
             _pipeline = null;
         }
 
