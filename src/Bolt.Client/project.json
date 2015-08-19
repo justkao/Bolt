@@ -9,15 +9,13 @@
   "frameworks": {
     "net45": {
       "frameworkAssemblies": {
-        "System.Net.Http": "",
-        "System.Collections.Concurrent": ""
+        "System.Net.Http": ""
         
       }
     },
     "dnx451": {
       "frameworkAssemblies": {
-        "System.Net.Http": "",
-        "System.Collections.Concurrent": ""
+        "System.Net.Http": ""
       }
     },
     "dotnet": {
