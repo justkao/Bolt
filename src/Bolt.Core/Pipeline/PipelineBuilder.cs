@@ -7,8 +7,9 @@ namespace Bolt.Pipeline
 {
     public class PipelineBuilder<T> where T : ActionContextBase
     {
-        private readonly IList<Func<ActionDelegate<T>, ActionDelegate<T>>> _middlewares = new List<Func<ActionDelegate<T>, ActionDelegate<T>>>();
-        private readonly List<IMiddleware<T>> _instances = new List<IMiddleware<T>>();
+        private readonly IList<IMiddleware<T>> _middlewares = new List<IMiddleware<T>>();
+
+        public IEnumerable<IMiddleware<T>> Middlewares => _middlewares;
 
         public PipelineBuilder<T> Use(Func<ActionDelegate<T>, T, Task> action)
         {
@@ -18,30 +19,26 @@ namespace Bolt.Pipeline
         public PipelineBuilder<T> Use(IMiddleware<T> middleware)
         {
             if (middleware == null) throw new ArgumentNullException(nameof(middleware));
-            _instances.Add(middleware);
-
-            return Use(next =>
-            {
-                middleware.Init(next);
-                return middleware.Invoke;
-            });
+            _middlewares.Add(middleware);
+            return this;
         }
 
         public PipelineResult<T> Build()
         {
             ActionDelegate<T> app = context => Task.FromResult(0);
-            foreach (var component in _middlewares.Reverse())
+
+            foreach (var middleware in _middlewares.Reverse())
             {
-                app = component(app);
+                Func<ActionDelegate<T>, ActionDelegate<T>> actionDelegate = (next) =>
+                    {
+                        middleware.Init(next);
+                        return middleware.Invoke;
+                    };
+
+                app = actionDelegate(app);
             }
 
-            return new PipelineResult<T>(app, _instances);
-        }
-
-        private PipelineBuilder<T> Use(Func<ActionDelegate<T>, ActionDelegate<T>> middleware)
-        {
-            _middlewares.Add(middleware);
-            return this;
+            return new PipelineResult<T>(app, (List<IMiddleware<T>>)_middlewares);
         }
     }
 }
