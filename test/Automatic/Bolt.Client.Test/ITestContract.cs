@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
-using Bolt.Pipeline;
+
+using Bolt.Client.Pipeline;
 
 namespace Bolt.Client.Test
 {
@@ -18,7 +19,7 @@ namespace Bolt.Client.Test
 
     public class TestContractProxy : ProxyBase, ITestContract
     {
-        public TestContractProxy(IPipeline<ClientActionContext> pipeline)
+        public TestContractProxy(IClientPipeline pipeline)
             : base(typeof(ITestContract), pipeline)
         {
         }

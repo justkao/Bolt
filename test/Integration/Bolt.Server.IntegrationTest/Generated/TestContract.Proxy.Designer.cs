@@ -74,7 +74,7 @@ namespace Bolt.Server.IntegrationTest.Core
         {
         }
 
-        public TestContractProxy(Bolt.Pipeline.IPipeline<ClientActionContext> channel) : base(typeof(Bolt.Server.IntegrationTest.Core.ITestContract), channel)
+        public TestContractProxy(Bolt.Client.Pipeline.IClientPipeline channel) : base(typeof(Bolt.Server.IntegrationTest.Core.ITestContract), channel)
         {
         }
 

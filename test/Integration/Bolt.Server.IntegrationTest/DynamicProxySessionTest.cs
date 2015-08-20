@@ -1,4 +1,5 @@
 using Bolt.Client;
+using Bolt.Client.Pipeline;
 using Bolt.Client.Proxy;
 using Bolt.Pipeline;
 using Bolt.Server.IntegrationTest.Core;
@@ -12,9 +13,10 @@ namespace Bolt.Server.IntegrationTest
             ClientConfiguration.ProxyFactory = new DynamicProxyFactory();
         }
 
-        public override ITestContractStateFullAsync GetProxy(IPipeline<ClientActionContext> pipeline = null, bool open = true)
+        public override ITestContractStateFullAsync GetProxy(IClientPipeline pipeline = null, bool open = true)
         {
-            ITestContractStateFullAsync proxy = ClientConfiguration.ProxyFactory.CreateProxy<ITestContractStateFullAsync>(pipeline ?? CreatePipeline());
+            ITestContractStateFullAsync proxy =
+                ClientConfiguration.ProxyFactory.CreateProxy<ITestContractStateFullAsync>(pipeline ?? CreatePipeline());
             if (open)
             {
                 proxy.OpenSessionAsync("arg").GetAwaiter().GetResult();

@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Bolt.Client;
+using Bolt.Client.Pipeline;
 using Bolt.Client.Proxy;
 using Bolt.Pipeline;
 using Bolt.Server.IntegrationTest.Core;
@@ -42,7 +43,7 @@ namespace Bolt.Server.IntegrationTest
         }
 
 
-        public override ITestContractAsync CreateChannel(IPipeline<ClientActionContext> pipeline = null)
+        public override ITestContractAsync CreateChannel(IClientPipeline pipeline = null)
         {
             return ClientConfiguration.ProxyFactory.CreateProxy<ITestContractAsync>(pipeline ?? CreatePipeline());
         }

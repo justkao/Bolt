@@ -2,6 +2,8 @@
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Bolt.Client.Pipeline;
 using Bolt.Pipeline;
 using Moq;
 using Xunit;
@@ -22,7 +24,7 @@ namespace Bolt.Client.Proxy.Test
         [Fact]
         public void Create_EnsureDerivesFromContractProxy()
         {
-            Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
+            Mock<IClientPipeline> pipeline = new Mock<IClientPipeline>();
             ProxyFactory factory = Create();
 
             ITestContract proxy = factory.CreateProxy<ITestContract>(pipeline.Object);
@@ -33,7 +35,7 @@ namespace Bolt.Client.Proxy.Test
         public void Create_EnsureIsChannel()
         {
             ProxyFactory factory = Create();
-            Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
+            Mock<IClientPipeline> pipeline = new Mock<IClientPipeline>();
             ITestContract proxy = factory.CreateProxy<ITestContract>(pipeline.Object);
 
             Assert.True(proxy is IProxy);
@@ -44,7 +46,7 @@ namespace Bolt.Client.Proxy.Test
         {
             ProxyFactory factory = Create();
 
-            Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
+            Mock<IClientPipeline> pipeline = new Mock<IClientPipeline>();
             pipeline.Setup(p => p.Instance).Returns(ctxt =>
             {
                 ctxt.ActionResult = "some value";
@@ -66,7 +68,7 @@ namespace Bolt.Client.Proxy.Test
         {
             ProxyFactory factory = Create();
 
-            Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
+            Mock<IClientPipeline> pipeline = new Mock<IClientPipeline>();
             pipeline.Setup(p => p.Instance).Returns(ctxt =>
             {
                 ctxt.ActionResult = "some value";
@@ -84,7 +86,7 @@ namespace Bolt.Client.Proxy.Test
         {
             ProxyFactory factory = Create();
 
-            Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
+            Mock<IClientPipeline> pipeline = new Mock<IClientPipeline>();
             pipeline.Setup(p => p.Instance).Returns(ctxt =>
             {
                 ctxt.ActionResult = "some value";
@@ -104,7 +106,7 @@ namespace Bolt.Client.Proxy.Test
         {
             ProxyFactory factory = Create();
 
-            Mock<IPipeline<ClientActionContext>> pipeline = new Mock<IPipeline<ClientActionContext>>();
+            Mock<IClientPipeline> pipeline = new Mock<IClientPipeline>();
             pipeline.Setup(p => p.Instance).Returns(ctxt =>
             {
                 ctxt.ActionResult = 10;

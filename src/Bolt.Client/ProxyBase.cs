@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
+
 using Bolt.Client.Pipeline;
-using Bolt.Pipeline;
 
 namespace Bolt.Client
 {
     public abstract class ProxyBase : IProxy, IPipelineCallback
     {
-        private IPipeline<ClientActionContext> _pipeline;
+        private IClientPipeline _pipeline;
 
         protected ProxyBase()
         {
         }
 
-        protected ProxyBase(Type contract, IPipeline<ClientActionContext> pipeline)
+        protected ProxyBase(Type contract, IClientPipeline pipeline)
         {
             if (contract == null) throw new ArgumentNullException(nameof(contract));
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
@@ -39,7 +39,7 @@ namespace Bolt.Client
 
         public ProxyState State { get; private set; }
 
-        protected IPipeline<ClientActionContext> Pipeline
+        protected IClientPipeline Pipeline
         {
             get
             {

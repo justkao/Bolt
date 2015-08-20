@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
+
+using Bolt.Client.Pipeline;
 using Bolt.Pipeline;
 using Castle.DynamicProxy;
 
@@ -12,7 +14,7 @@ namespace Bolt.Client.Proxy
 
         private readonly ProxyGenerator _generator = new ProxyGenerator();
 
-        public override T CreateProxy<T>(IPipeline<ClientActionContext> pipeline)
+        public override T CreateProxy<T>(IClientPipeline pipeline)
         {
             if (pipeline == null)
             {
@@ -42,7 +44,7 @@ namespace Bolt.Client.Proxy
 
         public class DynamicContractProxy : ProxyBase
         {
-            internal void Initialize(Type contract, IPipeline<ClientActionContext> pipeline)
+            internal void Initialize(Type contract, IClientPipeline pipeline)
             {
                 Pipeline = pipeline;
                 Contract = contract;

@@ -1,9 +1,9 @@
-﻿using Bolt.Pipeline;
+﻿using Bolt.Client.Pipeline;
 
 namespace Bolt.Client
 {
     public interface IProxyFactory
     {
-        T CreateProxy<T>(IPipeline<ClientActionContext> pipeline) where T : class;
+        T CreateProxy<T>(IClientPipeline pipeline) where T : class;
     }
 }

@@ -161,7 +161,7 @@ namespace Bolt.Client.Test
             public async Task Execute_OpenedSession_EnsureSessionId()
             {
                 string sessionid = "temp session";
-                IPipeline<ClientActionContext> pipeline = CreatePipeline(
+                var pipeline = CreatePipeline(
                     (next, ctxt) =>
                         {
                             ctxt.ServerConnection = ConnectionDescriptor;
@@ -181,7 +181,7 @@ namespace Bolt.Client.Test
             [Fact]
             public async Task Close_Uninitialized_Ok()
             {
-                IPipeline<ClientActionContext> pipeline = CreatePipeline();
+                var pipeline = CreatePipeline();
                 var proxy = CreateProxy(pipeline);
                 await proxy.CloseAsync();
 
@@ -197,7 +197,7 @@ namespace Bolt.Client.Test
             [Theory]
             public async Task Execute_ThrowsError_Handle(bool recoverableProxy, ErrorHandlingResult  handlingResult)
             {
-                IPipeline<ClientActionContext> pipeline = CreatePipeline(
+                var pipeline = CreatePipeline(
                       (next, ctxt) =>
                       {
                           ctxt.ServerConnection = ConnectionDescriptor;

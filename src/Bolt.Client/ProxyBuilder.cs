@@ -126,14 +126,14 @@ namespace Bolt.Client
             return this;
         }
 
-        public virtual IPipeline<ClientActionContext> BuildPipeline()
+        public virtual IClientPipeline BuildPipeline()
         {
             if (_serverProvider == null)
             {
                 throw new InvalidOperationException("Server provider or target url was not configured.");
             }
 
-            PipelineBuilder<ClientActionContext> context = new PipelineBuilder<ClientActionContext>();
+            ClientPipelineBuilder context = new ClientPipelineBuilder();
 
             context.Use(new ValidateProxyMiddleware());
             if (_retryRequest != null)
@@ -164,12 +164,12 @@ namespace Bolt.Client
             }
 
             context.Use(new CommunicationMiddleware(_messageHandler ?? _configuration.HttpMessageHandler ?? new HttpClientHandler()));
-            return context.Build();
+            return (IClientPipeline)context.Build();
         }
 
         public virtual TContract Build<TContract>() where TContract : class
         {
-            IPipeline<ClientActionContext> pipeline = BuildPipeline();
+            IClientPipeline pipeline = BuildPipeline();
             TContract proxy = _configuration.ProxyFactory.CreateProxy<TContract>(pipeline);
             if (proxy is IContractProvider)
             {

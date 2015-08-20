@@ -1,11 +1,12 @@
 ﻿using System;
-using Bolt.Pipeline;
+
+using Bolt.Client.Pipeline;
 
 namespace Bolt.Client
 {
     public class ProxyFactory : IProxyFactory
     {
-        public virtual T CreateProxy<T>(IPipeline<ClientActionContext> pipeline) where T:class
+        public virtual T CreateProxy<T>(IClientPipeline pipeline) where T:class
         {
             if (pipeline == null)
             {

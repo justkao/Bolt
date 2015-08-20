@@ -29,7 +29,7 @@ namespace Bolt.Client.Test
                 Proxy.OpenSession("test").GetAwaiter().GetResult();
             }
 
-            public IPipeline<ClientActionContext> Pipeline { get; set; }
+            public IClientPipeline Pipeline { get; set; }
 
             public TestContractProxy Proxy { get; set; }
 

@@ -21,7 +21,9 @@
         {
             public const string Namespace = "Bolt.Client";
 
-            public static readonly ClassDescriptor Pipeline = new ClassDescriptor("IPipeline<ClientActionContext>", Core.PipelineNamespace) { IsInterface = true };
+            public const string PipelineNamespace = "Bolt.Client.Pipeline";
+
+            public static readonly ClassDescriptor Pipeline = new ClassDescriptor("IClientPipeline", PipelineNamespace) { IsInterface = true };
 
             public static readonly ClassDescriptor ProxyBase = new ClassDescriptor("ProxyBase", Namespace) { IsInterface = false };
         }

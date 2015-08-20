@@ -404,7 +404,7 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public void LongOperation_TimeoutSet_EnsureCallTimeouted()
         {
-            IPipeline<ClientActionContext> pipeline = CreatePipeline();
+            IClientPipeline pipeline = CreatePipeline();
             pipeline.Find<CommunicationMiddleware>().ResponseTimeout = TimeSpan.FromSeconds(0.1);
 
             ITestContractAsync client = CreateChannel(pipeline);
@@ -450,12 +450,12 @@ namespace Bolt.Server.IntegrationTest
             return mock;
         }
 
-        public virtual ITestContractAsync CreateChannel(IPipeline<ClientActionContext> pipeline = null)
+        public virtual ITestContractAsync CreateChannel(IClientPipeline pipeline = null)
         {
             return new TestContractProxy(pipeline ?? CreatePipeline());
         }
 
-        protected IPipeline<ClientActionContext> CreatePipeline(int recoveries = 0)
+        protected IClientPipeline CreatePipeline(int recoveries = 0)
         {
             var builder = ClientConfiguration.ProxyBuilder().Url(ServerUrl);
             if (recoveries > 0)

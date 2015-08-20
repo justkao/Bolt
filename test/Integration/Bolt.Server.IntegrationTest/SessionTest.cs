@@ -398,7 +398,7 @@ namespace Bolt.Server.IntegrationTest
             Assert.Null(session.GetSession(client)?.SessionId);
         }
 
-        public virtual ITestContractStateFullAsync GetProxy(IPipeline<ClientActionContext> pipeline = null, bool open = true)
+        public virtual ITestContractStateFullAsync GetProxy(IClientPipeline pipeline = null, bool open = true)
         {
             var proxy = new TestContractStateFullProxy(pipeline ?? CreatePipeline());
             if (open)
@@ -409,7 +409,7 @@ namespace Bolt.Server.IntegrationTest
             return proxy;
         }
 
-        protected IPipeline<ClientActionContext> CreatePipeline(int recoveries = 0, IErrorHandling errorHandling = null)
+        protected IClientPipeline CreatePipeline(int recoveries = 0, IErrorHandling errorHandling = null)
         {
             var builder = ClientConfiguration.ProxyBuilder().Url(ServerUrl).UseSession(errorHandling: errorHandling);
             if (recoveries > 0)

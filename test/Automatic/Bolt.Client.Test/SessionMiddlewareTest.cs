@@ -31,23 +31,23 @@ namespace Bolt.Client.Test
             }
         }
 
-        public TestContractProxy CreateProxy(IPipeline<ClientActionContext> pipeline)
+        public TestContractProxy CreateProxy(IClientPipeline pipeline)
         {
             return new TestContractProxy(pipeline);
         }
 
         public SessionContractDescriptor ContractDescriptor => BoltFramework.GetSessionDescriptor(typeof(ITestContract));
 
-        public IPipeline<ClientActionContext> CreatePipeline(Func<ActionDelegate<ClientActionContext>, ClientActionContext, Task> next = null)
+        public IClientPipeline CreatePipeline(Func<ActionDelegate<ClientActionContext>, ClientActionContext, Task> next = null)
         {
-            PipelineBuilder<ClientActionContext> builder = new PipelineBuilder<ClientActionContext>();
+            ClientPipelineBuilder builder = new ClientPipelineBuilder();
             builder.Use(new SessionMiddleware(SessionHandler.Object, SessionErrorHandling.Object));
             if (next != null)
             {
                 builder.Use(next);
             }
 
-            return builder.Build();
+            return builder.BuildClient();
         } 
 
         public interface IInvokeCallback

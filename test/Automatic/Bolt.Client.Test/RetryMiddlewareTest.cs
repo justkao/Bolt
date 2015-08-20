@@ -93,14 +93,14 @@ namespace Bolt.Client.Test
             }
         }
 
-        public TestContractProxy CreateProxy(IPipeline<ClientActionContext> pipeline)
+        public TestContractProxy CreateProxy(IClientPipeline pipeline)
         {
             return new TestContractProxy(pipeline);
         }
 
-        public IPipeline<ClientActionContext> CreatePipeline(int retries)
+        public IClientPipeline CreatePipeline(int retries)
         {
-            PipelineBuilder<ClientActionContext> builder = new PipelineBuilder<ClientActionContext>();
+            ClientPipelineBuilder builder = new ClientPipelineBuilder();
             builder.Use(new RetryRequestMiddleware(ErrorHandling.Object) {Retries = retries});
             builder.Use(
                 (next, ctxt) =>
@@ -109,7 +109,7 @@ namespace Bolt.Client.Test
                         return next(ctxt);
                     });
 
-            return builder.Build();
+            return builder.BuildClient();
         }
 
         public interface IInvokeCallback

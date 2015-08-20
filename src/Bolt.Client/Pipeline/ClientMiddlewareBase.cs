@@ -2,7 +2,7 @@
 
 namespace Bolt.Client.Pipeline
 {
-    public abstract class ClientMiddlewareBase : MiddlewareBase<ClientActionContext>
+    public abstract class ClientMiddlewareBase : MiddlewareBase<ClientActionContext>, IClientMiddleware
     {
     }
 }

@@ -23,7 +23,12 @@ namespace Bolt.Pipeline
             return this;
         }
 
-        public PipelineResult<T> Build()
+        public virtual PipelineResult<T> Build()
+        {
+            return new PipelineResult<T>(BuildActionDelegate(), (List<IMiddleware<T>>)_middlewares);
+        }
+
+        protected ActionDelegate<T> BuildActionDelegate()
         {
             ActionDelegate<T> app = context => Task.FromResult(0);
 
@@ -38,7 +43,7 @@ namespace Bolt.Pipeline
                 app = actionDelegate(app);
             }
 
-            return new PipelineResult<T>(app, (List<IMiddleware<T>>)_middlewares);
+            return app;
         }
     }
 }

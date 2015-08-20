@@ -42,7 +42,7 @@ namespace Bolt.Server.IntegrationTest.Core
         {
         }
 
-        public TestContractStateFullProxy(Bolt.Pipeline.IPipeline<ClientActionContext> channel) : base(typeof(Bolt.Server.IntegrationTest.Core.ITestContractStateFull), channel)
+        public TestContractStateFullProxy(Bolt.Client.Pipeline.IClientPipeline channel) : base(typeof(Bolt.Server.IntegrationTest.Core.ITestContractStateFull), channel)
         {
         }
 
