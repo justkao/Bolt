@@ -51,10 +51,11 @@ namespace TestService.Client
             app.Command("performance", c =>
             {
                 c.Description = "Tests the Bolt performance.";
+                var argConcurrency = c.Option("-c <NUMBER>", "Concurrency of each action.", CommandOptionType.SingleValue);
 
                 c.OnExecute(() =>
                 {
-                    int concurrency = 100;
+                    int concurrency = 1;
                     int repeats = 100000;
 
                     PerformanceResult result = new PerformanceResult
@@ -66,13 +67,20 @@ namespace TestService.Client
                         Environment = new RuntimeEnvironment(_runtime)
                     };
 
-                    var previous = ReadPreviousVersion();
-                    ExecuteActions(proxies, repeats, concurrency, result, previous);
-
-                    string file = $"{GetReportsDirectory()}/performance_{result.Version}.json";
-                    if (!Directory.Exists(GetReportsDirectory()))
+                    if (argConcurrency.HasValue())
                     {
-                        Directory.CreateDirectory(GetReportsDirectory());
+                        concurrency = int.Parse(argConcurrency.Value());
+                    }
+
+                    string testCase = $"Concurrency_{concurrency}";
+                    var previous = ReadPreviousVersion(testCase);
+                    ExecuteActions(proxies, repeats, concurrency, result, previous);
+                    var reportsDirectory = GetReportsDirectory(testCase);
+
+                    string file = $"{reportsDirectory}/performance_{result.Version}.json";
+                    if (!Directory.Exists(reportsDirectory))
+                    {
+                        Directory.CreateDirectory(reportsDirectory);
                     }
 
                     Console.WriteLine($"Writing performance overview to '{file.Yellow().Bold()}'");
@@ -139,13 +147,20 @@ namespace TestService.Client
 
         private void ExecuteActions(IEnumerable<Tuple<string, ITestContract>> proxies, int cnt, int degree, PerformanceResult result, PerformanceResult previous)
         {
-            ThreadPool.SetMinThreads(degree*3, degree*3);
+            int threads = degree*3;
+            if (threads < 25)
+            {
+                threads = 25;
+            }
+
+            ThreadPool.SetMinThreads(threads, threads);
 
             Execute(proxies, c => c.DoNothing(), cnt, degree, "DoNothing", result, previous);
             ExecuteAsync(proxies, c => c.DoNothingAsAsync(), cnt, degree, "DoNothingAsync", result, previous);
-            Execute(proxies, c => c.GetSimpleType(new Random().Next()), cnt, degree, "GetSimpleType", result, previous);
-            Execute(proxies, c => c.GetSinglePerson(Person.Create(10)), cnt, degree, "GetSinglePerson", result, previous);
-            ExecuteAsync(proxies, c => c.GetSinglePersonAsAsync(Person.Create(10)), cnt, degree, "GetSinglePersonAsync", result, previous);
+            Execute(proxies, c => c.GetSimpleType(9), cnt, degree, "GetSimpleType", result, previous);
+            Person person = Person.Create(10);
+            Execute(proxies, c => c.GetSinglePerson(person), cnt, degree, "GetSinglePerson", result, previous);
+            ExecuteAsync(proxies, c => c.GetSinglePersonAsAsync(person), cnt, degree, "GetSinglePersonAsync", result, previous);
             Execute(proxies, c => c.GetManyPersons(), cnt, degree, "GetManyPersons", result, previous);
             List<Person> input = Enumerable.Range(0, 100).Select(Person.Create).ToList();
             Execute(proxies, c => c.DoNothingWithComplexParameter(input), cnt, degree, "DoNothingWithComplexParameter", result, previous);
@@ -312,11 +327,11 @@ namespace TestService.Client
             {
                 if (elapsed < previousValue)
                 {
-                    Console.WriteLine($"{elapsed.ToString().White().Bold() + "ms", -25}  {"Improvement:".Green().Bold(),-20} {(previousValue - elapsed) + "ms", -10}");
+                    Console.WriteLine($"{elapsed.ToString().White().Bold() + "ms", -25}  {"Improvement:".Green().Bold(),-20} {(CalculatePercentage(previousValue.Value, elapsed).ToString("P2")), -10}");
                 }
                 else if (elapsed > previousValue)
                 {
-                    Console.WriteLine($"{elapsed.ToString().White().Bold()+ "ms",-25}  {"Regression:".Red().Bold(),-20} {(previousValue - elapsed) + "ms",-10}");
+                    Console.WriteLine($"{elapsed.ToString().White().Bold()+ "ms",-25}  {"Regression:".Red().Bold(),-20} {(CalculatePercentage(elapsed, previousValue.Value).ToString("P2")),-10}");
                 }
                 else
                 {
@@ -327,6 +342,11 @@ namespace TestService.Client
             {
                 Console.WriteLine($"{(elapsed + "ms").White().Bold()}");
             }
+        }
+
+        private static double CalculatePercentage(long current, long previous)
+        {
+            return (1.0 - previous/(double) current);
         }
 
         private bool IsPortUsed(int port)
@@ -352,9 +372,9 @@ namespace TestService.Client
             return !isAvailable;
         }
 
-        private string GetReportsDirectory()
+        private string GetReportsDirectory(string testCase)
         {
-            string path = $"Reports/{Environment.MachineName}";
+            string path = $"Reports/{Environment.MachineName}/{testCase}";
 
             foreach (char invalidPathChar in Path.GetInvalidPathChars())
             {
@@ -364,14 +384,14 @@ namespace TestService.Client
             return path;
         }
 
-        private PerformanceResult ReadPreviousVersion()
+        private PerformanceResult ReadPreviousVersion(string testCase)
         {
-            if (!Directory.Exists(GetReportsDirectory()))
+            if (!Directory.Exists(GetReportsDirectory(testCase)))
             {
                 return null;
             }
             
-            var latestResult = (from report in Directory.GetFiles(GetReportsDirectory())
+            var latestResult = (from report in Directory.GetFiles(GetReportsDirectory(testCase))
                 let version = new Version(Path.GetFileNameWithoutExtension(report).Split('_')[1])
                 where version != typeof (IProxy).Assembly.GetName().Version
                 orderby version descending 
