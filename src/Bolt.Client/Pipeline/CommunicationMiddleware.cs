@@ -24,8 +24,8 @@ namespace Bolt.Client.Pipeline
 
         public override async Task Invoke(ClientActionContext context)
         {
-            context.Request.Headers.Connection.Add("Keep-Alive");
-            context.Request.Method = HttpMethod.Post;
+            context.EnsureRequest().Headers.Connection.Add("Keep-Alive");
+            context.EnsureRequest().Method = HttpMethod.Post;
             context.Response = await _handler.SendAsync(context.Request, context.RequestAborted, ResponseTimeout);
             await Next(context);
         }

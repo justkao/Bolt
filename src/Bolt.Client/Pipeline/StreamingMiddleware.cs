@@ -38,7 +38,7 @@ namespace Bolt.Client.Pipeline
 
             await Next(context);
 
-            context.Response.EnsureSuccessStatusCode();
+            context.EnsureResponse().EnsureSuccessStatusCode();
             if (metadata.ContentResultType != null)
             {
                 if (typeof (HttpContent).CanAssign(metadata.ContentResultType))

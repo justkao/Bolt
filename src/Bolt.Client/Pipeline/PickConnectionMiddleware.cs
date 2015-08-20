@@ -27,7 +27,7 @@ namespace Bolt.Client.Pipeline
                 context.ServerConnection = ServerProvider.GetServer();
             }
 
-            context.Request.RequestUri = EndpointProvider.GetEndpoint(context.ServerConnection.Server, context.Contract, context.Action);
+            context.EnsureRequest().RequestUri = EndpointProvider.GetEndpoint(context.ServerConnection.Server, context.Contract, context.Action);
             try
             {
                 await Next(context);

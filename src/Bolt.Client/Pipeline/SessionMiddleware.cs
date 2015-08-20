@@ -37,6 +37,8 @@ namespace Bolt.Client.Pipeline
 
         public override async Task Invoke(ClientActionContext context)
         {
+            context.EnsureRequest();
+
             // access or create session assigned to current proxy
             SessionDescriptor session = _sessions.GetOrAdd(
                 context.Proxy,
@@ -93,7 +95,7 @@ namespace Bolt.Client.Pipeline
                 try
                 {
                     // execute destroy session and close proxy
-                    ClientSessionHandler.EnsureSession(context.Request, session.SessionId);
+                    ClientSessionHandler.EnsureSession(context.EnsureRequest(), session.SessionId);
                     await Next(context);
                 }
                 finally
@@ -106,7 +108,7 @@ namespace Bolt.Client.Pipeline
             else
             {
                 // prepare the request with session
-                ClientSessionHandler.EnsureSession(context.Request, session.SessionId);
+                ClientSessionHandler.EnsureSession(context.EnsureRequest(), session.SessionId);
 
                 try
                 {

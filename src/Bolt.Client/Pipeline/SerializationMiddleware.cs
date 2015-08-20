@@ -30,16 +30,19 @@ namespace Bolt.Client.Pipeline
 
         public override async Task Invoke(ClientActionContext context)
         {
-            if (context.Request.Content == null && context.HasParameters)
+            if (context.EnsureRequest().Content == null && context.HasParameters)
             {
-                context.Request.Content = BuildRequestParameters(context);
+                context.EnsureRequest().Content = BuildRequestParameters(context);
             }
 
             await Next(context);
 
             if (context.Response == null)
             {
-                throw new BoltException($"Unable to process result for action '{context.Action.Name}' because response from server '{context.Request.RequestUri}' was not received.");
+                throw new BoltClientException(
+                    $"Unable to process result for action '{context.Action.Name}' because response from server '{context.Request.RequestUri}' was not received.",
+                    ClientErrorCode.DeserializeResponse,
+                    context.Action);
             }
 
             await HandleResponseAsync(context);

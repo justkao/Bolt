@@ -38,6 +38,26 @@ namespace Bolt.Client
 
         public IProxy Proxy { get; set; }
 
+        public HttpRequestMessage EnsureRequest()
+        {
+            if (Request == null)
+            {
+                throw new InvalidOperationException("Required HttpRequestMessage instance is not assigned to current action.");
+            }
+
+            return Request;
+        }
+
+        public HttpResponseMessage EnsureResponse()
+        {
+            if (Response == null)
+            {
+                throw new InvalidOperationException("Required HttpResponseMessage instance is not assigned to current action.");
+            }
+
+            return Response;
+        }
+
         protected override void Disposing(bool dispose)
         {
             if (dispose)

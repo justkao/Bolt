@@ -27,7 +27,7 @@ namespace Bolt.Server.Pipeline
 
         protected virtual async Task<object[]> DeserializeParameters(ServerActionContext context)
         {
-            IObjectSerializer rawParameters = null;
+            IObjectSerializer rawParameters;
             try
             {
                 rawParameters =
