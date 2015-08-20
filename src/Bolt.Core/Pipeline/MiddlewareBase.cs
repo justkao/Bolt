@@ -17,6 +17,6 @@ namespace Bolt.Pipeline
 
         protected ActionDelegate<T> Next { get; private set; }
 
-        public abstract Task Invoke(T context);
+        public abstract Task InvokeAsync(T context);
     }
 }

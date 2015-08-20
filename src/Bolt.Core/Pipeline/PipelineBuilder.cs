@@ -32,7 +32,7 @@ namespace Bolt.Pipeline
                 Func<ActionDelegate<T>, ActionDelegate<T>> actionDelegate = (next) =>
                     {
                         middleware.Init(next);
-                        return middleware.Invoke;
+                        return middleware.InvokeAsync;
                     };
 
                 app = actionDelegate(app);

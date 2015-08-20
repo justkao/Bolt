@@ -22,7 +22,7 @@ namespace Bolt.Client.Pipeline
 
         public TimeSpan ResponseTimeout { get; set; }
 
-        public override async Task Invoke(ClientActionContext context)
+        public override async Task InvokeAsync(ClientActionContext context)
         {
             context.EnsureRequest().Headers.Connection.Add("Keep-Alive");
             context.EnsureRequest().Method = HttpMethod.Post;

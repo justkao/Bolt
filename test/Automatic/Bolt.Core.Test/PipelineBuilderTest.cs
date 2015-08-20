@@ -37,7 +37,7 @@ namespace Bolt.Core.Test
                 _target = target;
             }
 
-            public override async Task Invoke(ActionContextBase context)
+            public override async Task InvokeAsync(ActionContextBase context)
             {
                 _target.Add(_name);
                 await Next(context);

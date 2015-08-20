@@ -3,50 +3,7 @@
   "version": 1,
   "targets": {
     "DNX,Version=v4.5.1": {
-      "Bolt.Console/0.15.0-alpha1": {
-        "type": "project",
-        "dependencies": {
-          "Bolt.Generators": null,
-          "Bolt.Sources": null,
-          "Microsoft.Dnx.Runtime.Abstractions": "1.0.0",
-          "Microsoft.Framework.CommandLineUtils.Sources": "1.0.0",
-          "Newtonsoft.Json": "6.0.8"
-        }
-      },
-      "Bolt.Core/0.15.0-alpha1": {
-        "type": "project",
-        "dependencies": {
-          "Bolt.Sources": null,
-          "Newtonsoft.Json": "6.0.8"
-        },
-        "frameworkAssemblies": [
-          "System.Net.Http",
-          "System.Runtime.Serialization"
-        ]
-      },
-      "Bolt.Generators/0.15.0-alpha1": {
-        "type": "project",
-        "dependencies": {
-          "Bolt.Sources": null
-        }
-      },
-      "Bolt.Sources/0.15.0-alpha1": {
-        "type": "project"
-      },
-      "Bolt.Test.Common/1.0.0": {
-        "type": "project",
-        "dependencies": {
-          "Bolt.Sources": null
-        },
-        "frameworkAssemblies": [
-          "System.Collections",
-          "System.Net",
-          "System.Net.Http",
-          "System.Runtime.Serialization"
-        ]
-      },
       "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12364": {
-        "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp",
           "mscorlib",
@@ -61,7 +18,6 @@
         }
       },
       "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta7-12364": {
-        "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp",
           "mscorlib",
@@ -76,54 +32,17 @@
         }
       },
       "Newtonsoft.Json/6.0.8": {
-        "type": "package",
         "compile": {
           "lib/net45/Newtonsoft.Json.dll": {}
         },
         "runtime": {
           "lib/net45/Newtonsoft.Json.dll": {}
         }
-      },
-      "TestService.Core/1.0.0": {
-        "type": "project",
-        "dependencies": {
-          "Bolt.Console": null,
-          "Bolt.Core": null,
-          "Bolt.Test.Common": null
-        },
-        "frameworkAssemblies": [
-          "System.ServiceModel"
-        ]
       }
     }
   },
   "libraries": {
-    "Bolt.Console/0.15.0-alpha1": {
-      "type": "project",
-      "path": "../../../src/Bolt.Console/project.json"
-    },
-    "Bolt.Core/0.15.0-alpha1": {
-      "type": "project",
-      "path": "../../../src/Bolt.Core/project.json"
-    },
-    "Bolt.Generators/0.15.0-alpha1": {
-      "type": "project",
-      "path": "../../../src/Bolt.Generators/project.json"
-    },
-    "Bolt.Sources/0.15.0-alpha1": {
-      "type": "project",
-      "path": "../../../src/Bolt.Sources/project.json"
-    },
-    "Bolt.Test.Common/1.0.0": {
-      "type": "project",
-      "path": "../../Common/Bolt.Test.Common/project.json"
-    },
-    "TestService.Core/1.0.0": {
-      "type": "project",
-      "path": "../TestService.Core/project.json"
-    },
     "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12364": {
-      "type": "package",
       "serviceable": true,
       "sha512": "olzxOCVByDrpprw7qrizpD+6Xv4zY7yKyThzbYhC4YE3aQ5qlR2AYKyD6EJ60EBHkOEgL2x1neo6j0oQbUkdww==",
       "files": [
@@ -137,7 +56,6 @@
       ]
     },
     "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta7-12364": {
-      "type": "package",
       "sha512": "dnDLBXkZo9adNdXakHTRNsJqVBo/Nycvi8i/RiSi6GemexQfm3imAM6YPQet/dkuxlR7NfVHOg8j+WKDRs8WXA==",
       "files": [
         "lib/dnx451/Microsoft.Framework.CommandLineUtils.Sources.dll",
@@ -155,7 +73,6 @@
       ]
     },
     "Newtonsoft.Json/6.0.8": {
-      "type": "package",
       "sha512": "7ut47NDedTW19EbL0JpFDYUP62fcuz27hJrehCDNajdCS5NtqL+E39+7Um3OkNc2wl2ym7K8Ln5eNuLus6mVGQ==",
       "files": [
         "lib/net20/Newtonsoft.Json.dll",

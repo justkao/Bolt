@@ -7,7 +7,7 @@ namespace Bolt.Client.Pipeline
 {
     public class StreamingMiddleware : StreamingMiddlewareBase<ClientActionContext>
     {
-        public override async Task Invoke(ClientActionContext context)
+        public override async Task InvokeAsync(ClientActionContext context)
         {
             Metadata metadata = TryGetMetadata(context.Action);
             if (metadata == null)
@@ -16,6 +16,31 @@ namespace Bolt.Client.Pipeline
                 return;
             }
 
+            PrepareStreamingContent(context, metadata);
+            await Next(context);
+            HandleStreamingResponse(context, metadata);
+        }
+
+        private static void HandleStreamingResponse(ClientActionContext context, Metadata metadata)
+        {
+            context.EnsureResponse().EnsureSuccessStatusCode();
+            if (metadata.ContentResultType != null)
+            {
+                if (typeof(HttpContent).CanAssign(metadata.ContentResultType))
+                {
+                    // since we are not supoprting HttpResponseMEssage we will try copy headers to HttpContent
+                    foreach (KeyValuePair<string, IEnumerable<string>> header in context.Response.Headers)
+                    {
+                        context.Response.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                    }
+
+                    context.ActionResult = context.Response.Content;
+                }
+            }
+        }
+
+        private static void PrepareStreamingContent(ClientActionContext context, Metadata metadata)
+        {
             BoltFramework.ValidateParameters(context.Action, context.Parameters);
 
             if (metadata.ContentResultType != null)
@@ -26,31 +51,15 @@ namespace Bolt.Client.Pipeline
 
             if (metadata.HttpContentIndex >= 0)
             {
-                HttpContent content = (HttpContent) context.Parameters[metadata.HttpContentIndex];
+                HttpContent content = (HttpContent)context.Parameters[metadata.HttpContentIndex];
                 if (content == null)
                 {
                     throw new BoltClientException(
                         $"Action '{context.Action.Name}' requires not null HttpContent parameter.",
-                        ClientErrorCode.SerializeParameters, context.Action);
+                        ClientErrorCode.SerializeParameters,
+                        context.Action);
                 }
                 context.Request.Content = content;
-            }
-
-            await Next(context);
-
-            context.EnsureResponse().EnsureSuccessStatusCode();
-            if (metadata.ContentResultType != null)
-            {
-                if (typeof (HttpContent).CanAssign(metadata.ContentResultType))
-                {
-                    // since we are not supoprting HttpResponseMEssage we will try copy headers to HttpContent
-                    foreach (KeyValuePair<string, IEnumerable<string>> header in context.Response.Headers)
-                    {
-                        context.Response.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);
-                    }
-
-                    context.ActionResult = context.Response.Content;
-                }
             }
         }
     }

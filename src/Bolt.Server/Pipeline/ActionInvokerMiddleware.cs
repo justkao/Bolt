@@ -12,7 +12,7 @@ namespace Bolt.Server.Pipeline
     {
         private readonly ConcurrentDictionary<MethodInfo, ActionDescriptor> _actions = new ConcurrentDictionary<MethodInfo, ActionDescriptor>();
 
-        public override async Task Invoke(ServerActionContext context)
+        public override async Task InvokeAsync(ServerActionContext context)
         {
             if (context.HasParameters)
             {

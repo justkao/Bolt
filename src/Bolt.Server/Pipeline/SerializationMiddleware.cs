@@ -9,7 +9,7 @@ namespace Bolt.Server.Pipeline
 {
     public class SerializationMiddleware : MiddlewareBase<ServerActionContext>
     {
-        public override async Task Invoke(ServerActionContext context)
+        public override async Task InvokeAsync(ServerActionContext context)
         {
             if (context.HasParameters && context.Parameters == null)
             {

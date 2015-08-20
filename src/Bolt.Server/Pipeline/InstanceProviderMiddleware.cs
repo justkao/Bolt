@@ -6,7 +6,7 @@ namespace Bolt.Server.Pipeline
 {
     public class InstanceProviderMiddleware : MiddlewareBase<ServerActionContext>
     {
-        public override async Task Invoke(ServerActionContext context)
+        public override async Task InvokeAsync(ServerActionContext context)
         {
             bool instanceCreated = false;
             if (context.ContractInstance == null)

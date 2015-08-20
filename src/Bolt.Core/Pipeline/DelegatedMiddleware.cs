@@ -18,7 +18,7 @@ namespace Bolt.Pipeline
             _action = action;
         }
 
-        public sealed override Task Invoke(T context)
+        public sealed override Task InvokeAsync(T context)
         {
             return _action(Next, context);
         }

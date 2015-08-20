@@ -20,7 +20,7 @@ namespace Bolt.Client.Pipeline
 
         public IEndpointProvider EndpointProvider { get; }
 
-        public override async Task Invoke(ClientActionContext context)
+        public override async Task InvokeAsync(ClientActionContext context)
         {
             if (context.ServerConnection == null)
             {

@@ -5,7 +5,7 @@ namespace Bolt.Client.Pipeline
 {
     public class ValidateProxyMiddleware : ClientMiddlewareBase
     {
-        public override async Task Invoke(ClientActionContext context)
+        public override async Task InvokeAsync(ClientActionContext context)
         {
             ProxyState proxyState = context.Proxy.State;
 

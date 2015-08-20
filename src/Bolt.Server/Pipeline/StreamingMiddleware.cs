@@ -8,7 +8,7 @@ namespace Bolt.Server.Pipeline
 {
     public class StreamingMiddleware : StreamingMiddlewareBase<ServerActionContext>
     {
-        public override async Task Invoke(ServerActionContext context)
+        public override async Task InvokeAsync(ServerActionContext context)
         {
             Metadata metadata = TryGetMetadata(context.Action);
             if (metadata == null)

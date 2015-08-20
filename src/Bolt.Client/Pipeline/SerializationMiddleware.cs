@@ -28,7 +28,7 @@ namespace Bolt.Client.Pipeline
 
         public IClientErrorProvider ErrorProvider { get; }
 
-        public override async Task Invoke(ClientActionContext context)
+        public override async Task InvokeAsync(ClientActionContext context)
         {
             if (context.EnsureRequest().Content == null && context.HasParameters)
             {
@@ -45,7 +45,44 @@ namespace Bolt.Client.Pipeline
                     context.Action);
             }
 
+            TryHandleBoltServerError(context);
+
             await HandleResponseAsync(context);
+        }
+
+        protected virtual async Task HandleResponseAsync(ClientActionContext context)
+        {
+            if (!context.Response.IsSuccessStatusCode)
+            {
+                Exception errorOnServer;
+                using (Stream stream = await GetResponseStreamAsync(context.Response))
+                {
+                    errorOnServer = DeserializeException(context, stream);
+                }
+
+                if (errorOnServer != null)
+                {
+                    context.ErrorResult = errorOnServer;
+                    throw errorOnServer;
+                }
+
+                context.Response.EnsureSuccessStatusCode();
+            }
+            else
+            {
+                if (context.HasSerializableActionResult && context.ActionResult == null)
+                {
+                    using (Stream stream = await GetResponseStreamAsync(context.Response))
+                    {
+                        context.ActionResult = DeserializeResponse(context, stream);
+                    }
+                }
+            }
+        }
+
+        protected virtual async Task<Stream> GetResponseStreamAsync(HttpResponseMessage response)
+        {
+            return new MemoryStream(await response.Content.ReadAsByteArrayAsync());
         }
 
         protected virtual HttpContent BuildRequestParameters(ClientActionContext context)
@@ -128,91 +165,64 @@ namespace Bolt.Client.Pipeline
             }
         }
 
-        protected virtual async Task<object> ReadResponseAsync(ClientActionContext context)
+        protected virtual object DeserializeResponse(ClientActionContext context, Stream stream)
         {
-            using (Stream stream = new MemoryStream(await context.Response.Content.ReadAsByteArrayAsync()))
+            if (stream.Length == 0)
             {
-                if (stream.Length == 0)
+                return null;
+            }
+
+            try
+            {
+                return Serializer.Read(context.ResponseType, stream);
+            }
+            catch (Exception e)
+            {
+                throw new BoltClientException(
+                    $"Failed to deserialize response for action '{context.Action.Name}'.",
+                    ClientErrorCode.DeserializeResponse,
+                    context.Action,
+                    e);
+            }
+        }
+
+        protected virtual Exception DeserializeException(ClientActionContext context, Stream stream)
+        {
+            if (stream.Length == 0)
+            {
+                return null;
+            }
+
+            try
+            {
+                object result = Serializer.Read(ExceptionWrapper.Type, stream);
+                if (result == null)
                 {
                     return null;
                 }
 
-                try
-                {
-                    return Serializer.Read(context.ResponseType, stream);
-                }
-                catch (Exception e)
-                {
-                    throw new BoltClientException(
-                        $"Failed to deserialize response for action '{context.Action.Name}'.",
-                        ClientErrorCode.DeserializeResponse,
-                        context.Action,
-                        e);
-                }
+                return ExceptionWrapper.Unwrap(result);
             }
-        }
-
-        protected virtual async Task<Exception> ReadExceptionAsync(ClientActionContext context)
-        {
-            using (Stream stream = new MemoryStream(await context.Response.Content.ReadAsByteArrayAsync()))
+            catch (Exception e)
             {
-                if (stream.Length == 0)
-                {
-                    return null;
-                }
-
-                try
-                {
-                    object result = Serializer.Read(ExceptionWrapper.Type, stream);
-                    if (result == null)
-                    {
-                        return null;
-                    }
-
-                    return ExceptionWrapper.Unwrap(result);
-                }
-                catch (Exception e)
-                {
-                    throw new BoltClientException(
-                        $"Failed to deserialize exception response for action '{context.Action.Name}'.",
-                        ClientErrorCode.DeserializeExceptionResponse,
-                        context.Action,
-                        e);
-                }
+                throw new BoltClientException(
+                    $"Failed to deserialize exception response for action '{context.Action.Name}'.",
+                    ClientErrorCode.DeserializeExceptionResponse,
+                    context.Action,
+                    e);
             }
         }
 
-        protected virtual async Task HandleResponseAsync(ClientActionContext context)
+        protected virtual void TryHandleBoltServerError(ClientActionContext context)
         {
             if (!context.Response.IsSuccessStatusCode)
             {
-                BoltServerException boltError = ReadBoltServerErrorIfAvailable(context);
+                BoltServerException boltError = ErrorProvider.TryReadServerError(context);
                 if (boltError != null)
                 {
                     throw boltError;
                 }
-
-                Exception errorOnServer = await ReadExceptionAsync(context);
-                if (errorOnServer != null)
-                {
-                    context.ErrorResult = errorOnServer;
-                    throw errorOnServer;
-                }
-
-                context.Response.EnsureSuccessStatusCode();
             }
-            else
-            {
-                if (context.HasSerializableActionResult && context.ActionResult == null)
-                {
-                    context.ActionResult = await ReadResponseAsync(context);
-                }
-            }
-        }
-
-        protected virtual BoltServerException ReadBoltServerErrorIfAvailable(ClientActionContext context)
-        {
-            return ErrorProvider.TryReadServerError(context);
         }
     }
 }

@@ -41,7 +41,7 @@ namespace Bolt.Core.Test
 
         public class TestStreamingMiddleware : StreamingMiddlewareBase<ActionContextBase>
         {
-            public override Task Invoke(ActionContextBase context)
+            public override Task InvokeAsync(ActionContextBase context)
             {
                 throw new NotSupportedException();
             }

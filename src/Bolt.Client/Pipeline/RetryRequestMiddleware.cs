@@ -16,7 +16,7 @@ namespace Bolt.Client.Pipeline
 
         public TimeSpan RetryDelay { get; set; }
 
-        public override async Task Invoke(ClientActionContext context)
+        public override async Task InvokeAsync(ClientActionContext context)
         {
             int tries = 0;
 

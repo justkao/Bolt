@@ -35,7 +35,7 @@ namespace Bolt.Client.Pipeline
             return output;
         }
 
-        public override async Task Invoke(ClientActionContext context)
+        public override async Task InvokeAsync(ClientActionContext context)
         {
             context.EnsureRequest();
 

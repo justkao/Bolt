@@ -7,7 +7,7 @@ namespace Bolt.Server.Pipeline
 {
     public class HandleErrorMiddleware : MiddlewareBase<ServerActionContext>
     {
-        public override async Task Invoke(ServerActionContext context)
+        public override async Task InvokeAsync(ServerActionContext context)
         {
             try
             {
