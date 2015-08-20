@@ -3,7 +3,50 @@
   "version": 1,
   "targets": {
     "DNX,Version=v4.5.1": {
-      "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12364": {
+      "Bolt.Console/0.16.0-alpha1": {
+        "type": "project",
+        "dependencies": {
+          "Bolt.Generators": null,
+          "Bolt.Sources": null,
+          "Microsoft.Dnx.Runtime.Abstractions": "1.0.0",
+          "Microsoft.Framework.CommandLineUtils.Sources": "1.0.0",
+          "Newtonsoft.Json": "6.0.8"
+        }
+      },
+      "Bolt.Core/0.16.0-alpha1": {
+        "type": "project",
+        "dependencies": {
+          "Bolt.Sources": null,
+          "Newtonsoft.Json": "6.0.8"
+        },
+        "frameworkAssemblies": [
+          "System.Net.Http",
+          "System.Runtime.Serialization"
+        ]
+      },
+      "Bolt.Generators/0.16.0-alpha1": {
+        "type": "project",
+        "dependencies": {
+          "Bolt.Sources": null
+        }
+      },
+      "Bolt.Sources/0.16.0-alpha1": {
+        "type": "project"
+      },
+      "Bolt.Test.Common/1.0.0": {
+        "type": "project",
+        "dependencies": {
+          "Bolt.Sources": null
+        },
+        "frameworkAssemblies": [
+          "System.Collections",
+          "System.Net",
+          "System.Net.Http",
+          "System.Runtime.Serialization"
+        ]
+      },
+      "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta8-15118": {
+        "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp",
           "mscorlib",
@@ -17,7 +60,8 @@
           "lib/dnx451/Microsoft.Dnx.Runtime.Abstractions.dll": {}
         }
       },
-      "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta7-12364": {
+      "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta8-15118": {
+        "type": "package",
         "frameworkAssemblies": [
           "Microsoft.CSharp",
           "mscorlib",
@@ -32,38 +76,76 @@
         }
       },
       "Newtonsoft.Json/6.0.8": {
+        "type": "package",
         "compile": {
           "lib/net45/Newtonsoft.Json.dll": {}
         },
         "runtime": {
           "lib/net45/Newtonsoft.Json.dll": {}
         }
+      },
+      "TestService.Core/1.0.0": {
+        "type": "project",
+        "dependencies": {
+          "Bolt.Console": null,
+          "Bolt.Core": null,
+          "Bolt.Test.Common": null
+        },
+        "frameworkAssemblies": [
+          "System.ServiceModel"
+        ]
       }
     }
   },
   "libraries": {
-    "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta7-12364": {
+    "Bolt.Console/0.16.0-alpha1": {
+      "type": "project",
+      "path": "../../../src/Bolt.Console/project.json"
+    },
+    "Bolt.Core/0.16.0-alpha1": {
+      "type": "project",
+      "path": "../../../src/Bolt.Core/project.json"
+    },
+    "Bolt.Generators/0.16.0-alpha1": {
+      "type": "project",
+      "path": "../../../src/Bolt.Generators/project.json"
+    },
+    "Bolt.Sources/0.16.0-alpha1": {
+      "type": "project",
+      "path": "../../../src/Bolt.Sources/project.json"
+    },
+    "Bolt.Test.Common/1.0.0": {
+      "type": "project",
+      "path": "../../Common/Bolt.Test.Common/project.json"
+    },
+    "TestService.Core/1.0.0": {
+      "type": "project",
+      "path": "../TestService.Core/project.json"
+    },
+    "Microsoft.Dnx.Runtime.Abstractions/1.0.0-beta8-15118": {
+      "type": "package",
       "serviceable": true,
-      "sha512": "olzxOCVByDrpprw7qrizpD+6Xv4zY7yKyThzbYhC4YE3aQ5qlR2AYKyD6EJ60EBHkOEgL2x1neo6j0oQbUkdww==",
+      "sha512": "/XzJVdt+XvYqgaIPWXYdLErVBblM0Uu24DSYw2lmC4DgI3BQbwHfh7FxAgfCX8ww9+Myl14oHbdSGOdbILiVbw==",
       "files": [
         "lib/dnx451/Microsoft.Dnx.Runtime.Abstractions.dll",
         "lib/dnx451/Microsoft.Dnx.Runtime.Abstractions.xml",
         "lib/dnxcore50/Microsoft.Dnx.Runtime.Abstractions.dll",
         "lib/dnxcore50/Microsoft.Dnx.Runtime.Abstractions.xml",
-        "Microsoft.Dnx.Runtime.Abstractions.1.0.0-beta7-12364.nupkg",
-        "Microsoft.Dnx.Runtime.Abstractions.1.0.0-beta7-12364.nupkg.sha512",
+        "Microsoft.Dnx.Runtime.Abstractions.1.0.0-beta8-15118.nupkg",
+        "Microsoft.Dnx.Runtime.Abstractions.1.0.0-beta8-15118.nupkg.sha512",
         "Microsoft.Dnx.Runtime.Abstractions.nuspec"
       ]
     },
-    "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta7-12364": {
-      "sha512": "dnDLBXkZo9adNdXakHTRNsJqVBo/Nycvi8i/RiSi6GemexQfm3imAM6YPQet/dkuxlR7NfVHOg8j+WKDRs8WXA==",
+    "Microsoft.Framework.CommandLineUtils.Sources/1.0.0-beta8-15118": {
+      "type": "package",
+      "sha512": "OPAKQ2qPZxCLbf5LW8/vXuBDEEjzVKMlCCoi06Hy9paibOiL2sCURP9DxTqEMsP3iyGJoEjKpQoZKmSFPaTUuQ==",
       "files": [
         "lib/dnx451/Microsoft.Framework.CommandLineUtils.Sources.dll",
         "lib/dnx451/Microsoft.Framework.CommandLineUtils.Sources.xml",
         "lib/dnxcore50/Microsoft.Framework.CommandLineUtils.Sources.dll",
         "lib/dnxcore50/Microsoft.Framework.CommandLineUtils.Sources.xml",
-        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta7-12364.nupkg",
-        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta7-12364.nupkg.sha512",
+        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta8-15118.nupkg",
+        "Microsoft.Framework.CommandLineUtils.Sources.1.0.0-beta8-15118.nupkg.sha512",
         "Microsoft.Framework.CommandLineUtils.Sources.nuspec",
         "shared/AnsiConsole.cs",
         "shared/CommandArgument.cs",
@@ -73,6 +155,7 @@
       ]
     },
     "Newtonsoft.Json/6.0.8": {
+      "type": "package",
       "sha512": "7ut47NDedTW19EbL0JpFDYUP62fcuz27hJrehCDNajdCS5NtqL+E39+7Um3OkNc2wl2ym7K8Ln5eNuLus6mVGQ==",
       "files": [
         "lib/net20/Newtonsoft.Json.dll",

@@ -24,6 +24,7 @@
   },
   "commands": {
     "run": "TestService",
-    "test": "TestService test"
+    "test": "TestService test",
+    "performance": "TestService performance"
   }
 }
