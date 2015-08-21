@@ -1,0 +1,30 @@
+﻿{
+  "dependencies": {
+    "Microsoft.Framework.CommandLineUtils.Sources": {
+      "version": "1.0.0-*",
+      "type": "build"
+    },
+    "Newtonsoft.Json": "6.0.8",
+    "Bolt.Sources": { "type": "build" },
+    "Bolt.Generators": "",
+    "Bolt.Client": "",
+    "Bolt.Client.Proxy": "",
+    "Bolt.Performance.Core": "",
+    "Microsoft.Dnx.Runtime.Abstractions": "1.0.0-*"
+  },
+  "frameworks": {
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.Runtime": "",
+        "System.Collections": "",
+        "System.Runtime.Serialization": "",
+        "System.ServiceModel": ""
+      }
+    }
+  },
+  "commands": {
+    "run": "Bolt.Performance.Console",
+    "test": "Bolt.Performance.Console test",
+    "performance": "Bolt.Performance.Console performance"
+  }
+}

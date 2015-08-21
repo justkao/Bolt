@@ -1,0 +1,17 @@
+﻿{
+  "version": "1.0.0-*",
+  "dependencies": {
+    "Bolt.Core": "",
+    "Bolt.Test.Common": "",
+    "Newtonsoft.Json": "6.0.8"
+  },
+  "compileExclude": "Generated\\*.*",
+  "frameworks": {
+    "dnx451": {
+      "frameworkAssemblies": { "System.ServiceModel": "" }
+    }
+  },
+  "commands": {
+    "gen": "Bolt.Console code --contract ITestContract --output ../Bolt.Performance.Console/Generated/ --mode Proxy"
+  }
+}

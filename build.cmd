@@ -24,13 +24,13 @@ if %errorlevel% neq 0 goto failure
 call dnu build test\Integration\Bolt.Server.IntegrationTest.Core\project.json --configuration Release
 if %errorlevel% neq 0 goto failure
 
-call dnu build test\Service\TestService.Core\project.json --configuration Release
+call dnu build test\Performance\Bolt.Performance.Core\project.json --configuration Release
 if %errorlevel% neq 0 goto failure
-call dnu build test\Service\TestService\project.json --configuration Release
+call dnu build test\Performance\Bolt.Performance.Console\project.json --configuration Release
 if %errorlevel% neq 0 goto failure
-call dnu build test\Service\TestService.Server.Bolt\project.json --configuration Release
+call dnu build test\Performance\Bolt.Performance.Server\project.json --configuration Release
 if %errorlevel% neq 0 goto failure
-call dnu build test\Service\TestService.Server.Wcf\project.json --configuration Release
+call dnu build test\Performance\Bolt.Performance.Server.Wcf\project.json --configuration Release
 if %errorlevel% neq 0 goto failure
 
 goto success
