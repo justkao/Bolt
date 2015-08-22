@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading;
 using System.Threading.Tasks;
@@ -26,6 +27,14 @@ namespace Bolt.Performance.Contracts
 
         [OperationContract]
         void DoNothingWithComplexParameter(List<Person> person);
+
+        [OperationContract]
+        void MethodWithManyArguments(List<Person> person, int intValue, string stringValue, DateTime dateValue,
+            Person objectValue);
+
+        [OperationContract]
+        Task MethodWithManyArgumentsAsAsync(List<Person> person, int intValue, string stringValue, DateTime dateValue,
+            Person objectValue);
 
         [OperationContract]
         int GetSimpleType(int arg);

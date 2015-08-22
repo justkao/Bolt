@@ -157,11 +157,15 @@ namespace Bolt.Performance.Console
             }
 
             ThreadPool.SetMinThreads(threads, threads);
+            Person person = Person.Create(10);
+            List<Person> listArg = Enumerable.Repeat(person, 3).ToList();
+            DateTime dateArg = DateTime.UtcNow;
 
+            Execute(proxies, c => c.MethodWithManyArguments(listArg, 10, "someString", dateArg, person), cnt, degree, "MethodWithManyArguments", result, previous);
+            ExecuteAsync(proxies, c => c.MethodWithManyArgumentsAsAsync(listArg, 10, "someString", dateArg, person), cnt, degree, "MethodWithManyArgumentsAsync", result, previous);
             Execute(proxies, c => c.DoNothing(), cnt, degree, "DoNothing", result, previous);
             ExecuteAsync(proxies, c => c.DoNothingAsAsync(), cnt, degree, "DoNothingAsync", result, previous);
             Execute(proxies, c => c.GetSimpleType(9), cnt, degree, "GetSimpleType", result, previous);
-            Person person = Person.Create(10);
             Execute(proxies, c => c.GetSinglePerson(person), cnt, degree, "GetSinglePerson", result, previous);
             ExecuteAsync(proxies, c => c.GetSinglePersonAsAsync(person), cnt, degree, "GetSinglePersonAsync", result, previous);
             Execute(proxies, c => c.GetManyPersons(), cnt, degree, "GetManyPersons", result, previous);

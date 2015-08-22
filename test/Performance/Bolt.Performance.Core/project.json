@@ -3,6 +3,8 @@
   "dependencies": {
     "Bolt.Core": "",
     "Bolt.Test.Common": "",
+    "Bolt.Console": "",
+
     "Newtonsoft.Json": "6.0.8"
   },
   "compileExclude": "Generated\\*.*",

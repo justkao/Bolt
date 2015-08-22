@@ -51,6 +51,17 @@ namespace Bolt.Performance.Contracts
         {
         }
 
+        public void MethodWithManyArguments(List<Person> person, int intValue, string stringValue, DateTime dateValue, Person objectValue)
+        {
+            
+        }
+
+        public Task MethodWithManyArgumentsAsAsync(List<Person> person, int intValue, string stringValue, DateTime dateValue,
+            Person objectValue)
+        {
+            return Task.FromResult(true);
+        }
+
         public int GetSimpleType(int arg)
         {
             return arg;

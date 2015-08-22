@@ -82,6 +82,21 @@ namespace Bolt.Performance.Contracts
             return this.SendAsync(__DoNothingWithComplexParameterAction, person);
         }
 
+        public virtual void MethodWithManyArguments(List<Person> person, int intValue, string stringValue, DateTime dateValue, Person objectValue)
+        {
+            this.Send(__MethodWithManyArgumentsAction, person, intValue, stringValue, dateValue, objectValue);
+        }
+
+        public virtual Task MethodWithManyArgumentsAsync(List<Person> person, int intValue, string stringValue, DateTime dateValue, Person objectValue)
+        {
+            return this.SendAsync(__MethodWithManyArgumentsAction, person, intValue, stringValue, dateValue, objectValue);
+        }
+
+        public virtual Task MethodWithManyArgumentsAsAsync(List<Person> person, int intValue, string stringValue, DateTime dateValue, Person objectValue)
+        {
+            return this.SendAsync(__MethodWithManyArgumentsAsAsyncAction, person, intValue, stringValue, dateValue, objectValue);
+        }
+
         public virtual int GetSimpleType(int arg)
         {
             return this.Send<int>(__GetSimpleTypeAction, arg);
@@ -187,6 +202,8 @@ namespace Bolt.Performance.Contracts
         private static readonly MethodInfo __DoNothingAction = typeof(ITestContract).GetMethod(nameof(ITestContract.DoNothing));
         private static readonly MethodInfo __DoNothingWithComplexParameterAsAsyncAction = typeof(ITestContract).GetMethod(nameof(ITestContract.DoNothingWithComplexParameterAsAsync));
         private static readonly MethodInfo __DoNothingWithComplexParameterAction = typeof(ITestContract).GetMethod(nameof(ITestContract.DoNothingWithComplexParameter));
+        private static readonly MethodInfo __MethodWithManyArgumentsAction = typeof(ITestContract).GetMethod(nameof(ITestContract.MethodWithManyArguments));
+        private static readonly MethodInfo __MethodWithManyArgumentsAsAsyncAction = typeof(ITestContract).GetMethod(nameof(ITestContract.MethodWithManyArgumentsAsAsync));
         private static readonly MethodInfo __GetSimpleTypeAction = typeof(ITestContract).GetMethod(nameof(ITestContract.GetSimpleType));
         private static readonly MethodInfo __GetSimpleTypeAsAsyncAction = typeof(ITestContract).GetMethod(nameof(ITestContract.GetSimpleTypeAsAsync));
         private static readonly MethodInfo __GetSinglePersonAction = typeof(ITestContract).GetMethod(nameof(ITestContract.GetSinglePerson));
