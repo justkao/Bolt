@@ -1,4 +1,5 @@
-﻿using System.ServiceModel;
+﻿using System;
+using System.ServiceModel;
 
 using Bolt.Client;
 using Bolt.Client.Proxy;
@@ -12,29 +13,14 @@ namespace Bolt.Performance.Console
             ProxyFactory = new DynamicProxyFactory()
         };
 
-        public static ITestContract CreateIISBolt()
+        public static ITestContract CreateDynamicProxy(Uri server)
         {
-            return Config.CreateProxy<TestContractProxy>(Servers.IISBoltServer);
+            return Config.CreateProxy<ITestContract>(server);
         }
 
-        public static ITestContract CreateBolt()
+        public static ITestContract CreateProxy(Uri server)
         {
-            return Config.CreateProxy<TestContractProxy>(Servers.BoltServer);
-        }
-
-        public static ITestContract CreateDynamicBolt()
-        {
-            return Config.CreateProxy<ITestContract>(Servers.BoltServer);
-        }
-
-        public static ITestContract CreateKestrelBolt()
-        {
-            return Config.CreateProxy<TestContractProxy>(Servers.KestrelBoltServer);
-        }
-
-        public static ITestContract CreateDynamicKestrelBolt()
-        {
-            return Config.CreateProxy<ITestContract>(Servers.KestrelBoltServer);
+            return Config.CreateProxy<TestContractProxy>(server);
         }
 
         public static ITestContract CreateWcf()

@@ -12,6 +12,7 @@
     }
   },
   "commands": {
-    "run": "run"
+    "run": "run",
+    "web": "Bolt.Performance.Server.Wcf"
   }
 }

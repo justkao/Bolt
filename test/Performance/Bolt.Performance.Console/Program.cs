@@ -56,39 +56,17 @@ namespace Bolt.Performance.Console
 
                 c.OnExecute(() =>
                 {
-                    int concurrency = 1;
-                    int repeats = 10;
-
-                    var result = CreateEmptyReport(concurrency, repeats);
+                    int repeats = 100000;
 
                     if (argConcurrency.HasValue())
                     {
-                        concurrency = int.Parse(argConcurrency.Value());
+                        ExecuteConcurrencyTest(proxies, int.Parse(argConcurrency.Value()), repeats);
                     }
-
-                    string testCase = $"Concurrency_{concurrency}";
-                    var reportsDirectory = GetReportsDirectory(testCase);
-
-                    PerformanceResultHandler handler = new PerformanceResultHandler();
-                    PerformanceResult previous = handler.ReadLatestReport(reportsDirectory, new Version(result.Version));
-                    if (previous != null)
+                    else
                     {
-                        Console.WriteLine(
-                            $"Detected previous report for version '{previous.Version}' that will be used to compare the performancce."
-                                .Yellow());
+                        ExecuteConcurrencyTest(proxies, 1, repeats);
+                        ExecuteConcurrencyTest(proxies, 100, repeats);
                     }
-
-                    ExecuteActions(proxies, repeats, concurrency, result, previous);
-
-                    string file = $"{reportsDirectory}/performance_{result.Version}.json";
-                    if (!Directory.Exists(reportsDirectory))
-                    {
-                        Directory.CreateDirectory(reportsDirectory);
-                    }
-
-                    Console.WriteLine($"Writing performance overview to '{file.Yellow().Bold()}'");
-                    File.WriteAllText(file, JsonConvert.SerializeObject(result, Formatting.Indented));
-                    Console.WriteLine(string.Empty);
 
                     Console.WriteLine("Test finished. Press any key to exit program ... ");
                     System.Console.ReadLine();
@@ -141,6 +119,35 @@ namespace Bolt.Performance.Console
             return app.Execute(args);
         }
 
+        private void ExecuteConcurrencyTest(List<Tuple<string, ITestContract>> proxies, int concurrency,  int repeats)
+        {
+            var result = CreateEmptyReport(concurrency, repeats);
+
+            string testCase = $"Concurrency_{concurrency}";
+            var reportsDirectory = GetReportsDirectory(testCase);
+
+            PerformanceResultHandler handler = new PerformanceResultHandler();
+            PerformanceResult previous = handler.ReadLatestReport(reportsDirectory, new Version(result.Version));
+            if (previous != null)
+            {
+                Console.WriteLine(
+                    $"Detected previous report for version '{previous.Version}' that will be used to compare the performancce."
+                        .Yellow());
+            }
+
+            ExecuteActions(proxies, repeats, concurrency, result, previous);
+
+            string file = $"{reportsDirectory}/performance_{result.Version}.json";
+            if (!Directory.Exists(reportsDirectory))
+            {
+                Directory.CreateDirectory(reportsDirectory);
+            }
+
+            Console.WriteLine($"Writing performance overview to '{file.Yellow().Bold()}'");
+            File.WriteAllText(file, JsonConvert.SerializeObject(result, Formatting.Indented));
+            Console.WriteLine(string.Empty);
+        }
+
         private void ExecuteActions(IEnumerable<Tuple<string, ITestContract>> proxies, int cnt, int degree, PerformanceResult result, PerformanceResult previous)
         {
             int threads = degree*3;
@@ -165,28 +172,25 @@ namespace Bolt.Performance.Console
 
         private IEnumerable<Tuple<string, ITestContract>> CreateClients()
         {
-            if (IsPortUsed(Servers.BoltServer.Port))
+            if (IsPortUsed(Servers.BoltWebListenerServer.Port))
             {
-                yield return new Tuple<string, ITestContract>("Bolt", ClientFactory.CreateBolt());
-
-                yield return new Tuple<string, ITestContract>("Bolt(D)", ClientFactory.CreateDynamicBolt());
+                yield return new Tuple<string, ITestContract>(Proxies.BoltWebListener, ClientFactory.CreateDynamicProxy(Servers.BoltWebListenerServer));
+                yield return new Tuple<string, ITestContract>(Proxies.BoltWebListenerGeneratedProxy, ClientFactory.CreateProxy(Servers.BoltWebListenerServer));
             }
 
             if (IsPortUsed(Servers.KestrelBoltServer.Port))
             {
-                yield return new Tuple<string, ITestContract>("Bolt(K)", ClientFactory.CreateBolt());
-
-                yield return new Tuple<string, ITestContract>("Bolt(K,D)", ClientFactory.CreateDynamicBolt());
+                yield return new Tuple<string, ITestContract>(Proxies.BoltKestrel, ClientFactory.CreateDynamicProxy(Servers.KestrelBoltServer));
             }
 
             if (IsPortUsed(Servers.IISBoltServer.Port))
             {
-                yield return new Tuple<string, ITestContract>("Bolt(IIS)", ClientFactory.CreateIISBolt());
+                yield return new Tuple<string, ITestContract>(Proxies.BoltIIS, ClientFactory.CreateDynamicProxy(Servers.IISBoltServer));
             }
 
             if (IsPortUsed(Servers.WcfServer.Port))
             {
-                yield return new Tuple<string, ITestContract>("WCF", ClientFactory.CreateWcf());
+                yield return new Tuple<string, ITestContract>(Proxies.WCF, ClientFactory.CreateWcf());
             }
         }
 

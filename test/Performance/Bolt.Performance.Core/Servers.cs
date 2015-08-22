@@ -4,7 +4,7 @@ namespace Bolt.Performance
 {
     public static class Servers
     {
-        public static readonly Uri BoltServer = new Uri("http://localhost:9000/");
+        public static readonly Uri BoltWebListenerServer = new Uri("http://localhost:9000/");
 
         public static readonly Uri KestrelBoltServer = new Uri("http://localhost:9003/");
 
