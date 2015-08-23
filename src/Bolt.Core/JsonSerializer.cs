@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -9,6 +8,9 @@ namespace Bolt
 {
     public class JsonSerializer : ISerializer
     {
+        private const int BufferSize = 1024*1024;
+        private static readonly Encoding Encoding = Encoding.UTF8;
+
         public JsonSerializer()
         {
             Serializer = new Newtonsoft.Json.JsonSerializer
@@ -22,20 +24,6 @@ namespace Bolt
 
         public string ContentType => "application/json";
 
-        public IObjectSerializer CreateSerializer(Stream inputStream)
-        {
-            if (inputStream == null) throw new ArgumentNullException(nameof(inputStream));
-
-            return new JsonObjectSerializer(this, inputStream, true);
-        }
-
-        public IObjectSerializer CreateDeserializer(Stream inputStream)
-        {
-            if (inputStream == null) throw new ArgumentNullException(nameof(inputStream));
-
-            return new JsonObjectSerializer(this, inputStream, false);
-        }
-
         public Newtonsoft.Json.JsonSerializer Serializer { get; }
 
         public void Write(Stream stream, object data)
@@ -45,7 +33,7 @@ namespace Bolt
                 throw new ArgumentNullException(nameof(stream));
             }
 
-            using (StreamWriter writer = new StreamWriter(stream, Encoding.UTF8, 4096, true))
+            using (StreamWriter writer = new StreamWriter(stream, Encoding, BufferSize, true))
             {
                 Serializer.Serialize(writer, data);
             }
@@ -58,7 +46,7 @@ namespace Bolt
                 throw new ArgumentNullException(nameof(stream));
             }
 
-            using (TextReader reader = new StreamReader(stream, Encoding.UTF8, true, 4096, true))
+            using (TextReader reader = new StreamReader(stream, Encoding, true, BufferSize, true))
             {
                 using (JsonReader jsonReader = new JsonTextReader(reader))
                 {
@@ -67,140 +55,112 @@ namespace Bolt
             }
         }
 
-        private class JsonObjectSerializer : IObjectSerializer
+        public void Read(Stream stream, MethodInfo method, object[] output)
         {
-            private readonly JsonSerializer _parent;
+            if (method == null) throw new ArgumentNullException(nameof(method));
+            if (output == null) throw new ArgumentNullException(nameof(output));
+            var parameters = method.GetParameters();
 
-            // used for writing
-            private readonly JsonTextWriter _textWriter;
-
-            // used for reading
-            private readonly JsonTextReader _textReader;
-            private bool _readingClosed;
-
-            private readonly bool _writeMode;
-
-            private Dictionary<string, string> _skippedProperties;
-
-            public JsonObjectSerializer(JsonSerializer parent, Stream stream, bool writeMode)
+            using (StreamReader streamReader = new StreamReader(stream, Encoding, true, BufferSize, true))
             {
-                _parent = parent;
-                _writeMode = writeMode;
-                if (writeMode)
+                using (JsonTextReader reader = new JsonTextReader(streamReader) {CloseInput = false})
                 {
-                    _textWriter = new JsonTextWriter(new StreamWriter(stream));
-                    _textWriter.CloseOutput = false;
-                    _textWriter.WriteStartObject();
-                }
-                else
-                {
-                    _textReader = new JsonTextReader(new StreamReader(stream));
-                    _textReader.Read();
-                    _textReader.CloseInput = false;
-                }
-
-                IsEmpty = true;
-            }
-
-            public bool IsEmpty { get; private set; }
-
-            public void Write(string key, Type type, object value)
-            {
-                if (!_writeMode)
-                {
-                    throw new InvalidOperationException("Serializer can only be used for writing.");
-                }
-
-                if (key == null) throw new ArgumentNullException(nameof(key));
-                if (type == null) throw new ArgumentNullException(nameof(type));
-
-                if (Equals(value, null))
-                {
-                    return;
-                }
-
-                IsEmpty = false;
-                _textWriter.WritePropertyName(key);
-                _parent.Serializer.Serialize(_textWriter, value);
-                _textWriter.Flush();
-            }
-
-            public bool TryRead(string key, Type type, out object value)
-            {
-                if (_writeMode)
-                {
-                    throw new InvalidOperationException("Serializer can only be used for reading.");
-                }
-
-                if (key == null) throw new ArgumentNullException(nameof(key));
-                if (type == null) throw new ArgumentNullException(nameof(type));
-
-                if (_readingClosed)
-                {
-                    value = null;
-                    return false;
-                }
-
-                while (true)
-                {
-                    if (_skippedProperties != null)
+                    reader.Read();
+                    for (int i = 0; i < parameters.Length; i++)
                     {
-                        string raw;
-                        if (_skippedProperties.TryGetValue(key, out raw))
+                        var parameter = parameters[i];
+                        if (parameter.IsCancellationToken())
                         {
-                            if (typeof(string) == type)
+                            continue;
+                        }
+
+                        try
+                        {
+                            reader.Read();
+                            if (reader.TokenType == JsonToken.EndObject || reader.TokenType == JsonToken.None)
                             {
-                                value = raw;
-                                return true;
+                                break;
                             }
 
-                            value = _parent.Serializer.Deserialize(new StringReader(raw), type);
-                            return true;
+                            if (reader.TokenType != JsonToken.PropertyName)
+                            {
+                                throw new InvalidOperationException($"Invalid json structure. Property name expected but '{reader.TokenType}' was found instead.");
+                            }
+
+                            string propertyName = reader.Value.ToString();
+                            reader.Read();
+
+                            if (!string.Equals(propertyName, parameter.Name, StringComparison.OrdinalIgnoreCase))
+                            {
+                                var index = FindParameter(parameters, propertyName);
+                                if (index >= 0)
+                                {
+                                    output[index] = Serializer.Deserialize(reader, parameters[index].ParameterType);
+                                }
+                                else
+                                {
+                                    throw new InvalidOperationException($"The parameter '{propertyName}' retrieved from request was not found in list of available parameters.");
+                                }
+                            }
+                            else
+                            {
+                                output[i] = Serializer.Deserialize(reader, parameters[i].ParameterType);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            throw new BoltException($"Failed to deserialize parameter '{parameter.Name}'.", e);
                         }
                     }
-
-                    _textReader.Read();
-                    if (_textReader.TokenType == JsonToken.EndObject || _textReader.TokenType == JsonToken.None)
-                    {
-                        _readingClosed = true;
-                        value = null;
-                        return false;
-                    }
-
-                    IsEmpty = false;
-
-                    if (_textReader.TokenType != JsonToken.PropertyName)
-                    {
-                        throw new InvalidOperationException($"Invalid json structure. Property name expected but '{_textReader.TokenType}' was found instead.");
-                    }
-
-                    if (Equals(_textReader.Value, key))
-                    {
-                        _textReader.Read();
-                        value = _parent.Serializer.Deserialize(_textReader, type);
-                        return true;
-                    }
-
-                    if (_skippedProperties == null)
-                    {
-                        _skippedProperties = new Dictionary<string, string>();
-                    }
-
-                    _skippedProperties.Add(_textReader.Value.ToString(), _textReader.ReadAsString());
+                    reader.Read();
                 }
             }
+        }
 
-            public void Dispose()
+        public void Write(Stream stream, MethodInfo method, object[] values)
+        {
+            if (stream == null) throw new ArgumentNullException(nameof(stream));
+            if (method == null) throw new ArgumentNullException(nameof(method));
+            if (values == null) throw new ArgumentNullException(nameof(values));
+
+            var parameters = method.GetParameters();
+            BoltFramework.ValidateParameters(method, values);
+
+            using (var streamWriter = new StreamWriter(stream, Encoding, BufferSize, true))
             {
-                if (_writeMode)
+                using (var writer = new JsonTextWriter(streamWriter) {CloseOutput = false})
                 {
-                    _textWriter.Close();
-                }
-                else
-                {
-                    _textReader.Close();
+                    writer.WriteStartObject();
+                    for (int i = 0; i < parameters.Length; i++)
+                    {
+                        var value = values[i];
+                        var parameter = parameters[i];
+
+                        if (Equals(values[i], null) || parameter.IsCancellationToken())
+                        {
+                            continue;
+                        }
+
+                        writer.WritePropertyName(parameter.Name);
+                        Serializer.Serialize(writer, value);
+                        writer.Flush();
+                    }
+                    writer.WriteEndObject();
                 }
             }
+        }
+
+        private static int FindParameter(ParameterInfo[] parameters, string name)
+        {
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                if (string.Equals(parameters[i].Name, name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
         }
     }
 }

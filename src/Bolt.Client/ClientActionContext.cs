@@ -16,9 +16,13 @@ namespace Bolt.Client
         {
             Proxy = proxy;
             Request = new HttpRequestMessage();
-            if (Parameters != null)
+            if (Parameters.Definition.CancellationTokenIndex >= 0 && parameters != null)
             {
-                RequestAborted = Parameters.OfType<CancellationToken>().FirstOrDefault();
+                var cancellation = parameters[Parameters.Definition.CancellationTokenIndex];
+                if (cancellation is CancellationToken)
+                {
+                    RequestAborted = (CancellationToken) cancellation;
+                }
             }
         }
 

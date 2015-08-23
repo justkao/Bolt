@@ -12,9 +12,9 @@ namespace Bolt.Server.Pipeline
 
         public override async Task InvokeAsync(ServerActionContext context)
         {
-            if (context.HasParameters && context.Parameters == null)
+            if (context.HasParameters && context.Parameters.Values == null)
             {
-                context.Parameters = await DeserializeParameters(context);
+                context.Parameters.Values = await DeserializeParameters(context);
             }
 
             await Next(context);
@@ -28,12 +28,21 @@ namespace Bolt.Server.Pipeline
 
         protected virtual async Task<object[]> DeserializeParameters(ServerActionContext context)
         {
-            IObjectSerializer rawParameters;
             try
             {
-                rawParameters =
-                    context.Configuration.Serializer.CreateDeserializer(
-                        await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted));
+                using (MemoryStream stream = await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted))
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+
+                    object[] parameterValues = context.Parameters.Values ?? new object[context.Parameters.Definition.Parameters.Length];
+                    context.Configuration.Serializer.Read(stream, context.Action, parameterValues);
+                    if (context.Parameters.Definition.CancellationTokenIndex >= 0)
+                    {
+                        parameterValues[context.Parameters.Definition.CancellationTokenIndex] = context.RequestAborted;
+                    }
+
+                    return parameterValues;
+                }
             }
             catch (Exception e)
             {
@@ -44,38 +53,6 @@ namespace Bolt.Server.Pipeline
                     context.RequestUrl,
                     e);
             }
-
-            ParameterInfo[] parameters = context.Action.GetParameters();
-            object[] parameterValues = new object[parameters.Length];
-
-            for (int i = 0; i < parameters.Length; i++)
-            {
-                ParameterInfo parameter = parameters[i];
-                if (parameter.IsCancellationToken())
-                {
-                    parameterValues[i] = context.RequestAborted;
-                }
-
-                try
-                {
-                    object val;
-                    if (rawParameters.TryRead(parameter.Name, parameter.ParameterType, out val))
-                    {
-                        parameterValues[i] = val;
-                    }
-                }
-                catch (Exception e)
-                {
-                    throw new BoltServerException(
-                        $"Failed to deserialize parameter '{parameter.Name}' for action '{context.Action.Name}'.",
-                        ServerErrorCode.DeserializeParameters,
-                        context.Action,
-                        context.RequestUrl,
-                        e);
-                }
-            }
-
-            return parameterValues;
         }
 
         protected virtual async Task HandleResponse(ServerActionContext context)

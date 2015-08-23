@@ -36,15 +36,6 @@ namespace Bolt.Core.Test
         }
 
         [Fact]
-        public void WriteString_EnsureNoRedundancy()
-        {
-            MemoryStream stream = new MemoryStream();
-            Serializer.Write(stream, "test");
-
-            Assert.Equal("test", Encoding.UTF8.GetString(stream.ToArray()));
-        }
-
-        [Fact]
         public void Read_NullObject_DoesNotThrow()
         {
             MemoryStream stream = new MemoryStream();

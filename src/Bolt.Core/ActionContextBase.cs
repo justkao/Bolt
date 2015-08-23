@@ -14,6 +14,7 @@ namespace Bolt
     public abstract class ActionContextBase : IContractProvider, IDisposable
     {
         private IDictionary<object, object> _items;
+        private RuntimeActionParameters _parameters;
 
         protected ActionContextBase(ActionContextBase context)
         {
@@ -24,7 +25,6 @@ namespace Bolt
             Parameters = context.Parameters;
             ActionResult = context.ActionResult;
             RequestAborted = context.RequestAborted;
-
         }
 
         protected ActionContextBase(Type contract, MethodInfo action, object[] parameters)
@@ -34,7 +34,11 @@ namespace Bolt
 
             Contract = contract;
             Action = action;
-            Parameters = parameters;
+            Parameters = new RuntimeActionParameters
+            {
+                Definition = BoltFramework.GetParameters(action),
+                Values = parameters
+            };
         }
 
         protected ActionContextBase()
@@ -45,17 +49,34 @@ namespace Bolt
 
         public MethodInfo Action { get; set; }
 
-        public object[] Parameters { get; set; }
-
         public object ActionResult { get; set; }
 
         public CancellationToken RequestAborted { get; set; }
 
-        public bool HasParameters => Action.GetParameters().Any();
+        public bool HasParameters => Parameters.Definition.Parameters.Any();
 
         public bool HasSerializableActionResult => ResponseType != typeof (void);
 
         public string ContractName => this.GetContractName();
+
+        public RuntimeActionParameters Parameters
+        {
+            get
+            {
+                if (_parameters == null)
+                {
+                    _parameters = new RuntimeActionParameters()
+                    {
+                        Definition = BoltFramework.GetParameters(Action),
+                        Values = null
+                    };
+                }
+
+                return _parameters;
+            }
+
+            set { _parameters = value; }
+        }
 
         public SessionContractDescriptor SessionContract => BoltFramework.SessionContractDescriptorProvider.Resolve(Contract);
 

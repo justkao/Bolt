@@ -51,9 +51,9 @@ namespace Bolt.Client.Proxy.Test
             {
                 ctxt.ActionResult = "some value";
                 Assert.Equal(MethodWithParameters, ctxt.Action);
-                Assert.Equal("val", ctxt.Parameters[0]);
-                Assert.Equal(10, ctxt.Parameters[1]);
-                Assert.Equal(CancellationToken.None, ctxt.Parameters[2]);
+                Assert.Equal("val", ctxt.Parameters.Values[0]);
+                Assert.Equal(10, ctxt.Parameters.Values[1]);
+                Assert.Equal(CancellationToken.None, ctxt.Parameters.Values[2]);
 
                 return Task.FromResult(0);
             });

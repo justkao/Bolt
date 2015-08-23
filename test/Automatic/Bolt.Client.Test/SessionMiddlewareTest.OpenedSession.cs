@@ -67,7 +67,7 @@ namespace Bolt.Client.Test
                 Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
                     c =>
                     {
-                        Assert.Equal("temp", c.Parameters[0]);
+                        Assert.Equal("temp", c.Parameters.Values[0]);
                     }).Verifiable();
 
                 await Proxy.CloseSession("temp");

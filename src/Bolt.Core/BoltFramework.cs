@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -10,6 +11,8 @@ namespace Bolt
 {
     public static class BoltFramework
     {
+        public static ConcurrentDictionary<MethodInfo, ActionParametersDescriptor> _parameters = new ConcurrentDictionary<MethodInfo, ActionParametersDescriptor>(); 
+
         public const string AsyncPostFix = "Async";
 
         public static readonly ISessionContractDescriptorProvider SessionContractDescriptorProvider = new SessionContractDescriptorProvider();
@@ -49,6 +52,29 @@ namespace Bolt
                 throw new InvalidOperationException(
                     $"Unable to use interface '{contract.FullName}' as contract because it methods with the same name.");
             }
+        }
+
+        public static ActionParametersDescriptor GetParameters(MethodInfo method)
+        {
+            return _parameters.GetOrAdd(method, m =>
+            {
+                ParameterInfo[] parameters = method.GetParameters();
+
+                ActionParametersDescriptor descriptor = new ActionParametersDescriptor();
+                descriptor.Action = method;
+                descriptor.Parameters = parameters.Select(p => new ParameterDescriptor(p.ParameterType, p.Name)).ToArray();
+                descriptor.HasSerializableParameters = GetSerializableParameters(method).Any();
+                descriptor.CancellationTokenIndex = -1;
+                for (int i = 0; i < parameters.Length; i++)
+                {
+                    if (parameters[i].IsCancellationToken())
+                    {
+                        descriptor.CancellationTokenIndex = i;
+                    }
+                }
+
+                return descriptor;
+            });
         }
 
         public static Type GetResultType(MethodInfo method)
@@ -107,6 +133,12 @@ namespace Bolt
             return true;
         }
 
+        public static SessionContractDescriptor GetSessionDescriptor(Type contract)
+        {
+            return SessionContractDescriptorProvider.Resolve(contract);
+        }
+
+
         public static IEnumerable<ParameterInfo> GetSerializableParameters(MethodInfo method)
         {
             ParameterInfo[] p = method.GetParameters();
@@ -115,12 +147,7 @@ namespace Bolt
                 return Enumerable.Empty<ParameterInfo>();
             }
 
-            return method.GetParameters().Where(info => info.ParameterType != typeof (CancellationToken) && info.ParameterType != typeof (CancellationToken?));
-        }
-
-        public static SessionContractDescriptor GetSessionDescriptor(Type contract)
-        {
-            return SessionContractDescriptorProvider.Resolve(contract);
+            return method.GetParameters().Where(info => info.ParameterType != typeof(CancellationToken) && info.ParameterType != typeof(CancellationToken?));
         }
 
         public static void ValidateParameters(MethodInfo method, object[] parameters)

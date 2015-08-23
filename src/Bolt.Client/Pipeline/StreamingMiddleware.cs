@@ -41,7 +41,7 @@ namespace Bolt.Client.Pipeline
 
         private static void PrepareStreamingContent(ClientActionContext context, Metadata metadata)
         {
-            BoltFramework.ValidateParameters(context.Action, context.Parameters);
+            BoltFramework.ValidateParameters(context.Action, context.Parameters.Values);
 
             if (metadata.ContentResultType != null)
             {
@@ -51,7 +51,7 @@ namespace Bolt.Client.Pipeline
 
             if (metadata.HttpContentIndex >= 0)
             {
-                HttpContent content = (HttpContent)context.Parameters[metadata.HttpContentIndex];
+                HttpContent content = (HttpContent)context.Parameters.Values[metadata.HttpContentIndex];
                 if (content == null)
                 {
                     throw new BoltClientException(

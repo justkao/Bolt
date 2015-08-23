@@ -18,7 +18,7 @@ namespace Bolt.Server.Pipeline
             {
                 try
                 {
-                    BoltFramework.ValidateParameters(context.Action, context.Parameters);
+                    BoltFramework.ValidateParameters(context.Action, context.Parameters.Values);
                 }
                 catch (Exception e)
                 {
@@ -83,7 +83,7 @@ namespace Bolt.Server.Pipeline
                 object result;
                 try
                 {
-                    result = implementedMethod.Invoke(context.ContractInstance, context.Parameters);
+                    result = implementedMethod.Invoke(context.ContractInstance, context.Parameters.Values);
                 }
                 catch (TargetInvocationException e)
                 {

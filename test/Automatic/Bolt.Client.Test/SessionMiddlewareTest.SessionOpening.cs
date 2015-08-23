@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Bolt.Client.Pipeline;
-using Bolt.Pipeline;
 using Moq;
 using Xunit;
 
@@ -57,7 +56,7 @@ namespace Bolt.Client.Test
                     (next, ctxt) =>
                         {
                             Assert.Equal(SessionContract.InitSession, ctxt.Action);
-                            Assert.Equal("test", ctxt.Parameters[0]);
+                            Assert.Equal("test", ctxt.Parameters.Values[0]);
                             ctxt.ActionResult = "result";
                             ctxt.ServerConnection = ConnectionDescriptor;
                             return next(ctxt);

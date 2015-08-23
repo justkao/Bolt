@@ -82,7 +82,7 @@ namespace Bolt.Client.Pipeline
                     return;
                 }
 
-                if (session.RequiresDestroyParameters && context.Parameters == null)
+                if (session.RequiresDestroyParameters && context.Parameters.Values == null)
                 {
                     // we are trying to close proxy using IProxy.CloseAsync even when the destroy action requires actual parameters
                     throw new BoltClientException(
@@ -232,7 +232,7 @@ namespace Bolt.Client.Pipeline
                 {
                     try
                     {
-                        BoltFramework.ValidateParameters(sessionDescriptor.Contract.InitSession, initSessionContext.Parameters);
+                        BoltFramework.ValidateParameters(sessionDescriptor.Contract.InitSession, initSessionContext.Parameters.Values);
                     }
                     catch (Exception e)
                     {
@@ -266,7 +266,7 @@ namespace Bolt.Client.Pipeline
                     }
 
                     sessionDescriptor.InitSessionResult = initSessionContext.ActionResult;
-                    sessionDescriptor.InitSessionParameters = initSessionContext.Parameters;
+                    sessionDescriptor.InitSessionParameters = initSessionContext.Parameters.Values;
                     sessionDescriptor.SessionId = sessionId;
                     sessionDescriptor.ServerConnection = initSessionContext.ServerConnection;
                     sessionDescriptor.ChangeState(context.Proxy, ProxyState.Open);

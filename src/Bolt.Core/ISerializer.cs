@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Reflection;
 
 namespace Bolt
 {
@@ -11,9 +12,9 @@ namespace Bolt
 
         string ContentType { get; }
 
-        IObjectSerializer CreateSerializer(Stream inputStream);
+        void Write(Stream stream, MethodInfo method, object[] values);
 
-        IObjectSerializer CreateDeserializer(Stream inputStream);
+        void Read(Stream stream, MethodInfo method, object[] output);
     }
 
     public static class SerializerExtensions
