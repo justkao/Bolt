@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Pipeline;
 
@@ -9,6 +8,8 @@ namespace Bolt.Server.Pipeline
 {
     public class SerializationMiddleware : MiddlewareBase<ServerActionContext>
     {
+        private const int DefaultBuffer = 1024*1024;
+
         public override async Task InvokeAsync(ServerActionContext context)
         {
             if (context.HasParameters && context.Parameters == null)
@@ -106,7 +107,7 @@ namespace Bolt.Server.Pipeline
                     context.HttpContext.Response.ContentLength = stream.Length;
                     context.HttpContext.Response.ContentType = context.Configuration.Serializer.ContentType;
 
-                    await stream.CopyToAsync(context.HttpContext.Response.Body);
+                    await stream.CopyToAsync(context.HttpContext.Response.Body, DefaultBuffer, context.RequestAborted);
                 }
                 else
                 {

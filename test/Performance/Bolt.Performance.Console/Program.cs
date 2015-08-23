@@ -64,8 +64,8 @@ namespace Bolt.Performance.Console
                     }
                     else
                     {
-                        ExecuteConcurrencyTest(proxies, 1, repeats);
                         ExecuteConcurrencyTest(proxies, 100, repeats);
+                        ExecuteConcurrencyTest(proxies, 1, repeats);
                     }
 
                     Console.WriteLine("Test finished. Press any key to exit program ... ");
@@ -204,11 +204,14 @@ namespace Bolt.Performance.Console
             Console.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}, Concurrency = {degree.ToString().Bold()}");
 
             result.Actions[actionName] = new ActionMetadata();
+            ActionMetadata previousMetadata = null;
+            previous?.Actions.TryGetValue(actionName, out previousMetadata);
+
             foreach (var item in contracts)
             {
                 try
                 {
-                    ExecuteAsync(action, count, degree, item.Item2, item.Item1, result.Actions[actionName], previous?.Actions[actionName])
+                    ExecuteAsync(action, count, degree, item.Item2, item.Item1, result.Actions[actionName], previousMetadata)
                         .GetAwaiter()
                         .GetResult();
                 }
@@ -227,11 +230,14 @@ namespace Bolt.Performance.Console
             Console.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}, Concurrency = {degree.ToString().Bold()}");
 
             result.Actions[actionName] = new ActionMetadata();
+            ActionMetadata previousMetadata = null;
+            previous?.Actions.TryGetValue(actionName, out previousMetadata);
+
             foreach (var item in contracts)
             {
                 try
                 {
-                    Execute(action, count, degree, item.Item2, item.Item1, result.Actions[actionName], previous?.Actions[actionName]);
+                    Execute(action, count, degree, item.Item2, item.Item1, result.Actions[actionName], previousMetadata);
                 }
                 catch (Exception e)
                 {
