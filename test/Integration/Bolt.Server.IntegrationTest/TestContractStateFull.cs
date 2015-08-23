@@ -7,7 +7,6 @@ namespace Bolt.Server.IntegrationTest
     public class TestContractStateFull : ITestContractStateFull
     {
         private readonly ISessionProvider _sessionProvider;
-        private bool _initialized;
         private string _state;
         private bool _failProxy;
 
@@ -50,7 +49,6 @@ namespace Bolt.Server.IntegrationTest
 
         public void Destroy()
         {
-            _initialized = false;
         }
 
         public string GetSessionId()

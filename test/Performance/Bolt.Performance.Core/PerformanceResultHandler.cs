@@ -11,25 +11,29 @@ namespace Bolt.Performance
     {
         public string GetReportFileName(string name, Version version)
         {
-            return $"{name}_{version}.json";
+            return $"{name}_{DateTime.UtcNow.ToFileTimeUtc()}_{version}.json";
         }
 
-        public Version ParseVersion(string name)
+        public PerformanceResult ReadLatestReport(string directory, int repeats, int concurrency)
         {
-            Version version;
-            Version.TryParse(Path.GetFileNameWithoutExtension(name).Split('_').Last(), out version);
-            return version;
+            return ReadReports(directory)
+                .Where(r => r.Machine == Environment.MachineName && r.Concurrency == concurrency && r.Repeats == repeats)
+                .OrderByDescending(r => r.Time)
+                .FirstOrDefault();
         }
 
-        public PerformanceResult ReadLatestReport(string directory, Version excludedVersion)
+        public void WriteReportToDirectory(string directory, PerformanceResult result)
         {
-            var found = GetLatestReportVersion(directory, excludedVersion);
-            if (Equals(found, default(KeyValuePair<string,Version>)))
-            {
-                return null;
-            }
+            WriteReport(Path.Combine(directory, GetReportFileName("report", new Version(result.Version))), result);
+        }
 
-            return ReadReport(found.Key);
+        public void WriteReport(string file, PerformanceResult result)
+        {
+            var settings = new JsonSerializerSettings();
+            settings.MissingMemberHandling = MissingMemberHandling.Ignore;
+            settings.Formatting = Formatting.Indented;
+
+            File.WriteAllText(file, JsonConvert.SerializeObject(result, settings));
         }
 
         public PerformanceResult ReadReport(string file)
@@ -39,28 +43,28 @@ namespace Bolt.Performance
             return JsonConvert.DeserializeObject<PerformanceResult>(File.ReadAllText(file), settings);
         }
 
-        public KeyValuePair<string, Version> GetLatestReportVersion(string directory, Version excludedVersion)
+        public PerformanceResult TryReadReport(string file)
         {
-            return ReadReportVersions(directory).FirstOrDefault(p => p.Value != excludedVersion);
+            try
+            {
+                return ReadReport(file);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
         }
 
         public IEnumerable<PerformanceResult> ReadReports(string directory)
         {
-            return ReadReportVersions(directory).Select(v => ReadReport(v.Key));
-        }
-
-        public IEnumerable<KeyValuePair<string, Version>> ReadReportVersions(string directory)
-        {
             if (!Directory.Exists(directory))
             {
-                return Enumerable.Empty<KeyValuePair<string, Version>>();
+                return Enumerable.Empty<PerformanceResult>();
             }
 
-            return from report in Directory.GetFiles(directory)
-                   let version = ParseVersion(report)
-                   where version != null
-                   orderby version descending
-                   select new KeyValuePair<string, Version>(report, version);
+            return Directory.GetFiles(directory).Select(TryReadReport).Where(r => r != null);
         }
+
+
     }
 }

@@ -1,0 +1,97 @@
+{
+  "Version": "0.16.0.0",
+  "Concurrency": 1,
+  "Repeats": 100000,
+  "Machine": "KAO-PC",
+  "Cores": 4,
+  "Time": "2015-08-23T08:14:57.0180693Z",
+  "Environment": {
+    "OperatingSystem": "Windows",
+    "OperatingSystemVersion": "6.1.7601.65536",
+    "RuntimeType": "CLR",
+    "RuntimeArchitecture": "x86",
+    "RuntimeVersion": "1.0.0-beta8-15118"
+  },
+  "Actions": {
+    "MethodWithManyArguments": {
+      "Metrics": {
+        "Bolt": 30606,
+        "Bolt(G)": 30552,
+        "Bolt(K)": 28168,
+        "WCF": 19769
+      }
+    },
+    "MethodWithManyArgumentsAsync": {
+      "Metrics": {
+        "Bolt": 29939,
+        "Bolt(G)": 30012,
+        "Bolt(K)": 27807,
+        "WCF": 21383
+      }
+    },
+    "DoNothing": {
+      "Metrics": {
+        "Bolt": 13938,
+        "Bolt(G)": 13935,
+        "Bolt(K)": 13404,
+        "WCF": 14817
+      }
+    },
+    "DoNothingAsync": {
+      "Metrics": {
+        "Bolt": 13369,
+        "Bolt(G)": 13052,
+        "Bolt(K)": 12934,
+        "WCF": 16493
+      }
+    },
+    "GetSimpleType": {
+      "Metrics": {
+        "Bolt": 26145,
+        "Bolt(G)": 25992,
+        "Bolt(K)": 23974,
+        "WCF": 15127
+      }
+    },
+    "GetSinglePerson": {
+      "Metrics": {
+        "Bolt": 29891,
+        "Bolt(G)": 30017,
+        "Bolt(K)": 27209,
+        "WCF": 18453
+      }
+    },
+    "GetSinglePersonAsync": {
+      "Metrics": {
+        "Bolt": 29773,
+        "Bolt(G)": 29532,
+        "Bolt(K)": 27437,
+        "WCF": 20704
+      }
+    },
+    "GetManyPersons": {
+      "Metrics": {
+        "Bolt": 94916,
+        "Bolt(G)": 95400,
+        "Bolt(K)": 97674,
+        "WCF": 80100
+      }
+    },
+    "DoNothingWithComplexParameter": {
+      "Metrics": {
+        "Bolt": 143702,
+        "Bolt(G)": 144232,
+        "Bolt(K)": 123489,
+        "WCF": 76546
+      }
+    },
+    "DoNothingWithComplexParameterAsync": {
+      "Metrics": {
+        "Bolt": 141851,
+        "Bolt(G)": 142513,
+        "Bolt(K)": 121389,
+        "WCF": 77743
+      }
+    }
+  }
+}

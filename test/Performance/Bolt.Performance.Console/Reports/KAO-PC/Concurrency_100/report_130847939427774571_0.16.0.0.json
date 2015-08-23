@@ -1,0 +1,97 @@
+{
+  "Version": "0.16.0.0",
+  "Concurrency": 100,
+  "Repeats": 100000,
+  "Machine": "KAO-PC",
+  "Cores": 4,
+  "Time": "2015-08-23T08:47:55.6025905Z",
+  "Environment": {
+    "OperatingSystem": "Windows",
+    "OperatingSystemVersion": "6.1.7601.65536",
+    "RuntimeType": "CLR",
+    "RuntimeArchitecture": "x86",
+    "RuntimeVersion": "1.0.0-beta8-15118"
+  },
+  "Actions": {
+    "MethodWithManyArguments": {
+      "Metrics": {
+        "Bolt": 11774,
+        "Bolt(G)": 11659,
+        "Bolt(K)": 10976,
+        "WCF": 6955
+      }
+    },
+    "MethodWithManyArgumentsAsync": {
+      "Metrics": {
+        "Bolt": 10420,
+        "Bolt(G)": 10523,
+        "Bolt(K)": 9255,
+        "WCF": 11088
+      }
+    },
+    "DoNothing": {
+      "Metrics": {
+        "Bolt": 5988,
+        "Bolt(G)": 6060,
+        "Bolt(K)": 5528,
+        "WCF": 5626
+      }
+    },
+    "DoNothingAsync": {
+      "Metrics": {
+        "Bolt": 4439,
+        "Bolt(G)": 4438,
+        "Bolt(K)": 3677,
+        "WCF": 8328
+      }
+    },
+    "GetSimpleType": {
+      "Metrics": {
+        "Bolt": 11984,
+        "Bolt(G)": 11985,
+        "Bolt(K)": 10417,
+        "WCF": 5810
+      }
+    },
+    "GetSinglePerson": {
+      "Metrics": {
+        "Bolt": 12913,
+        "Bolt(G)": 12842,
+        "Bolt(K)": 11581,
+        "WCF": 6585
+      }
+    },
+    "GetSinglePersonAsync": {
+      "Metrics": {
+        "Bolt": 11722,
+        "Bolt(G)": 11105,
+        "Bolt(K)": 10214,
+        "WCF": 10139
+      }
+    },
+    "GetManyPersons": {
+      "Metrics": {
+        "Bolt": 28279,
+        "Bolt(G)": 28105,
+        "Bolt(K)": 26404,
+        "WCF": 21792
+      }
+    },
+    "DoNothingWithComplexParameter": {
+      "Metrics": {
+        "Bolt": 40194,
+        "Bolt(G)": 40425,
+        "Bolt(K)": 35512,
+        "WCF": 20755
+      }
+    },
+    "DoNothingWithComplexParameterAsync": {
+      "Metrics": {
+        "Bolt": 42911,
+        "Bolt(G)": 44694,
+        "Bolt(K)": 43280,
+        "WCF": 37536
+      }
+    }
+  }
+}

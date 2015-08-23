@@ -127,11 +127,11 @@ namespace Bolt.Performance.Console
             var reportsDirectory = GetReportsDirectory(testCase);
 
             PerformanceResultHandler handler = new PerformanceResultHandler();
-            PerformanceResult previous = handler.ReadLatestReport(reportsDirectory, new Version(result.Version));
+            PerformanceResult previous = handler.ReadLatestReport(reportsDirectory, repeats, concurrency);
             if (previous != null)
             {
                 Console.WriteLine(
-                    $"Detected previous report for version '{previous.Version}' that will be used to compare the performancce."
+                    $"Detected previous report for version '{previous.Version}' from '{previous.Time.ToLocalTime()}' that will be used to compare the performance."
                         .Yellow());
             }
 
@@ -144,7 +144,7 @@ namespace Bolt.Performance.Console
             }
 
             Console.WriteLine($"Writing performance overview to '{file.Yellow().Bold()}'");
-            File.WriteAllText(file, JsonConvert.SerializeObject(result, Formatting.Indented));
+            handler.WriteReportToDirectory(reportsDirectory, result);
             Console.WriteLine(string.Empty);
         }
 
