@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Bolt.Session
+namespace Bolt.Metadata
 {
-    public class SessionContractDescriptor
+    public class SessionContractMetadata
     {
-        public SessionContractDescriptor(Type contract, MethodInfo initSession, MethodInfo destroySession)
+        public SessionContractMetadata(Type contract, MethodInfo initSession, MethodInfo destroySession)
         {
             if (contract == null) throw new ArgumentNullException(nameof(contract));
             if (initSession == null) throw new ArgumentNullException(nameof(initSession));

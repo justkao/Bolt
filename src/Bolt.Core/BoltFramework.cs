@@ -5,17 +5,17 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-using Bolt.Session;
+using Bolt.Metadata;
 
 namespace Bolt
 {
     public static class BoltFramework
     {
-        public static ConcurrentDictionary<MethodInfo, ActionParametersDescriptor> _parameters = new ConcurrentDictionary<MethodInfo, ActionParametersDescriptor>(); 
-
         public const string AsyncPostFix = "Async";
 
-        public static readonly ISessionContractDescriptorProvider SessionContractDescriptorProvider = new SessionContractDescriptorProvider();
+        public static readonly ISessionContractMetadataProvider SessionMetadata = new SessionContractMetadataProvider();
+
+        public static readonly IActionMetadataProvider ActionMetadata = new ActionMetadataProvider();
 
         public static IEnumerable<MethodInfo> GetContractActions(Type contract)
         {
@@ -52,44 +52,6 @@ namespace Bolt
                 throw new InvalidOperationException(
                     $"Unable to use interface '{contract.FullName}' as contract because it methods with the same name.");
             }
-        }
-
-        public static ActionParametersDescriptor GetParameters(MethodInfo method)
-        {
-            return _parameters.GetOrAdd(method, m =>
-            {
-                ParameterInfo[] parameters = method.GetParameters();
-
-                ActionParametersDescriptor descriptor = new ActionParametersDescriptor();
-                descriptor.Action = method;
-                descriptor.Parameters = parameters.Select(p => new ParameterDescriptor(p.ParameterType, p.Name)).ToArray();
-                descriptor.HasSerializableParameters = GetSerializableParameters(method).Any();
-                descriptor.CancellationTokenIndex = -1;
-                for (int i = 0; i < parameters.Length; i++)
-                {
-                    if (parameters[i].IsCancellationToken())
-                    {
-                        descriptor.CancellationTokenIndex = i;
-                    }
-                }
-
-                return descriptor;
-            });
-        }
-
-        public static Type GetResultType(MethodInfo method)
-        {
-            if (method == null)
-            {
-                throw new ArgumentNullException(nameof(method));
-            }
-
-            if (typeof(Task).IsAssignableFrom(method.ReturnType))
-            {
-                return TypeHelper.GetTaskInnerTypeOrNull(method.ReturnType) ?? typeof(void);
-            }
-
-            return method.ReturnType;
         }
 
         public static string GetContractName(Type contract)
@@ -133,21 +95,9 @@ namespace Bolt
             return true;
         }
 
-        public static SessionContractDescriptor GetSessionDescriptor(Type contract)
+        public static SessionContractMetadata GetSessionDescriptor(Type contract)
         {
             return SessionContractDescriptorProvider.Resolve(contract);
-        }
-
-
-        public static IEnumerable<ParameterInfo> GetSerializableParameters(MethodInfo method)
-        {
-            ParameterInfo[] p = method.GetParameters();
-            if (p.Length == 0)
-            {
-                return Enumerable.Empty<ParameterInfo>();
-            }
-
-            return method.GetParameters().Where(info => info.ParameterType != typeof(CancellationToken) && info.ParameterType != typeof(CancellationToken?));
         }
 
         public static void ValidateParameters(MethodInfo method, object[] parameters)

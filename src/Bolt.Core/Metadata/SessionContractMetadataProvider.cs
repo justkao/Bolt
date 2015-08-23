@@ -3,42 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace Bolt.Session
+namespace Bolt.Metadata
 {
-    public class SessionContractDescriptorProvider : ISessionContractDescriptorProvider
+    public class SessionContractMetadataProvider : ValueCache<Type,SessionContractMetadata>, ISessionContractMetadataProvider
     {
-        private readonly Dictionary<Type, SessionContractDescriptor> _descriptors = new Dictionary<Type, SessionContractDescriptor>();
-        private readonly object _syncRoot = new object(); 
-
-        public SessionContractDescriptor Resolve(Type contract)
+        public SessionContractMetadata Resolve(Type contract)
         {
             if (contract == null) throw new ArgumentNullException(nameof(contract));
-
-            lock (_syncRoot)
-            {
-                SessionContractDescriptor descriptor;
-                if (_descriptors.TryGetValue(contract, out descriptor))
-                {
-                    return descriptor;
-                }
-
-                descriptor = Analyze(contract);
-                _descriptors[contract] = descriptor;
-                return descriptor;
-            }
+            return Get(contract);
         }
 
         public MethodInfo InitSessionDummy => InitSessionAction;
 
         public MethodInfo DestroySessionDummy => DestroySessionAction;
 
-        protected virtual SessionContractDescriptor Analyze(Type contract)
+        protected virtual SessionContractMetadata Analyze(Type contract)
         {
             BoltFramework.ValidateContract(contract);
 
             Type[] allInterfaces = new[] {contract}.Concat(contract.GetTypeInfo().ImplementedInterfaces).ToArray();
 
-            return new SessionContractDescriptor(contract,
+            return new SessionContractMetadata(contract,
                 FindMethod(allInterfaces, nameof(InitSessionAttribute)) ?? InitSessionAction,
                 FindMethod(allInterfaces, nameof(DestroySessionAttribute)) ?? DestroySessionAction);
         }
@@ -71,6 +56,11 @@ namespace Bolt.Session
 
         private static void DestroyBoltSession()
         {
+        }
+
+        protected override SessionContractMetadata Create(Type key)
+        {
+            return Analyze(key);
         }
     }
 }

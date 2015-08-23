@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
-using Bolt.Session;
+using Bolt.Metadata;
 
 namespace Bolt
 {
@@ -14,7 +12,6 @@ namespace Bolt
     public abstract class ActionContextBase : IContractProvider, IDisposable
     {
         private IDictionary<object, object> _items;
-        private RuntimeActionParameters _parameters;
 
         protected ActionContextBase(ActionContextBase context)
         {
@@ -34,11 +31,8 @@ namespace Bolt
 
             Contract = contract;
             Action = action;
-            Parameters = new RuntimeActionParameters
-            {
-                Definition = BoltFramework.GetParameters(action),
-                Values = parameters
-            };
+            Parameters = parameters;
+            ActionMetadata = BoltFramework.ActionMetadata.Resolve(action);
         }
 
         protected ActionContextBase()
@@ -49,49 +43,15 @@ namespace Bolt
 
         public MethodInfo Action { get; set; }
 
+        public ActionMetadata ActionMetadata { get; set; }
+
         public object ActionResult { get; set; }
+
+        public object Parameters { get; set; }
 
         public CancellationToken RequestAborted { get; set; }
 
-        public bool HasParameters => Parameters.Definition.Parameters.Any();
-
-        public bool HasSerializableActionResult => ResponseType != typeof (void);
-
         public string ContractName => this.GetContractName();
-
-        public RuntimeActionParameters Parameters
-        {
-            get
-            {
-                if (_parameters == null)
-                {
-                    _parameters = new RuntimeActionParameters()
-                    {
-                        Definition = BoltFramework.GetParameters(Action),
-                        Values = null
-                    };
-                }
-
-                return _parameters;
-            }
-
-            set { _parameters = value; }
-        }
-
-        public SessionContractDescriptor SessionContract => BoltFramework.SessionContractDescriptorProvider.Resolve(Contract);
-
-        public Type ResponseType
-        {
-            get
-            {
-                if (typeof (Task).IsAssignableFrom(Action.ReturnType))
-                {
-                    return TypeHelper.GetTaskInnerTypeOrNull(Action.ReturnType) ?? typeof (void);
-                }
-
-                return Action.ReturnType;
-            }
-        }
 
         public IDictionary<object, object> Items
         {
