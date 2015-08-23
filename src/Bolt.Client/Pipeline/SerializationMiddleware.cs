@@ -11,7 +11,8 @@ namespace Bolt.Client.Pipeline
 {
     public class SerializationMiddleware : MiddlewareBase<ClientActionContext>
     {
-        public SerializationMiddleware( ISerializer serializer, IExceptionWrapper exceptionWrapper, IClientErrorProvider errorProvider)
+        public SerializationMiddleware(ISerializer serializer, IExceptionWrapper exceptionWrapper,
+            IClientErrorProvider errorProvider)
         {
             if (serializer == null) throw new ArgumentNullException(nameof(serializer));
             if (exceptionWrapper == null) throw new ArgumentNullException(nameof(exceptionWrapper));
@@ -100,69 +101,52 @@ namespace Bolt.Client.Pipeline
                     e);
             }
 
-            IObjectSerializer parameterSerializer = Serializer.CreateSerializer();
-            ParameterInfo[] parameterTypes = context.Action.GetParameters();
-            for (int i = 0; i < context.Parameters.Length; i++)
+            MemoryStream stream = new MemoryStream();
+            using (IObjectSerializer parameterSerializer = Serializer.CreateSerializer(stream))
             {
-                if (context.Parameters[i] == null)
+                ParameterInfo[] parameterTypes = context.Action.GetParameters();
+                for (int i = 0; i < context.Parameters.Length; i++)
                 {
-                    continue;
+                    if (context.Parameters[i] == null)
+                    {
+                        continue;
+                    }
+
+                    if (context.Parameters[i] is CancellationToken)
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        parameterSerializer.Write(parameterTypes[i].Name, context.Parameters[i].GetType(),
+                            context.Parameters[i]);
+                    }
+                    catch (BoltException)
+                    {
+                        throw;
+                    }
+                    catch (Exception e)
+                    {
+                        throw new BoltClientException(
+                            $"Failed to serialize value for parameter '{parameterTypes[i].Name}' and action '{context.Action.Name}'.",
+                            ClientErrorCode.SerializeParameters,
+                            context.Action,
+                            e);
+                    }
                 }
 
-                if (context.Parameters[i] is CancellationToken)
+                if (parameterSerializer.IsEmpty)
                 {
-                    continue;
+                    return null;
                 }
 
-                try
-                {
-                    parameterSerializer.Write(parameterTypes[i].Name, context.Parameters[i].GetType(), context.Parameters[i]);
-                }
-                catch (BoltException)
-                {
-                    throw;
-                }
-                catch (Exception e)
-                {
-                    throw new BoltClientException(
-                        $"Failed to serialize value for parameter '{parameterTypes[i].Name}' and action '{context.Action.Name}'.",
-                        ClientErrorCode.SerializeParameters,
-                        context.Action,
-                        e);
-                }
-            }
-
-            if (parameterSerializer.IsEmpty)
-            {
-                return null;
-            }
-
-            try
-            {
-                Stream resultStream = parameterSerializer.GetOutputStream();
-                byte[] rawData;
-                if (resultStream is MemoryStream)
-                {
-                    rawData = (resultStream as MemoryStream).ToArray();
-                }
-                else
-                {
-                    rawData = resultStream.Copy().ToArray();
-                }
-
-                ByteArrayContent content = new ByteArrayContent(rawData);
-                content.Headers.ContentLength = rawData.Length;
+                ByteArrayContent content = new ByteArrayContent(stream.ToArray());
+                content.Headers.ContentLength = stream.Length;
                 context.Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Serializer.ContentType));
                 return content;
             }
-            catch (Exception e)
-            {
-                throw new BoltClientException(
-                    $"Failed to serialize parameters for action '{context.Action.Name}'.",
-                    ClientErrorCode.SerializeParameters,
-                    context.Action,
-                    e);
-            }
+
         }
 
         protected virtual object DeserializeResponse(ClientActionContext context, Stream stream)

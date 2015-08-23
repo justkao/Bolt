@@ -31,7 +31,7 @@ namespace Bolt.Server.Pipeline
             try
             {
                 rawParameters =
-                    context.Configuration.Serializer.CreateSerializer(
+                    context.Configuration.Serializer.CreateDeserializer(
                         await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted));
             }
             catch (Exception e)

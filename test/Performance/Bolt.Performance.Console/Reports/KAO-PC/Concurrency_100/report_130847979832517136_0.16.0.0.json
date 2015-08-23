@@ -1,0 +1,97 @@
+{
+  "Version": "0.16.0.0",
+  "Concurrency": 100,
+  "Repeats": 100000,
+  "Machine": "KAO-PC",
+  "Cores": 4,
+  "Time": "2015-08-23T09:56:46.8800227Z",
+  "Environment": {
+    "OperatingSystem": "Windows",
+    "OperatingSystemVersion": "6.1.7601.65536",
+    "RuntimeType": "CLR",
+    "RuntimeArchitecture": "x86",
+    "RuntimeVersion": "1.0.0-beta8-15118"
+  },
+  "Actions": {
+    "MethodWithManyArguments": {
+      "Metrics": {
+        "Bolt": 10491,
+        "Bolt(G)": 10598,
+        "Bolt(K)": 10670,
+        "WCF": 6854
+      }
+    },
+    "MethodWithManyArgumentsAsync": {
+      "Metrics": {
+        "Bolt": 8795,
+        "Bolt(G)": 8758,
+        "Bolt(K)": 7754,
+        "WCF": 11232
+      }
+    },
+    "DoNothing": {
+      "Metrics": {
+        "Bolt": 6225,
+        "Bolt(G)": 6113,
+        "Bolt(K)": 5503,
+        "WCF": 5517
+      }
+    },
+    "DoNothingAsync": {
+      "Metrics": {
+        "Bolt": 4356,
+        "Bolt(G)": 4453,
+        "Bolt(K)": 3727,
+        "WCF": 8483
+      }
+    },
+    "GetSimpleType": {
+      "Metrics": {
+        "Bolt": 11610,
+        "Bolt(G)": 10920,
+        "Bolt(K)": 9681,
+        "WCF": 5619
+      }
+    },
+    "GetSinglePerson": {
+      "Metrics": {
+        "Bolt": 12154,
+        "Bolt(G)": 12199,
+        "Bolt(K)": 10661,
+        "WCF": 6585
+      }
+    },
+    "GetSinglePersonAsync": {
+      "Metrics": {
+        "Bolt": 10428,
+        "Bolt(G)": 10343,
+        "Bolt(K)": 9073,
+        "WCF": 10174
+      }
+    },
+    "GetManyPersons": {
+      "Metrics": {
+        "Bolt": 28184,
+        "Bolt(G)": 28256,
+        "Bolt(K)": 26527,
+        "WCF": 21711
+      }
+    },
+    "DoNothingWithComplexParameter": {
+      "Metrics": {
+        "Bolt": 28761,
+        "Bolt(G)": 28933,
+        "Bolt(K)": 27108,
+        "WCF": 20820
+      }
+    },
+    "DoNothingWithComplexParameterAsync": {
+      "Metrics": {
+        "Bolt": 29821,
+        "Bolt(G)": 29756,
+        "Bolt(K)": 29111,
+        "WCF": 38146
+      }
+    }
+  }
+}

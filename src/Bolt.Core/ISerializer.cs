@@ -11,9 +11,9 @@ namespace Bolt
 
         string ContentType { get; }
 
-        IObjectSerializer CreateSerializer();
-
         IObjectSerializer CreateSerializer(Stream inputStream);
+
+        IObjectSerializer CreateDeserializer(Stream inputStream);
     }
 
     public static class SerializerExtensions
