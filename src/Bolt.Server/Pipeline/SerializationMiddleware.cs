@@ -85,7 +85,6 @@ namespace Bolt.Server.Pipeline
             if (context.HasSerializableActionResult && context.ActionResult != null)
             {
                 MemoryStream stream = new MemoryStream();
-
                 try
                 {
                     context.Configuration.Serializer.Write(stream, context.ActionResult);
@@ -100,13 +99,14 @@ namespace Bolt.Server.Pipeline
                         e);
                 }
 
-                byte[] raw = stream.ToArray();
-                if (raw.Length > 0)
+                stream.Seek(0, SeekOrigin.Begin);
+
+                if (stream.Length > 0)
                 {
-                    context.HttpContext.Response.ContentLength = raw.Length;
+                    context.HttpContext.Response.ContentLength = stream.Length;
                     context.HttpContext.Response.ContentType = context.Configuration.Serializer.ContentType;
 
-                    await context.HttpContext.Response.Body.WriteAsync(raw, 0, raw.Length, context.RequestAborted);
+                    await stream.CopyToAsync(context.HttpContext.Response.Body);
                 }
                 else
                 {

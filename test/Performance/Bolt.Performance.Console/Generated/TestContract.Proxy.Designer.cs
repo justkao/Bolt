@@ -137,9 +137,9 @@ namespace Bolt.Performance.Contracts
             return this.SendAsync<List<Person>>(__GetManyPersonsAction);
         }
 
-        public virtual Task<List<Person>> GetManyPersonsAsAsync(Person person)
+        public virtual Task<List<Person>> GetManyPersonsAsAsync()
         {
-            return this.SendAsync<List<Person>>(__GetManyPersonsAsAsyncAction, person);
+            return this.SendAsync<List<Person>>(__GetManyPersonsAsAsyncAction);
         }
 
         public virtual void Throws()

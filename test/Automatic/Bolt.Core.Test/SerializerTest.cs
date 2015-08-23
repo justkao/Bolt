@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Bolt.Test.Common;
 using Xunit;
 
@@ -32,6 +33,15 @@ namespace Bolt.Core.Test
         {
             MemoryStream stream = new MemoryStream();
             Serializer.Write(stream, null);
+        }
+
+        [Fact]
+        public void WriteString_EnsureNoRedundancy()
+        {
+            MemoryStream stream = new MemoryStream();
+            Serializer.Write(stream, "test");
+
+            Assert.Equal("test", Encoding.UTF8.GetString(stream.ToArray()));
         }
 
         [Fact]

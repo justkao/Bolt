@@ -87,7 +87,7 @@ namespace Bolt.Performance.Contracts
             return Enumerable.Range(0, 100).Select(Person.Create).ToList();
         }
 
-        public Task<List<Person>> GetManyPersonsAsAsync(Person person)
+        public Task<List<Person>> GetManyPersonsAsAsync()
         {
             return Task.FromResult(Enumerable.Range(0, 100).Select(Person.Create).ToList());
         }

@@ -52,7 +52,7 @@ namespace Bolt.Performance.Contracts
         List<Person> GetManyPersons();
 
         [OperationContract]
-        Task<List<Person>> GetManyPersonsAsAsync(Person person);
+        Task<List<Person>> GetManyPersonsAsAsync();
 
         [OperationContract]
         void Throws();
