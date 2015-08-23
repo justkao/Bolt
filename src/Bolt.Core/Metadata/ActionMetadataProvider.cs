@@ -19,7 +19,7 @@ namespace Bolt.Metadata
 
             ActionMetadata descriptor = new ActionMetadata();
             descriptor.Action = method;
-            descriptor.Parameters = parameters.Select(p => new ParameterDescriptor(p.ParameterType, p.Name)).ToArray();
+            descriptor.Parameters = parameters.Select(p => new ParameterMetadata(p.ParameterType, p.Name)).ToArray();
             descriptor.HasSerializableParameters = GetSerializableParameters(method).Any();
             descriptor.ResultType = GetResultType(method);
             descriptor.HasResult = descriptor.ResultType != typeof(void);

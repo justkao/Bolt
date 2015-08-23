@@ -1,6 +1,5 @@
 ﻿using System;
 using System.ServiceModel;
-
 using Bolt.Client;
 using Bolt.Client.Proxy;
 using Bolt.Performance.Contracts;

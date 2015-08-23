@@ -2,9 +2,9 @@
 
 namespace Bolt
 {
-    public class ParameterDescriptor
+    public class ParameterMetadata
     {
-        public ParameterDescriptor(Type type, string name)
+        public ParameterMetadata(Type type, string name)
         {
             Type = type;
             Name = name;

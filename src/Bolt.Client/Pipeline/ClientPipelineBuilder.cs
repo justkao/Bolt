@@ -1,5 +1,4 @@
 using System.Linq;
-
 using Bolt.Pipeline;
 
 namespace Bolt.Client.Pipeline

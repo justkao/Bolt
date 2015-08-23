@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Pipeline;
 
@@ -12,9 +11,9 @@ namespace Bolt.Server.Pipeline
 
         public override async Task InvokeAsync(ServerActionContext context)
         {
-            if (context.HasParameters && context.Parameters.Values == null)
+            if (context.EnsureActionMetadata().HasParameters && context.Parameters == null)
             {
-                context.Parameters.Values = await DeserializeParameters(context);
+                context.Parameters = await DeserializeParameters(context);
             }
 
             await Next(context);
@@ -34,11 +33,11 @@ namespace Bolt.Server.Pipeline
                 {
                     stream.Seek(0, SeekOrigin.Begin);
 
-                    object[] parameterValues = context.Parameters.Values ?? new object[context.Parameters.Definition.Parameters.Length];
-                    context.Configuration.Serializer.Read(stream, context.Action, parameterValues);
-                    if (context.Parameters.Definition.CancellationTokenIndex >= 0)
+                    object[] parameterValues = context.Parameters ?? new object[context.ActionMetadata.Parameters.Length];
+                    context.Configuration.Serializer.Read(stream, context.ActionMetadata, parameterValues);
+                    if (context.ActionMetadata.CancellationTokenIndex >= 0)
                     {
-                        parameterValues[context.Parameters.Definition.CancellationTokenIndex] = context.RequestAborted;
+                        parameterValues[context.ActionMetadata.CancellationTokenIndex] = context.RequestAborted;
                     }
 
                     return parameterValues;
@@ -60,7 +59,7 @@ namespace Bolt.Server.Pipeline
             context.RequestAborted.ThrowIfCancellationRequested();
             context.HttpContext.Response.StatusCode = 200;
 
-            if (context.HasSerializableActionResult && context.ActionResult != null)
+            if (context.EnsureActionMetadata().HasResult && context.ActionResult != null)
             {
                 MemoryStream stream = new MemoryStream();
                 try

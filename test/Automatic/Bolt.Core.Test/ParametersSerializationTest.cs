@@ -1,8 +1,8 @@
-﻿using System.Diagnostics;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using Bolt.Metadata;
 using Xunit;
 
 namespace Bolt.Core.Test
@@ -24,8 +24,8 @@ namespace Bolt.Core.Test
         public void WriteSingleArgument_OK(int value)
         {
             MemoryStream stream = new MemoryStream();
-            var input = new object[Args3Parameters.GetParameters().Length];
-            var output = new object[Args3Parameters.GetParameters().Length];
+            var input = new object[Args3Parameters.Parameters.Length];
+            var output = new object[Args3Parameters.Parameters.Length];
             input[0] = value;
 
             Serializer.Write(stream, Args3Parameters, input);
@@ -46,7 +46,7 @@ namespace Bolt.Core.Test
             SimpleObject obj = null;
             if (name != null || description != null)
             {
-                obj = new SimpleObject()
+                obj = new SimpleObject
                 {
                     Name = name,
                     Description = description
@@ -54,8 +54,8 @@ namespace Bolt.Core.Test
             }
 
             MemoryStream stream = new MemoryStream();
-            var input = new object[Args2Parameters.GetParameters().Length];
-            var output = new object[Args2Parameters.GetParameters().Length];
+            var input = new object[Args2Parameters.Parameters.Length];
+            var output = new object[Args2Parameters.Parameters.Length];
             input[0] = obj;
 
             Serializer.Write(stream, Args2Parameters, input);
@@ -76,8 +76,8 @@ namespace Bolt.Core.Test
         public void WriteMultipleParameters_OK(int arg1, string arg2, double arg3, string arg4)
         {
             MemoryStream stream = new MemoryStream();
-            var input = new object[Args1Parameters.GetParameters().Length];
-            var output = new object[Args1Parameters.GetParameters().Length];
+            var input = new object[Args1Parameters.Parameters.Length];
+            var output = new object[Args1Parameters.Parameters.Length];
             input[0] = arg1;
             input[1] = arg2;
             input[2] = arg3;
@@ -101,8 +101,8 @@ namespace Bolt.Core.Test
         public void WriteParameter_IncludeCAncellationToken_Ok(int arg1)
         {
             MemoryStream stream = new MemoryStream();
-            var input = new object[WithCancellationTokenParameters.GetParameters().Length];
-            var output = new object[WithCancellationTokenParameters.GetParameters().Length];
+            var input = new object[WithCancellationTokenParameters.Parameters.Length];
+            var output = new object[WithCancellationTokenParameters.Parameters.Length];
             input[0] = arg1;
 
             Serializer.Write(stream, WithCancellationTokenParameters, input);
@@ -128,7 +128,7 @@ namespace Bolt.Core.Test
             {
                 if (ReferenceEquals(null, obj)) return false;
                 if (ReferenceEquals(this, obj)) return true;
-                if (obj.GetType() != this.GetType()) return false;
+                if (obj.GetType() != GetType()) return false;
                 return Equals((SimpleObject) obj);
             }
 
@@ -141,17 +141,17 @@ namespace Bolt.Core.Test
             }
         }
 
-        private static MethodInfo Args1Parameters =
-            typeof (ParametersSerializationTest).GetRuntimeMethods().First(m => m.Name == nameof(Args1));
+        private static ActionMetadata Args1Parameters = BoltFramework.ActionMetadata.Resolve(
+            typeof (ParametersSerializationTest).GetRuntimeMethods().First(m => m.Name == nameof(Args1)));
 
-        private static MethodInfo Args2Parameters =
-            typeof (ParametersSerializationTest).GetRuntimeMethods().First(m => m.Name == nameof(Args2));
+        private static ActionMetadata Args2Parameters = BoltFramework.ActionMetadata.Resolve(
+            typeof (ParametersSerializationTest).GetRuntimeMethods().First(m => m.Name == nameof(Args2)));
 
-        private static MethodInfo Args3Parameters =
-            typeof (ParametersSerializationTest).GetRuntimeMethods().First(m => m.Name == nameof(Args3));
+        private static ActionMetadata Args3Parameters = BoltFramework.ActionMetadata.Resolve(
+            typeof (ParametersSerializationTest).GetRuntimeMethods().First(m => m.Name == nameof(Args3)));
 
-        private static MethodInfo WithCancellationTokenParameters =
-            typeof (ParametersSerializationTest).GetRuntimeMethods().First(m => m.Name == nameof(WithCancellationToken));
+        private static ActionMetadata WithCancellationTokenParameters = BoltFramework.ActionMetadata.Resolve(
+            typeof (ParametersSerializationTest).GetRuntimeMethods().First(m => m.Name == nameof(WithCancellationToken)));
 
         private void Args1(int arg1, string arg2,  double arg3, SimpleObject arg4)
         {

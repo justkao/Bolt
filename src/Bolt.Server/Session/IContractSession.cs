@@ -1,5 +1,4 @@
 ﻿using System.Threading.Tasks;
-using Bolt.Session;
 
 namespace Bolt.Server.Session
 {

@@ -6,7 +6,7 @@ namespace Bolt.Client.Pipeline
 {
     public class SessionMiddleware : ClientMiddlewareBase
     {
-        private readonly ConcurrentDictionary<IProxy, SessionDescriptor> _sessions = new ConcurrentDictionary<IProxy, SessionDescriptor>();
+        private readonly ConcurrentDictionary<IProxy, SessionMetadata> _sessions = new ConcurrentDictionary<IProxy, SessionMetadata>();
 
         public SessionMiddleware(IClientSessionHandler sessionHandler, IErrorHandling errorHandling)
         {
@@ -23,14 +23,14 @@ namespace Bolt.Client.Pipeline
 
         public bool Recoverable { get; set; }
 
-        public SessionDescriptor GetSession(object proxy)
+        public SessionMetadata GetSession(object proxy)
         {
             if (proxy == null)
             {
                 throw new ArgumentNullException(nameof(proxy));
             }
 
-            SessionDescriptor output;
+            SessionMetadata output;
             _sessions.TryGetValue((IProxy)proxy, out output);
             return output;
         }
@@ -40,9 +40,9 @@ namespace Bolt.Client.Pipeline
             context.EnsureRequest();
 
             // access or create session assigned to current proxy
-            SessionDescriptor session = _sessions.GetOrAdd(
+            SessionMetadata session = _sessions.GetOrAdd(
                 context.Proxy,
-                proxy => new SessionDescriptor(BoltFramework.GetSessionDescriptor(proxy.Contract)));
+                proxy => new SessionMetadata(BoltFramework.SessionMetadata.Resolve(proxy.Contract)));
 
             if (session.State != ProxyState.Open)
             {
@@ -56,7 +56,7 @@ namespace Bolt.Client.Pipeline
                 context.ServerConnection = session.ServerConnection;
             }
 
-            if (context.Action == session.Contract.InitSession)
+            if (context.Action == session.Contract.InitSession.Action)
             {
                 // at this point session is opened, assign initialization result just in case
                 if (context.ActionResult == null)
@@ -64,7 +64,7 @@ namespace Bolt.Client.Pipeline
                     context.ActionResult = session.InitSessionResult;
                 }
             }
-            else if (context.Action == session.Contract.DestroySession)
+            else if (context.Action == session.Contract.DestroySession.Action)
             {
                 if (context.Proxy.State == ProxyState.Closed)
                 {
@@ -82,7 +82,7 @@ namespace Bolt.Client.Pipeline
                     return;
                 }
 
-                if (session.RequiresDestroyParameters && context.Parameters.Values == null)
+                if (session.RequiresDestroyParameters && context.Parameters == null)
                 {
                     // we are trying to close proxy using IProxy.CloseAsync even when the destroy action requires actual parameters
                     throw new BoltClientException(
@@ -132,7 +132,7 @@ namespace Bolt.Client.Pipeline
             }
         }
 
-        protected virtual Exception HandleError(ClientActionContext context, Exception error, SessionDescriptor session)
+        protected virtual Exception HandleError(ClientActionContext context, Exception error, SessionMetadata session)
         {
             ErrorHandlingResult handlingResult = ErrorHandling.Handle(context, error);
             switch (handlingResult)
@@ -157,7 +157,7 @@ namespace Bolt.Client.Pipeline
             return error;
         }
 
-        protected virtual Exception HandleOpenConnectionError(ClientActionContext context, Exception error, SessionDescriptor session)
+        protected virtual Exception HandleOpenConnectionError(ClientActionContext context, Exception error, SessionMetadata session)
         {
             session.ClearSession();
             ErrorHandlingResult handlingResult = ErrorHandling.Handle(context, error);
@@ -177,40 +177,40 @@ namespace Bolt.Client.Pipeline
             return error;
         }
 
-        private async Task<ConnectionDescriptor> EnsureConnectionAsync(ClientActionContext context, SessionDescriptor sessionDescriptor)
+        private async Task<ConnectionDescriptor> EnsureConnectionAsync(ClientActionContext context, SessionMetadata sessionMetadata)
         {
-            if (sessionDescriptor.State == ProxyState.Open)
+            if (sessionMetadata.State == ProxyState.Open)
             {
-                context.ActionResult = sessionDescriptor.InitSessionResult;
-                return sessionDescriptor.ServerConnection;
+                context.ActionResult = sessionMetadata.InitSessionResult;
+                return sessionMetadata.ServerConnection;
             }
 
-            if (sessionDescriptor.State == ProxyState.Closed)
+            if (sessionMetadata.State == ProxyState.Closed)
             {
                 throw new ProxyClosedException();
             }
 
-            using (await sessionDescriptor.LockAsync())
+            using (await sessionMetadata.LockAsync())
             {
                 // check connections tate again when under lock
-                if (sessionDescriptor.State == ProxyState.Open)
+                if (sessionMetadata.State == ProxyState.Open)
                 {
-                    context.ActionResult = sessionDescriptor.InitSessionResult;
-                    return sessionDescriptor.ServerConnection;
+                    context.ActionResult = sessionMetadata.InitSessionResult;
+                    return sessionMetadata.ServerConnection;
                 }
 
-                if (sessionDescriptor.State == ProxyState.Closed)
+                if (sessionMetadata.State == ProxyState.Closed)
                 {
                     throw new ProxyClosedException();
                 }
 
                 ClientActionContext initSessionContext = context;
-                if (context.Action != sessionDescriptor.Contract.InitSession)
+                if (context.Action != sessionMetadata.Contract.InitSession.Action)
                 {
                     // we are not initializaing proxy explicitely, so we need to check whether proxy has been initalized before
-                    if (sessionDescriptor.RequiresInitParameters)
+                    if (sessionMetadata.Contract.InitSession.HasParameters)
                     {
-                        if (sessionDescriptor.InitSessionParameters == null)
+                        if (sessionMetadata.InitSessionParameters == null)
                         {
                             // we can not reuse initialization parameters, so throw 
                             throw new BoltClientException(
@@ -225,14 +225,14 @@ namespace Bolt.Client.Pipeline
                     initSessionContext = new ClientActionContext(
                         context.Proxy,
                         context.Contract,
-                        sessionDescriptor.Contract.InitSession,
-                        sessionDescriptor.InitSessionParameters);
+                        sessionMetadata.Contract.InitSession.Action,
+                        sessionMetadata.InitSessionParameters);
                 }
-                else if (sessionDescriptor.RequiresInitParameters)
+                else if (sessionMetadata.Contract.InitSession.HasParameters)
                 {
                     try
                     {
-                        BoltFramework.ValidateParameters(sessionDescriptor.Contract.InitSession, initSessionContext.Parameters.Values);
+                        sessionMetadata.Contract.InitSession.ValidateParameters(initSessionContext.Parameters);
                     }
                     catch (Exception e)
                     {
@@ -256,7 +256,7 @@ namespace Bolt.Client.Pipeline
                     {
                         throw new BoltServerException(
                             ServerErrorCode.SessionIdNotReceived,
-                            sessionDescriptor.Contract.InitSession,
+                            sessionMetadata.Contract.InitSession.Action,
                             initSessionContext.Request?.RequestUri?.ToString());
                     }
 
@@ -265,15 +265,15 @@ namespace Bolt.Client.Pipeline
                         throw new BoltClientException(ClientErrorCode.ConnectionUnavailable, initSessionContext.Action);
                     }
 
-                    sessionDescriptor.InitSessionResult = initSessionContext.ActionResult;
-                    sessionDescriptor.InitSessionParameters = initSessionContext.Parameters.Values;
-                    sessionDescriptor.SessionId = sessionId;
-                    sessionDescriptor.ServerConnection = initSessionContext.ServerConnection;
-                    sessionDescriptor.ChangeState(context.Proxy, ProxyState.Open);
+                    sessionMetadata.InitSessionResult = initSessionContext.ActionResult;
+                    sessionMetadata.InitSessionParameters = initSessionContext.Parameters;
+                    sessionMetadata.SessionId = sessionId;
+                    sessionMetadata.ServerConnection = initSessionContext.ServerConnection;
+                    sessionMetadata.ChangeState(context.Proxy, ProxyState.Open);
                 }
                 catch (Exception e)
                 {
-                    Exception handled = HandleOpenConnectionError(initSessionContext, e, sessionDescriptor);
+                    Exception handled = HandleOpenConnectionError(initSessionContext, e, sessionMetadata);
                     if (handled == e)
                     {
                         throw;
@@ -289,13 +289,13 @@ namespace Bolt.Client.Pipeline
                 finally
                 {
                     // we should not dispose original context
-                    if (context.Action != sessionDescriptor.Contract.InitSession)
+                    if (context.Action != sessionMetadata.Contract.InitSession.Action)
                     {
                         initSessionContext.Dispose();
                     }
                 }
 
-                return sessionDescriptor.ServerConnection;
+                return sessionMetadata.ServerConnection;
             }
         }
     }

@@ -9,26 +9,21 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Bolt.Client;
-using Bolt.Performance.Contracts;
-
+using Bolt.Client.Pipeline;
 
 namespace Bolt.Performance.Contracts
 {
-    public partial class TestContractProxy : Bolt.Client.ProxyBase, Bolt.Performance.Contracts.ITestContract
+    public partial class TestContractProxy : ProxyBase, ITestContract
     {
-        public TestContractProxy(Bolt.Performance.Contracts.TestContractProxy proxy) : base(proxy)
+        public TestContractProxy(TestContractProxy proxy) : base(proxy)
         {
         }
 
-        public TestContractProxy(Bolt.Client.Pipeline.IClientPipeline channel) : base(typeof(Bolt.Performance.Contracts.ITestContract), channel)
+        public TestContractProxy(IClientPipeline channel) : base(typeof(ITestContract), channel)
         {
         }
 

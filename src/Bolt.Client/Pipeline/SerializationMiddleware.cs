@@ -2,8 +2,6 @@
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Pipeline;
 
@@ -31,7 +29,7 @@ namespace Bolt.Client.Pipeline
 
         public override async Task InvokeAsync(ClientActionContext context)
         {
-            if (context.EnsureRequest().Content == null && context.HasParameters)
+            if (context.EnsureRequest().Content == null && context.EnsureActionMetadata().HasParameters)
             {
                 context.EnsureRequest().Content = BuildRequestParameters(context);
             }
@@ -71,7 +69,7 @@ namespace Bolt.Client.Pipeline
             }
             else
             {
-                if (context.HasSerializableActionResult && context.ActionResult == null)
+                if (context.EnsureActionMetadata().HasResult && context.ActionResult == null)
                 {
                     using (Stream stream = await GetResponseStreamAsync(context.Response))
                     {
@@ -92,7 +90,7 @@ namespace Bolt.Client.Pipeline
             {
                 MemoryStream stream = new MemoryStream();
 
-                Serializer.Write(stream, context.Action, context.Parameters.Values);
+                Serializer.Write(stream, context.EnsureActionMetadata(), context.Parameters);
 
                 ByteArrayContent content = new ByteArrayContent(stream.ToArray());
                 content.Headers.ContentLength = stream.Length;
@@ -118,7 +116,7 @@ namespace Bolt.Client.Pipeline
 
             try
             {
-                return Serializer.Read(context.ResponseType, stream);
+                return Serializer.Read(context.EnsureActionMetadata().ResultType, stream);
             }
             catch (Exception e)
             {

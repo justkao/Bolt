@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client;
 using Bolt.Client.Pipeline;
-using Bolt.Pipeline;
 using Bolt.Server.IntegrationTest.Core;
 using Bolt.Test.Common;
 using Microsoft.AspNet.Builder;

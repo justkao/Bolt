@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-
 using Bolt.Pipeline;
 
 namespace Bolt.Client.Pipeline

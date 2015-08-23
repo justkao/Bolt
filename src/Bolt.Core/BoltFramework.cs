@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
 using Bolt.Metadata;
 
 namespace Bolt
@@ -93,46 +91,6 @@ namespace Bolt
 
             coercedName = name.Substring(0, index);
             return true;
-        }
-
-        public static SessionContractMetadata GetSessionDescriptor(Type contract)
-        {
-            return SessionContractDescriptorProvider.Resolve(contract);
-        }
-
-        public static void ValidateParameters(MethodInfo method, object[] parameters)
-        {
-            ParameterInfo[] parameterTypes = method.GetParameters();
-            if (!parameterTypes.Any())
-            {
-                if (parameters != null && parameters.Length > 0)
-                {
-                    throw new BoltException($"Action '{method.Name}' does not require any parameters.");
-                }
-
-                return;
-            }
-
-            for (int i = 0; i < parameterTypes.Length; i++)
-            {
-                ParameterInfo parameterInfo = parameterTypes[i];
-                object parameter = parameters[i];
-
-                if (parameter == null)
-                {
-                    continue;
-                }
-
-                if (parameter is CancellationToken)
-                {
-                    continue;
-                }
-
-                if (!parameterInfo.ParameterType.IsAssignableFrom(parameter.GetType()))
-                {
-                    throw new BoltException($"Expected value for parameter '{parameterInfo.Name}' should be '{parameterInfo.ParameterType.Name}' instead '{parameter.GetType().Name}' was provided.");
-                }
-            }
         }
     }
 }

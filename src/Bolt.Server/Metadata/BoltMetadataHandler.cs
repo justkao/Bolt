@@ -76,33 +76,34 @@ namespace Bolt.Server.Metadata
                 else
                 {
                     context.Action = action;
+                    context.ActionMetadata = BoltFramework.ActionMetadata.Resolve(action);
+
                     JsonSchema actionSchema = new JsonSchema
                                                   {
                                                       Properties = new Dictionary<string, JsonSchema>(),
                                                       Description = $"Request and response parameters for action '{actionName}'."
                                                   };
 
-                    List<ParameterInfo> actionParameters = BoltFramework.GetSerializableParameters(action).ToList();
-                    if (actionParameters.Any())
+                    if (context.ActionMetadata.HasSerializableParameters)
                     {
                         JsonSchemaGenerator generator = new JsonSchemaGenerator();
                         JsonSchema arguments = new JsonSchema
                                                    {
                                                        Properties =
-                                                           actionParameters.ToDictionary(
+                                                           context.ActionMetadata.GetSerializableParameters().ToDictionary(
                                                                p => p.Name,
-                                                               p => generator.Generate(p.ParameterType)),
+                                                               p => generator.Generate(p.Type)),
                                                        Required = true,
-                                                       Type = JsonSchemaType.Object,
+                                                       Type = JsonSchemaType.Object
                                                    };
 
                         actionSchema.Properties.Add("request", arguments);
                     }
 
-                    if (context.ResponseType != typeof(void))
+                    if (context.ActionMetadata.HasResult)
                     {
                         JsonSchemaGenerator generator = new JsonSchemaGenerator();
-                        actionSchema.Properties.Add("response", generator.Generate(context.ResponseType));
+                        actionSchema.Properties.Add("response", generator.Generate(context.ActionMetadata.ResultType));
                     }
 
                     using (var sw = new StringWriter())

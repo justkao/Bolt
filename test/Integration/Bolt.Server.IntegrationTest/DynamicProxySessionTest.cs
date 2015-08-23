@@ -1,7 +1,5 @@
-using Bolt.Client;
 using Bolt.Client.Pipeline;
 using Bolt.Client.Proxy;
-using Bolt.Pipeline;
 using Bolt.Server.IntegrationTest.Core;
 
 namespace Bolt.Server.IntegrationTest

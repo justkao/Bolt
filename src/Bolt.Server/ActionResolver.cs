@@ -10,14 +10,16 @@ namespace Bolt.Server
     {
         public MethodInfo Resolve(Type contract, string actionName)
         {
-            if (actionName.ToLowerInvariant() == BoltFramework.GetSessionDescriptor(contract).InitSession.Name.ToLowerInvariant())
+            var initSession = BoltFramework.SessionMetadata.Resolve(contract).InitSession;
+            if (actionName.ToLowerInvariant() == initSession.Name.ToLowerInvariant())
             {
-                return BoltFramework.GetSessionDescriptor(contract).InitSession;
+                return initSession.Action;
             }
 
-            if (actionName.ToLowerInvariant() == BoltFramework.GetSessionDescriptor(contract).DestroySession.Name.ToLowerInvariant())
+            var destroySession = BoltFramework.SessionMetadata.Resolve(contract).DestroySession;
+            if (actionName.ToLowerInvariant() == destroySession.Name.ToLowerInvariant())
             {
-                return BoltFramework.GetSessionDescriptor(contract).DestroySession;
+                return destroySession.Action;
             }
 
             List<MethodInfo> candidates = contract.GetRuntimeMethods().ToList();

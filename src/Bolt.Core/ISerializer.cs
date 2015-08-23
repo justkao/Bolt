@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
+using Bolt.Metadata;
 
 namespace Bolt
 {
@@ -12,9 +12,9 @@ namespace Bolt
 
         string ContentType { get; }
 
-        void Write(Stream stream, MethodInfo method, object[] values);
+        void Write(Stream stream, ActionMetadata actionMetadata, object[] parameterValues);
 
-        void Read(Stream stream, MethodInfo method, object[] output);
+        void Read(Stream stream, ActionMetadata actionMetadata, object[] parameterValues);
     }
 
     public static class SerializerExtensions

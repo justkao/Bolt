@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Bolt.Client;
 using Bolt.Client.Pipeline;
-using Bolt.Pipeline;
 using Bolt.Server.InstanceProviders;
 using Bolt.Server.IntegrationTest.Core;
 using Bolt.Server.Session;

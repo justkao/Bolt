@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
-
 using Bolt.Client.Pipeline;
 
 namespace Bolt.Client
@@ -56,7 +55,7 @@ namespace Bolt.Client
 
         public async Task OpenAsync()
         {
-            using (ClientActionContext ctxt = new ClientActionContext(this, Contract, BoltFramework.GetSessionDescriptor(Contract).InitSession, null))
+            using (ClientActionContext ctxt = new ClientActionContext(this, Contract, BoltFramework.SessionMetadata.Resolve(Contract).InitSession.Action, null))
             {
                 await Pipeline.Instance(ctxt);
                 State = ProxyState.Open;
@@ -67,7 +66,7 @@ namespace Bolt.Client
         {
             if (State == ProxyState.Open)
             {
-                using (ClientActionContext ctxt = new ClientActionContext(this, Contract, BoltFramework.GetSessionDescriptor(Contract).DestroySession, null))
+                using (ClientActionContext ctxt = new ClientActionContext(this, Contract, BoltFramework.SessionMetadata.Resolve(Contract).DestroySession.Action, null))
                 {
                     await Pipeline.Instance(ctxt);
                     State = ProxyState.Closed;

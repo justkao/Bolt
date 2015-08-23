@@ -19,9 +19,9 @@ namespace Bolt.Server.Test
             Subject = CreateSubject();
         }
 
-        protected MethodInfo InitSessionAction => BoltFramework.GetSessionDescriptor(typeof(TContract)).InitSession;
+        protected MethodInfo InitSessionAction => BoltFramework.SessionMetadata.Resolve(typeof(TContract)).InitSession.Action;
 
-        protected MethodInfo DestroySessionAction => BoltFramework.GetSessionDescriptor(typeof(TContract)).DestroySession;
+        protected MethodInfo DestroySessionAction => BoltFramework.SessionMetadata.Resolve(typeof(TContract)).DestroySession.Action;
 
         protected MockSessionInstanceProvider Subject { get; set; }
 

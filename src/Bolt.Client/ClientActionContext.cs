@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
@@ -16,9 +15,9 @@ namespace Bolt.Client
         {
             Proxy = proxy;
             Request = new HttpRequestMessage();
-            if (Parameters.Definition.CancellationTokenIndex >= 0 && parameters != null)
+            if (ActionMetadata.CancellationTokenIndex >= 0 && parameters != null)
             {
-                var cancellation = parameters[Parameters.Definition.CancellationTokenIndex];
+                var cancellation = parameters[ActionMetadata.CancellationTokenIndex];
                 if (cancellation is CancellationToken)
                 {
                     RequestAborted = (CancellationToken) cancellation;

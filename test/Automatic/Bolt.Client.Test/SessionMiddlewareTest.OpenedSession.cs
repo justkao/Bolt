@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Bolt.Client.Pipeline;
-using Bolt.Pipeline;
 using Moq;
 using Xunit;
 
@@ -53,7 +52,7 @@ namespace Bolt.Client.Test
                 Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
                     c =>
                         {
-                            Assert.Equal(ContractDescriptor.DestroySession, c.Action);
+                            Assert.Equal(ContractDescriptor.DestroySession.Action, c.Action);
                         }).Verifiable();
 
                 await Proxy.CloseSession("Test");
@@ -67,7 +66,7 @@ namespace Bolt.Client.Test
                 Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
                     c =>
                     {
-                        Assert.Equal("temp", c.Parameters.Values[0]);
+                        Assert.Equal("temp", c.Parameters[0]);
                     }).Verifiable();
 
                 await Proxy.CloseSession("temp");

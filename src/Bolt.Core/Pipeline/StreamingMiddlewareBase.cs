@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Linq;
-using System.Reflection;
 using System.Net.Http;
+using System.Reflection;
+using Bolt.Metadata;
 
 namespace Bolt.Pipeline
 {
@@ -34,21 +34,16 @@ namespace Bolt.Pipeline
         {
             public Metadata()
             {
-                CancellationTokenIndex = -1;
                 HttpContentIndex = -1;
             }
 
-            public MethodInfo Action { get; internal set; }
+            public ActionMetadata Action { get; internal set; }
 
             public Type ContentResultType { get; internal set; }
-
-            public int CancellationTokenIndex { get; internal set; }
 
             public int HttpContentIndex { get; internal set; }
 
             public Type ContentRequestType { get; internal set; }
-
-            public int ParametersCount { get; internal set; }
         }
 
         protected static Metadata Validate(Type contract, MethodInfo method)
@@ -56,7 +51,8 @@ namespace Bolt.Pipeline
             if (contract == null) throw new ArgumentNullException(nameof(contract));
             if (method == null) throw new ArgumentNullException(nameof(method));
 
-            ParameterInfo[] parameters = method.GetParameters();
+            ActionMetadata actionMetadata =BoltFramework.ActionMetadata.Resolve(method);
+            var parameters = actionMetadata.Parameters;
             if (parameters.Length > 2)
             {
                 throw new ContractViolationException(
@@ -64,8 +60,7 @@ namespace Bolt.Pipeline
                     contract, method);
             }
 
-            Type methodResult = BoltFramework.GetResultType(method);
-            if (typeof (HttpResponseMessage).CanAssign(methodResult))
+            if (typeof (HttpResponseMessage).CanAssign(actionMetadata.ResultType))
             {
                 throw new ContractViolationException(
                     $"Action '{method.Name}' has invalid declaration. The HttpResponseMessage return type is not supported.",
@@ -73,8 +68,8 @@ namespace Bolt.Pipeline
             }
 
 
-            bool hasContentResult = typeof (HttpContent).CanAssign(methodResult);
-            if (hasContentResult && methodResult != typeof (HttpContent))
+            bool hasContentResult = typeof (HttpContent).CanAssign(actionMetadata.ResultType);
+            if (hasContentResult && actionMetadata.ResultType != typeof (HttpContent))
             {
                 throw new ContractViolationException(
                     $"Action '{method.Name}' has invalid declaration. Only HttpContent return type is supported.",
@@ -83,21 +78,20 @@ namespace Bolt.Pipeline
 
             Metadata metadata = new Metadata
             {
-                Action = method,
-                ParametersCount = parameters.Length
+                Action = actionMetadata
             };
 
             if (hasContentResult)
             {
-                metadata.ContentResultType = methodResult;
+                metadata.ContentResultType = actionMetadata.ResultType;
             }
 
             for (int i = 0; i < parameters.Length; i++)
             {
-                ParameterInfo info = parameters[i];
-                if (typeof (HttpContent).CanAssign(info.ParameterType))
+                ParameterMetadata info = parameters[i];
+                if (typeof (HttpContent).CanAssign(info.Type))
                 {
-                    if (info.ParameterType != typeof (HttpContent))
+                    if (info.Type != typeof (HttpContent))
                     {
                         throw new ContractViolationException(
                             $"Action '{method.Name}' has invalid declaration. Only HttpContent parameter type is supported.",
@@ -111,16 +105,12 @@ namespace Bolt.Pipeline
                             contract, method);
                     }
 
-                    metadata.ContentRequestType = info.ParameterType;
+                    metadata.ContentRequestType = info.Type;
                     metadata.HttpContentIndex = i;
-                }
-                else if (info.IsCancellationToken())
-                {
-                    metadata.CancellationTokenIndex = i;
                 }
             }
 
-            if (metadata.HttpContentIndex >= 0 && parameters.Length > 1 && metadata.CancellationTokenIndex < 0)
+            if (metadata.HttpContentIndex >= 0 && parameters.Length > 1 && actionMetadata.CancellationTokenIndex < 0)
             {
                 throw new ContractViolationException(
                     $"Action '{method.Name}' has invalid declaration. Only HttpContent parameter type witj optional cancellation token is supported.",

@@ -1,5 +1,4 @@
-﻿using Bolt.Session;
-using Microsoft.AspNet.Http.Features;
+﻿using Microsoft.AspNet.Http.Features;
 
 namespace Bolt.Server
 {

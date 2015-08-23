@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
 using System.Text;
+using Bolt.Metadata;
 using Newtonsoft.Json;
 
 namespace Bolt
@@ -55,11 +55,11 @@ namespace Bolt
             }
         }
 
-        public void Read(Stream stream, MethodInfo method, object[] output)
+        public void Read(Stream stream, ActionMetadata actionMetadata, object[] parameterValues)
         {
-            if (method == null) throw new ArgumentNullException(nameof(method));
-            if (output == null) throw new ArgumentNullException(nameof(output));
-            var parameters = method.GetParameters();
+            if (actionMetadata == null) throw new ArgumentNullException(nameof(actionMetadata));
+            if (parameterValues == null) throw new ArgumentNullException(nameof(parameterValues));
+            var parameters = actionMetadata.Parameters;
 
             using (StreamReader streamReader = new StreamReader(stream, Encoding, true, BufferSize, true))
             {
@@ -69,7 +69,7 @@ namespace Bolt
                     for (int i = 0; i < parameters.Length; i++)
                     {
                         var parameter = parameters[i];
-                        if (parameter.IsCancellationToken())
+                        if (i == actionMetadata.CancellationTokenIndex)
                         {
                             continue;
                         }
@@ -95,7 +95,7 @@ namespace Bolt
                                 var index = FindParameter(parameters, propertyName);
                                 if (index >= 0)
                                 {
-                                    output[index] = Serializer.Deserialize(reader, parameters[index].ParameterType);
+                                    parameterValues[index] = Serializer.Deserialize(reader, parameters[index].Type);
                                 }
                                 else
                                 {
@@ -104,7 +104,7 @@ namespace Bolt
                             }
                             else
                             {
-                                output[i] = Serializer.Deserialize(reader, parameters[i].ParameterType);
+                                parameterValues[i] = Serializer.Deserialize(reader, parameters[i].Type);
                             }
                         }
                         catch (Exception e)
@@ -117,14 +117,14 @@ namespace Bolt
             }
         }
 
-        public void Write(Stream stream, MethodInfo method, object[] values)
+        public void Write(Stream stream, ActionMetadata actionMetadata, object[] values)
         {
             if (stream == null) throw new ArgumentNullException(nameof(stream));
-            if (method == null) throw new ArgumentNullException(nameof(method));
+            if (actionMetadata == null) throw new ArgumentNullException(nameof(actionMetadata));
             if (values == null) throw new ArgumentNullException(nameof(values));
 
-            var parameters = method.GetParameters();
-            BoltFramework.ValidateParameters(method, values);
+            var parameters = actionMetadata.Parameters;
+            actionMetadata.ValidateParameters(values);
 
             using (var streamWriter = new StreamWriter(stream, Encoding, BufferSize, true))
             {
@@ -136,7 +136,7 @@ namespace Bolt
                         var value = values[i];
                         var parameter = parameters[i];
 
-                        if (Equals(values[i], null) || parameter.IsCancellationToken())
+                        if (Equals(values[i], null) || i == actionMetadata.CancellationTokenIndex)
                         {
                             continue;
                         }
@@ -150,7 +150,7 @@ namespace Bolt
             }
         }
 
-        private static int FindParameter(ParameterInfo[] parameters, string name)
+        private static int FindParameter(ParameterMetadata[] parameters, string name)
         {
             for (int i = 0; i < parameters.Length; i++)
             {

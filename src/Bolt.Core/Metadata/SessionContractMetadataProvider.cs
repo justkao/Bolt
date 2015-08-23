@@ -23,9 +23,10 @@ namespace Bolt.Metadata
 
             Type[] allInterfaces = new[] {contract}.Concat(contract.GetTypeInfo().ImplementedInterfaces).ToArray();
 
-            return new SessionContractMetadata(contract,
-                FindMethod(allInterfaces, nameof(InitSessionAttribute)) ?? InitSessionAction,
-                FindMethod(allInterfaces, nameof(DestroySessionAttribute)) ?? DestroySessionAction);
+            var initSession = FindMethod(allInterfaces, nameof(InitSessionAttribute)) ?? InitSessionAction;
+            var destroySession = FindMethod(allInterfaces, nameof(DestroySessionAttribute)) ?? DestroySessionAction;
+
+            return new SessionContractMetadata(contract, BoltFramework.ActionMetadata.Resolve(initSession), BoltFramework.ActionMetadata.Resolve(destroySession));
         }
 
         private MethodInfo FindMethod(IEnumerable<Type> types, string attributeName)
@@ -43,11 +44,11 @@ namespace Bolt.Metadata
         }
 
         private static readonly MethodInfo InitSessionAction =
-            typeof (SessionContractDescriptorProvider).GetTypeInfo()
+            typeof (SessionContractMetadataProvider).GetTypeInfo()
                 .DeclaredMethods.First(m => m.IsStatic && m.Name == nameof(InitBoltSession));
 
         private static readonly MethodInfo DestroySessionAction =
-            typeof (SessionContractDescriptorProvider).GetTypeInfo()
+            typeof (SessionContractMetadataProvider).GetTypeInfo()
                 .DeclaredMethods.First(m => m.IsStatic && m.Name == nameof(DestroyBoltSession));
 
         private static void InitBoltSession()

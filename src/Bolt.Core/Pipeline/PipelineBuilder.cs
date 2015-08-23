@@ -34,7 +34,7 @@ namespace Bolt.Pipeline
 
             foreach (var middleware in _middlewares.Reverse())
             {
-                Func<ActionDelegate<T>, ActionDelegate<T>> actionDelegate = (next) =>
+                Func<ActionDelegate<T>, ActionDelegate<T>> actionDelegate = next =>
                     {
                         middleware.Init(next);
                         return middleware.InvokeAsync;

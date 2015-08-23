@@ -7,12 +7,9 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Bolt.Performance.Contracts;
-
 using Microsoft.Dnx.Runtime;
 using Microsoft.Dnx.Runtime.Common.CommandLine;
-
 using Newtonsoft.Json;
 
 namespace Bolt.Performance.Console

@@ -1,12 +1,12 @@
 ﻿using System;
-using Bolt.Session;
+using Bolt.Metadata;
 using Xunit;
 
 namespace Bolt.Core.Test
 {
     public class SessionContractDescriptorTest
     {
-        public ISessionContractDescriptorProvider Provider = new SessionContractDescriptorProvider();
+        public ISessionContractMetadataProvider Provider = new SessionContractMetadataProvider();
 
         [Fact]
         public void Resolve_Ok()

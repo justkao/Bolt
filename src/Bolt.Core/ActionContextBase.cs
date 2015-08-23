@@ -47,11 +47,21 @@ namespace Bolt
 
         public object ActionResult { get; set; }
 
-        public object Parameters { get; set; }
+        public object[] Parameters { get; set; }
 
         public CancellationToken RequestAborted { get; set; }
 
         public string ContractName => this.GetContractName();
+
+        public ActionMetadata EnsureActionMetadata()
+        {
+            if (ActionMetadata == null)
+            {
+                throw new InvalidOperationException("Required ActionMetadata instance is not assigned to current action.");
+            }
+
+            return ActionMetadata;
+        }
 
         public IDictionary<object, object> Items
         {
