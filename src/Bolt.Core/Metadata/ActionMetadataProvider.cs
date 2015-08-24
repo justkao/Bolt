@@ -22,7 +22,6 @@ namespace Bolt.Metadata
             descriptor.Parameters = parameters.Select(p => new ParameterMetadata(p.ParameterType, p.Name)).ToArray();
             descriptor.HasSerializableParameters = GetSerializableParameters(method).Any();
             descriptor.ResultType = GetResultType(method);
-            descriptor.HasResult = descriptor.ResultType != typeof(void);
             descriptor.CancellationTokenIndex = -1;
             for (int i = 0; i < parameters.Length; i++)
             {

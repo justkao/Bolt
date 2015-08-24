@@ -12,15 +12,13 @@ namespace Bolt.Metadata
         {
         }
 
-        public ActionMetadata(MethodInfo action, ParameterMetadata[] parameters, int cancellationTokenIndex, bool hasCancellationToken, bool hasSerializableParameters, Type resultType, bool hasResult)
+        public ActionMetadata(MethodInfo action, ParameterMetadata[] parameters, int cancellationTokenIndex, Type resultType, bool hasSerializableParameters)
         {
             Action = action;
             Parameters = parameters;
             CancellationTokenIndex = cancellationTokenIndex;
-            HasCancellationToken = hasCancellationToken;
-            HasSerializableParameters = hasSerializableParameters;
             ResultType = resultType;
-            HasResult = hasResult;
+            HasSerializableParameters = hasSerializableParameters;
         }
 
         public string Name => Action.Name;
@@ -28,6 +26,18 @@ namespace Bolt.Metadata
         public MethodInfo Action { get; internal set; }
 
         public ParameterMetadata[] Parameters { get; internal set; }
+
+        public int CancellationTokenIndex { get; internal set; }
+
+        public Type ResultType { get; internal set; }
+
+        public bool HasResult => ResultType != typeof(void);
+
+        public bool HasSerializableParameters { get; internal set; }
+
+        public bool HasCancellationToken => CancellationTokenIndex >= 0;
+
+        public bool HasParameters => Parameters.Length > 0;
 
         public IEnumerable<ParameterMetadata> GetSerializableParameters()
         {
@@ -41,18 +51,6 @@ namespace Bolt.Metadata
                 yield return Parameters[i];
             }
         }
-
-        public int CancellationTokenIndex { get; internal set; }
-
-        public bool HasCancellationToken { get; internal set; }
-
-        public bool HasSerializableParameters { get; internal set; }
-
-        public bool HasParameters => Parameters.Length > 0;
-
-        public Type ResultType { get; internal set; }
-
-        public bool HasResult { get; internal set; }
 
         public void ValidateParameters(object[] parameters)
         {

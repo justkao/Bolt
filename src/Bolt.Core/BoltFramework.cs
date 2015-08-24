@@ -11,6 +11,8 @@ namespace Bolt
     {
         public const string AsyncPostFix = "Async";
 
+        public const int DefaultBufferSize = 80 * 1024;
+
         public static readonly ISessionContractMetadataProvider SessionMetadata = new SessionContractMetadataProvider();
 
         public static readonly IActionMetadataProvider ActionMetadata = new ActionMetadataProvider();

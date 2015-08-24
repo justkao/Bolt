@@ -7,8 +7,6 @@ namespace Bolt.Server.Pipeline
 {
     public class SerializationMiddleware : MiddlewareBase<ServerActionContext>
     {
-        private const int DefaultBuffer = 1024*1024;
-
         public override async Task InvokeAsync(ServerActionContext context)
         {
             if (context.EnsureActionMetadata().HasParameters && context.Parameters == null)
@@ -83,7 +81,7 @@ namespace Bolt.Server.Pipeline
                     context.HttpContext.Response.ContentLength = stream.Length;
                     context.HttpContext.Response.ContentType = context.Configuration.Serializer.ContentType;
 
-                    await stream.CopyToAsync(context.HttpContext.Response.Body, DefaultBuffer, context.RequestAborted);
+                    await stream.CopyToAsync(context.HttpContext.Response.Body, BoltFramework.DefaultBufferSize, context.RequestAborted);
                 }
                 else
                 {

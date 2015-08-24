@@ -8,7 +8,8 @@ namespace Bolt
 {
     public class JsonSerializer : ISerializer
     {
-        private const int BufferSize = 1024*1024;
+        private const int BufferSize = 2048;
+
         private static readonly Encoding Encoding = Encoding.UTF8;
 
         public JsonSerializer()
@@ -48,10 +49,7 @@ namespace Bolt
 
             using (TextReader reader = new StreamReader(stream, Encoding, true, BufferSize, true))
             {
-                using (JsonReader jsonReader = new JsonTextReader(reader))
-                {
-                    return Serializer.Deserialize(jsonReader, type);
-                }
+                return Serializer.Deserialize(reader, type);
             }
         }
 
