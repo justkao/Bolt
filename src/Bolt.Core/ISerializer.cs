@@ -1,6 +1,5 @@
 ﻿using System;
 using System.IO;
-using Bolt.Metadata;
 
 namespace Bolt
 {
@@ -12,9 +11,9 @@ namespace Bolt
 
         object Read(Type type, Stream stream);
 
-        void Write(Stream stream, ActionMetadata actionMetadata, object[] parameterValues);
+        IObjectSerializer CreateSerializer(Stream inputStream);
 
-        void Read(Stream stream, ActionMetadata actionMetadata, object[] parameterValues);
+        IObjectSerializer CreateDeserializer(Stream inputStream);
     }
 
     public static class SerializerExtensions
