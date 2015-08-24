@@ -9,7 +9,7 @@ namespace Bolt
 {
     public class JsonSerializer : ISerializer
     {
-        private const int BufferSize = 2048;
+        private const int BufferSize = 4 * 1024;
 
         private static readonly Encoding Encoding = Encoding.UTF8;
 

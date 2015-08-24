@@ -1,0 +1,105 @@
+{
+  "Version": "0.16.0.0",
+  "Concurrency": 1,
+  "Repeats": 100000,
+  "Machine": "KAO-PC",
+  "Cores": 4,
+  "Time": "2015-08-24T17:20:39.6825215Z",
+  "Environment": {
+    "OperatingSystem": "Windows",
+    "OperatingSystemVersion": "6.1.7601.65536",
+    "RuntimeType": "CLR",
+    "RuntimeArchitecture": "x86",
+    "RuntimeVersion": "1.0.0-beta8-15118"
+  },
+  "Actions": {
+    "GetManyPersons": {
+      "Metrics": {
+        "Bolt": 93542,
+        "Bolt(G)": 92611,
+        "Bolt(K)": 89722,
+        "WCF": 77616
+      }
+    },
+    "GetManyPersonsAsync": {
+      "Metrics": {
+        "Bolt": 93730,
+        "Bolt(G)": 92416,
+        "Bolt(K)": 89119,
+        "WCF": 82417
+      }
+    },
+    "MethodWithManyArguments": {
+      "Metrics": {
+        "Bolt": 26369,
+        "Bolt(G)": 26162,
+        "Bolt(K)": 24733,
+        "WCF": 19288
+      }
+    },
+    "MethodWithManyArgumentsAsync": {
+      "Metrics": {
+        "Bolt": 25260,
+        "Bolt(G)": 25178,
+        "Bolt(K)": 24475,
+        "WCF": 21499
+      }
+    },
+    "DoNothing": {
+      "Metrics": {
+        "Bolt": 13912,
+        "Bolt(G)": 13855,
+        "Bolt(K)": 12819,
+        "WCF": 14603
+      }
+    },
+    "DoNothingAsync": {
+      "Metrics": {
+        "Bolt": 12638,
+        "Bolt(G)": 12462,
+        "Bolt(K)": 12676,
+        "WCF": 16253
+      }
+    },
+    "GetSimpleType": {
+      "Metrics": {
+        "Bolt": 25066,
+        "Bolt(G)": 25018,
+        "Bolt(K)": 22102,
+        "WCF": 14887
+      }
+    },
+    "GetSinglePerson": {
+      "Metrics": {
+        "Bolt": 28130,
+        "Bolt(G)": 28031,
+        "Bolt(K)": 25056,
+        "WCF": 18203
+      }
+    },
+    "GetSinglePersonAsync": {
+      "Metrics": {
+        "Bolt": 27267,
+        "Bolt(G)": 26879,
+        "Bolt(K)": 25061,
+        "WCF": 20670
+      }
+    },
+    "DoNothingWithComplexParameter": {
+      "Metrics": {
+        "Bolt": 88914,
+        "Bolt(G)": 87644,
+        "Bolt(K)": 88704,
+        "WCF": 73994
+      }
+    },
+    "DoNothingWithComplexParameterAsync": {
+      "Metrics": {
+        "Bolt": 88332,
+        "Bolt(G)": 86280,
+        "Bolt(K)": 86406,
+        "WCF": 77654
+      }
+    }
+  }
+}
