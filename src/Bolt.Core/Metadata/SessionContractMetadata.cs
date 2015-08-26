@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Reflection;
 
-namespace Bolt.Session
+namespace Bolt.Metadata
 {
-    public class SessionContractDescriptor
+    public class SessionContractMetadata
     {
-        public SessionContractDescriptor(Type contract, MethodInfo initSession, MethodInfo destroySession)
+        public SessionContractMetadata(Type contract, ActionMetadata initSession, ActionMetadata destroySession)
         {
             if (contract == null) throw new ArgumentNullException(nameof(contract));
             if (initSession == null) throw new ArgumentNullException(nameof(initSession));
@@ -18,8 +17,8 @@ namespace Bolt.Session
 
         public Type Contract { get; private set; }
 
-        public MethodInfo InitSession { get; private set; }
+        public ActionMetadata InitSession { get; private set; }
 
-        public MethodInfo DestroySession { get; private set; }
+        public ActionMetadata DestroySession { get; private set; }
     }
 }

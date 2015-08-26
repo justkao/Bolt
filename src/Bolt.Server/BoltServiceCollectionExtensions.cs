@@ -4,7 +4,6 @@ using Bolt.Server;
 using Bolt.Server.Metadata;
 using Bolt.Server.Pipeline;
 using Bolt.Server.Session;
-using Bolt.Session;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Framework.DependencyInjection

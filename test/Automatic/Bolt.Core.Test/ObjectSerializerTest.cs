@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
+
 using Xunit;
 
 namespace Bolt.Core.Test
@@ -21,7 +21,7 @@ namespace Bolt.Core.Test
             Assert.Throws<InvalidOperationException>(() =>
             {
                 object val;
-                objectSerializer.TryRead("test", typeof (string), out val);
+                objectSerializer.TryRead("test", typeof(string), out val);
             });
         }
 
@@ -31,7 +31,7 @@ namespace Bolt.Core.Test
             var objectSerializer = Serializer.CreateDeserializer(new MemoryStream());
             Assert.Throws<InvalidOperationException>(() =>
             {
-                objectSerializer.Write("test", typeof (string), "val");
+                objectSerializer.Write("test", typeof(string), "val");
             });
         }
 
@@ -41,7 +41,7 @@ namespace Bolt.Core.Test
             var outputStream = new MemoryStream();
             var objectSerializer = Serializer.CreateSerializer(outputStream);
 
-            objectSerializer.Write("testProperty", typeof (string), "stringValue");
+            objectSerializer.Write("testProperty", typeof(string), "stringValue");
 
             string output = ReadString(outputStream);
 
@@ -62,7 +62,7 @@ namespace Bolt.Core.Test
         {
             var outputStream = new MemoryStream();
             var objectSerializer = Serializer.CreateSerializer(outputStream);
-            objectSerializer.Write("testProperty", typeof (string), null);
+            objectSerializer.Write("testProperty", typeof(string), null);
 
             Assert.True(objectSerializer.IsEmpty);
         }
@@ -82,8 +82,8 @@ namespace Bolt.Core.Test
         {
             var outputStream = new MemoryStream();
             var objectSerializer = Serializer.CreateSerializer(outputStream);
-            objectSerializer.Write("testProperty", typeof (SimpleObject),
-                new SimpleObject() {Name = "simpleObjectName", Description = "SimpleObjectDescription"});
+            objectSerializer.Write("testProperty", typeof(SimpleObject),
+                new SimpleObject() { Name = "simpleObjectName", Description = "SimpleObjectDescription" });
 
             string output = ReadString(outputStream);
 
@@ -99,8 +99,8 @@ namespace Bolt.Core.Test
             var objectSerializer = Serializer.CreateSerializer(outputStream);
             objectSerializer.Write("testProperty1", typeof(SimpleObject),
                 new SimpleObject() { Name = "simpleObjectName1", Description = "SimpleObjectDescription1" });
-            objectSerializer.Write("testProperty2", typeof (SimpleObject),
-                new SimpleObject() {Name = "simpleObjectName2", Description = "SimpleObjectDescription2"});
+            objectSerializer.Write("testProperty2", typeof(SimpleObject),
+                new SimpleObject() { Name = "simpleObjectName2", Description = "SimpleObjectDescription2" });
 
 
             string output = ReadString(outputStream);
@@ -121,12 +121,12 @@ namespace Bolt.Core.Test
         {
             var outputStream = new MemoryStream();
             var objectSerializer = Serializer.CreateSerializer(outputStream);
-            objectSerializer.Write("testProperty", typeof (string), serializedValue);
+            objectSerializer.Write("testProperty", typeof(string), serializedValue);
 
             var deserializer = CreateDeserializer(outputStream);
 
             object val;
-            deserializer.TryRead("testProperty", typeof (string), out val);
+            deserializer.TryRead("testProperty", typeof(string), out val);
             Assert.Equal(serializedValue, val);
         }
 
@@ -155,13 +155,13 @@ namespace Bolt.Core.Test
         {
             var outputStream = new MemoryStream();
             var objectSerializer = Serializer.CreateSerializer(outputStream);
-            objectSerializer.Write("prop1", typeof (int), first);
+            objectSerializer.Write("prop1", typeof(int), first);
             objectSerializer.Write("prop2", typeof(int), second);
 
             var deserializer = CreateDeserializer(outputStream);
 
             object val;
-            deserializer.TryRead("prop1", typeof (int), out val);
+            deserializer.TryRead("prop1", typeof(int), out val);
             Assert.Equal(first, val);
             deserializer.TryRead("prop2", typeof(int), out val);
             Assert.Equal(second, val);
@@ -243,7 +243,7 @@ namespace Bolt.Core.Test
         [Theory]
         public void ReadMultipleWithObjectsNotInOrder_Ok(object first, object second, object third)
         {
-            second = new SimpleObject() {Name = "testName", Description = "testDescription"};
+            second = new SimpleObject() { Name = "testName", Description = "testDescription" };
 
             var outputStream = new MemoryStream();
             var objectSerializer = Serializer.CreateSerializer(outputStream);
@@ -271,8 +271,8 @@ namespace Bolt.Core.Test
         {
             var outputStream = new MemoryStream();
             var objectSerializer = Serializer.CreateSerializer(outputStream);
-            objectSerializer.Write("testProperty", typeof (SimpleObject),
-                new SimpleObject() {Name = "objname", Description = "objDescription"});
+            objectSerializer.Write("testProperty", typeof(SimpleObject),
+                new SimpleObject() { Name = "objname", Description = "objDescription" });
 
             var deserialzier = CreateDeserializer(outputStream);
 

@@ -5,11 +5,11 @@ namespace Bolt
 {
     public interface ISerializer
     {
+        string ContentType { get; }
+
         void Write(Stream stream, object data);
 
         object Read(Type type, Stream stream);
-
-        string ContentType { get; }
 
         IObjectSerializer CreateSerializer(Stream inputStream);
 

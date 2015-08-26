@@ -41,7 +41,7 @@ namespace Bolt.Client.Pipeline
 
         private static void PrepareStreamingContent(ClientActionContext context, Metadata metadata)
         {
-            BoltFramework.ValidateParameters(context.Action, context.Parameters);
+            context.ActionMetadata.ValidateParameters(context.Parameters);
 
             if (metadata.ContentResultType != null)
             {

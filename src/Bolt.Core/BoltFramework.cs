@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
-using Bolt.Session;
+using Bolt.Metadata;
 
 namespace Bolt
 {
@@ -12,7 +11,11 @@ namespace Bolt
     {
         public const string AsyncPostFix = "Async";
 
-        public static readonly ISessionContractDescriptorProvider SessionContractDescriptorProvider = new SessionContractDescriptorProvider();
+        public const int DefaultBufferSize = 80 * 1024;
+
+        public static readonly ISessionContractMetadataProvider SessionMetadata = new SessionContractMetadataProvider();
+
+        public static readonly IActionMetadataProvider ActionMetadata = new ActionMetadataProvider();
 
         public static IEnumerable<MethodInfo> GetContractActions(Type contract)
         {
@@ -49,21 +52,6 @@ namespace Bolt
                 throw new InvalidOperationException(
                     $"Unable to use interface '{contract.FullName}' as contract because it methods with the same name.");
             }
-        }
-
-        public static Type GetResultType(MethodInfo method)
-        {
-            if (method == null)
-            {
-                throw new ArgumentNullException(nameof(method));
-            }
-
-            if (typeof(Task).IsAssignableFrom(method.ReturnType))
-            {
-                return TypeHelper.GetTaskInnerTypeOrNull(method.ReturnType) ?? typeof(void);
-            }
-
-            return method.ReturnType;
         }
 
         public static string GetContractName(Type contract)
@@ -105,57 +93,6 @@ namespace Bolt
 
             coercedName = name.Substring(0, index);
             return true;
-        }
-
-        public static IEnumerable<ParameterInfo> GetSerializableParameters(MethodInfo method)
-        {
-            ParameterInfo[] p = method.GetParameters();
-            if (p.Length == 0)
-            {
-                return Enumerable.Empty<ParameterInfo>();
-            }
-
-            return method.GetParameters().Where(info => info.ParameterType != typeof (CancellationToken) && info.ParameterType != typeof (CancellationToken?));
-        }
-
-        public static SessionContractDescriptor GetSessionDescriptor(Type contract)
-        {
-            return SessionContractDescriptorProvider.Resolve(contract);
-        }
-
-        public static void ValidateParameters(MethodInfo method, object[] parameters)
-        {
-            ParameterInfo[] parameterTypes = method.GetParameters();
-            if (!parameterTypes.Any())
-            {
-                if (parameters != null && parameters.Length > 0)
-                {
-                    throw new BoltException($"Action '{method.Name}' does not require any parameters.");
-                }
-
-                return;
-            }
-
-            for (int i = 0; i < parameterTypes.Length; i++)
-            {
-                ParameterInfo parameterInfo = parameterTypes[i];
-                object parameter = parameters[i];
-
-                if (parameter == null)
-                {
-                    continue;
-                }
-
-                if (parameter is CancellationToken)
-                {
-                    continue;
-                }
-
-                if (!parameterInfo.ParameterType.IsAssignableFrom(parameter.GetType()))
-                {
-                    throw new BoltException($"Expected value for parameter '{parameterInfo.Name}' should be '{parameterInfo.ParameterType.Name}' instead '{parameter.GetType().Name}' was provided.");
-                }
-            }
         }
     }
 }

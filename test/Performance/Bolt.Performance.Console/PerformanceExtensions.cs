@@ -1,5 +1,4 @@
 using Bolt.Client;
-
 using Microsoft.Dnx.Runtime;
 
 namespace Bolt.Performance.Console

@@ -2,8 +2,8 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Bolt.Client.Pipeline;
+using Bolt.Metadata;
 using Bolt.Pipeline;
-using Bolt.Session;
 using Moq;
 
 namespace Bolt.Client.Test
@@ -20,7 +20,7 @@ namespace Bolt.Client.Test
 
         public ConnectionDescriptor ConnectionDescriptor = new ConnectionDescriptor(new Uri("http://localhost"));
 
-        public SessionContractDescriptor SessionContract => BoltFramework.GetSessionDescriptor(typeof(ITestContract));
+        public SessionContractMetadata SessionContract => BoltFramework.SessionMetadata.Resolve(typeof(ITestContract));
 
         protected void SetupSessionHandler(string sessionid, bool ensuresSession = false)
         {
@@ -36,7 +36,7 @@ namespace Bolt.Client.Test
             return new TestContractProxy(pipeline);
         }
 
-        public SessionContractDescriptor ContractDescriptor => BoltFramework.GetSessionDescriptor(typeof(ITestContract));
+        public SessionContractMetadata ContractDescriptor => BoltFramework.SessionMetadata.Resolve(typeof(ITestContract));
 
         public IClientPipeline CreatePipeline(Func<ActionDelegate<ClientActionContext>, ClientActionContext, Task> next = null)
         {

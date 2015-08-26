@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Threading;
-using System.Threading.Tasks;
-using Bolt.Session;
+using Bolt.Metadata;
 
 namespace Bolt
 {
@@ -24,7 +22,6 @@ namespace Bolt
             Parameters = context.Parameters;
             ActionResult = context.ActionResult;
             RequestAborted = context.RequestAborted;
-
         }
 
         protected ActionContextBase(Type contract, MethodInfo action, object[] parameters)
@@ -35,6 +32,7 @@ namespace Bolt
             Contract = contract;
             Action = action;
             Parameters = parameters;
+            ActionMetadata = BoltFramework.ActionMetadata.Resolve(action);
         }
 
         protected ActionContextBase()
@@ -45,31 +43,24 @@ namespace Bolt
 
         public MethodInfo Action { get; set; }
 
-        public object[] Parameters { get; set; }
+        public ActionMetadata ActionMetadata { get; set; }
 
         public object ActionResult { get; set; }
 
+        public object[] Parameters { get; set; }
+
         public CancellationToken RequestAborted { get; set; }
-
-        public bool HasParameters => Action.GetParameters().Any();
-
-        public bool HasSerializableActionResult => ResponseType != typeof (void);
 
         public string ContractName => this.GetContractName();
 
-        public SessionContractDescriptor SessionContract => BoltFramework.SessionContractDescriptorProvider.Resolve(Contract);
-
-        public Type ResponseType
+        public ActionMetadata EnsureActionMetadata()
         {
-            get
+            if (ActionMetadata == null)
             {
-                if (typeof (Task).IsAssignableFrom(Action.ReturnType))
-                {
-                    return TypeHelper.GetTaskInnerTypeOrNull(Action.ReturnType) ?? typeof (void);
-                }
-
-                return Action.ReturnType;
+                throw new InvalidOperationException("Required ActionMetadata instance is not assigned to current action.");
             }
+
+            return ActionMetadata;
         }
 
         public IDictionary<object, object> Items

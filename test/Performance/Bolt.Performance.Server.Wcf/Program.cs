@@ -1,5 +1,4 @@
 ﻿using System.ServiceModel;
-
 using Bolt.Performance.Contracts;
 
 namespace Bolt.Performance.Server.Wcf

@@ -2,7 +2,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using Bolt.Client.Pipeline;
-using Bolt.Pipeline;
 using Moq;
 using Xunit;
 
@@ -56,7 +55,7 @@ namespace Bolt.Client.Test
                 var pipeline = CreatePipeline(
                     (next, ctxt) =>
                         {
-                            Assert.Equal(SessionContract.InitSession, ctxt.Action);
+                            Assert.Equal(SessionContract.InitSession.Action, ctxt.Action);
                             Assert.Equal("test", ctxt.Parameters[0]);
                             ctxt.ActionResult = "result";
                             ctxt.ServerConnection = ConnectionDescriptor;
@@ -67,7 +66,7 @@ namespace Bolt.Client.Test
                 var proxy = CreateProxy(pipeline);
                 var result = await proxy.OpenSession("test");
 
-                SessionDescriptor session = pipeline.Find<SessionMiddleware>().GetSession(proxy);
+                SessionMetadata session = pipeline.Find<SessionMiddleware>().GetSession(proxy);
                 Assert.Equal(ConnectionDescriptor, session.ServerConnection);
                 Assert.Equal(result, session.InitSessionResult);
                 Assert.Equal(ProxyState.Open, ProxyState.Open);
@@ -202,7 +201,7 @@ namespace Bolt.Client.Test
                       {
                           ctxt.ServerConnection = ConnectionDescriptor;
 
-                          if (ctxt.Action != ContractDescriptor.InitSession)
+                          if (ctxt.Action != ContractDescriptor.InitSession.Action)
                           {
                               throw new InvalidOperationException();
                           }

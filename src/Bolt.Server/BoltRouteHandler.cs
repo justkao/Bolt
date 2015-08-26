@@ -174,6 +174,8 @@ namespace Bolt.Server
             }
 
             actionContext.Action = actionDescriptor;
+            actionContext.ActionMetadata = BoltFramework.ActionMetadata.Resolve(actionDescriptor);
+
             await Execute(actionContext);
         }
 

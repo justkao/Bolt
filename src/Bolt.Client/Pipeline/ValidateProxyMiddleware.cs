@@ -19,21 +19,11 @@ namespace Bolt.Client.Pipeline
                 throw new ProxyClosedException("Proxy object is already closed.");
             }
 
-            try
-            {
-                await Next(context);
+            await Next(context);
 
-                if (proxyState == ProxyState.Ready)
-                {
-                    (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Open);
-                }
-            }
-            finally
+            if (proxyState == ProxyState.Ready)
             {
-                if (proxyState == ProxyState.Open && context.Action == context.SessionContract.DestroySession)
-                {
-                    (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
-                }
+                (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Open);
             }
         }
     }

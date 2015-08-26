@@ -7,12 +7,9 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
-
 using Bolt.Performance.Contracts;
-
 using Microsoft.Dnx.Runtime;
 using Microsoft.Dnx.Runtime.Common.CommandLine;
-
 using Newtonsoft.Json;
 
 namespace Bolt.Performance.Console
@@ -64,8 +61,8 @@ namespace Bolt.Performance.Console
                     }
                     else
                     {
-                        ExecuteConcurrencyTest(proxies, 1, repeats);
                         ExecuteConcurrencyTest(proxies, 100, repeats);
+                        ExecuteConcurrencyTest(proxies, 1, repeats);
                     }
 
                     Console.WriteLine("Test finished. Press any key to exit program ... ");
@@ -161,6 +158,8 @@ namespace Bolt.Performance.Console
             List<Person> listArg = Enumerable.Repeat(person, 3).ToList();
             DateTime dateArg = DateTime.UtcNow;
 
+            Execute(proxies, c => c.GetManyPersons(), cnt, degree, "GetManyPersons", result, previous);
+            ExecuteAsync(proxies, c => c.GetManyPersonsAsAsync(), cnt, degree, "GetManyPersonsAsync", result, previous);
             Execute(proxies, c => c.MethodWithManyArguments(listArg, 10, "someString", dateArg, person), cnt, degree, "MethodWithManyArguments", result, previous);
             ExecuteAsync(proxies, c => c.MethodWithManyArgumentsAsAsync(listArg, 10, "someString", dateArg, person), cnt, degree, "MethodWithManyArgumentsAsync", result, previous);
             Execute(proxies, c => c.DoNothing(), cnt, degree, "DoNothing", result, previous);
@@ -168,7 +167,6 @@ namespace Bolt.Performance.Console
             Execute(proxies, c => c.GetSimpleType(9), cnt, degree, "GetSimpleType", result, previous);
             Execute(proxies, c => c.GetSinglePerson(person), cnt, degree, "GetSinglePerson", result, previous);
             ExecuteAsync(proxies, c => c.GetSinglePersonAsAsync(person), cnt, degree, "GetSinglePersonAsync", result, previous);
-            Execute(proxies, c => c.GetManyPersons(), cnt, degree, "GetManyPersons", result, previous);
             List<Person> input = Enumerable.Range(0, 100).Select(Person.Create).ToList();
             Execute(proxies, c => c.DoNothingWithComplexParameter(input), cnt, degree, "DoNothingWithComplexParameter", result, previous);
             ExecuteAsync(proxies, c => c.DoNothingWithComplexParameterAsAsync(input), cnt, degree, "DoNothingWithComplexParameterAsync", result, previous);
@@ -203,11 +201,14 @@ namespace Bolt.Performance.Console
             Console.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}, Concurrency = {degree.ToString().Bold()}");
 
             result.Actions[actionName] = new ActionMetadata();
+            ActionMetadata previousMetadata = null;
+            previous?.Actions.TryGetValue(actionName, out previousMetadata);
+
             foreach (var item in contracts)
             {
                 try
                 {
-                    ExecuteAsync(action, count, degree, item.Item2, item.Item1, result.Actions[actionName], previous?.Actions[actionName])
+                    ExecuteAsync(action, count, degree, item.Item2, item.Item1, result.Actions[actionName], previousMetadata)
                         .GetAwaiter()
                         .GetResult();
                 }
@@ -226,11 +227,14 @@ namespace Bolt.Performance.Console
             Console.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}, Concurrency = {degree.ToString().Bold()}");
 
             result.Actions[actionName] = new ActionMetadata();
+            ActionMetadata previousMetadata = null;
+            previous?.Actions.TryGetValue(actionName, out previousMetadata);
+
             foreach (var item in contracts)
             {
                 try
                 {
-                    Execute(action, count, degree, item.Item2, item.Item1, result.Actions[actionName], previous?.Actions[actionName]);
+                    Execute(action, count, degree, item.Item2, item.Item1, result.Actions[actionName], previousMetadata);
                 }
                 catch (Exception e)
                 {
@@ -316,23 +320,25 @@ namespace Bolt.Performance.Console
             if (previous != null)
             {
                 var result = current.Analyze(previous, proxy);
-                string state = result.State.ToString();
-                switch (result.State)
+                if (result != null)
                 {
-                    case PerformanceState.Regression:
-                        state = state.Red().Bold();
-                        break;
-                    case PerformanceState.Improvement:
-                        state = state.Green().Bold();
-                        break;
-                }
+                    string state = result.State.ToString();
+                    switch (result.State)
+                    {
+                        case PerformanceState.Regression:
+                            state = state.Red().Bold();
+                            break;
+                        case PerformanceState.Improvement:
+                            state = state.Green().Bold();
+                            break;
+                    }
 
-                Console.WriteLine($"{result.First.ToString().White().Bold() + "ms",-25}  {state,-20} {result.GetPercentage(),-10}");
+                    Console.WriteLine($"{result.First.ToString().White().Bold() + "ms",-25}  {state,-20} {result.GetPercentage(),-10}");
+                    return;
+                }
             }
-            else
-            {
-                Console.WriteLine($"{(current.Metrics[proxy] + "ms").White().Bold()}");
-            }
+
+            Console.WriteLine($"{(current.Metrics[proxy] + "ms").White().Bold()}");
         }
 
         private bool IsPortUsed(int port)

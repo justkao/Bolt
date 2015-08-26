@@ -14,11 +14,11 @@ namespace Bolt.Server.Pipeline
 
         public override async Task InvokeAsync(ServerActionContext context)
         {
-            if (context.HasParameters)
+            if (context.EnsureActionMetadata().HasParameters)
             {
                 try
                 {
-                    BoltFramework.ValidateParameters(context.Action, context.Parameters);
+                    context.EnsureActionMetadata().ValidateParameters(context.Parameters);
                 }
                 catch (Exception e)
                 {
@@ -67,12 +67,12 @@ namespace Bolt.Server.Pipeline
 
                 if (implementedMethod == null)
                 {
-                    if (context.Action == BoltFramework.SessionContractDescriptorProvider.InitSessionDummy)
+                    if (context.Action == BoltFramework.SessionMetadata.InitSessionDummy)
                     {
                         return;
                     }
 
-                    if (context.Action == BoltFramework.SessionContractDescriptorProvider.DestroySessionDummy)
+                    if (context.Action == BoltFramework.SessionMetadata.DestroySessionDummy)
                     {
                         return;
                     }

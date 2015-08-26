@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using Bolt.Server.IntegrationTest.Core;
-using Bolt.Session;
 
 namespace Bolt.Server.IntegrationTest
 {

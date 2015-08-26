@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using System.Reflection;
-using System.Threading;
 using System.Threading.Tasks;
+
+using Bolt.Metadata;
 using Bolt.Pipeline;
 
 namespace Bolt.Server.Pipeline
@@ -11,9 +11,10 @@ namespace Bolt.Server.Pipeline
     {
         public override async Task InvokeAsync(ServerActionContext context)
         {
-            if (context.HasParameters && context.Parameters == null)
+            var actionMetadata = context.EnsureActionMetadata();
+            if (actionMetadata.HasParameters && context.Parameters == null)
             {
-                context.Parameters = await DeserializeParameters(context);
+                context.Parameters = await DeserializeParameters(context, actionMetadata);
             }
 
             await Next(context);
@@ -25,7 +26,7 @@ namespace Bolt.Server.Pipeline
             }
         }
 
-        protected virtual async Task<object[]> DeserializeParameters(ServerActionContext context)
+        protected virtual async Task<object[]> DeserializeParameters(ServerActionContext context, ActionMetadata metadata)
         {
             IObjectSerializer rawParameters;
             try
@@ -44,37 +45,41 @@ namespace Bolt.Server.Pipeline
                     e);
             }
 
-            ParameterInfo[] parameters = context.Action.GetParameters();
-            object[] parameterValues = new object[parameters.Length];
-
-            for (int i = 0; i < parameters.Length; i++)
+            using (rawParameters)
             {
-                ParameterInfo parameter = parameters[i];
-                if (parameter.IsCancellationToken())
+                object[] parameterValues = new object[metadata.Parameters.Length];
+                for (int i = 0; i < metadata.Parameters.Length; i++)
                 {
-                    parameterValues[i] = context.RequestAborted;
-                }
-
-                try
-                {
-                    object val;
-                    if (rawParameters.TryRead(parameter.Name, parameter.ParameterType, out val))
+                    if (i == metadata.CancellationTokenIndex)
                     {
-                        parameterValues[i] = val;
+                        parameterValues[i] = context.RequestAborted;
+                        continue;
+                    }
+
+                    var parameter = metadata.Parameters[i];
+
+                    try
+                    {
+                        object val;
+                        if (rawParameters.TryRead(parameter.Name, parameter.Type, out val))
+                        {
+                            parameterValues[i] = val;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        throw new BoltServerException(
+                            $"Failed to deserialize parameter '{parameter.Name}' for action '{context.Action.Name}'.",
+                            ServerErrorCode.DeserializeParameters,
+                            context.Action,
+                            context.RequestUrl,
+                            e);
                     }
                 }
-                catch (Exception e)
-                {
-                    throw new BoltServerException(
-                        $"Failed to deserialize parameter '{parameter.Name}' for action '{context.Action.Name}'.",
-                        ServerErrorCode.DeserializeParameters,
-                        context.Action,
-                        context.RequestUrl,
-                        e);
-                }
+
+                return parameterValues;
             }
 
-            return parameterValues;
         }
 
         protected virtual async Task HandleResponse(ServerActionContext context)
@@ -82,10 +87,9 @@ namespace Bolt.Server.Pipeline
             context.RequestAborted.ThrowIfCancellationRequested();
             context.HttpContext.Response.StatusCode = 200;
 
-            if (context.HasSerializableActionResult && context.ActionResult != null)
+            if (context.EnsureActionMetadata().HasResult && context.ActionResult != null)
             {
                 MemoryStream stream = new MemoryStream();
-
                 try
                 {
                     context.Configuration.Serializer.Write(stream, context.ActionResult);
@@ -100,13 +104,14 @@ namespace Bolt.Server.Pipeline
                         e);
                 }
 
-                byte[] raw = stream.ToArray();
-                if (raw.Length > 0)
+                stream.Seek(0, SeekOrigin.Begin);
+
+                if (stream.Length > 0)
                 {
-                    context.HttpContext.Response.ContentLength = raw.Length;
+                    context.HttpContext.Response.ContentLength = stream.Length;
                     context.HttpContext.Response.ContentType = context.Configuration.Serializer.ContentType;
 
-                    await context.HttpContext.Response.Body.WriteAsync(raw, 0, raw.Length, context.RequestAborted);
+                    await stream.CopyToAsync(context.HttpContext.Response.Body, BoltFramework.DefaultBufferSize, context.RequestAborted);
                 }
                 else
                 {

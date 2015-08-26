@@ -18,15 +18,15 @@ namespace Bolt.Server.Pipeline
             }
 
             // handle action parameters
-            context.Parameters = new object[metadata.ParametersCount];
+            context.Parameters = new object[context.EnsureActionMetadata().Parameters.Length];
             if (metadata.HttpContentIndex >= 0)
             {
                 context.Parameters[metadata.HttpContentIndex] = CreateHttpContent(context, metadata);
             }
 
-            if (metadata.CancellationTokenIndex >= 0)
+            if (context.ActionMetadata.CancellationTokenIndex >= 0)
             {
-                context.Parameters[metadata.CancellationTokenIndex] = context.RequestAborted;
+                context.Parameters[context.ActionMetadata.CancellationTokenIndex] = context.RequestAborted;
             }
 
             // this middleware will also handle the result

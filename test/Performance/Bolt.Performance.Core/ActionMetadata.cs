@@ -13,6 +13,11 @@ namespace Bolt.Performance
 
         public AnalyzeActionResult Analyze(ActionMetadata other, string actionName)
         {
+            if (!Metrics.ContainsKey(actionName) || !other.Metrics.ContainsKey(actionName))
+            {
+                return null;
+            }
+
             var currentValue = Metrics[actionName];
             var otherValue = other.Metrics[actionName];
 

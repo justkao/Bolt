@@ -1,21 +1,20 @@
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Bolt.Client.Helpers;
-using Bolt.Session;
+using Bolt.Metadata;
 
 namespace Bolt.Client.Pipeline
 {
-    public class SessionDescriptor
+    public class SessionMetadata
     {
         private readonly AwaitableCriticalSection _syncRoot = new AwaitableCriticalSection();
 
-        public SessionDescriptor(SessionContractDescriptor contract)
+        public SessionMetadata(SessionContractMetadata contract)
         {
             Contract = contract;
         }
 
-        public SessionContractDescriptor Contract { get; }
+        public SessionContractMetadata Contract { get; }
 
         public ConnectionDescriptor ServerConnection { get; set; }
 
@@ -33,13 +32,11 @@ namespace Bolt.Client.Pipeline
             (proxy as IPipelineCallback)?.ChangeState(state);
         }
 
-        public bool RequiresInitParameters => BoltFramework.GetSerializableParameters(Contract.InitSession).Any();
+        public bool RequiresDestroyParameters => Contract.DestroySession.HasSerializableParameters;
 
-        public bool RequiresDestroyParameters => BoltFramework.GetSerializableParameters(Contract.DestroySession).Any();
+        public bool HasInitResult => Contract.InitSession.HasResult;
 
-        public bool HasInitResult => BoltFramework.GetResultType(Contract.InitSession) != typeof(void);
-
-        public bool HasDestroyResult => BoltFramework.GetResultType(Contract.DestroySession) != typeof(void);
+        public bool HasDestroyResult => Contract.DestroySession.HasResult;
 
         public string SessionId { get; set; }
 

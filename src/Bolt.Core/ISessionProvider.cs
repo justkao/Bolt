@@ -1,4 +1,4 @@
-﻿namespace Bolt.Session
+﻿namespace Bolt
 {
     public interface ISessionProvider
     {
