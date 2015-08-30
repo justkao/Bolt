@@ -7,8 +7,8 @@ namespace Bolt.Core.Test
         [Fact]
         public void Resolve_EnsureSameInstance()
         {
-            var instance1 = BoltFramework.ActionMetadata.Resolve(BoltFramework.SessionMetadata.InitSessionDummy);
-            var instance2 = BoltFramework.ActionMetadata.Resolve(BoltFramework.SessionMetadata.InitSessionDummy);
+            var instance1 = BoltFramework.ActionMetadata.Resolve(BoltFramework.SessionMetadata.InitSessionDefault);
+            var instance2 = BoltFramework.ActionMetadata.Resolve(BoltFramework.SessionMetadata.InitSessionDefault);
 
             Assert.Same(instance2, instance1);
         }

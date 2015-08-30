@@ -67,12 +67,12 @@ namespace Bolt.Server.Pipeline
 
                 if (implementedMethod == null)
                 {
-                    if (context.Action == BoltFramework.SessionMetadata.InitSessionDummy)
+                    if (context.Action == BoltFramework.SessionMetadata.InitSessionDefault)
                     {
                         return;
                     }
 
-                    if (context.Action == BoltFramework.SessionMetadata.DestroySessionDummy)
+                    if (context.Action == BoltFramework.SessionMetadata.DestroySessionDefault)
                     {
                         return;
                     }

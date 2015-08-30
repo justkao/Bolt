@@ -13,9 +13,9 @@ namespace Bolt.Metadata
             return Get(contract);
         }
 
-        public MethodInfo InitSessionDummy => InitSessionAction;
+        public MethodInfo InitSessionDefault => InitSessionAction;
 
-        public MethodInfo DestroySessionDummy => DestroySessionAction;
+        public MethodInfo DestroySessionDefault => DestroySessionAction;
 
         protected virtual SessionContractMetadata Analyze(Type contract)
         {

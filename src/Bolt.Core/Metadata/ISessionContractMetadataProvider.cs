@@ -7,9 +7,9 @@ namespace Bolt.Metadata
     {
         SessionContractMetadata Resolve(Type contract);
 
-        MethodInfo InitSessionDummy { get; }
+        MethodInfo InitSessionDefault { get; }
 
-        MethodInfo DestroySessionDummy { get; }
+        MethodInfo DestroySessionDefault { get; }
     }
 
     public static class SessionContractMetadataProviderExtensions
