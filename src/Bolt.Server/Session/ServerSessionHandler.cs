@@ -17,7 +17,7 @@ namespace Bolt.Server.Session
                 throw new ArgumentNullException(nameof(options));
             }
 
-            _options = options.Options;
+            _options = options.Value;
         }
 
         public virtual string GetIdentifier(HttpContext context)

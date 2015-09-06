@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Http.Features;
 using Microsoft.Framework.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema;
@@ -57,7 +58,7 @@ namespace Bolt.Server.Metadata
             try
             {
                 string result = string.Empty;
-                string actionName = context.HttpContext.Request.Query["action"]?.Trim();
+                string actionName = context.HttpContext.Request.Query["action"][0]?.Trim();
                 MethodInfo action = null;
 
                 if (!string.IsNullOrEmpty(actionName))
@@ -136,19 +137,19 @@ namespace Bolt.Server.Metadata
 
         private ContractMetadata CrateContractMetadata(ServerActionContext context)
         {
-            var feature = context.HttpContext.GetFeature<IBoltFeature>();
+            var feature = context.HttpContext.Features.Get<IBoltFeature>();
             var m = new ContractMetadata
                         {
                             Actions = BoltFramework.GetContractActions(context.Contract).Select(a => a.Name).ToList(),
                             ErrorHeader = feature.ActionContext.Configuration.Options.ServerErrorHeader,
-                            ContentType = feature.ActionContext.Configuration.Serializer.ContentType
+                            ContentTypes = feature.ActionContext.Configuration.AvailableSerializers.Select(s => s.ContentType).ToArray()
                         };
             return m;
         }
 
         protected class ContractMetadata
         {
-            public string ContentType { get; set; }
+            public string[] ContentTypes { get; set; }
 
             public string ErrorHeader { get; set; }
 

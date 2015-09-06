@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Bolt.Server.Session;
+using Microsoft.AspNet.Http.Features;
 
 namespace Bolt.Server.InstanceProviders
 {
@@ -27,20 +28,20 @@ namespace Bolt.Server.InstanceProviders
             {
                 contractSession = await _sessionFactory.CreateAsync(context.HttpContext, await base.GetInstanceAsync(context, type));
                 context.ContractInstance = contractSession.Instance;
-                context.HttpContext.SetFeature(contractSession);
+                context.HttpContext.Features.Set<IContractSession>(contractSession);
 
                 await OnInstanceCreatedAsync(context, contractSession.SessionId);
                 return contractSession.Instance;
             }
 
             contractSession = await _sessionFactory.GetExistingAsync(context.HttpContext, () => base.GetInstanceAsync(context, type));
-            context.HttpContext.SetFeature(contractSession);
+            context.HttpContext.Features.Set<IContractSession>(contractSession);
             return contractSession.Instance;
         }
 
         public sealed override async Task ReleaseInstanceAsync(ServerActionContext context, object obj, Exception error)
         {
-            var session = context.HttpContext.GetFeature<IContractSession>();
+            var session = context.HttpContext.Features.Get<IContractSession>();
             if (session == null)
             {
                 return;

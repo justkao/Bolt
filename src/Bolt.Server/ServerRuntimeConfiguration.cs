@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Bolt.Server
 {
@@ -15,12 +16,16 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(other));
             }
 
-            Serializer = other.Serializer;
+            AvailableSerializers = other.AvailableSerializers;
+            DefaultSerializer = other.DefaultSerializer;
             ExceptionWrapper = other.ExceptionWrapper;
             Options = other.Options;
+            ErrorHandler = other.ErrorHandler;
         }
 
-        public ISerializer Serializer { get; set; }
+        public ISerializer DefaultSerializer { get; set; }
+
+        public IReadOnlyCollection<ISerializer> AvailableSerializers { get; set; }
 
         public IExceptionWrapper ExceptionWrapper { get; set; }
 
@@ -35,9 +40,9 @@ namespace Bolt.Server
                 return;
             }
 
-            if (other.Serializer != null)
+            if (other.AvailableSerializers != null)
             {
-                Serializer = other.Serializer;
+                AvailableSerializers = other.AvailableSerializers;
             }
             if (other.ExceptionWrapper != null)
             {
@@ -47,9 +52,9 @@ namespace Bolt.Server
             {
                 Options = other.Options;
             }
-            if (other.Serializer != null)
+            if (other.DefaultSerializer != null)
             {
-                Serializer = other.Serializer;
+                DefaultSerializer = other.DefaultSerializer;
             }
             if (other.ErrorHandler != null)
             {

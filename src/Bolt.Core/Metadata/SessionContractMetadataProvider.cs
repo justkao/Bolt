@@ -59,7 +59,7 @@ namespace Bolt.Metadata
         {
         }
 
-        protected override SessionContractMetadata Create(Type key)
+        protected override SessionContractMetadata Create(Type key, object context)
         {
             return Analyze(key);
         }

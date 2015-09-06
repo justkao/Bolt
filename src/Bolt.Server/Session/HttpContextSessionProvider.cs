@@ -20,12 +20,12 @@ namespace Bolt.Server.Session
 
         public string SessionId
         {
-            get { return _httpContextAccessor.HttpContext?.GetFeature<IContractSession>()?.SessionId; }
+            get { return _httpContextAccessor.HttpContext?.Features.Get<IContractSession>()?.SessionId; }
         }
 
         public ISession Session
         {
-            get { return _httpContextAccessor.HttpContext?.GetFeature<ISessionFeature>()?.Session; }
+            get { return _httpContextAccessor.HttpContext?.Features.Get<ISessionFeature>()?.Session; }
         }
     }
 }

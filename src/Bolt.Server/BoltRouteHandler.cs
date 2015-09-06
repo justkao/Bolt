@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Server.Metadata;
 using Microsoft.AspNet.Http;
+using Microsoft.AspNet.Http.Features;
 using Microsoft.AspNet.Routing;
 using Microsoft.Framework.Logging;
 using Microsoft.Framework.OptionsModel;
@@ -51,7 +52,7 @@ namespace Bolt.Server
             Logger = factory.CreateLogger<BoltRouteHandler>();
             MetadataHandler = metadataHandler;
             ApplicationServices = applicationServices;
-            Configuration = defaultConfiguration.Options;
+            Configuration = defaultConfiguration.Value;
             _actionResolver = actionResolver;
             _contractResolver = contractResolver;
         }
@@ -138,7 +139,7 @@ namespace Bolt.Server
                 {
                     Logger.LogWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", result[0], path);
                     actionContext.HttpContext.Response.StatusCode = (int) HttpStatusCode.NotFound;
-                    actionContext.HttpContext.Response.Headers.Set(Options.ServerErrorHeader, ServerErrorCode.ContractNotFound.ToString());
+                    actionContext.HttpContext.Response.Headers[Options.ServerErrorHeader] = ServerErrorCode.ContractNotFound.ToString();
                     routeContext.IsHandled = true;
                 }
 
@@ -168,7 +169,7 @@ namespace Bolt.Server
                 Logger.LogWarning(BoltLogId.ContractNotFound, "Action with name '{0}' not found on contract '{1}'", actionName, actionContext.ContractName);
 
                 actionContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                actionContext.HttpContext.Response.Headers.Set(Options.ServerErrorHeader, ServerErrorCode.ActionNotFound.ToString());
+                actionContext.HttpContext.Response.Headers[Options.ServerErrorHeader] = ServerErrorCode.ActionNotFound.ToString();
                 routeContext.IsHandled = true;
                 return;
             }
@@ -195,12 +196,7 @@ namespace Bolt.Server
                 }
                 catch (OperationCanceledException)
                 {
-                    if (!ctxt.RequestAborted.IsCancellationRequested)
-                    {
-                        // TODO: is this ok ? 
-                        ctxt.HttpContext.Response.Body.Dispose();
-                        Logger.LogError(BoltLogId.RequestCancelled, "Action '{0}' was cancelled.", ctxt.Action.Name);
-                    }
+                    ctxt.HttpContext.Response.StatusCode = (int)HttpStatusCode.RequestTimeout;
                 }
                 catch (Exception e)
                 {
@@ -220,7 +216,7 @@ namespace Bolt.Server
         protected virtual IBoltFeature AssignBoltFeature( ServerActionContext actionContext)
         {
             BoltFeature boltFeature = new BoltFeature(actionContext);
-            actionContext.HttpContext.SetFeature<IBoltFeature>(boltFeature);
+            actionContext.HttpContext.Features.Set<IBoltFeature>(boltFeature);
             return boltFeature;
         }
 
@@ -247,7 +243,7 @@ namespace Bolt.Server
                 return;
             }
 
-            var feature = context.HttpContext.GetFeature<IBoltFeature>();
+            var feature = context.HttpContext.Features.Get<IBoltFeature>();
 
             try
             {
@@ -270,7 +266,7 @@ namespace Bolt.Server
                 return;
             }
 
-            var feature = context.HttpContext.GetFeature<IBoltFeature>();
+            var feature = context.HttpContext.Features.Get<IBoltFeature>();
 
             try
             {

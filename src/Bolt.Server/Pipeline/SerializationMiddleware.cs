@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 
 using Bolt.Metadata;
 using Bolt.Pipeline;
+using System.Linq;
 
 namespace Bolt.Server.Pipeline
 {
@@ -11,6 +12,11 @@ namespace Bolt.Server.Pipeline
     {
         public override async Task InvokeAsync(ServerActionContext context)
         {
+            if (context.Configuration.DefaultSerializer == null)
+            {
+                context.Configuration.DefaultSerializer = PickSerializer(context);
+            }
+
             var actionMetadata = context.EnsureActionMetadata();
             if (actionMetadata.HasParameters && context.Parameters == null)
             {
@@ -32,8 +38,12 @@ namespace Bolt.Server.Pipeline
             try
             {
                 rawParameters =
-                    context.Configuration.Serializer.CreateDeserializer(
+                    context.GetRequiredSerializer().CreateDeserializer(
                         await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted));
+            }
+            catch(OperationCanceledException e)
+            {
+                throw;
             }
             catch (Exception e)
             {
@@ -66,6 +76,10 @@ namespace Bolt.Server.Pipeline
                             parameterValues[i] = val;
                         }
                     }
+                    catch (OperationCanceledException e)
+                    {
+                        throw;
+                    }
                     catch (Exception e)
                     {
                         throw new BoltServerException(
@@ -92,7 +106,7 @@ namespace Bolt.Server.Pipeline
                 MemoryStream stream = new MemoryStream();
                 try
                 {
-                    context.Configuration.Serializer.Write(stream, context.ActionResult);
+                    context.GetRequiredSerializer().Write(stream, context.ActionResult);
                 }
                 catch (Exception e)
                 {
@@ -109,7 +123,7 @@ namespace Bolt.Server.Pipeline
                 if (stream.Length > 0)
                 {
                     context.HttpContext.Response.ContentLength = stream.Length;
-                    context.HttpContext.Response.ContentType = context.Configuration.Serializer.ContentType;
+                    context.HttpContext.Response.ContentType = context.Configuration.DefaultSerializer.ContentType;
 
                     await stream.CopyToAsync(context.HttpContext.Response.Body, BoltFramework.DefaultBufferSize, context.RequestAborted);
                 }
@@ -124,6 +138,11 @@ namespace Bolt.Server.Pipeline
             }
 
             context.HttpContext.Response.Body.Dispose();
+        }
+
+        protected virtual ISerializer PickSerializer(ServerActionContext context)
+        {
+            return context.Configuration.AvailableSerializers.First();
         }
     }
 }

@@ -16,11 +16,6 @@ namespace Bolt.Server
 
         public bool DetailedServerErrors { get; set; }
 
-        BoltServerOptions IOptions<BoltServerOptions>.GetNamedOptions(string name)
-        {
-            return this;
-        }
-
-        BoltServerOptions IOptions<BoltServerOptions>.Options => this;
+        BoltServerOptions IOptions<BoltServerOptions>.Value => this;
     }
 }

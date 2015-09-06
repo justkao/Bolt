@@ -7,7 +7,7 @@ namespace Bolt.Metadata
         private readonly object _syncRoot = new object();
         private Dictionary<TKey, TValue> _cache = new Dictionary<TKey,TValue>();
 
-        protected TValue Get(TKey key)
+        protected TValue Get(TKey key, object context = null)
         {
             TValue value;
             if (_cache.TryGetValue(key, out value))
@@ -17,7 +17,7 @@ namespace Bolt.Metadata
 
             lock (_syncRoot)
             {
-                value = Create(key);
+                value = Create(key, context);
                 var copied = new Dictionary<TKey, TValue>(_cache);
                 copied[key] = value;
                 _cache = copied;
@@ -25,6 +25,6 @@ namespace Bolt.Metadata
             }
         }
 
-        protected abstract TValue Create(TKey key);
+        protected abstract TValue Create(TKey key, object context);
     }
 }

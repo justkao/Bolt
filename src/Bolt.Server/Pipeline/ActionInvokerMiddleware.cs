@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Pipeline;
+using Bolt.Metadata;
 
 namespace Bolt.Server.Pipeline
 {
@@ -49,7 +50,7 @@ namespace Bolt.Server.Pipeline
             await Next(context);
         }
 
-        private class ActionDescriptor
+        private class ActionDescriptor : ValueCache<string, MethodInfo>
         {
             public ActionDescriptor(MethodInfo actionInfo)
             {
@@ -63,7 +64,7 @@ namespace Bolt.Server.Pipeline
 
             public async Task Execute(ServerActionContext context)
             {
-                MethodInfo implementedMethod = context.ContractInstance.GetType().GetRuntimeMethod(context.Action.Name, ParametersTypes);
+                MethodInfo implementedMethod = Get(context.Action.Name, context);
 
                 if (implementedMethod == null)
                 {
@@ -102,6 +103,12 @@ namespace Bolt.Server.Pipeline
                 {
                     context.ActionResult = result;
                 }
+            }
+
+            protected override MethodInfo Create(string key, object context)
+            {
+                var serverContext = context as ServerActionContext;
+                return serverContext.ContractInstance.GetType().GetRuntimeMethod(key, ParametersTypes);
             }
         }
     }

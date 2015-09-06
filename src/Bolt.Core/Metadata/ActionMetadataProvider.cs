@@ -13,7 +13,7 @@ namespace Bolt.Metadata
             return Get(action);
         }
 
-        protected override ActionMetadata Create(MethodInfo method)
+        protected override ActionMetadata Create(MethodInfo method, object context)
         {
             ParameterInfo[] parameters = method.GetParameters();
 

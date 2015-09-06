@@ -1,0 +1,94 @@
+{
+  "Version": "0.16.0.0",
+  "Concurrency": 100,
+  "Repeats": 100000,
+  "Machine": "KAO-PC",
+  "Cores": 4,
+  "Time": "2015-09-02T20:10:55.8434073Z",
+  "Environment": {
+    "OperatingSystem": "Windows",
+    "OperatingSystemVersion": "6.1.7601.65536",
+    "RuntimeType": "CLR",
+    "RuntimeArchitecture": "x86",
+    "RuntimeVersion": "1.0.0-beta8-15553"
+  },
+  "Actions": {
+    "GetManyPersons": {
+      "Metrics": {
+        "Bolt": 27218,
+        "Bolt(G)": 27082,
+        "WCF": 21086
+      }
+    },
+    "GetManyPersonsAsync": {
+      "Metrics": {
+        "Bolt": 25871,
+        "Bolt(G)": 25715,
+        "WCF": 24397
+      }
+    },
+    "MethodWithManyArguments": {
+      "Metrics": {
+        "Bolt": 10344,
+        "Bolt(G)": 10331,
+        "WCF": 6809
+      }
+    },
+    "MethodWithManyArgumentsAsync": {
+      "Metrics": {
+        "Bolt": 8649,
+        "Bolt(G)": 8592,
+        "WCF": 10950
+      }
+    },
+    "DoNothing": {
+      "Metrics": {
+        "Bolt": 5748,
+        "Bolt(G)": 5728,
+        "WCF": 5584
+      }
+    },
+    "DoNothingAsync": {
+      "Metrics": {
+        "Bolt": 4423,
+        "Bolt(G)": 4166,
+        "WCF": 8240
+      }
+    },
+    "GetSimpleType": {
+      "Metrics": {
+        "Bolt": 10995,
+        "Bolt(G)": 10924,
+        "WCF": 5760
+      }
+    },
+    "GetSinglePerson": {
+      "Metrics": {
+        "Bolt": 11810,
+        "Bolt(G)": 11865,
+        "WCF": 6501
+      }
+    },
+    "GetSinglePersonAsync": {
+      "Metrics": {
+        "Bolt": 10309,
+        "Bolt(G)": 9769,
+        "WCF": 10044
+      }
+    },
+    "DoNothingWithComplexParameter": {
+      "Metrics": {
+        "Bolt": 28519,
+        "Bolt(G)": 28146,
+        "WCF": 19907
+      }
+    },
+    "DoNothingWithComplexParameterAsync": {
+      "Metrics": {
+        "Bolt": 28444,
+        "Bolt(G)": 28360,
+        "WCF": 37194
+      }
+    }
+  }
+}

@@ -52,7 +52,17 @@ namespace Bolt.Client.Pipeline
                                     : timeoutToken;
                     }
 
-                    return await SendAsync(request, token);
+                    var response = await SendAsync(request, token);
+                    if (response.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
+                    {
+                        throw new TimeoutException();
+                    }
+
+                    return response;
+                }
+                catch (TimeoutException)
+                {
+                    throw;
                 }
                 catch (OperationCanceledException)
                 {

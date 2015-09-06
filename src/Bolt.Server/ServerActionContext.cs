@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Extensions;
 using Microsoft.AspNet.Routing;
+using System;
 
 namespace Bolt.Server
 {
@@ -34,5 +35,16 @@ namespace Bolt.Server
         public string RequestUrl => HttpContext?.Request?.GetDisplayUrl();
 
         public ServerRuntimeConfiguration Configuration { get; set; }
+
+        public ISerializer GetRequiredSerializer()
+        {
+            var serializer = Configuration?.DefaultSerializer;
+            if (serializer == null)
+            {
+                throw new InvalidOperationException("Serializer is not assigned to current action.");
+            }
+
+            return serializer;
+        }
     }
 }

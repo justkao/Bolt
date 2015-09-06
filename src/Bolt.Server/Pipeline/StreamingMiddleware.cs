@@ -3,6 +3,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Bolt.Pipeline;
+using Microsoft.AspNet.Http;
+using Microsoft.Framework.Primitives;
 
 namespace Bolt.Server.Pipeline
 {
@@ -59,7 +61,7 @@ namespace Bolt.Server.Pipeline
             StreamContent streamContent = new StreamContent(context.HttpContext.Request.Body);
             foreach (var header in context.HttpContext.Request.Headers)
             {
-                streamContent.Headers.TryAddWithoutValidation(header.Key, header.Value);
+                streamContent.Headers.TryAddWithoutValidation(header.Key, header.Value.ToArray());
             }
 
             return streamContent;

@@ -13,6 +13,10 @@ namespace Bolt.Server.Pipeline
             {
                 await Next(context);
             }
+            catch(OperationCanceledException)
+            {
+                throw;
+            }
             catch (Exception e)
             {
                 if (context.Configuration.ErrorHandler.Handle(context, e))
@@ -51,8 +55,12 @@ namespace Bolt.Server.Pipeline
                     return Task.FromResult(0);
                 }
 
-                context.Configuration.Serializer.Write(serializedException, wrappedException);
+                context.GetRequiredSerializer().Write(serializedException, wrappedException);
                 serializedException.Seek(0, SeekOrigin.Begin);
+            }
+            catch (OperationCanceledException e)
+            {
+                throw;
             }
             catch (Exception e)
             {
@@ -71,7 +79,7 @@ namespace Bolt.Server.Pipeline
             }
 
             httpContext.Response.ContentLength = serializedException.Length;
-            httpContext.Response.ContentType = context.Configuration.Serializer.ContentType;
+            httpContext.Response.ContentType = context.GetRequiredSerializer().ContentType;
 
             return serializedException.CopyToAsync(httpContext.Response.Body, 4096, httpContext.RequestAborted);
         }

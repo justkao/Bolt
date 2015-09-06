@@ -47,7 +47,7 @@ namespace Bolt.Server.Session
 
             // establish session
             ISession session = _sessionStore.Create(sessionId, SessionTimeout, () => true, true);
-            context.SetFeature<ISessionFeature>(new SessionFeature());
+            context.Features.Set<ISessionFeature>(new SessionFeature());
             context.Session = session;
 
             return Task.FromResult((IContractSession)new DistributedContractSession(sessionId, instance, session));
@@ -64,7 +64,7 @@ namespace Bolt.Server.Session
 
             // establish session
             ISession session = _sessionStore.Create(sessionId, SessionTimeout, () => true, false);
-            context.SetFeature<ISessionFeature>(new SessionFeature());
+            context.Features.Set<ISessionFeature>(new SessionFeature());
             context.Session = session;
 
             return new DistributedContractSession(sessionId, await instanceFactory(), session);
