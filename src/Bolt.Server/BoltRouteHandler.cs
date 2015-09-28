@@ -196,7 +196,12 @@ namespace Bolt.Server
                 }
                 catch (OperationCanceledException)
                 {
-                    ctxt.HttpContext.Response.StatusCode = (int)HttpStatusCode.RequestTimeout;
+                    if (!ctxt.HttpContext.Response.HasStarted)
+                    {
+                        ctxt.HttpContext.Response.StatusCode = (int) HttpStatusCode.RequestTimeout;
+                    }
+
+                    Logger.LogWarning(BoltLogId.RequestCancelled, "Execution of '{0}' has been aborted by client.", ctxt.Action.Name);
                 }
                 catch (Exception e)
                 {
@@ -213,7 +218,7 @@ namespace Bolt.Server
             }
         }
 
-        protected virtual IBoltFeature AssignBoltFeature( ServerActionContext actionContext)
+        protected virtual IBoltFeature AssignBoltFeature(ServerActionContext actionContext)
         {
             BoltFeature boltFeature = new BoltFeature(actionContext);
             actionContext.HttpContext.Features.Set<IBoltFeature>(boltFeature);
