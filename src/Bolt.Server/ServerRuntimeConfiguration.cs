@@ -25,7 +25,7 @@ namespace Bolt.Server
 
         public ISerializer DefaultSerializer { get; set; }
 
-        public IReadOnlyCollection<ISerializer> AvailableSerializers { get; set; }
+        public IReadOnlyList<ISerializer> AvailableSerializers { get; set; }
 
         public IExceptionWrapper ExceptionWrapper { get; set; }
 

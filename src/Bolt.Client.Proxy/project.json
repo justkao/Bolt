@@ -1,5 +1,5 @@
 {
-  "version": "0.16.0-alpha1",
+  "version": "0.17.0-alpha1",
   "authors": [ "Martin Tomka" ],
   "description": "Contains factory for dynamic Bolt proxy generation.",
   "dependencies": {

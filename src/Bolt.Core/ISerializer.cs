@@ -5,7 +5,7 @@ namespace Bolt
 {
     public interface ISerializer
     {
-        string ContentType { get; }
+        string MediaType { get; }
 
         void Write(Stream stream, object data);
 

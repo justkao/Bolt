@@ -60,10 +60,6 @@ namespace Bolt.Client.Pipeline
 
                     return response;
                 }
-                catch (TimeoutException)
-                {
-                    throw;
-                }
                 catch (OperationCanceledException)
                 {
                     if (timeoutToken.IsCancellationRequested)

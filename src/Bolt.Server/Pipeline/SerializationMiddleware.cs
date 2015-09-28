@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Bolt.Metadata;
 using Bolt.Pipeline;
 using System.Linq;
+using System.Net.Http.Headers;
+using Microsoft.Framework.Primitives;
 
 namespace Bolt.Server.Pipeline
 {
@@ -41,7 +43,7 @@ namespace Bolt.Server.Pipeline
                     context.GetRequiredSerializer().CreateDeserializer(
                         await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted));
             }
-            catch(OperationCanceledException e)
+            catch(OperationCanceledException)
             {
                 throw;
             }
@@ -123,7 +125,7 @@ namespace Bolt.Server.Pipeline
                 if (stream.Length > 0)
                 {
                     context.HttpContext.Response.ContentLength = stream.Length;
-                    context.HttpContext.Response.ContentType = context.Configuration.DefaultSerializer.ContentType;
+                    context.HttpContext.Response.ContentType = context.Configuration.DefaultSerializer.MediaType;
 
                     await stream.CopyToAsync(context.HttpContext.Response.Body, BoltFramework.DefaultBufferSize, context.RequestAborted);
                 }
@@ -142,7 +144,27 @@ namespace Bolt.Server.Pipeline
 
         protected virtual ISerializer PickSerializer(ServerActionContext context)
         {
-            return context.Configuration.AvailableSerializers.First();
+            if (context.Configuration.AvailableSerializers.Count == 1)
+            {
+                return context.Configuration.AvailableSerializers[0];
+            }
+
+            StringValues value;
+            if (context.HttpContext.Request.Headers.TryGetValue("Accept", out value))
+            {
+                MediaTypeHeaderValue header;
+                if (MediaTypeHeaderValue.TryParse(value, out header))
+                {
+                    var found =
+                        context.Configuration.AvailableSerializers.FirstOrDefault(f => f.MediaType == header.MediaType);
+                    if (found != null)
+                    {
+                        return found;
+                    }
+                }
+            }
+
+            return context.Configuration.AvailableSerializers[0];
         }
     }
 }

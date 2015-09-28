@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -20,6 +21,8 @@ namespace Bolt.Server
         private readonly IActionResolver _actionResolver;
         private readonly IContractResolver _contractResolver;
         private readonly List<IContractInvoker> _invokers = new List<IContractInvoker>();
+        private readonly ConcurrentDictionary<ActionKey, MethodInfo> _actionCache = new ConcurrentDictionary<ActionKey, MethodInfo>();
+        private readonly ConcurrentDictionary<string, IContractInvoker> _contractCache = new ConcurrentDictionary<string, IContractInvoker>();
 
         public BoltRouteHandler(ILoggerFactory factory, IOptions<ServerRuntimeConfiguration> defaultConfiguration, IBoltMetadataHandler metadataHandler,
              IServiceProvider applicationServices, IActionResolver actionResolver, IContractResolver contractResolver)
@@ -118,7 +121,6 @@ namespace Bolt.Server
                     return;
                 }
             }
-
             var result = path.Value.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 
             // we have accessed Bolt root
@@ -227,18 +229,36 @@ namespace Bolt.Server
 
         protected virtual IContractInvoker FindContract(IEnumerable<IContractInvoker> registeredContracts, string contractName)
         {
+            IContractInvoker invoker;
+            if (_contractCache.TryGetValue(contractName, out invoker))
+            {
+                return invoker;
+            }
+
             var found = _contractResolver.Resolve(registeredContracts.Select(c => c.Contract), contractName);
             if (found == null)
             {
+                _contractCache.TryAdd(contractName, null);
                 return null;
             }
 
-            return registeredContracts.First(c => c.Contract == found);
+            invoker = registeredContracts.First(c => c.Contract == found);
+            _contractCache.TryAdd(contractName, invoker);
+            return invoker;
         }
 
         protected virtual MethodInfo FindAction(ServerActionContext context, string actionName)
         {
-            return _actionResolver.Resolve(context.ContractInvoker.Contract, actionName);
+            var key = new ActionKey(context.ContractInvoker.Contract, actionName);
+            MethodInfo action;
+            if (_actionCache.TryGetValue(key, out action))
+            {
+                return action;
+            }
+
+            action = _actionResolver.Resolve(context.ContractInvoker.Contract, actionName);
+            _actionCache.TryAdd(key, action);
+            return action;
         }
 
         protected virtual async Task HandleContractRootAsync(RouteContext context, IContractInvoker descriptor)
@@ -291,5 +311,38 @@ namespace Bolt.Server
         {
             return null;
         }
+
+        private struct ActionKey
+        {
+            public ActionKey(Type type, string action)
+            {
+                Type = type;
+                Action = action;
+            }
+
+            public Type Type { get; }
+
+            public string Action { get; }
+
+            public bool Equals(ActionKey other)
+            {
+                return Type == other.Type && string.Equals(Action, other.Action);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                return obj is ActionKey && Equals((ActionKey) obj);
+            }
+
+            public override int GetHashCode()
+            {
+                unchecked
+                {
+                    return ((Type?.GetHashCode() ?? 0)*397) ^ (Action?.GetHashCode() ?? 0);
+                }
+            }
+        }
+
     }
 }

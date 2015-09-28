@@ -142,7 +142,7 @@ namespace Bolt.Server.Metadata
                         {
                             Actions = BoltFramework.GetContractActions(context.Contract).Select(a => a.Name).ToList(),
                             ErrorHeader = feature.ActionContext.Configuration.Options.ServerErrorHeader,
-                            ContentTypes = feature.ActionContext.Configuration.AvailableSerializers.Select(s => s.ContentType).ToArray()
+                            ContentTypes = feature.ActionContext.Configuration.AvailableSerializers.Select(s => s.MediaType).ToArray()
                         };
             return m;
         }

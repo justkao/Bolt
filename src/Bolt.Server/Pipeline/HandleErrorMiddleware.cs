@@ -79,7 +79,7 @@ namespace Bolt.Server.Pipeline
             }
 
             httpContext.Response.ContentLength = serializedException.Length;
-            httpContext.Response.ContentType = context.GetRequiredSerializer().ContentType;
+            httpContext.Response.ContentType = context.GetRequiredSerializer().MediaType;
 
             return serializedException.CopyToAsync(httpContext.Response.Body, 4096, httpContext.RequestAborted);
         }

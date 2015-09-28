@@ -4,6 +4,7 @@ using Bolt.Server;
 using Bolt.Server.Metadata;
 using Bolt.Server.Pipeline;
 using Bolt.Server.Session;
+using Microsoft.Framework.DependencyInjection.Extensions;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Framework.DependencyInjection
@@ -21,19 +22,19 @@ namespace Microsoft.Framework.DependencyInjection
         {
             services.ConfigureOptions<ConfigureServerRuntimeConfiguration>();
 
-            services.AddTransient<ISerializer, JsonSerializer>();
-            services.AddTransient<IExceptionWrapper, JsonExceptionWrapper>();
-            services.AddTransient<IBoltRouteHandler, BoltRouteHandler>();
-            services.AddTransient<IBoltMetadataHandler, BoltMetadataHandler>();
-            services.AddTransient<IContractInvoker, ContractInvoker>();
-            services.AddTransient<IActionResolver, ActionResolver>();
-            services.AddTransient<IContractResolver, ContractResolver>();
-            services.AddTransient<IServerSessionHandler, ServerSessionHandler>();
-            services.AddTransient<ISessionProvider, HttpContextSessionProvider>();
-            services.AddTransient<IHttpSessionProvider, HttpContextSessionProvider>();
-            services.AddSingleton<IContractInvokerFactory, ContractInvokerFactory>();
-            services.AddSingleton<IServerPipelineBuilder, ServerPipelineBuilder>();
-            services.AddSingleton<IServerErrorHandler, ServerErrorHandler>();
+            services.TryAddTransient<IBoltRouteHandler, BoltRouteHandler>();
+            services.TryAddTransient<IExceptionWrapper, JsonExceptionWrapper>();
+            services.TryAddTransient<IBoltMetadataHandler, BoltMetadataHandler>();
+            services.TryAddTransient<IContractInvoker, ContractInvoker>();
+            services.TryAddSingleton<IActionResolver, ActionResolver>();
+            services.TryAddSingleton<IContractResolver, ContractResolver>();
+            services.TryAddTransient<IServerSessionHandler, ServerSessionHandler>();
+            services.TryAddTransient<ISessionProvider, HttpContextSessionProvider>();
+            services.TryAddTransient<IHttpSessionProvider, HttpContextSessionProvider>();
+            services.TryAddSingleton<IContractInvokerFactory, ContractInvokerFactory>();
+            services.TryAddSingleton<IServerPipelineBuilder, ServerPipelineBuilder>();
+            services.TryAddSingleton<IServerErrorHandler, ServerErrorHandler>();
+            services.TryAddSingleton<ISerializer, JsonSerializer>();
 
             return services;
         }

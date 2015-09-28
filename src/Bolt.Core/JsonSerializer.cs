@@ -24,7 +24,7 @@ namespace Bolt
             };
         }
 
-        public string ContentType => "application/json";
+        public string MediaType => "application/json";
 
         public Newtonsoft.Json.JsonSerializer Serializer { get; }
 

@@ -33,6 +33,8 @@ namespace Bolt.Client.Pipeline
         public override async Task InvokeAsync(ClientActionContext context)
         {
             var actionMetadata = context.EnsureActionMetadata();
+
+            context.Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Serializer.MediaType));
             if (context.EnsureRequest().Content == null && actionMetadata.HasSerializableParameters)
             {
                 context.EnsureRequest().Content = BuildRequestParameters(context, actionMetadata);
@@ -139,7 +141,6 @@ namespace Bolt.Client.Pipeline
 
             ByteArrayContent content = new ByteArrayContent(stream.ToArray());
             content.Headers.ContentLength = stream.Length;
-            context.Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Serializer.ContentType));
             return content;
         }
 
