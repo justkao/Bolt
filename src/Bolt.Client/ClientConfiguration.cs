@@ -42,6 +42,8 @@ namespace Bolt.Client
 
         public IClientErrorProvider ErrorProvider{ get; set; }
 
+        public IRequestTimeoutProvider TimeoutProvider { get; set; }
+
         public HttpMessageHandler HttpMessageHandler { get; set; }
 
         public virtual ProxyBuilder ProxyBuilder()

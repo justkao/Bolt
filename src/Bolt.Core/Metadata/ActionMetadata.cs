@@ -10,6 +10,7 @@ namespace Bolt.Metadata
     {
         internal ActionMetadata()
         {
+            Timeout = TimeSpan.Zero;
         }
 
         public ActionMetadata(MethodInfo action, ParameterMetadata[] parameters, int cancellationTokenIndex, Type resultType, bool hasSerializableParameters)
@@ -19,6 +20,7 @@ namespace Bolt.Metadata
             CancellationTokenIndex = cancellationTokenIndex;
             ResultType = resultType;
             HasSerializableParameters = hasSerializableParameters;
+            Timeout = TimeSpan.Zero;
         }
 
         public string Name => Action.Name;
@@ -38,6 +40,8 @@ namespace Bolt.Metadata
         public bool HasCancellationToken => CancellationTokenIndex >= 0;
 
         public bool HasParameters => Parameters.Length > 0;
+
+        public TimeSpan Timeout { get; internal set; }
 
         public IEnumerable<ParameterMetadata> GetSerializableParameters()
         {

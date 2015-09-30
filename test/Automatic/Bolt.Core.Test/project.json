@@ -5,10 +5,14 @@
     "Bolt.Test.Common": "",
     "xunit.runner.dnx": "2.1.0-*",
     "xunit.core": "2.1.0-*",
-    "xunit.assert": "2.1.0-*"
+    "xunit.assert": "2.1.0-*",
   },
   "frameworks": {
-    "dnx451": { }
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.Reflection.Extensions": ""
+      }
+    }
   },
   "commands": {
     "test": "xunit.runner.dnx"

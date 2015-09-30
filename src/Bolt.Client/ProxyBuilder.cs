@@ -17,8 +17,10 @@ namespace Bolt.Client
         private HttpMessageHandler _messageHandler;
         private AcceptLanguageMiddleware _acceptLanguageMiddleware;
         private StreamingMiddleware _streamingMiddleware;
+        private TimeSpan? _timeout;
+        private IRequestTimeoutProvider _timeoutProvider;
 
-        private List<IMiddleware<ClientActionContext>> _beforeSend = new List<IMiddleware<ClientActionContext>>();
+        private readonly List<IMiddleware<ClientActionContext>> _beforeSend = new List<IMiddleware<ClientActionContext>>();
 
         public ProxyBuilder(ClientConfiguration configuration)
         {
@@ -69,6 +71,18 @@ namespace Bolt.Client
             }
 
             return Url(servers.Select(s => new Uri(s)).ToArray());
+        }
+
+        public virtual ProxyBuilder Timeout(TimeSpan timeout)
+        {
+            _timeout = timeout;
+            return this;
+        }
+
+        public virtual ProxyBuilder Timeout(IRequestTimeoutProvider timeoutProvider)
+        {
+            _timeoutProvider = timeoutProvider;
+            return this;
         }
 
         public virtual ProxyBuilder Url(params Uri[] servers)
@@ -163,7 +177,14 @@ namespace Bolt.Client
                 context.Use(middleware);
             }
 
-            context.Use(new CommunicationMiddleware(_messageHandler ?? _configuration.HttpMessageHandler ?? new HttpClientHandler()));
+            context.Use(
+                new CommunicationMiddleware(_messageHandler ??
+                                            _configuration.HttpMessageHandler ?? new HttpClientHandler())
+                {
+                    ResponseTimeout = _timeout ?? _configuration.DefaultResponseTimeout,
+                    TimeoutProvider = _timeoutProvider ?? _configuration.TimeoutProvider
+                });
+
             return (IClientPipeline)context.Build();
         }
 

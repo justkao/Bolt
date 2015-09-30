@@ -1,5 +1,6 @@
 ﻿using System;
 using Bolt.Client.Pipeline;
+using Bolt.Metadata;
 using Bolt.Pipeline;
 using Xunit;
 
@@ -63,6 +64,36 @@ namespace Bolt.Client.Test
 
             Assert.NotNull(pipeline.Find<SessionMiddleware>());
             Assert.NotNull(pipeline.Find<RetryRequestMiddleware>());
+        }
+
+        [Fact]
+        public void Timeout_Ok()
+        {
+            IPipeline<ClientActionContext> pipeline =
+                ClientConfiguration.ProxyBuilder().Url("http://localhost:8080").Timeout(TimeSpan.FromSeconds(99))
+                    .BuildPipeline();
+
+            Assert.Equal(TimeSpan.FromSeconds(99), pipeline.Find<CommunicationMiddleware>().ResponseTimeout);
+        }
+
+        [Fact]
+        public void TimeoutProvider_Ok()
+        {
+            var provider = new TimeoutProvider();
+
+            IPipeline<ClientActionContext> pipeline =
+                ClientConfiguration.ProxyBuilder().Url("http://localhost:8080").Timeout(provider)
+                    .BuildPipeline();
+
+            Assert.Equal(provider, pipeline.Find<CommunicationMiddleware>().TimeoutProvider);
+        }
+
+        private class TimeoutProvider : IRequestTimeoutProvider
+        {
+            public TimeSpan GetActionTimeout(Type contract, ActionMetadata actionMetadata)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

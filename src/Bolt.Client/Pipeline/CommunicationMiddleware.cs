@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using Bolt.Metadata;
 using Bolt.Pipeline;
 
 namespace Bolt.Client.Pipeline
@@ -22,12 +23,36 @@ namespace Bolt.Client.Pipeline
 
         public TimeSpan ResponseTimeout { get; set; }
 
+        public IRequestTimeoutProvider TimeoutProvider { get; set; }
+
         public override async Task InvokeAsync(ClientActionContext context)
         {
             context.EnsureRequest().Headers.Connection.Add("Keep-Alive");
             context.EnsureRequest().Method = HttpMethod.Post;
-            context.Response = await _handler.SendAsync(context.Request, context.RequestAborted, ResponseTimeout);
+            context.Response = await _handler.SendAsync(context.Request, context.RequestAborted, GetResponseTimeout(context, ResponseTimeout));
             await Next(context);
+        }
+
+        protected virtual TimeSpan GetResponseTimeout(ClientActionContext context, TimeSpan defaultTimeout)
+        {
+            TimeSpan timeout = defaultTimeout;
+            ActionMetadata metadata = context.EnsureActionMetadata();
+            if (metadata.Timeout != TimeSpan.Zero)
+            {
+                timeout = metadata.Timeout;
+            }
+
+            var timeoutProvider = TimeoutProvider;
+            if (timeoutProvider != null)
+            {
+                var timeoutOverride = timeoutProvider.GetActionTimeout(context.Contract, context.ActionMetadata);
+                if (timeoutOverride != TimeSpan.Zero)
+                {
+                    timeout = timeoutOverride;
+                }
+            }
+
+            return timeout;
         }
 
         private class MessageHandler : DelegatingHandler
