@@ -8,7 +8,11 @@ Bolt requires interface describing your service that will be used for communicat
 ```c#
 public interface IFooService
 {
-    void DoYourThing();
+    void SimpleMethod();
+    
+    // Support for asynchrony, action timeouts and cancellation tokens
+    [Timeout(4500)]
+    Task SimpleMethodWitCancellationAsync(CancellationToken token);
 }
 ```
 
