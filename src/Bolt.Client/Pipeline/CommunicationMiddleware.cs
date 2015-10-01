@@ -96,6 +96,7 @@ namespace Bolt.Client.Pipeline
                     var response = await SendAsync(request, token);
                     if (response.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
                         throw new TimeoutException();
                     }
 
