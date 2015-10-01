@@ -35,12 +35,7 @@ namespace Bolt.Client.Pipeline
 
         protected virtual CancellationToken GetCancellationToken(CancellationToken defaultToken)
         {
-            if (defaultToken != CancellationToken.None)
-            {
-                return defaultToken;
-            }
-
-            return RequestScope.Current?.Cancellation ?? CancellationToken.None;
+            return RequestScope.Current?.Cancellation ?? defaultToken;
         }
 
         protected virtual TimeSpan GetResponseTimeout(ClientActionContext context, TimeSpan defaultTimeout)

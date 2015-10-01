@@ -5,6 +5,16 @@ namespace Bolt.Client
 {
     public class RequestScope : IDisposable
     {
+        public RequestScope(CancellationToken cancellation)
+            : this(TimeSpan.Zero, cancellation)
+        {
+        }
+
+        public RequestScope(TimeSpan timeout)
+            : this(timeout, CancellationToken.None)
+        {
+        }
+
         public RequestScope(TimeSpan timeout = default (TimeSpan), CancellationToken cancellation = default (CancellationToken))
         {
             Timeout = timeout;
@@ -34,14 +44,8 @@ namespace Bolt.Client
 
         public static RequestScope Current
         {
-            get
-            {
-                return RequestScopeCurrent.Value;
-            }
-            set
-            {
-                RequestScopeCurrent.Value = value;
-            }
+            get { return RequestScopeCurrent.Value; }
+            set { RequestScopeCurrent.Value = value; }
         }
 #endif
     }
