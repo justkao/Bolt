@@ -4,7 +4,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Bolt.Pipeline;
 using Microsoft.AspNet.Http;
-using Microsoft.Framework.Primitives;
+using Microsoft.Extensions.Primitives;
 
 namespace Bolt.Server.Pipeline
 {

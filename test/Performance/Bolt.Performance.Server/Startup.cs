@@ -2,8 +2,8 @@
 using Bolt.Performance.Contracts;
 using Bolt.Server;
 using Microsoft.AspNet.Builder;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Bolt.Performance.Server
 {

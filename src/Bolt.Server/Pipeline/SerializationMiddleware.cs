@@ -6,7 +6,7 @@ using Bolt.Metadata;
 using Bolt.Pipeline;
 using System.Linq;
 using System.Net.Http.Headers;
-using Microsoft.Framework.Primitives;
+using Microsoft.Extensions.Primitives;
 
 namespace Bolt.Server.Pipeline
 {

@@ -5,9 +5,9 @@ using Bolt.Server.InstanceProviders;
 using Bolt.Server.Pipeline;
 using Bolt.Server.Session;
 using Microsoft.AspNet.Session;
-using Microsoft.Framework.Caching.Distributed;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Bolt.Server
 {

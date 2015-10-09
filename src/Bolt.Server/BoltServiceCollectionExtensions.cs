@@ -4,10 +4,10 @@ using Bolt.Server;
 using Bolt.Server.Metadata;
 using Bolt.Server.Pipeline;
 using Bolt.Server.Session;
-using Microsoft.Framework.DependencyInjection.Extensions;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 // ReSharper disable once CheckNamespace
-namespace Microsoft.Framework.DependencyInjection
+namespace Microsoft.Extensions.DependencyInjection
 {
     public static class BoltServiceCollectionExtensions
     {

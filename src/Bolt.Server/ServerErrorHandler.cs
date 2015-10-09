@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using Bolt.Server.Pipeline;
-using Microsoft.Framework.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace Bolt.Server
 {

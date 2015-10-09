@@ -1,6 +1,6 @@
 ﻿using Bolt.Client;
 using Microsoft.AspNet.Builder;
-using Microsoft.Framework.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
 namespace Bolt.Server.IntegrationTest

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Linq;
-using Microsoft.Framework.DependencyInjection;
-using Microsoft.Framework.Logging;
-using Microsoft.Framework.OptionsModel;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.OptionsModel;
 using System.Collections.Generic;
 
 namespace Bolt.Server
@@ -12,7 +12,8 @@ namespace Bolt.Server
         private readonly IServiceProvider _provider;
         private readonly ILogger _logger;
 
-        public ConfigureServerRuntimeConfiguration(IServiceProvider provider, ILoggerFactory loggerFactory) : base(null)
+        public ConfigureServerRuntimeConfiguration(IServiceProvider provider, ILoggerFactory loggerFactory)
+            : base((o) => { })
         {
             if (provider == null)
             {
@@ -30,7 +31,8 @@ namespace Bolt.Server
 
         public override void Configure(ServerRuntimeConfiguration options)
         {
-            _logger.LogInformation(BoltLogId.ConfigureDefaultServerRuntimeConfiguration, "Configuring default server runtime configuration.");
+            _logger.LogInformation(BoltLogId.ConfigureDefaultServerRuntimeConfiguration,
+                "Configuring default server runtime configuration.");
 
             options.Options = _provider.GetRequiredService<IOptions<BoltServerOptions>>().Value;
             options.AvailableSerializers = _provider.GetRequiredService<IEnumerable<ISerializer>>().ToList();

@@ -3,7 +3,7 @@ using System.Net.Http;
 using Bolt.Client;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.TestHost;
-using Microsoft.Framework.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Bolt.Server.IntegrationTest
 {
