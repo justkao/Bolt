@@ -29,15 +29,26 @@ namespace Bolt.Client.Pipeline
         {
             context.EnsureRequest().Headers.Connection.Add("Keep-Alive");
             context.EnsureRequest().Method = HttpMethod.Post;
-            context.Response = await _handler.SendAsync(context.Request, context.RequestAborted, GetResponseTimeout(context, ResponseTimeout));
+            context.Response = await _handler.SendAsync(context.Request, GetCancellationToken(context.RequestAborted), GetResponseTimeout(context, ResponseTimeout));
             await Next(context);
+        }
+
+        protected virtual CancellationToken GetCancellationToken(CancellationToken defaultToken)
+        {
+            return RequestScope.Current?.Cancellation ?? defaultToken;
         }
 
         protected virtual TimeSpan GetResponseTimeout(ClientActionContext context, TimeSpan defaultTimeout)
         {
+            var currentScope = RequestScope.Current;
+            if (currentScope != null && currentScope.Timeout > TimeSpan.Zero)
+            {
+                return currentScope.Timeout;
+            }
+
             TimeSpan timeout = defaultTimeout;
             ActionMetadata metadata = context.EnsureActionMetadata();
-            if (metadata.Timeout != TimeSpan.Zero)
+            if (metadata.Timeout > TimeSpan.Zero)
             {
                 timeout = metadata.Timeout;
             }
@@ -46,7 +57,7 @@ namespace Bolt.Client.Pipeline
             if (timeoutProvider != null)
             {
                 var timeoutOverride = timeoutProvider.GetActionTimeout(context.Contract, context.ActionMetadata);
-                if (timeoutOverride != TimeSpan.Zero)
+                if (timeoutOverride > TimeSpan.Zero)
                 {
                     timeout = timeoutOverride;
                 }
@@ -69,7 +80,7 @@ namespace Bolt.Client.Pipeline
                 try
                 {
                     CancellationToken token = cancellationToken;
-                    if (responseTimeout != TimeSpan.Zero)
+                    if (responseTimeout > TimeSpan.Zero)
                     {
                         timeoutToken = new CancellationTokenSource(responseTimeout).Token;
                         token = token != CancellationToken.None
@@ -80,6 +91,7 @@ namespace Bolt.Client.Pipeline
                     var response = await SendAsync(request, token);
                     if (response.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
                         throw new TimeoutException();
                     }
 
