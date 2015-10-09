@@ -6,7 +6,7 @@ using Bolt.Client;
 using Bolt.Client.Proxy;
 
 using Microsoft.AspNet.Builder;
-using Microsoft.Framework.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 
 using Moq;
 

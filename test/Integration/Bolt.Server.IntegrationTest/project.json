@@ -12,7 +12,7 @@
     "Microsoft.AspNet.TestHost": "1.0.0-*",
     "Microsoft.AspNet.Localization": "1.0.0-*",
     "Microsoft.AspNet.Session": "1.0.0-*",
-    "Microsoft.Framework.Caching.SqlServer": "1.0.0-*",
+    "Microsoft.Extensions.Caching.SqlServer": "1.0.0-*",
     "EntityFramework.InMemory": "7.0.0-*",
     "Moq": "4.2.1502.911",
     "Castle.Core": "3.3.3"
