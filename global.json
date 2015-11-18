@@ -9,9 +9,9 @@
         "test/Integration",
         "wrap"
     ],
-    "sdk": {
-        "version": "1.0.0-beta8",
-        "runtime": "clr",
-        "architecture": "x86"
-    }
+  "sdk": {
+    "runtime": "clr",
+    "architecture": "x86",
+    "version": "1.0.0-rc1-final"
+  }
 }

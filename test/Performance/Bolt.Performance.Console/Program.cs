@@ -355,7 +355,7 @@ namespace Bolt.Performance.Console
 
         private string GetReportsDirectory(string testCase)
         {
-            string path = $"Reports/{Environment.MachineName}/{testCase}";
+            string path = $"../Reports/{Environment.MachineName}/{testCase}";
 
             foreach (char invalidPathChar in Path.GetInvalidPathChars())
             {
