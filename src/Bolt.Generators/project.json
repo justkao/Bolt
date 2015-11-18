@@ -6,15 +6,9 @@
     "Bolt.Sources": { "type": "build" }
   },
   "frameworks": {
-    "net45": {
-      "frameworkAssemblies": {
-      }
+    "net451": {
     },
-    "dnx451": {
-      "frameworkAssemblies": {
-      }
-    },
-    "dotnet": {
+    "dotnet5.4": {
       "dependencies": {
         "System.Collections": "4.0.11-*",
         "System.Reflection.Extensions": "4.0.0-*",

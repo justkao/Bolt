@@ -16,15 +16,15 @@
     "Microsoft.Extensions.Logging.Abstractions": "1.0.0-*",
     "Microsoft.Extensions.OptionsModel": "1.0.0-*",
     "Microsoft.Extensions.ActivatorUtilities.Sources": "1.0.0-*",
-    "Newtonsoft.Json": "6.0.8"
+    "Newtonsoft.Json": "7.0.1"
   },
   "frameworks": {
-    "dnx451": {
+    "net451": {
       "frameworkAssemblies": {
-         "System.Net.Http":"" 
+        "System.Net.Http": ""
       }
     },
-    "dnxcore50": {
+    "dotnet5.4": {
       "dependencies": {
         "System.Threading.Timer": "4.0.0-*",
         "System.Net.Http": "4.0.0-*"

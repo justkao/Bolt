@@ -3,7 +3,6 @@ using Bolt.Performance.Contracts;
 using Bolt.Server;
 using Microsoft.AspNet.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Bolt.Performance.Server
 {
@@ -22,7 +21,6 @@ namespace Bolt.Performance.Server
 
         public void Configure(IApplicationBuilder app)
         {
-            app.ApplicationServices.GetRequiredService<ILoggerFactory>().AddConsole(LogLevel.Information);
             app.UseBolt(
                 b =>
                 {

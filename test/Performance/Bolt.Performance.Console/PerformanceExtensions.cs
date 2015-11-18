@@ -1,5 +1,5 @@
 using Bolt.Client;
-using Microsoft.Dnx.Runtime;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Bolt.Performance.Console
 {

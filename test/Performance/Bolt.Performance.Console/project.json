@@ -1,16 +1,16 @@
 ﻿{
   "dependencies": {
-    "Microsoft.Framework.CommandLineUtils.Sources": {
+    "Microsoft.Extensions.CommandLineUtils.Sources": {
       "version": "1.0.0-*",
       "type": "build"
     },
-    "Newtonsoft.Json": "6.0.8",
+    "Newtonsoft.Json": "7.0.1",
     "Bolt.Sources": { "type": "build" },
     "Bolt.Generators": "",
     "Bolt.Client": "",
     "Bolt.Client.Proxy": "",
     "Bolt.Performance.Core": "",
-    "Microsoft.Dnx.Runtime.Abstractions": "1.0.0-*"
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*"
   },
   "frameworks": {
     "dnx451": {

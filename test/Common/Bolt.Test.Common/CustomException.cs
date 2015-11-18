@@ -3,7 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Bolt.Test.Common
 {
-#if NET45 || DNX451
+#if NET451 || DNX451
     [Serializable]
 #endif
     public class CustomException : Exception
@@ -27,7 +27,7 @@ namespace Bolt.Test.Common
         {
         }
 
-#if NET45 || DNX451
+#if NET451 || DNX451
         public CustomException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {

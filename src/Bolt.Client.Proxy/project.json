@@ -8,7 +8,7 @@
     "Castle.Core": "3.3.3"
   },
   "frameworks": {
-    "net45": {
+    "net451": {
     },
     "dnx451": {
     }

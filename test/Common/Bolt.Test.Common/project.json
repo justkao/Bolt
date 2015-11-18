@@ -1,7 +1,7 @@
 ﻿{
   "dependencies": { "Bolt.Sources": { "type": "build" } },
   "frameworks": {
-    "net45": {
+    "net451": {
       "frameworkAssemblies": {
         "System.Collections": "",
         "System.Runtime.Serialization": "",
@@ -9,12 +9,12 @@
         "System.Net.Http": ""
       }
     },
-    "dnx451": {
-      "frameworkAssemblies": {
-        "System.Collections": "",
-        "System.Runtime.Serialization": "",
-        "System.Net": "",
-        "System.Net.Http": ""
+    "dotnet5.4": {
+      "dependencies": {
+        "System.Collections": "4.0.10-*",
+        "System.Net.Http": "4.0.0-*",
+        "System.Runtime.Serialization.Primitives": "4.0.11-*",
+        "System.Linq": "4.0.0-*"
       }
     }
   }

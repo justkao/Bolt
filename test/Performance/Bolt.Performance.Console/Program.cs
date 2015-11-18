@@ -8,8 +8,8 @@ using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Performance.Contracts;
-using Microsoft.Dnx.Runtime;
 using Microsoft.Dnx.Runtime.Common.CommandLine;
+using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json;
 
 namespace Bolt.Performance.Console
@@ -174,20 +174,9 @@ namespace Bolt.Performance.Console
 
         private IEnumerable<Tuple<string, ITestContract>> CreateClients()
         {
-            if (IsPortUsed(Servers.BoltWebListenerServer.Port))
-            {
-                yield return new Tuple<string, ITestContract>(Proxies.BoltWebListener, ClientFactory.CreateDynamicProxy(Servers.BoltWebListenerServer));
-                yield return new Tuple<string, ITestContract>(Proxies.BoltWebListenerGeneratedProxy, ClientFactory.CreateProxy(Servers.BoltWebListenerServer));
-            }
-
             if (IsPortUsed(Servers.KestrelBoltServer.Port))
             {
                 yield return new Tuple<string, ITestContract>(Proxies.BoltKestrel, ClientFactory.CreateDynamicProxy(Servers.KestrelBoltServer));
-            }
-
-            if (IsPortUsed(Servers.IISBoltServer.Port))
-            {
-                yield return new Tuple<string, ITestContract>(Proxies.BoltIIS, ClientFactory.CreateDynamicProxy(Servers.IISBoltServer));
             }
 
             if (IsPortUsed(Servers.WcfServer.Port))

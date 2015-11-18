@@ -14,7 +14,7 @@ namespace Bolt.Server.IntegrationTest
         protected IntegrationTestBase()
         {
             ServerUrl = new Uri("http://localhost");
-            _runningServer = TestServer.Create(Configure, ConfigureServices);
+            _runningServer = TestServer.Create(Configure, s => { ConfigureServices(s); });
             ClientConfiguration = new ClientConfiguration();
             HttpMessageHandler handler = _runningServer.CreateHandler();
             ClientConfiguration.HttpMessageHandler = handler;

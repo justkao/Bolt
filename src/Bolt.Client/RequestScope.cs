@@ -31,7 +31,7 @@ namespace Bolt.Client
             Current = null;
         }
 
-#if DNX451 || NET45
+#if !DOTNET5_4
         private const string LogicalDataKey = "__Bolt_RequestScope_Current__";
 
         public static RequestScope Current

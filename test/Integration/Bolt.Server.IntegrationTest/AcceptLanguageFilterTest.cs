@@ -54,7 +54,7 @@ namespace Bolt.Server.IntegrationTest
 
         protected override void Configure(IApplicationBuilder appBuilder)
         {
-            appBuilder.UseRequestLocalization(new RequestLocalizationOptions());
+            appBuilder.UseRequestLocalization(new RequestCulture("en-us"));
             base.Configure(appBuilder);
         }
 

@@ -7,18 +7,13 @@
     "Bolt.Core": ""
   },
   "frameworks": {
-    "net45": {
+    "net451": {
       "frameworkAssemblies": {
         "System.Net.Http": ""
-        
+
       }
     },
-    "dnx451": {
-      "frameworkAssemblies": {
-        "System.Net.Http": ""
-      }
-    },
-    "dotnet": {
+    "dotnet5.4": {
       "dependencies": {
         "System.Net.Http": "4.0.0-*",
         "System.Threading": "4.0.11-*",

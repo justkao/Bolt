@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Dnx.Runtime;
 using Microsoft.Dnx.Runtime.Common.CommandLine;
+using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Bolt.Console
 {
@@ -39,6 +39,11 @@ namespace Bolt.Console
         public Assembly Load(AssemblyName assemblyName)
         {
             return Load(assemblyName.Name);
+        }
+
+        public IntPtr LoadUnmanagedLibrary(string name)
+        {
+            throw new NotSupportedException();
         }
 
         public Assembly Load(string assembly)
