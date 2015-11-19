@@ -3,7 +3,7 @@ using Bolt.Performance.Contracts;
 
 namespace Bolt.Performance.Server.Wcf
 {
-    public class Program
+    public static class Program
     {
         public static void Main(string[] args)
         {

@@ -10,7 +10,6 @@
     "net451": {
       "frameworkAssemblies": {
         "System.Net.Http": ""
-
       }
     },
     "dotnet5.4": {

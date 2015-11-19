@@ -53,7 +53,7 @@ namespace Bolt.Performance.Console
 
                 c.OnExecute(() =>
                 {
-                    int repeats = 100000;
+                    int repeats = 1000000;
 
                     if (argConcurrency.HasValue())
                     {
@@ -158,18 +158,23 @@ namespace Bolt.Performance.Console
             List<Person> listArg = Enumerable.Repeat(person, 3).ToList();
             DateTime dateArg = DateTime.UtcNow;
 
+            /*
             Execute(proxies, c => c.GetManyPersons(), cnt, degree, "GetManyPersons", result, previous);
             ExecuteAsync(proxies, c => c.GetManyPersonsAsAsync(), cnt, degree, "GetManyPersonsAsync", result, previous);
             Execute(proxies, c => c.MethodWithManyArguments(listArg, 10, "someString", dateArg, person), cnt, degree, "MethodWithManyArguments", result, previous);
             ExecuteAsync(proxies, c => c.MethodWithManyArgumentsAsAsync(listArg, 10, "someString", dateArg, person), cnt, degree, "MethodWithManyArgumentsAsync", result, previous);
             Execute(proxies, c => c.DoNothing(), cnt, degree, "DoNothing", result, previous);
+            */
+
             ExecuteAsync(proxies, c => c.DoNothingAsAsync(), cnt, degree, "DoNothingAsync", result, previous);
+            /*
             Execute(proxies, c => c.GetSimpleType(9), cnt, degree, "GetSimpleType", result, previous);
             Execute(proxies, c => c.GetSinglePerson(person), cnt, degree, "GetSinglePerson", result, previous);
             ExecuteAsync(proxies, c => c.GetSinglePersonAsAsync(person), cnt, degree, "GetSinglePersonAsync", result, previous);
             List<Person> input = Enumerable.Range(0, 100).Select(Person.Create).ToList();
             Execute(proxies, c => c.DoNothingWithComplexParameter(input), cnt, degree, "DoNothingWithComplexParameter", result, previous);
             ExecuteAsync(proxies, c => c.DoNothingWithComplexParameterAsAsync(input), cnt, degree, "DoNothingWithComplexParameterAsync", result, previous);
+            */
         }
 
         private IEnumerable<Tuple<string, ITestContract>> CreateClients()

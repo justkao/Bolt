@@ -8,19 +8,18 @@ using Microsoft.Extensions.PlatformAbstractions;
 
 namespace Bolt.Console
 {
-    public class Program
+    public static class Program
     {
         private static readonly AnsiConsole Console = AnsiConsole.GetOutput(true);
         private static readonly AnsiConsole ErrorConsole = AnsiConsole.GetError(true);
 
-        private readonly AssemblyCache _cache;
+        private static readonly AssemblyCache Cache = new AssemblyCache(
+            PlatformServices.Default.LibraryManager,
+            PlatformServices.Default.AssemblyLoadContextAccessor,
+            PlatformServices.Default.AssemblyLoaderContainer,
+            PlatformServices.Default.Application);
 
-        public Program(ILibraryManager manager, IAssemblyLoadContextAccessor accessor, IAssemblyLoaderContainer container, IApplicationEnvironment environment)
-        {
-            _cache = new AssemblyCache(manager, accessor, container, environment);
-        }
-
-        public int Main(string[] args)
+        public static int Main(string[] args)
         {
             var app = new CommandLineApplication();
             app.Name = "bolt";
@@ -41,7 +40,7 @@ namespace Bolt.Console
                 {
                     try
                     {
-                        string result = CreateSampleConfiguration(_cache).Serialize();
+                        string result = CreateSampleConfiguration(Cache).Serialize();
                         string outputFile = PathHelpers.GetOutput(Directory.GetCurrentDirectory(), argRoot.Value, "bolt.example.json");
                         bool exist = File.Exists(outputFile);
                         File.WriteAllText(outputFile, result);
@@ -73,13 +72,13 @@ namespace Bolt.Console
 
                 c.OnExecute(() =>
                 {
-                    if (string.IsNullOrEmpty(input.Value) && !_cache.IsHosted())
+                    if (string.IsNullOrEmpty(input.Value) && !Cache.IsHosted())
                     {
                         Console.WriteLine("Assembly must be specified.".Yellow());
                         return 1;
                     }
 
-                    if (!_cache.IsHosted() && !File.Exists(input.Value))
+                    if (!Cache.IsHosted() && !File.Exists(input.Value))
                     {
                         Console.WriteLine($"Assembly not found: {input.Value.White()}".Yellow());
                         return 1;
@@ -87,7 +86,7 @@ namespace Bolt.Console
 
                     try
                     {
-                        string json = RootConfig.CreateFromAssembly(_cache, input.Value, GenerateContractMode.All, false).Serialize();
+                        string json = RootConfig.CreateFromAssembly(Cache, input.Value, GenerateContractMode.All, false).Serialize();
                         var outputFile = PathHelpers.GetOutput(Path.GetDirectoryName(input.Value), output.Value(), "bolt.configuration.json");
                         bool exist = File.Exists(outputFile);
                         File.WriteAllText(outputFile, json);
@@ -126,7 +125,7 @@ namespace Bolt.Console
 
                 c.OnExecute(() =>
                 {
-                    bool inputMustExist = !_cache.IsHosted();
+                    bool inputMustExist = !Cache.IsHosted();
                     bool inputExists = !string.IsNullOrEmpty(input.Value);
 
                     if (inputMustExist && !inputExists)
@@ -145,14 +144,14 @@ namespace Bolt.Console
 
                     if (inputExists)
                     {
-                        _cache.Loader.AddDirectory(Path.GetDirectoryName(Path.GetFullPath(input.Value)));
+                        Cache.Loader.AddDirectory(Path.GetDirectoryName(Path.GetFullPath(input.Value)));
                     }
 
                     foreach (var dir in dirOption.Values)
                     {
                         if (Directory.Exists(dir))
                         {
-                            _cache.Loader.AddDirectory(dir);
+                            Cache.Loader.AddDirectory(dir);
                         }
                     }
 
@@ -174,11 +173,11 @@ namespace Bolt.Console
                     {
                         if (extension == ".exe" || extension == ".dll")
                         {
-                            rootConfig = new RootConfig(_cache);
+                            rootConfig = new RootConfig(Cache);
                             try
                             {
                                 Console.WriteLine($"Loading all contracts from assembly: ${input.Value}");
-                                _cache.Loader.Load(input.Value);
+                                Cache.Loader.Load(input.Value);
                                 rootConfig.Assemblies.Add(input.Value);
                             }
                             catch (Exception e)
@@ -195,7 +194,7 @@ namespace Bolt.Console
                         {
                             try
                             {
-                                rootConfig = RootConfig.CreateFromConfig(_cache, input.Value);
+                                rootConfig = RootConfig.CreateFromConfig(Cache, input.Value);
                             }
                             catch (Exception e)
                             {
@@ -205,7 +204,7 @@ namespace Bolt.Console
                     }
                     else
                     {
-                        rootConfig = new RootConfig(_cache);
+                        rootConfig = new RootConfig(Cache);
                         if (AddContracts(rootConfig, contractOption.Values, mode, asInternal) != 0)
                         {
                             return 1;
@@ -233,11 +232,11 @@ namespace Bolt.Console
             }
             finally
             {
-                _cache.Dispose();
+                Cache.Dispose();
             }
         }
 
-        private int AddContracts(RootConfig rootConfig, List<string> contracts, GenerateContractMode mode, bool internalVisibility)
+        private static int AddContracts(RootConfig rootConfig, List<string> contracts, GenerateContractMode mode, bool internalVisibility)
         {
             if (!contracts.Any() || contracts.Any(c => c.EndsWith(".*", StringComparison.OrdinalIgnoreCase)))
             {
