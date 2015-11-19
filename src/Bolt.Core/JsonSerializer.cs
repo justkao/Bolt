@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
@@ -28,180 +30,152 @@ namespace Bolt
 
         public Newtonsoft.Json.JsonSerializer Serializer { get; }
 
-        public void Write(Stream stream, object data)
+        public Task WriteAsync(Stream stream, object data)
         {
             if (stream == null)
             {
                 throw new ArgumentNullException(nameof(stream));
             }
 
-            using (StreamWriter writer = new StreamWriter(stream, Encoding, BufferSize, true))
+            using (StreamWriter writer = CreateStreamWriter(stream))
             {
                 Serializer.Serialize(writer, data);
             }
+
+            return CompletedTask.Done;
         }
 
-        public object Read(Type type, Stream stream)
+        public Task<object> ReadAsync(Type type, Stream stream)
         {
             if (stream == null)
             {
                 throw new ArgumentNullException(nameof(stream));
             }
 
-            using (TextReader reader = new StreamReader(stream, Encoding, true, BufferSize, true))
+            using (TextReader reader = CreateStreamReader(stream))
             {
-                return Serializer.Deserialize(reader, type);
+                return Task.FromResult(Serializer.Deserialize(reader, type));
             }
         }
 
-        public IObjectSerializer CreateSerializer(Stream inputStream)
+        public Task WriteAsync(SerializeContext context)
         {
-            if (inputStream == null) throw new ArgumentNullException(nameof(inputStream));
-
-            return new JsonObjectSerializer(this, inputStream, true);
-        }
-
-        public IObjectSerializer CreateDeserializer(Stream inputStream)
-        {
-            if (inputStream == null) throw new ArgumentNullException(nameof(inputStream));
-
-            return new JsonObjectSerializer(this, inputStream, false);
-        }
-
-        private class JsonObjectSerializer : IObjectSerializer
-        {
-            private readonly JsonSerializer _parent;
-
-            // used for writing
-            private readonly JsonTextWriter _textWriter;
-
-            // used for reading
-            private readonly JsonTextReader _textReader;
-            private bool _readingClosed;
-
-            private readonly bool _writeMode;
-
-            private Dictionary<string, string> _skippedProperties;
-
-            public JsonObjectSerializer(JsonSerializer parent, Stream stream, bool writeMode)
+            if (context == null)
             {
-                _parent = parent;
-                _writeMode = writeMode;
-                if (writeMode)
-                {
-                    _textWriter = new JsonTextWriter(new StreamWriter(stream));
-                    _textWriter.CloseOutput = false;
-                    _textWriter.WriteStartObject();
-                }
-                else
-                {
-                    _textReader = new JsonTextReader(new StreamReader(stream));
-                    _textReader.Read();
-                    _textReader.CloseInput = false;
-                }
-
-                IsEmpty = true;
+                throw new ArgumentNullException(nameof(context));
             }
 
-            public bool IsEmpty { get; private set; }
-
-            public void Write(string key, Type type, object value)
+            if (context.Stream == null)
             {
-                if (!_writeMode)
-                {
-                    throw new InvalidOperationException("Serializer can only be used for writing.");
-                }
-
-                if (key == null) throw new ArgumentNullException(nameof(key));
-                if (type == null) throw new ArgumentNullException(nameof(type));
-
-                if (Equals(value, null))
-                {
-                    return;
-                }
-
-                IsEmpty = false;
-                _textWriter.WritePropertyName(key);
-                _parent.Serializer.Serialize(_textWriter, value);
-                _textWriter.Flush();
+                throw new ArgumentNullException(nameof(context.Stream));
             }
 
-            public bool TryRead(string key, Type type, out object value)
+            if (context.Values == null || context.Values.Count == 0)
             {
-                if (_writeMode)
-                {
-                    throw new InvalidOperationException("Serializer can only be used for reading.");
-                }
+                return CompletedTask.Done;
+            }
 
-                if (key == null) throw new ArgumentNullException(nameof(key));
-                if (type == null) throw new ArgumentNullException(nameof(type));
-
-                if (_readingClosed)
+            using (StreamWriter streamWriter = CreateStreamWriter(context.Stream))
+            {
+                using (JsonTextWriter jsonWriter = new JsonTextWriter(streamWriter))
                 {
-                    value = null;
-                    return false;
-                }
+                    jsonWriter.CloseOutput = false;
+                    jsonWriter.WriteStartObject();
 
-                while (true)
-                {
-                    if (_skippedProperties != null)
+                    foreach (KeyValuePair<string, object> pair in context.Values)
                     {
-                        string raw;
-                        if (_skippedProperties.TryGetValue(key, out raw))
+                        if (Equals(pair.Value, null))
                         {
-                            if (typeof(string) == type)
-                            {
-                                value = raw;
-                                return true;
-                            }
+                            continue;
+                        }
 
-                            value = _parent.Serializer.Deserialize(new StringReader(raw), type);
-                            return true;
+                        jsonWriter.WritePropertyName(pair.Key);
+                        Serializer.Serialize(jsonWriter, pair.Value);
+                    }
+                }
+            }
+
+            return CompletedTask.Done;
+        }
+
+        public Task ReadAsync(DeserializeContext context)
+        {
+            if (context == null)
+            {
+                throw new ArgumentNullException(nameof(context));
+            }
+
+            if (context.Stream == null)
+            {
+                throw new ArgumentNullException(nameof(context.Stream));
+            }
+
+            if (context.ExpectedValues == null || context.ExpectedValues.Count == 0)
+            {
+                return CompletedTask.Done;
+            }
+
+            if (context.ExpectedValues == null)
+            {
+                throw new ArgumentNullException(nameof(context.ExpectedValues));
+            }
+
+            List<KeyValuePair<string, object>> result = new List<KeyValuePair<string, object>>();
+
+            using (StreamReader  streamReader = CreateStreamReader(context.Stream))
+            {
+                using (JsonTextReader reader = new JsonTextReader(streamReader))
+                {
+                    reader.Read();
+                    reader.CloseInput = false;
+
+                    while (true)
+                    {
+                        reader.Read();
+                        if (reader.TokenType == JsonToken.EndObject || reader.TokenType == JsonToken.None)
+                        {
+                            break;
+                        }
+
+                        if (reader.TokenType != JsonToken.PropertyName)
+                        {
+                            throw new InvalidOperationException($"Invalid json structure. Property name expected but '{reader.TokenType}' was found instead.");
+                        }
+
+                        string key = reader.Value as string;
+                        KeyValuePair<string, Type> type = context.ExpectedValues.FirstOrDefault(v => v.Key.EqualsNoCase(key));
+                        if (type.Value == null)
+                        {
+                            // we will skip this value, no type definition available
+                            reader.ReadAsString();
+                            continue;
+                        }
+
+                        reader.Read();
+                        try
+                        {
+                            result.Add(new KeyValuePair<string, object>(key, Serializer.Deserialize(reader, type.Value)));
+                        }
+                        catch (Exception e)
+                        {
+                            throw new InvalidOperationException($"Invalid json structure. Failed to deserialize '{key}' property of type '{type.Value}'.", e);
                         }
                     }
-
-                    _textReader.Read();
-                    if (_textReader.TokenType == JsonToken.EndObject || _textReader.TokenType == JsonToken.None)
-                    {
-                        _readingClosed = true;
-                        value = null;
-                        return false;
-                    }
-
-                    IsEmpty = false;
-
-                    if (_textReader.TokenType != JsonToken.PropertyName)
-                    {
-                        throw new InvalidOperationException($"Invalid json structure. Property name expected but '{_textReader.TokenType}' was found instead.");
-                    }
-
-                    if (Equals(_textReader.Value, key))
-                    {
-                        _textReader.Read();
-                        value = _parent.Serializer.Deserialize(_textReader, type);
-                        return true;
-                    }
-
-                    if (_skippedProperties == null)
-                    {
-                        _skippedProperties = new Dictionary<string, string>();
-                    }
-
-                    _skippedProperties.Add(_textReader.Value.ToString(), _textReader.ReadAsString());
                 }
             }
 
-            public void Dispose()
-            {
-                if (_writeMode)
-                {
-                    _textWriter.Close();
-                }
-                else
-                {
-                    _textReader.Close();
-                }
-            }
+            context.Values = result;
+            return CompletedTask.Done;
+        }
+
+        private static StreamReader CreateStreamReader(Stream stream)
+        {
+            return new StreamReader(stream, Encoding, true, BufferSize, true);
+        }
+
+        private static StreamWriter CreateStreamWriter(Stream stream)
+        {
+            return new StreamWriter(stream, Encoding, BufferSize, true);
         }
     }
 }

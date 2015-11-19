@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -32,12 +33,10 @@ namespace Bolt.Client.Pipeline
 
         public override async Task InvokeAsync(ClientActionContext context)
         {
-            var actionMetadata = context.EnsureActionMetadata();
-
             context.Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Serializer.MediaType));
-            if (context.EnsureRequest().Content == null && actionMetadata.HasSerializableParameters)
+            if (context.EnsureRequest().Content == null)
             {
-                context.EnsureRequest().Content = BuildRequestParameters(context, actionMetadata);
+                context.EnsureRequest().Content = await BuildRequestParametersAsync(context);
             }
 
             await Next(context);
@@ -62,7 +61,7 @@ namespace Bolt.Client.Pipeline
                 Exception errorOnServer;
                 using (Stream stream = await GetResponseStreamAsync(context.Response))
                 {
-                    errorOnServer = DeserializeException(context, stream);
+                    errorOnServer = await DeserializeExceptionAsync(context, stream);
                 }
 
                 if (errorOnServer != null)
@@ -79,7 +78,7 @@ namespace Bolt.Client.Pipeline
                 {
                     using (Stream stream = await GetResponseStreamAsync(context.Response))
                     {
-                        context.ActionResult = DeserializeResponse(context, stream);
+                        context.ActionResult = await DeserializeResponseAsync(context, stream);
                     }
                 }
             }
@@ -90,61 +89,79 @@ namespace Bolt.Client.Pipeline
             return new MemoryStream(await response.Content.ReadAsByteArrayAsync());
         }
 
-        protected virtual HttpContent BuildRequestParameters(ClientActionContext context, ActionMetadata metadata)
+        protected virtual async Task<HttpContent> BuildRequestParametersAsync(ClientActionContext context)
         {
+            ActionMetadata metadata = context.EnsureActionMetadata();
+            if (metadata.HasSerializableParameters)
+            {
+                try
+                {
+                    metadata.ValidateParameters(context.Parameters);
+                }
+                catch (Exception e)
+                {
+                    throw new BoltClientException(
+                        $"Parameter validation failed for action '{context.Action.Name}'.",
+                        ClientErrorCode.SerializeParameters,
+                        context.Action,
+                        e);
+                }
+            }
+
+            if (context.SerializeParametersContext == null)
+            {
+                context.SerializeParametersContext = CreateSerializeContext(context);
+            }
+
             try
             {
-                metadata.ValidateParameters(context.Parameters);
+                await Serializer.WriteAsync(context.SerializeParametersContext);
             }
             catch (Exception e)
             {
                 throw new BoltClientException(
-                    $"Parameter validation failed for action '{context.Action.Name}'.",
+                    $"Failed to serialize parameters for action '{context.Action.Name}'.",
                     ClientErrorCode.SerializeParameters,
                     context.Action,
                     e);
             }
 
-            MemoryStream stream = new MemoryStream();
-            using (IObjectSerializer parameterSerializer = Serializer.CreateSerializer(stream))
+            if (context.SerializeParametersContext.Stream.Length == 0)
             {
-                for (int i = 0; i < metadata.Parameters.Length; i++)
-                {
-                    if (context.Parameters[i] == null)
-                    {
-                        continue;
-                    }
-
-                    if (context.Parameters[i] is CancellationToken)
-                    {
-                        continue;
-                    }
-
-                    try
-                    {
-                        parameterSerializer.Write(metadata.Parameters[i].Name, context.Parameters[i].GetType(), context.Parameters[i]);
-                    }
-                    catch (BoltException)
-                    {
-                        throw;
-                    }
-                    catch (Exception e)
-                    {
-                        throw new BoltClientException(
-                            $"Failed to serialize value for parameter '{metadata.Parameters[i].Name}' and action '{context.Action.Name}'.",
-                            ClientErrorCode.SerializeParameters,
-                            context.Action,
-                            e);
-                    }
-                }
+                return null;
             }
 
-            ByteArrayContent content = new ByteArrayContent(stream.ToArray());
-            content.Headers.ContentLength = stream.Length;
-            return content;
+            context.SerializeParametersContext.Stream.Seek(0, SeekOrigin.Begin);
+            StreamContent content = new StreamContent(context.SerializeParametersContext.Stream);
+            content.Headers.ContentLength = context.SerializeParametersContext.Stream.Length;
+
+            return content; 
         }
 
-        protected virtual object DeserializeResponse(ClientActionContext context, Stream stream)
+        private SerializeContext CreateSerializeContext(ClientActionContext context)
+        {
+            SerializeContext ctxt = new SerializeContext() { Stream = new MemoryStream() };
+            ctxt.Values = new List<KeyValuePair<string, object>>();
+
+            for (int i = 0; i < context.ActionMetadata.Parameters.Length; i++)
+            {
+                if (context.Parameters[i] == null)
+                {
+                    continue;
+                }
+
+                if (context.Parameters[i] is CancellationToken)
+                {
+                    continue;
+                }
+
+                ctxt.Values.Add(new KeyValuePair<string, object>(context.ActionMetadata.Parameters[i].Name, context.Parameters[i]));
+            }
+
+            return ctxt;
+        }
+
+        protected virtual async Task<object> DeserializeResponseAsync(ClientActionContext context, Stream stream)
         {
             if (stream.Length == 0)
             {
@@ -153,7 +170,7 @@ namespace Bolt.Client.Pipeline
 
             try
             {
-                return Serializer.Read(context.EnsureActionMetadata().ResultType, stream);
+                return await Serializer.ReadAsync(context.EnsureActionMetadata().ResultType, stream);
             }
             catch (Exception e)
             {
@@ -165,7 +182,7 @@ namespace Bolt.Client.Pipeline
             }
         }
 
-        protected virtual Exception DeserializeException(ClientActionContext context, Stream stream)
+        protected virtual async Task<Exception> DeserializeExceptionAsync(ClientActionContext context, Stream stream)
         {
             if (stream.Length == 0)
             {
@@ -174,7 +191,7 @@ namespace Bolt.Client.Pipeline
 
             try
             {
-                object result = Serializer.Read(ExceptionWrapper.Type, stream);
+                object result = await Serializer.ReadAsync(ExceptionWrapper.Type, stream);
                 if (result == null)
                 {
                     return null;

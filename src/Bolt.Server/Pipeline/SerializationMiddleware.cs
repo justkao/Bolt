@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -36,14 +37,27 @@ namespace Bolt.Server.Pipeline
 
         protected virtual async Task<object[]> DeserializeParameters(ServerActionContext context, ActionMetadata metadata)
         {
-            IObjectSerializer rawParameters;
+            ISerializer serializer = context.GetRequiredSerializer();
+
+            DeserializeContext deserializeContext = new DeserializeContext();
+            deserializeContext.Stream = context.HttpContext.Request.Body;
+            deserializeContext.ExpectedValues = new List<KeyValuePair<string, Type>>();
+
+            for (int i = 0; i < metadata.Parameters.Length; i++)
+            {
+                if (i == metadata.CancellationTokenIndex)
+                {
+                    continue;
+                }
+
+                deserializeContext.ExpectedValues.Add(new KeyValuePair<string, Type>(metadata.Parameters[i].Name, metadata.Parameters[i].Type));
+            }
             try
             {
-                rawParameters =
-                    context.GetRequiredSerializer().CreateDeserializer(
-                        await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted));
+
+                await serializer.ReadAsync(deserializeContext);
             }
-            catch(OperationCanceledException)
+            catch (OperationCanceledException)
             {
                 throw;
             }
@@ -57,45 +71,24 @@ namespace Bolt.Server.Pipeline
                     e);
             }
 
-            using (rawParameters)
+            // now fill the invocation parameters
+            object[] parameterValues = new object[metadata.Parameters.Length];
+            if (deserializeContext.Values != null)
             {
-                object[] parameterValues = new object[metadata.Parameters.Length];
-                for (int i = 0; i < metadata.Parameters.Length; i++)
+                for (int i = 0; i < deserializeContext.Values.Count; i++)
                 {
-                    if (i == metadata.CancellationTokenIndex)
+                    KeyValuePair<string, object> pair = deserializeContext.Values[i];
+                    for (int j = 0; j < metadata.Parameters.Length; j++)
                     {
-                        parameterValues[i] = context.RequestAborted;
-                        continue;
-                    }
-
-                    var parameter = metadata.Parameters[i];
-
-                    try
-                    {
-                        object val;
-                        if (rawParameters.TryRead(parameter.Name, parameter.Type, out val))
+                        if (metadata.Parameters[j].Name.EqualsNoCase(pair.Key))
                         {
-                            parameterValues[i] = val;
+                            parameterValues[j] = pair.Value;
                         }
                     }
-                    catch (OperationCanceledException e)
-                    {
-                        throw;
-                    }
-                    catch (Exception e)
-                    {
-                        throw new BoltServerException(
-                            $"Failed to deserialize parameter '{parameter.Name}' for action '{context.Action.Name}'.",
-                            ServerErrorCode.DeserializeParameters,
-                            context.Action,
-                            context.RequestUrl,
-                            e);
-                    }
                 }
-
-                return parameterValues;
             }
 
+            return parameterValues;
         }
 
         protected virtual async Task HandleResponse(ServerActionContext context)
@@ -108,7 +101,7 @@ namespace Bolt.Server.Pipeline
                 MemoryStream stream = new MemoryStream();
                 try
                 {
-                    context.GetRequiredSerializer().Write(stream, context.ActionResult);
+                    await context.GetRequiredSerializer().WriteAsync(stream, context.ActionResult);
                 }
                 catch (Exception e)
                 {

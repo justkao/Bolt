@@ -1,26 +1,44 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Bolt
 {
+    public class SerializeContext
+    {
+        public Stream Stream { get; set; }
+
+        public IList<KeyValuePair<string, object>> Values { get; set; }
+    }
+
+    public class DeserializeContext
+    {
+        public Stream Stream { get; set; }
+
+        public IList<KeyValuePair<string, Type>> ExpectedValues { get; set; }
+
+        public IList<KeyValuePair<string, object>> Values { get; set; }
+    }
+
     public interface ISerializer
     {
         string MediaType { get; }
 
-        void Write(Stream stream, object data);
+        Task WriteAsync(Stream stream, object data);
 
-        object Read(Type type, Stream stream);
+        Task<object> ReadAsync(Type type, Stream stream);
 
-        IObjectSerializer CreateSerializer(Stream inputStream);
+        Task WriteAsync(SerializeContext context);
 
-        IObjectSerializer CreateDeserializer(Stream inputStream);
+        Task ReadAsync(DeserializeContext context);
     }
 
     public static class SerializerExtensions
     {
-        public static T Read<T>(this ISerializer serializer, Stream stream)
+        public static async Task<T> ReadAsync<T>(this ISerializer serializer, Stream stream)
         {
-            return (T)serializer.Read(typeof(T), stream);
+            return (T)(await serializer.ReadAsync(typeof(T), stream));
         }
     }
 }

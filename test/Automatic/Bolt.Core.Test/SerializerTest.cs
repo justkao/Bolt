@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
+
 using Bolt.Test.Common;
 using Xunit;
+using Bolt;
 
 namespace Bolt.Core.Test
 {
@@ -16,84 +19,84 @@ namespace Bolt.Core.Test
         public ISerializer Serializer { get; }
 
         [Fact]
-        public void Write_NullStream_ThrowsArgumentNullException()
+        public Task Write_NullStream_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => Serializer.Write(null, null));
+            return Assert.ThrowsAsync<ArgumentNullException>(() => Serializer.WriteAsync(null, null));
         }
 
         [Fact]
-        public void Read_NullArgument_ThrowsArgumentNullException()
+        public Task Read_NullArgument_ThrowsArgumentNullException()
         {
-            Assert.Throws<ArgumentNullException>(() => Serializer.Read<string>(null));
+            return Assert.ThrowsAsync<ArgumentNullException>(() => Serializer.ReadAsync<string>(null));
         }
 
         [Fact]
-        public void Write_NullObject_DoesNotThrow()
+        public Task Write_NullObject_DoesNotThrow()
         {
             MemoryStream stream = new MemoryStream();
-            Serializer.Write(stream, null);
+            return Serializer.WriteAsync(stream, null);
         }
 
         [Fact]
-        public void Read_NullObject_DoesNotThrow()
+        public async Task Read_NullObject_DoesNotThrow()
         {
             MemoryStream stream = new MemoryStream();
-            Serializer.Write(stream, null);
+            await Serializer.WriteAsync(stream, null);
 
-            CompositeType result = Serializer.Read<CompositeType>(new MemoryStream(stream.ToArray()));
+            CompositeType result = await Serializer.ReadAsync<CompositeType>(new MemoryStream(stream.ToArray()));
             Assert.Null(result);
         }
 
         [Fact]
-        public void WriteRead_ComplexType_EnsureDeserializedProperly()
+        public async Task WriteRead_ComplexType_EnsureDeserializedProperly()
         {
             CompositeType obj = CompositeType.CreateRandom();
             MemoryStream stream = new MemoryStream();
-            Serializer.Write(stream, obj);
-            CompositeType deserialized = Serializer.Read<CompositeType>(new MemoryStream(stream.ToArray()));
+            await Serializer.WriteAsync(stream, obj);
+            CompositeType deserialized = await Serializer.ReadAsync<CompositeType>(new MemoryStream(stream.ToArray()));
             Assert.Equal(obj, deserialized);
         }
 
         [Fact]
-        public void WriteRead_SpecificType_EnsureDeserializedProperly()
+        public async Task WriteRead_SpecificType_EnsureDeserializedProperly()
         {
             SimpleCustomType obj = new SimpleCustomType { BoolProperty = false };
             MemoryStream stream = new MemoryStream();
-            Serializer.Write(stream, obj);
-            SimpleCustomType deserialized = Serializer.Read<SimpleCustomType>(new MemoryStream(stream.ToArray()));
+            await Serializer.WriteAsync(stream, obj);
+            SimpleCustomType deserialized = await Serializer.ReadAsync<SimpleCustomType>(new MemoryStream(stream.ToArray()));
 
             Assert.Equal(obj, deserialized);
         }
 
         [Fact]
-        public void WriteRead_ComplexTypeAndSameStream_EnsureDeserializedProperly()
+        public async Task WriteRead_ComplexTypeAndSameStream_EnsureDeserializedProperly()
         {
             CompositeType obj = CompositeType.CreateRandom();
             MemoryStream stream = new MemoryStream();
-            Serializer.Write(stream, obj);
+            await Serializer.WriteAsync(stream, obj);
             stream.Seek(0, SeekOrigin.Begin);
-            CompositeType deserialized = Serializer.Read<CompositeType>(stream);
+            CompositeType deserialized = await Serializer.ReadAsync<CompositeType>(stream);
 
             Assert.Equal(obj, deserialized);
         }
 
         [Fact]
-        public void ReadWrite_SimpleType_EnsureValidResult()
+        public async Task ReadWrite_SimpleType_EnsureValidResult()
         {
             MemoryStream stream = new MemoryStream();
-            Serializer.Write(stream, 10);
+            await Serializer.WriteAsync(stream, 10);
 
-            var result = Serializer.Read<int>(new MemoryStream(stream.ToArray()));
+            var result = await Serializer.ReadAsync<int>(new MemoryStream(stream.ToArray()));
             Assert.Equal(10, result);
         }
 
         [Fact]
-        public void ReadWrite_SimpleList_EnsureValidResult()
+        public async Task ReadWrite_SimpleList_EnsureValidResult()
         {
             MemoryStream stream = new MemoryStream();
-            Serializer.Write(stream, new List<int> { 1, 2, 3 });
+            await Serializer.WriteAsync(stream, new List<int> { 1, 2, 3 });
 
-            var result = Serializer.Read<List<int>>(new MemoryStream(stream.ToArray()));
+            var result = await Serializer.ReadAsync<List<int>>(new MemoryStream(stream.ToArray()));
             Assert.Equal(result[0], 1);
             Assert.Equal(result[1], 2);
             Assert.Equal(result[2], 3);

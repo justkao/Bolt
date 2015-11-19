@@ -38,7 +38,7 @@ namespace Bolt.Server.Pipeline
             }
         }
 
-        protected virtual Task WriteExceptionAsync(ServerActionContext context, Exception error)
+        protected virtual async Task WriteExceptionAsync(ServerActionContext context, Exception error)
         {
             MemoryStream serializedException = new MemoryStream();
 
@@ -52,10 +52,10 @@ namespace Bolt.Server.Pipeline
                 if (wrappedException == null)
                 {
                     httpContext.Response.Body.Dispose();
-                    return Task.FromResult(0);
+                    return;
                 }
 
-                context.GetRequiredSerializer().Write(serializedException, wrappedException);
+                await context.GetRequiredSerializer().WriteAsync(serializedException, wrappedException);
                 serializedException.Seek(0, SeekOrigin.Begin);
             }
             catch (OperationCanceledException e)
@@ -75,13 +75,13 @@ namespace Bolt.Server.Pipeline
             if (serializedException.Length == 0)
             {
                 httpContext.Response.Body.Dispose();
-                return Task.FromResult(0);
+                return;
             }
 
             httpContext.Response.ContentLength = serializedException.Length;
             httpContext.Response.ContentType = context.GetRequiredSerializer().MediaType;
 
-            return serializedException.CopyToAsync(httpContext.Response.Body, 4096, httpContext.RequestAborted);
+            await serializedException.CopyToAsync(httpContext.Response.Body, 4096, httpContext.RequestAborted);
         }
     }
 }

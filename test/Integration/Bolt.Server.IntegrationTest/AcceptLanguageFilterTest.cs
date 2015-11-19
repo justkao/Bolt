@@ -26,7 +26,7 @@ namespace Bolt.Server.IntegrationTest
             Callback = new Mock<IFiltersContract>();
             Callback.Setup(f => f.OnExecute()).Callback(() =>
             {
-                Assert.Equal(expectedCulture, CultureInfo.CurrentCulture);
+                Assert.Equal(expectedCulture.Name, CultureInfo.CurrentCulture.Name);
             }).Verifiable();
 
             CreateChannel().OnExecute();
@@ -44,7 +44,7 @@ namespace Bolt.Server.IntegrationTest
             Callback = new Mock<IFiltersContract>();
             Callback.Setup(f => f.OnExecute()).Callback(() =>
             {
-                Assert.Equal(expectedCulture, CultureInfo.CurrentUICulture);
+                Assert.Equal(expectedCulture.Name, CultureInfo.CurrentUICulture.Name);
             }).Verifiable();
 
             CreateChannel().OnExecute();

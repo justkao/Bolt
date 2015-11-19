@@ -41,6 +41,8 @@ namespace Bolt.Client
 
         public IProxy Proxy { get; set; }
 
+        public SerializeContext SerializeParametersContext { get; set; }
+
         public HttpRequestMessage EnsureRequest()
         {
             if (Request == null)
