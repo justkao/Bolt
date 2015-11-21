@@ -1,0 +1,94 @@
+{
+  "Version": "0.17.0.0",
+  "Concurrency": 100,
+  "Repeats": 200000,
+  "Machine": "KAO-PC",
+  "Cores": 4,
+  "Time": "2015-11-21T13:50:25.5376108Z",
+  "Environment": {
+    "OperatingSystem": "Windows",
+    "OperatingSystemVersion": "6.1",
+    "RuntimeType": "Clr",
+    "RuntimeArchitecture": "x86",
+    "RuntimeVersion": "1.0.0-rc1-16202"
+  },
+  "Actions": {
+    "Method_Async": {
+      "Metrics": {
+        "Bolt(K)": 7053,
+        "Bolt(P+K)": 6882,
+        "WCF": 18269
+      }
+    },
+    "Method_Int_Async": {
+      "Metrics": {
+        "Bolt(K)": 15295,
+        "Bolt(P+K)": 15228,
+        "WCF": 18557
+      }
+    },
+    "Method_Many_Async": {
+      "Metrics": {
+        "Bolt(K)": 15762,
+        "Bolt(P+K)": 15907,
+        "WCF": 20882
+      }
+    },
+    "Method_Object_Async": {
+      "Metrics": {
+        "Bolt(K)": 15459,
+        "Bolt(P+K)": 15594,
+        "WCF": 20729
+      }
+    },
+    "Method_String_Async": {
+      "Metrics": {
+        "Bolt(K)": 15039,
+        "Bolt(P+K)": 15111,
+        "WCF": 18273
+      }
+    },
+    "Return_Int_Async": {
+      "Metrics": {
+        "Bolt(K)": 9913,
+        "Bolt(P+K)": 9148,
+        "WCF": 18785
+      }
+    },
+    "Return_Ints_Async": {
+      "Metrics": {
+        "Bolt(K)": 10042,
+        "Bolt(P+K)": 9343,
+        "WCF": 19366
+      }
+    },
+    "Return_Object_Async": {
+      "Metrics": {
+        "Bolt(K)": 10497,
+        "Bolt(P+K)": 9434,
+        "WCF": 20291
+      }
+    },
+    "Return_Objects_Async": {
+      "Metrics": {
+        "Bolt(K)": 12352,
+        "Bolt(P+K)": 11650,
+        "WCF": 21587
+      }
+    },
+    "Return_String_Async": {
+      "Metrics": {
+        "Bolt(K)": 10104,
+        "Bolt(P+K)": 8754,
+        "WCF": 18761
+      }
+    },
+    "Return_Strings_Async": {
+      "Metrics": {
+        "Bolt(K)": 10084,
+        "Bolt(P+K)": 9098,
+        "WCF": 19437
+      }
+    }
+  }
+}
