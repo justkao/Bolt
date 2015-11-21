@@ -53,16 +53,14 @@ namespace Bolt.Performance.Console
 
                 c.OnExecute(() =>
                 {
-                    int repeats = 1000;
-
                     if (argConcurrency.HasValue())
                     {
-                        ExecuteConcurrencyTest(proxies, int.Parse(argConcurrency.Value()), repeats);
+                        ExecuteConcurrencyTest(proxies, int.Parse(argConcurrency.Value()), 200000);
                     }
                     else
                     {
-                        ExecuteConcurrencyTest(proxies, 100, repeats);
-                        ExecuteConcurrencyTest(proxies, 1, repeats);
+                        ExecuteConcurrencyTest(proxies, 100, 200000);
+                        ExecuteConcurrencyTest(proxies, 1, 50000);
                     }
 
                     Console.WriteLine("Test finished. Press any key to exit program ... ");
@@ -116,7 +114,7 @@ namespace Bolt.Performance.Console
             return app.Execute(args);
         }
 
-        private void ExecuteConcurrencyTest(List<Tuple<string, ITestContract>> proxies, int concurrency,  int repeats)
+        private void ExecuteConcurrencyTest(List<Tuple<string, IPerformanceContract>> proxies, int concurrency,  int repeats)
         {
             var result = CreateEmptyReport(concurrency, repeats);
 
@@ -145,9 +143,9 @@ namespace Bolt.Performance.Console
             Console.WriteLine(string.Empty);
         }
 
-        private void ExecuteActions(IEnumerable<Tuple<string, ITestContract>> proxies, int cnt, int degree, PerformanceResult result, PerformanceResult previous)
+        private void ExecuteActions(IEnumerable<Tuple<string, IPerformanceContract>> proxies, int cnt, int degree, PerformanceResult result, PerformanceResult previous)
         {
-            int threads = degree*3;
+            int threads = degree * 3;
             if (threads < 25)
             {
                 threads = 25;
@@ -158,34 +156,34 @@ namespace Bolt.Performance.Console
             List<Person> listArg = Enumerable.Repeat(person, 3).ToList();
             DateTime dateArg = DateTime.UtcNow;
 
-            Execute(proxies, c => c.GetManyPersons(), cnt, degree, "GetManyPersons", result, previous);
-            ExecuteAsync(proxies, c => c.GetManyPersonsAsAsync(), cnt, degree, "GetManyPersonsAsync", result, previous);
-            Execute(proxies, c => c.MethodWithManyArguments(listArg, 10, "someString", dateArg, person), cnt, degree, "MethodWithManyArguments", result, previous);
-            ExecuteAsync(proxies, c => c.MethodWithManyArgumentsAsAsync(listArg, 10, "someString", dateArg, person), cnt, degree, "MethodWithManyArgumentsAsync", result, previous);
-            Execute(proxies, c => c.DoNothing(), cnt, degree, "DoNothing", result, previous);
-            ExecuteAsync(proxies, c => c.DoNothingAsAsync(), cnt, degree, "DoNothingAsync", result, previous);
-            Execute(proxies, c => c.GetSimpleType(9), cnt, degree, "GetSimpleType", result, previous);
-            Execute(proxies, c => c.GetSinglePerson(person), cnt, degree, "GetSinglePerson", result, previous);
-            ExecuteAsync(proxies, c => c.GetSinglePersonAsAsync(person), cnt, degree, "GetSinglePersonAsync", result, previous);
-            List<Person> input = Enumerable.Range(0, 100).Select(Person.Create).ToList();
-            Execute(proxies, c => c.DoNothingWithComplexParameter(input), cnt, degree, "DoNothingWithComplexParameter", result, previous);
-            ExecuteAsync(proxies, c => c.DoNothingWithComplexParameterAsAsync(input), cnt, degree, "DoNothingWithComplexParameterAsync", result, previous);
+            ExecuteAsync(proxies, c => c.Method_Async(), cnt, degree, nameof(IPerformanceContract.Method_Async), result, previous);
+            ExecuteAsync(proxies, c => c.Method_Int_Async(10), cnt, degree, nameof(IPerformanceContract.Method_Int_Async), result, previous);
+            ExecuteAsync(proxies, c => c.Method_Many_Async(5, "dummy", dateArg, person), cnt, degree, nameof(IPerformanceContract.Method_Many_Async), result, previous);
+            ExecuteAsync(proxies, c => c.Method_Object_Async(person), cnt, degree, nameof(IPerformanceContract.Method_Object_Async), result, previous);
+            ExecuteAsync(proxies, c => c.Method_String_Async("dummy"), cnt, degree, nameof(IPerformanceContract.Method_String_Async), result, previous);
+            ExecuteAsync(proxies, c => c.Return_Int_Async(), cnt, degree, nameof(IPerformanceContract.Return_Int_Async), result, previous);
+            ExecuteAsync(proxies, c => c.Return_Ints_Async(), cnt, degree, nameof(IPerformanceContract.Return_Ints_Async), result, previous);
+            ExecuteAsync(proxies, c => c.Return_Object_Async(), cnt, degree, nameof(IPerformanceContract.Return_Object_Async), result, previous);
+            ExecuteAsync(proxies, c => c.Return_Objects_Async(), cnt, degree, nameof(IPerformanceContract.Return_Objects_Async), result, previous);
+            ExecuteAsync(proxies, c => c.Return_String_Async(), cnt, degree, nameof(IPerformanceContract.Return_String_Async), result, previous);
+            ExecuteAsync(proxies, c => c.Return_Strings_Async(), cnt, degree, nameof(IPerformanceContract.Return_Strings_Async), result, previous);
         }
 
-        private IEnumerable<Tuple<string, ITestContract>> CreateClients()
+        private IEnumerable<Tuple<string, IPerformanceContract>> CreateClients()
         {
             if (IsPortUsed(Servers.KestrelBoltServer.Port))
             {
-                yield return new Tuple<string, ITestContract>(Proxies.BoltKestrel, ClientFactory.CreateDynamicProxy(Servers.KestrelBoltServer));
+                yield return new Tuple<string, IPerformanceContract>(Proxies.BoltKestrel, ClientFactory.CreateDynamicProxy(Servers.KestrelBoltServer));
+                yield return new Tuple<string, IPerformanceContract>(Proxies.BoltKestrelProxy, ClientFactory.CreateProxy(Servers.KestrelBoltServer));
             }
 
             if (IsPortUsed(Servers.WcfServer.Port))
             {
-                yield return new Tuple<string, ITestContract>(Proxies.WCF, ClientFactory.CreateWcf());
+                yield return new Tuple<string, IPerformanceContract>(Proxies.WCF, ClientFactory.CreateWcf());
             }
         }
 
-        private static void ExecuteAsync(IEnumerable<Tuple<string, ITestContract>> contracts, Func<ITestContract, Task> action, int count, int degree, string actionName,  PerformanceResult result, PerformanceResult previous)
+        private static void ExecuteAsync(IEnumerable<Tuple<string, IPerformanceContract>> contracts, Func<IPerformanceContract, Task> action, int count, int degree, string actionName,  PerformanceResult result, PerformanceResult previous)
         {
             Console.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}, Concurrency = {degree.ToString().Bold()}");
 
@@ -211,7 +209,7 @@ namespace Bolt.Performance.Console
             Console.WriteLine(Environment.NewLine);
         }
 
-        private static void Execute(IEnumerable<Tuple<string, ITestContract>> contracts, Action<ITestContract> action, int count, int degree, string actionName,  PerformanceResult result, PerformanceResult previous)
+        private static void Execute(IEnumerable<Tuple<string, IPerformanceContract>> contracts, Action<IPerformanceContract> action, int count, int degree, string actionName,  PerformanceResult result, PerformanceResult previous)
         {
             Console.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}, Concurrency = {degree.ToString().Bold()}");
 
@@ -234,7 +232,7 @@ namespace Bolt.Performance.Console
             Console.WriteLine(Environment.NewLine);
         }
 
-        private static async Task ExecuteAsync(Func<ITestContract, Task> action, int count, int degree, ITestContract channel, string proxy, ActionMetadata metadata, ActionMetadata previousMetadata)
+        private static async Task ExecuteAsync(Func<IPerformanceContract, Task> action, int count, int degree, IPerformanceContract channel, string proxy, ActionMetadata metadata, ActionMetadata previousMetadata)
         {
             Console.Writer.Write($"{proxy,-10}");
 
@@ -267,7 +265,7 @@ namespace Bolt.Performance.Console
             PrintTime(metadata, previousMetadata, proxy);
         }
 
-        private static void Execute(Action<ITestContract> action, int count, int degree, ITestContract channel, string proxy, ActionMetadata metadata, ActionMetadata previousMetadata)
+        private static void Execute(Action<IPerformanceContract> action, int count, int degree, IPerformanceContract channel, string proxy, ActionMetadata metadata, ActionMetadata previousMetadata)
         {
             Console.Writer.Write($"{proxy,-10}");
 

@@ -7,7 +7,7 @@ namespace Bolt.Performance.Server.Wcf
     {
         public static void Main(string[] args)
         {
-            ServiceHost host = new ServiceHost(typeof(TestContractImplementation), Servers.WcfServer);
+            ServiceHost host = new ServiceHost(typeof(PerformanceContractImplementation), Servers.WcfServer);
             host.Open();
 
             System.Console.WriteLine($"WCF Host running at {Servers.WcfServer} ... ");

@@ -14,6 +14,6 @@
     }
   },
   "commands": {
-    "gen": "Bolt.Console code --contract ITestContract --output ../Bolt.Performance.Console/Generated/ --mode Proxy"
+    "gen": "Bolt.Console code --contract IPerformanceContract --output ../Bolt.Performance.Console/Generated/ --mode Proxy"
   }
 }

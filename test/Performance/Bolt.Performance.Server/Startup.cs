@@ -27,7 +27,7 @@ namespace Bolt.Performance.Server
             app.UseBolt(
                 b =>
                 {
-                    b.Use<ITestContract, TestContractImplementation>();
+                    b.Use<IPerformanceContract, PerformanceContractImplementation>();
                 });
         }
 

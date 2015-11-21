@@ -9,7 +9,7 @@
                 return true;
             }
 
-            return string.CompareOrdinal(first?.ToLowerInvariant() ?? first, second?.ToLowerInvariant() ?? second) == 0;
+            return string.Compare(first, second, comparisonType: System.StringComparison.OrdinalIgnoreCase) == 0;
         }
     }
 }

@@ -13,6 +13,7 @@ using Microsoft.AspNet.Http.Features;
 using Microsoft.AspNet.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Primitives;
 
 namespace Bolt.Server
 {
@@ -22,7 +23,7 @@ namespace Bolt.Server
         private readonly IContractResolver _contractResolver;
         private readonly List<IContractInvoker> _invokers = new List<IContractInvoker>();
         private readonly ConcurrentDictionary<ActionKey, MethodInfo> _actionCache = new ConcurrentDictionary<ActionKey, MethodInfo>();
-        private readonly ConcurrentDictionary<string, IContractInvoker> _contractCache = new ConcurrentDictionary<string, IContractInvoker>();
+        private readonly ConcurrentDictionary<StringSegment, IContractInvoker> _contractCache = new ConcurrentDictionary<StringSegment, IContractInvoker>();
 
         public BoltRouteHandler(ILoggerFactory factory, IOptions<ServerRuntimeConfiguration> defaultConfiguration, IBoltMetadataHandler metadataHandler,
              IServiceProvider applicationServices, IActionResolver actionResolver, IContractResolver contractResolver)
@@ -113,18 +114,15 @@ namespace Bolt.Server
             actionContext.Configuration = new ServerRuntimeConfiguration(Configuration);
             AssignBoltFeature(actionContext);
 
-            var path = routeContext.HttpContext.Request.Path;
-            if (!string.IsNullOrEmpty(Options.Prefix))
+            StringSegment contract = default(StringSegment);
+            StringSegment action = default(StringSegment);
+            if (!Parse(routeContext.HttpContext.Request.Path, ref contract, ref action))
             {
-                if (!path.StartsWithSegments(new PathString("/" + Options.Prefix), out path))
-                {
-                    return;
-                }
+                return;
             }
-            var result = path.Value.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
 
             // we have accessed Bolt root
-            if (result.Length == 0)
+            if (!contract.HasValue && !action.HasValue)
             {
                 if (!string.IsNullOrEmpty(Options.Prefix))
                 {
@@ -134,12 +132,12 @@ namespace Bolt.Server
                 return;
             }
 
-            var found = FindContract(_invokers, result[0]);
+            var found = FindContract(_invokers, contract);
             if (found == null)
             {
                 if (!string.IsNullOrEmpty(Options.Prefix))
                 {
-                    Logger.LogWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", result[0], path);
+                    Logger.LogWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", contract, routeContext.HttpContext.Request.Path);
                     actionContext.HttpContext.Response.StatusCode = (int) HttpStatusCode.NotFound;
                     actionContext.HttpContext.Response.Headers[Options.ServerErrorHeader] = ServerErrorCode.ContractNotFound.ToString();
                     routeContext.IsHandled = true;
@@ -152,7 +150,7 @@ namespace Bolt.Server
             actionContext.ContractInvoker = found;
             actionContext.Contract = found.Contract;
 
-            if (result.Length == 1)
+            if (!action.HasValue)
             {
                 if (!string.IsNullOrEmpty(Options.Prefix))
                 {
@@ -164,7 +162,7 @@ namespace Bolt.Server
 
             // at this point Bolt will handle the request
             routeContext.IsHandled = true;
-            var actionName = result[1];
+            var actionName = action;
             var actionDescriptor = FindAction(actionContext, actionName);
             if (actionDescriptor == null)
             {
@@ -227,7 +225,7 @@ namespace Bolt.Server
             return boltFeature;
         }
 
-        protected virtual IContractInvoker FindContract(IEnumerable<IContractInvoker> registeredContracts, string contractName)
+        protected virtual IContractInvoker FindContract(IEnumerable<IContractInvoker> registeredContracts, StringSegment contractName)
         {
             IContractInvoker invoker;
             if (_contractCache.TryGetValue(contractName, out invoker))
@@ -235,7 +233,7 @@ namespace Bolt.Server
                 return invoker;
             }
 
-            var found = _contractResolver.Resolve(registeredContracts.Select(c => c.Contract), contractName);
+            var found = _contractResolver.Resolve(registeredContracts.Select(c => c.Contract), contractName.Value);
             if (found == null)
             {
                 _contractCache.TryAdd(contractName, null);
@@ -247,7 +245,7 @@ namespace Bolt.Server
             return invoker;
         }
 
-        protected virtual MethodInfo FindAction(ServerActionContext context, string actionName)
+        protected virtual MethodInfo FindAction(ServerActionContext context, StringSegment actionName)
         {
             var key = new ActionKey(context.ContractInvoker.Contract, actionName);
             MethodInfo action;
@@ -256,7 +254,7 @@ namespace Bolt.Server
                 return action;
             }
 
-            action = _actionResolver.Resolve(context.ContractInvoker.Contract, actionName);
+            action = _actionResolver.Resolve(context.ContractInvoker.Contract, actionName.Value);
             _actionCache.TryAdd(key, action);
             return action;
         }
@@ -312,9 +310,92 @@ namespace Bolt.Server
             return null;
         }
 
+        private bool Parse(string path, ref StringSegment contract, ref StringSegment action)
+        {
+            if (string.IsNullOrEmpty(path))
+            {
+                return false;
+            }
+
+            int index = 0;
+            if (!string.IsNullOrEmpty(Options.Prefix))
+            {
+                int boltPrefixIndex = path.IndexOf(Options.Prefix, index, StringComparison.OrdinalIgnoreCase);
+                if (boltPrefixIndex == -1)
+                {
+                    return false;
+                }
+
+                // the path before bolt prefix must contain only path delimiter
+                for (int i = 0; i < boltPrefixIndex; i++)
+                {
+                    if (path[i] != '/')
+                    {
+                        return false;
+                    }
+                }
+
+                index = boltPrefixIndex + Options.Prefix.Length;
+            }
+
+            Skip(path, ref index);
+            if (index == path.Length)
+            {
+                return true;
+            }
+
+            int contractStartIndex = index;
+            Take(path, ref index);
+            int contractEndIndex = index;
+
+            if (contractStartIndex == contractEndIndex)
+            {
+                return false;
+            }
+            contract = new StringSegment(path, contractStartIndex, contractEndIndex - contractStartIndex);
+            if (contractEndIndex == path.Length)
+            {
+                return false;
+            }
+
+            Skip(path, ref index);
+            if (index == path.Length)
+            {
+                return false;
+            }
+
+            int actionStartIndex = index;
+            Take(path, ref index);
+            int actionEndIndex = index;
+
+            if (contractEndIndex == path.Length)
+            {
+                return false;
+            }
+
+            action = new StringSegment(path, actionStartIndex, actionEndIndex - actionStartIndex);
+            return true;
+        }
+
+        private void Take(string source, ref int index)
+        {
+            while (index < source.Length && source[index] != '/')
+            {
+                index++;
+            }
+        }
+
+        private void Skip(string source, ref int index)
+        {
+            while (index < source.Length && source[index] == '/')
+            {
+                index++;
+            }
+        }
+
         private struct ActionKey
         {
-            public ActionKey(Type type, string action)
+            public ActionKey(Type type, StringSegment action)
             {
                 Type = type;
                 Action = action;
@@ -322,7 +403,7 @@ namespace Bolt.Server
 
             public Type Type { get; }
 
-            public string Action { get; }
+            public StringSegment Action { get; }
 
             public bool Equals(ActionKey other)
             {
@@ -339,7 +420,7 @@ namespace Bolt.Server
             {
                 unchecked
                 {
-                    return ((Type?.GetHashCode() ?? 0)*397) ^ (Action?.GetHashCode() ?? 0);
+                    return ((Type?.GetHashCode() ?? 0)*397) ^ Action.GetHashCode();
                 }
             }
         }

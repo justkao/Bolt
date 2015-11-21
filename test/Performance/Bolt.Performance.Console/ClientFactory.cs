@@ -12,20 +12,20 @@ namespace Bolt.Performance.Console
             ProxyFactory = new DynamicProxyFactory()
         };
 
-        public static ITestContract CreateDynamicProxy(Uri server)
+        public static IPerformanceContract CreateDynamicProxy(Uri server)
         {
-            return Config.CreateProxy<ITestContract>(server);
+            return Config.CreateProxy<IPerformanceContract>(server);
         }
 
-        public static ITestContract CreateProxy(Uri server)
+        public static IPerformanceContract CreateProxy(Uri server)
         {
-            return Config.CreateProxy<TestContractProxy>(server);
+            return Config.CreateProxy<PerformanceContractProxy>(server);
         }
 
-        public static ITestContract CreateWcf()
+        public static IPerformanceContract CreateWcf()
         {
-            ChannelFactory<ITestContract> respository = new ChannelFactory<ITestContract>(new BasicHttpBinding());
-            ITestContract channel = respository.CreateChannel(new EndpointAddress(Servers.WcfServer));
+            ChannelFactory<IPerformanceContract> respository = new ChannelFactory<IPerformanceContract>(new BasicHttpBinding());
+            IPerformanceContract channel = respository.CreateChannel(new EndpointAddress(Servers.WcfServer));
             return channel;
         }
     }

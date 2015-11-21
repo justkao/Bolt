@@ -41,7 +41,7 @@ namespace Bolt.Server.Pipeline
 
             DeserializeContext deserializeContext = new DeserializeContext();
             deserializeContext.Stream = context.HttpContext.Request.Body;
-            deserializeContext.ExpectedValues = new List<KeyValuePair<string, Type>>();
+            deserializeContext.ExpectedValues = new List<KeyValuePair<string, Type>>(metadata.Parameters.Length);
 
             for (int i = 0; i < metadata.Parameters.Length; i++)
             {
@@ -50,11 +50,12 @@ namespace Bolt.Server.Pipeline
                     continue;
                 }
 
-                deserializeContext.ExpectedValues.Add(new KeyValuePair<string, Type>(metadata.Parameters[i].Name, metadata.Parameters[i].Type));
+                var parameter = metadata.Parameters[i];
+                deserializeContext.ExpectedValues.Add(new KeyValuePair<string, Type>(parameter.Name, parameter.Type));
             }
+
             try
             {
-
                 await serializer.ReadAsync(deserializeContext);
             }
             catch (OperationCanceledException)

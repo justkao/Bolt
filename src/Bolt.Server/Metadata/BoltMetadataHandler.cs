@@ -91,7 +91,7 @@ namespace Bolt.Server.Metadata
                         JsonSchema arguments = new JsonSchema
                                                    {
                                                        Properties =
-                                                           context.ActionMetadata.GetSerializableParameters().ToDictionary(
+                                                           context.ActionMetadata.SerializableParameters.ToDictionary(
                                                                p => p.Name,
                                                                p => generator.Generate(p.Type)),
                                                        Required = true,
