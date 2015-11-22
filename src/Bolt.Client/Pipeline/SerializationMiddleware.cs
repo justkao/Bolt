@@ -16,8 +16,7 @@ namespace Bolt.Client.Pipeline
     {
         private readonly MediaTypeWithQualityHeaderValue _acceptHeader;
 
-        public SerializationMiddleware(ISerializer serializer, IExceptionWrapper exceptionWrapper,
-            IClientErrorProvider errorProvider)
+        public SerializationMiddleware(ISerializer serializer, IExceptionWrapper exceptionWrapper, IClientErrorProvider errorProvider)
         {
             if (serializer == null) throw new ArgumentNullException(nameof(serializer));
             if (exceptionWrapper == null) throw new ArgumentNullException(nameof(exceptionWrapper));
@@ -91,7 +90,7 @@ namespace Bolt.Client.Pipeline
 
         protected virtual async Task<Stream> GetResponseStreamAsync(HttpResponseMessage response)
         {
-            return new MemoryStream(await response.Content.ReadAsByteArrayAsync());
+            return await response.Content.ReadAsStreamAsync();
         }
 
         protected virtual HttpContent BuildRequestContent(ClientActionContext context)
@@ -114,7 +113,7 @@ namespace Bolt.Client.Pipeline
             }
 
             var serializeContext = CreateSerializeContext(context);
-            if (serializeContext?.Values != null)
+            if (serializeContext?.Values?.Count > 0)
             {
                 return new SerializeParametersContent(serializeContext, Serializer, context);
             }
@@ -149,11 +148,6 @@ namespace Bolt.Client.Pipeline
 
         protected virtual async Task<object> DeserializeResponseAsync(ClientActionContext context, Stream stream)
         {
-            if (stream.Length == 0)
-            {
-                return null;
-            }
-
             try
             {
                 return await Serializer.ReadAsync(context.EnsureActionMetadata().ResultType, stream);
@@ -223,7 +217,6 @@ namespace Bolt.Client.Pipeline
             protected override async Task SerializeToStreamAsync(Stream stream, TransportContext context)
             {
                 _context.Stream = stream;
-
                 try
                 {
                     await _serializer.WriteAsync(_context);

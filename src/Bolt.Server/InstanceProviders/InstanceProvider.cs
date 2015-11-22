@@ -24,7 +24,7 @@ namespace Bolt.Server.InstanceProviders
         protected virtual object CreateInstance(ServerActionContext context, Type type)
         {
             var createFactory = _typeActivatorCache.GetOrAdd(type, t => ActivatorUtilities.CreateFactory(type, new Type[] { }));
-            return createFactory(context.HttpContext.ApplicationServices, null);
+            return createFactory(context.HttpContext.RequestServices, null);
         }
     }
 }
