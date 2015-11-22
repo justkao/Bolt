@@ -1,9 +1,10 @@
 ﻿using System.Threading;
-using Bolt.Performance.Contracts;
 using Bolt.Server;
+using Bolt.Performance.Contracts;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Bolt.Performance.Server
 {
@@ -24,6 +25,8 @@ namespace Bolt.Performance.Server
 
         public void Configure(IApplicationBuilder app)
         {
+            // app.ApplicationServices.GetRequiredService<ILoggerFactory>().AddConsole(minLevel: LogLevel.Debug);
+
             app.UseBolt(
                 b =>
                 {

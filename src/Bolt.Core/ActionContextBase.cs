@@ -9,9 +9,10 @@ namespace Bolt
     /// <summary>
     /// Base class for server and client action context.
     /// </summary>
-    public abstract class ActionContextBase : IContractProvider, IDisposable
+    public abstract class ActionContextBase : IContractProvider
     {
         private IDictionary<object, object> _items;
+        private ActionMetadata _actionMetadata;
 
         protected ActionContextBase(ActionContextBase context)
         {
@@ -24,17 +25,6 @@ namespace Bolt
             RequestAborted = context.RequestAborted;
         }
 
-        protected ActionContextBase(Type contract, MethodInfo action, object[] parameters)
-        {
-            if (contract == null) throw new ArgumentNullException(nameof(contract));
-            if (action == null) throw new ArgumentNullException(nameof(action));
-
-            Contract = contract;
-            Action = action;
-            Parameters = parameters;
-            ActionMetadata = BoltFramework.ActionMetadata.Resolve(action);
-        }
-
         protected ActionContextBase()
         {
         }
@@ -43,7 +33,23 @@ namespace Bolt
 
         public MethodInfo Action { get; set; }
 
-        public ActionMetadata ActionMetadata { get; set; }
+        public ActionMetadata ActionMetadata
+        {
+            get
+            {
+                if (Action == null)
+                {
+                    return null;
+                }
+
+                if ( _actionMetadata == null)
+                {
+                    _actionMetadata = BoltFramework.ActionMetadata.Resolve(Action);
+                }
+
+                return _actionMetadata;
+            }
+        }
 
         public object ActionResult { get; set; }
 
@@ -69,19 +75,15 @@ namespace Bolt
             set { _items = value; }
         }
 
-        public void Dispose()
+        public virtual void Reset()
         {
-            Disposing(true);
-            GC.SuppressFinalize(this);
-        }
-
-        protected virtual void Disposing(bool dispose)
-        {
-        }
-
-        ~ActionContextBase()
-        {
-            Disposing(false);
+            Contract = null;
+            Action = null;
+            ActionResult = null;
+            Parameters = null;
+            RequestAborted = CancellationToken.None;
+            _items = null;
+            _actionMetadata = null;
         }
     }
 }

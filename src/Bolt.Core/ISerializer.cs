@@ -1,26 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
 namespace Bolt
 {
-    public class SerializeContext
-    {
-        public Stream Stream { get; set; }
-
-        public IList<KeyValuePair<string, object>> Values { get; set; }
-    }
-
-    public class DeserializeContext
-    {
-        public Stream Stream { get; set; }
-
-        public IList<KeyValuePair<string, Type>> ExpectedValues { get; set; }
-
-        public IList<KeyValuePair<string, object>> Values { get; set; }
-    }
-
     public interface ISerializer
     {
         string MediaType { get; }

@@ -10,7 +10,7 @@ namespace Bolt.Performance
     {
         public string GetReportFileName(string name, Version version)
         {
-            return $"{name}_{DateTime.UtcNow.ToFileTimeUtc()}_{version}.json";
+            return $"{name}_{version}_{DateTime.Now.ToString("dd-MM-yyyy--hh-mm-ss")}.json";
         }
 
         public PerformanceResult ReadLatestReport(string directory, int repeats, int concurrency)

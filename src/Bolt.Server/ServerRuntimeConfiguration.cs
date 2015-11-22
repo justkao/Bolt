@@ -33,6 +33,15 @@ namespace Bolt.Server
 
         public IServerErrorHandler ErrorHandler { get; set; }
 
+        public void Reset()
+        {
+            DefaultSerializer = null;
+            AvailableSerializers = null;
+            ExceptionWrapper = null;
+            Options = null;
+            ErrorHandler = null;
+        }
+
         public void Merge(ServerRuntimeConfiguration other)
         {
             if (other == null)

@@ -14,20 +14,11 @@ using Newtonsoft.Json;
 
 namespace Bolt.Performance.Console
 {
-    public class Program
+    public static class Program
     {
         private static AnsiConsole Console = AnsiConsole.GetOutput(true);
 
-        private readonly IRuntimeEnvironment _runtime;
-        private readonly IApplicationEnvironment _applicationEnvironment;
-
-        public Program(IRuntimeEnvironment runtime, IApplicationEnvironment applicationEnvironment)
-        {
-            _runtime = runtime;
-            _applicationEnvironment = applicationEnvironment;
-        }
-
-        public int Main(params string[] args)
+        public static int Main(params string[] args)
         {
             ServicePointManager.DefaultConnectionLimit = 1000;
             ServicePointManager.MaxServicePoints = 1000;
@@ -59,6 +50,7 @@ namespace Bolt.Performance.Console
                     }
                     else
                     {
+                        ExecuteConcurrencyTest(proxies, 200, 300000);
                         ExecuteConcurrencyTest(proxies, 100, 200000);
                         ExecuteConcurrencyTest(proxies, 1, 50000);
                     }
@@ -114,7 +106,7 @@ namespace Bolt.Performance.Console
             return app.Execute(args);
         }
 
-        private void ExecuteConcurrencyTest(List<Tuple<string, IPerformanceContract>> proxies, int concurrency,  int repeats)
+        private static void ExecuteConcurrencyTest(List<Tuple<string, IPerformanceContract>> proxies, int concurrency,  int repeats)
         {
             var result = CreateEmptyReport(concurrency, repeats);
 
@@ -143,7 +135,7 @@ namespace Bolt.Performance.Console
             Console.WriteLine(string.Empty);
         }
 
-        private void ExecuteActions(IEnumerable<Tuple<string, IPerformanceContract>> proxies, int cnt, int degree, PerformanceResult result, PerformanceResult previous)
+        private static void ExecuteActions(IEnumerable<Tuple<string, IPerformanceContract>> proxies, int cnt, int degree, PerformanceResult result, PerformanceResult previous)
         {
             int threads = degree * 3;
             if (threads < 25)
@@ -152,13 +144,15 @@ namespace Bolt.Performance.Console
             }
 
             ThreadPool.SetMinThreads(threads, threads);
+
             Person person = Person.Create(10);
-            List<Person> listArg = Enumerable.Repeat(person, 3).ToList();
+            List<Person> large = Enumerable.Repeat(person, 100).ToList();
             DateTime dateArg = DateTime.UtcNow;
 
             ExecuteAsync(proxies, c => c.Method_Async(), cnt, degree, nameof(IPerformanceContract.Method_Async), result, previous);
             ExecuteAsync(proxies, c => c.Method_Int_Async(10), cnt, degree, nameof(IPerformanceContract.Method_Int_Async), result, previous);
             ExecuteAsync(proxies, c => c.Method_Many_Async(5, "dummy", dateArg, person), cnt, degree, nameof(IPerformanceContract.Method_Many_Async), result, previous);
+            ExecuteAsync(proxies, c => c.Method_Large_Async(large), cnt, degree, nameof(IPerformanceContract.Method_Large_Async), result, previous);
             ExecuteAsync(proxies, c => c.Method_Object_Async(person), cnt, degree, nameof(IPerformanceContract.Method_Object_Async), result, previous);
             ExecuteAsync(proxies, c => c.Method_String_Async("dummy"), cnt, degree, nameof(IPerformanceContract.Method_String_Async), result, previous);
             ExecuteAsync(proxies, c => c.Return_Int_Async(), cnt, degree, nameof(IPerformanceContract.Return_Int_Async), result, previous);
@@ -166,10 +160,11 @@ namespace Bolt.Performance.Console
             ExecuteAsync(proxies, c => c.Return_Object_Async(), cnt, degree, nameof(IPerformanceContract.Return_Object_Async), result, previous);
             ExecuteAsync(proxies, c => c.Return_Objects_Async(), cnt, degree, nameof(IPerformanceContract.Return_Objects_Async), result, previous);
             ExecuteAsync(proxies, c => c.Return_String_Async(), cnt, degree, nameof(IPerformanceContract.Return_String_Async), result, previous);
+            ExecuteAsync(proxies, c => c.Return_Large_Async(), cnt, degree, nameof(IPerformanceContract.Return_Large_Async), result, previous);
             ExecuteAsync(proxies, c => c.Return_Strings_Async(), cnt, degree, nameof(IPerformanceContract.Return_Strings_Async), result, previous);
         }
 
-        private IEnumerable<Tuple<string, IPerformanceContract>> CreateClients()
+        private static IEnumerable<Tuple<string, IPerformanceContract>> CreateClients()
         {
             if (IsPortUsed(Servers.KestrelBoltServer.Port))
             {
@@ -328,7 +323,7 @@ namespace Bolt.Performance.Console
             Console.WriteLine($"{(current.Metrics[proxy] + "ms").White().Bold()}");
         }
 
-        private bool IsPortUsed(int port)
+        private static bool IsPortUsed(int port)
         {
             bool isAvailable = true;
 
@@ -351,7 +346,7 @@ namespace Bolt.Performance.Console
             return !isAvailable;
         }
 
-        private string GetReportsDirectory(string testCase)
+        private static string GetReportsDirectory(string testCase)
         {
             string path = $"../Reports/{Environment.MachineName}/{testCase}";
 
@@ -363,7 +358,7 @@ namespace Bolt.Performance.Console
             return path;
         }
 
-        private PerformanceResult CreateEmptyReport(int concurrency, int repeats)
+        private static PerformanceResult CreateEmptyReport(int concurrency, int repeats)
         {
             PerformanceResult result = new PerformanceResult
             {
@@ -374,7 +369,7 @@ namespace Bolt.Performance.Console
                 Environment = new RuntimeEnvironment()
             };
 
-            result.Environment.Update(_runtime);
+            result.Environment.Update(PlatformServices.Default.Runtime);
             result.UpdateVersion();
             return result;
         }

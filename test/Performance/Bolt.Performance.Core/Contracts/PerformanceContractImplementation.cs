@@ -15,11 +15,17 @@ namespace Bolt.Performance.Contracts
 
         private static readonly Task<Person> CompletedPerson = Task.FromResult(Person.Create(10));
 
-        private static readonly Task<IEnumerable<int>> CompletedInts = Task.FromResult(Enumerable.Range(0, 5));
+        private static readonly Task<IEnumerable<int>> CompletedInts =
+            Task.FromResult((IEnumerable<int>) Enumerable.Range(0, 5).ToList());
 
-        private static readonly Task<IEnumerable<string>> CompletedStrings = Task.FromResult(Enumerable.Range(0, 5).Select(v => "dummy_" + v));
+        private static readonly Task<IEnumerable<string>> CompletedStrings =
+            Task.FromResult((IEnumerable<string>) Enumerable.Range(0, 5).Select(v => "dummy_" + v).ToList());
 
-        private static readonly Task<IEnumerable<Person>> CompletedObjects = Task.FromResult(Enumerable.Range(0, 5).Select(v => Person.Create(v)));
+        private static readonly Task<IEnumerable<Person>> CompletedObjects =
+            Task.FromResult((IEnumerable<Person>) Enumerable.Range(0, 5).Select(Person.Create).ToList());
+
+        private static readonly Task<IEnumerable<Person>> CompletedLarge =
+            Task.FromResult((IEnumerable<Person>) Enumerable.Range(0, 100).Select(Person.Create).ToList());
 
         public Task Method_Async()
         {
@@ -32,6 +38,11 @@ namespace Bolt.Performance.Contracts
         }
 
         public Task Method_Many_Async(int intValue, string stringValue, DateTime dateValue, Person objectValue)
+        {
+            return Completed;
+        }
+
+        public Task Method_Large_Async(List<Person> largeObject)
         {
             return Completed;
         }
@@ -74,6 +85,11 @@ namespace Bolt.Performance.Contracts
         public Task<IEnumerable<string>> Return_Strings_Async()
         {
             return CompletedStrings;
+        }
+
+        public Task<IEnumerable<Person>> Return_Large_Async()
+        {
+            return CompletedLarge;
         }
     }
 }

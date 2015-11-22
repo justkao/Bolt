@@ -41,18 +41,7 @@ namespace Bolt.Server.Pipeline
 
             DeserializeContext deserializeContext = new DeserializeContext();
             deserializeContext.Stream = context.HttpContext.Request.Body;
-            deserializeContext.ExpectedValues = new List<KeyValuePair<string, Type>>(metadata.Parameters.Length);
-
-            for (int i = 0; i < metadata.Parameters.Length; i++)
-            {
-                if (i == metadata.CancellationTokenIndex)
-                {
-                    continue;
-                }
-
-                var parameter = metadata.Parameters[i];
-                deserializeContext.ExpectedValues.Add(new KeyValuePair<string, Type>(parameter.Name, parameter.Type));
-            }
+            deserializeContext.ExpectedValues = metadata.SerializableParameters;
 
             try
             {
@@ -89,6 +78,11 @@ namespace Bolt.Server.Pipeline
                 }
             }
 
+            if (metadata.CancellationTokenIndex >= 0)
+            {
+                parameterValues[metadata.CancellationTokenIndex] = context.RequestAborted;
+            }
+
             return parameterValues;
         }
 
@@ -99,10 +93,10 @@ namespace Bolt.Server.Pipeline
 
             if (context.EnsureActionMetadata().HasResult && context.ActionResult != null)
             {
-                MemoryStream stream = new MemoryStream();
+                context.HttpContext.Response.ContentType = context.Configuration.DefaultSerializer.MediaType;
                 try
                 {
-                    await context.GetRequiredSerializer().WriteAsync(stream, context.ActionResult);
+                    await context.GetRequiredSerializer().WriteAsync(context.HttpContext.Response.Body, context.ActionResult);
                 }
                 catch (Exception e)
                 {
@@ -113,26 +107,13 @@ namespace Bolt.Server.Pipeline
                         context.RequestUrl,
                         e);
                 }
-
-                stream.Seek(0, SeekOrigin.Begin);
-
-                if (stream.Length > 0)
-                {
-                    context.HttpContext.Response.ContentLength = stream.Length;
-                    context.HttpContext.Response.ContentType = context.Configuration.DefaultSerializer.MediaType;
-
-                    await stream.CopyToAsync(context.HttpContext.Response.Body, BoltFramework.DefaultBufferSize, context.RequestAborted);
-                }
-                else
-                {
-                    context.HttpContext.Response.ContentLength = 0;
-                }
             }
             else
             {
                 context.HttpContext.Response.ContentLength = 0;
             }
 
+            await context.HttpContext.Response.Body.FlushAsync();
             context.HttpContext.Response.Body.Dispose();
         }
 

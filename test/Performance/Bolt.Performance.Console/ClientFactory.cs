@@ -8,7 +8,8 @@ namespace Bolt.Performance.Console
 {
     public class ClientFactory
     {
-        public static readonly ClientConfiguration Config = new ClientConfiguration {
+        public static readonly ClientConfiguration Config = new ClientConfiguration
+        {
             ProxyFactory = new DynamicProxyFactory()
         };
 

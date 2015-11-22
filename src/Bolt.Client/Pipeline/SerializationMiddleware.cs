@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -13,6 +14,8 @@ namespace Bolt.Client.Pipeline
 {
     public class SerializationMiddleware : MiddlewareBase<ClientActionContext>
     {
+        private readonly MediaTypeWithQualityHeaderValue _acceptHeader;
+
         public SerializationMiddleware(ISerializer serializer, IExceptionWrapper exceptionWrapper,
             IClientErrorProvider errorProvider)
         {
@@ -23,6 +26,8 @@ namespace Bolt.Client.Pipeline
             Serializer = serializer;
             ExceptionWrapper = exceptionWrapper;
             ErrorProvider = errorProvider;
+
+            _acceptHeader = new MediaTypeWithQualityHeaderValue(Serializer.MediaType);
         }
 
         public ISerializer Serializer { get; }
@@ -33,10 +38,10 @@ namespace Bolt.Client.Pipeline
 
         public override async Task InvokeAsync(ClientActionContext context)
         {
-            context.Request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue(Serializer.MediaType));
+            context.Request.Headers.Accept.Add(_acceptHeader);
             if (context.EnsureRequest().Content == null)
             {
-                context.EnsureRequest().Content = await BuildRequestParametersAsync(context);
+                context.EnsureRequest().Content = BuildRequestContent(context);
             }
 
             await Next(context);
@@ -89,7 +94,7 @@ namespace Bolt.Client.Pipeline
             return new MemoryStream(await response.Content.ReadAsByteArrayAsync());
         }
 
-        protected virtual async Task<HttpContent> BuildRequestParametersAsync(ClientActionContext context)
+        protected virtual HttpContent BuildRequestContent(ClientActionContext context)
         {
             ActionMetadata metadata = context.EnsureActionMetadata();
             if (metadata.HasSerializableParameters)
@@ -108,40 +113,21 @@ namespace Bolt.Client.Pipeline
                 }
             }
 
-            if (context.SerializeParametersContext == null)
+            var serializeContext = CreateSerializeContext(context);
+            if (serializeContext?.Values != null)
             {
-                context.SerializeParametersContext = CreateSerializeContext(context);
+                return new SerializeParametersContent(serializeContext, Serializer, context);
             }
 
-            try
-            {
-                await Serializer.WriteAsync(context.SerializeParametersContext);
-            }
-            catch (Exception e)
-            {
-                throw new BoltClientException(
-                    $"Failed to serialize parameters for action '{context.Action.Name}'.",
-                    ClientErrorCode.SerializeParameters,
-                    context.Action,
-                    e);
-            }
-
-            if (context.SerializeParametersContext.Stream.Length == 0)
-            {
-                return null;
-            }
-
-            context.SerializeParametersContext.Stream.Seek(0, SeekOrigin.Begin);
-            StreamContent content = new StreamContent(context.SerializeParametersContext.Stream);
-            content.Headers.ContentLength = context.SerializeParametersContext.Stream.Length;
-
-            return content; 
+            return null;
         }
 
         private SerializeContext CreateSerializeContext(ClientActionContext context)
         {
-            SerializeContext ctxt = new SerializeContext() { Stream = new MemoryStream() };
-            ctxt.Values = new List<KeyValuePair<string, object>>();
+            SerializeContext ctxt = new SerializeContext()
+            {
+                Values = new List<KeyValuePair<string, object>>()
+            };
 
             for (int i = 0; i < context.ActionMetadata.Parameters.Length; i++)
             {
@@ -218,6 +204,44 @@ namespace Bolt.Client.Pipeline
                 {
                     throw boltError;
                 }
+            }
+        }
+
+        private class SerializeParametersContent : HttpContent
+        {
+            private readonly ClientActionContext _clientContext;
+            private readonly SerializeContext _context;
+            private readonly ISerializer _serializer;
+
+            public SerializeParametersContent(SerializeContext context, ISerializer serializer, ClientActionContext clientContext)
+            {
+                _context = context;
+                _serializer = serializer;
+                _clientContext = clientContext;
+            }
+
+            protected override async Task SerializeToStreamAsync(Stream stream, TransportContext context)
+            {
+                _context.Stream = stream;
+
+                try
+                {
+                    await _serializer.WriteAsync(_context);
+                }
+                catch (Exception e)
+                {
+                    throw new BoltClientException(
+                        $"Failed to serialize parameters for action '{_clientContext.Action.Name}'.",
+                        ClientErrorCode.SerializeParameters,
+                        _clientContext.Action,
+                        e);
+                }
+            }
+
+            protected override bool TryComputeLength(out long length)
+            {
+                length = -1;
+                return false;
             }
         }
     }

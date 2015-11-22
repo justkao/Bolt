@@ -222,7 +222,8 @@ namespace Bolt.Client.Pipeline
                     }
 
                     // create init session context and reuse init parameters
-                    initSessionContext = new ClientActionContext(
+                    initSessionContext = new ClientActionContext();
+                    initSessionContext.Init(
                         context.Proxy,
                         context.Contract,
                         sessionMetadata.Contract.InitSession.Action,
@@ -291,7 +292,7 @@ namespace Bolt.Client.Pipeline
                     // we should not dispose original context
                     if (context.Action != sessionMetadata.Contract.InitSession.Action)
                     {
-                        initSessionContext.Dispose();
+                        initSessionContext.Reset();
                     }
                 }
 

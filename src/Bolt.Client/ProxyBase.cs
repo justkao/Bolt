@@ -2,12 +2,15 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Client.Pipeline;
+using System.Collections.Concurrent;
 
 namespace Bolt.Client
 {
     public abstract class ProxyBase : IProxy, IPipelineCallback
     {
         private IClientPipeline _pipeline;
+        private readonly ConcurrentQueue<ClientActionContext> _contexts = new ConcurrentQueue<ClientActionContext>();
+        private readonly int _poolSize = Environment.ProcessorCount * 5;
 
         protected ProxyBase()
         {
@@ -55,10 +58,15 @@ namespace Bolt.Client
 
         public async Task OpenAsync()
         {
-            using (ClientActionContext ctxt = new ClientActionContext(this, Contract, BoltFramework.SessionMetadata.Resolve(Contract).InitSession.Action, null))
+            ClientActionContext ctxt = CreateContext(BoltFramework.SessionMetadata.Resolve(Contract).InitSession.Action, null);
+            try
             {
                 await Pipeline.Instance(ctxt);
                 State = ProxyState.Open;
+            }
+            finally
+            {
+                ReleaseContext(ctxt);
             }
         }
 
@@ -66,10 +74,15 @@ namespace Bolt.Client
         {
             if (State == ProxyState.Open)
             {
-                using (ClientActionContext ctxt = new ClientActionContext(this, Contract, BoltFramework.SessionMetadata.Resolve(Contract).DestroySession.Action, null))
+                ClientActionContext ctxt =  CreateContext(BoltFramework.SessionMetadata.Resolve(Contract).DestroySession.Action, null);
+                try
                 {
                     await Pipeline.Instance(ctxt);
                     State = ProxyState.Closed;
+                }
+                finally
+                {
+                    ReleaseContext(ctxt);
                 }
             }
             else
@@ -82,10 +95,15 @@ namespace Bolt.Client
 
         public async Task<object> SendAsync(MethodInfo action, params object[] parameters)
         {
-            using (ClientActionContext ctxt = new ClientActionContext(this, Contract, action, parameters))
+            ClientActionContext ctxt = CreateContext(action, parameters);
+            try
             {
                 await Pipeline.Instance(ctxt);
                 return ctxt.ActionResult;
+            }
+            finally
+            {
+                ReleaseContext(ctxt);
             }
         }
 
@@ -102,6 +120,28 @@ namespace Bolt.Client
         void IPipelineCallback.ChangeState(ProxyState newState)
         {
             State = newState;
+        }
+
+        private ClientActionContext CreateContext(MethodInfo action, params object[] parameters)
+        {
+            ClientActionContext context;
+
+            if (!_contexts.TryDequeue(out context))
+            {
+                context = new ClientActionContext();
+            }
+
+            context.Init(this, Contract, action, parameters);
+            return context;
+        }
+
+        private void ReleaseContext(ClientActionContext context)
+        {
+            if (_contexts.Count < _poolSize)
+            {
+                context.Reset();
+                _contexts.Enqueue(context);
+            }
         }
     }
 }

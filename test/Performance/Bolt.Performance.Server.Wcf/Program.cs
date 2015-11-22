@@ -1,4 +1,5 @@
-﻿using System.ServiceModel;
+﻿using System.Threading;
+using System.ServiceModel;
 using Bolt.Performance.Contracts;
 
 namespace Bolt.Performance.Server.Wcf
@@ -7,6 +8,9 @@ namespace Bolt.Performance.Server.Wcf
     {
         public static void Main(string[] args)
         {
+            ThreadPool.SetMinThreads(100, 100);
+            ThreadPool.SetMinThreads(1000, 1000);
+
             ServiceHost host = new ServiceHost(typeof(PerformanceContractImplementation), Servers.WcfServer);
             host.Open();
 

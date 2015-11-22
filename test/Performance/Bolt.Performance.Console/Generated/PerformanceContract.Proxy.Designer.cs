@@ -34,7 +34,7 @@ namespace Bolt.Performance.Contracts
 
         public virtual Task Method_Async()
         {
-            return this.SendAsync(__MethodAsyncAction);
+            return this.SendAsync(__Method_AsyncAction);
         }
 
         public virtual Task Method_Int_Async(int value)
@@ -57,46 +57,58 @@ namespace Bolt.Performance.Contracts
             return this.SendAsync(__Method_Many_AsyncAction, intValue, stringValue, dateValue, objectValue);
         }
 
+        public virtual Task Method_Large_Async(List<Person> largeObject)
+        {
+            return this.SendAsync(__Method_Large_AsyncAction, largeObject);
+        }
+
         public virtual Task<int> Return_Int_Async()
         {
-            return this.SendAsync<int>(__ReturnIntAsyncAction);
+            return this.SendAsync<int>(__Return_Int_AsyncAction);
         }
 
         public virtual Task<string> Return_String_Async()
         {
-            return this.SendAsync<string>(__ReturnStringAsyncAction);
+            return this.SendAsync<string>(__Return_String_AsyncAction);
         }
 
         public virtual Task<Person> Return_Object_Async()
         {
-            return this.SendAsync<Person>(__ReturnObjectAsyncAction);
+            return this.SendAsync<Person>(__Return_Object_AsyncAction);
         }
 
         public virtual Task<IEnumerable<Person>> Return_Objects_Async()
         {
-            return this.SendAsync<IEnumerable<Person>>(__ReturnObjectCollectionAsyncAction);
+            return this.SendAsync<IEnumerable<Person>>(__Return_Objects_AsyncAction);
         }
 
         public virtual Task<IEnumerable<int>> Return_Ints_Async()
         {
-            return this.SendAsync<IEnumerable<int>>(__ReturnIntCollectionAsyncAction);
+            return this.SendAsync<IEnumerable<int>>(__Return_Ints_AsyncAction);
         }
 
         public virtual Task<IEnumerable<string>> Return_Strings_Async()
         {
-            return this.SendAsync<IEnumerable<string>>(__ReturnStringCollectionAsyncAction);
+            return this.SendAsync<IEnumerable<string>>(__Return_Strings_AsyncAction);
         }
 
-        private static readonly MethodInfo __MethodAsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Method_Async));
+        public virtual Task<IEnumerable<Person>> Return_Large_Async()
+        {
+            return this.SendAsync<IEnumerable<Person>>(__Return_Large_AsyncAction);
+        }
+
+        private static readonly MethodInfo __Method_AsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Method_Async));
         private static readonly MethodInfo __Method_Int_AsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Method_Int_Async));
         private static readonly MethodInfo __Method_String_AsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Method_String_Async));
         private static readonly MethodInfo __Method_Object_AsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Method_Object_Async));
         private static readonly MethodInfo __Method_Many_AsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Method_Many_Async));
-        private static readonly MethodInfo __ReturnIntAsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Return_Int_Async));
-        private static readonly MethodInfo __ReturnStringAsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Return_String_Async));
-        private static readonly MethodInfo __ReturnObjectAsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Return_Object_Async));
-        private static readonly MethodInfo __ReturnObjectCollectionAsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Return_Objects_Async));
-        private static readonly MethodInfo __ReturnIntCollectionAsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Return_Ints_Async));
-        private static readonly MethodInfo __ReturnStringCollectionAsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Return_Strings_Async));
+        private static readonly MethodInfo __Method_Large_AsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Method_Large_Async));
+        private static readonly MethodInfo __Return_Int_AsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Return_Int_Async));
+        private static readonly MethodInfo __Return_String_AsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Return_String_Async));
+        private static readonly MethodInfo __Return_Object_AsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Return_Object_Async));
+        private static readonly MethodInfo __Return_Objects_AsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Return_Objects_Async));
+        private static readonly MethodInfo __Return_Ints_AsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Return_Ints_Async));
+        private static readonly MethodInfo __Return_Strings_AsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Return_Strings_Async));
+        private static readonly MethodInfo __Return_Large_AsyncAction = typeof(IPerformanceContract).GetMethod(nameof(IPerformanceContract.Return_Large_Async));
     }
 }

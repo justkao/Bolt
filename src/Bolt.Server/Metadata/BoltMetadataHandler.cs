@@ -77,8 +77,6 @@ namespace Bolt.Server.Metadata
                 else
                 {
                     context.Action = action;
-                    context.ActionMetadata = BoltFramework.ActionMetadata.Resolve(action);
-
                     JsonSchema actionSchema = new JsonSchema
                                                   {
                                                       Properties = new Dictionary<string, JsonSchema>(),

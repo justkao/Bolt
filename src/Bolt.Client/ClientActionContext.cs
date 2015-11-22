@@ -10,21 +10,6 @@ namespace Bolt.Client
     /// </summary>
     public class ClientActionContext : ActionContextBase
     {
-        public ClientActionContext(IProxy proxy, Type contract, MethodInfo action, object[] parameters)
-            : base(contract, action, parameters)
-        {
-            Proxy = proxy;
-            Request = new HttpRequestMessage();
-            if (ActionMetadata.CancellationTokenIndex >= 0 && parameters != null)
-            {
-                var cancellation = parameters[ActionMetadata.CancellationTokenIndex];
-                if (cancellation is CancellationToken)
-                {
-                    RequestAborted = (CancellationToken) cancellation;
-                }
-            }
-        }
-
         public ConnectionDescriptor ServerConnection { get; set; }
 
         /// <summary>
@@ -40,8 +25,6 @@ namespace Bolt.Client
         public Exception ErrorResult { get; set; }
 
         public IProxy Proxy { get; set; }
-
-        public SerializeContext SerializeParametersContext { get; set; }
 
         public HttpRequestMessage EnsureRequest()
         {
@@ -63,14 +46,34 @@ namespace Bolt.Client
             return Response;
         }
 
-        protected override void Disposing(bool dispose)
+        public void Init(IProxy proxy, Type contract, MethodInfo action, object[] parameters)
         {
-            if (dispose)
+            Contract = contract;
+            Action = action;
+            Parameters = parameters;
+            Proxy = proxy;
+            Request = new HttpRequestMessage();
+            if (ActionMetadata.CancellationTokenIndex >= 0 && parameters != null)
             {
-                Response?.Dispose();
+                var cancellation = parameters[ActionMetadata.CancellationTokenIndex];
+                if (cancellation is CancellationToken)
+                {
+                    RequestAborted = (CancellationToken)cancellation;
+                }
             }
+        }
 
-            base.Disposing(dispose);
+        public override void Reset()
+        {
+            ServerConnection = null;
+            Request = null;
+            Response?.Dispose();
+            Response = null;
+            ErrorResult = null;
+            Parameters = null;
+            Proxy = null;
+
+            base.Reset();
         }
     }
 }

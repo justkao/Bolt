@@ -30,7 +30,7 @@ namespace Bolt
 
         public Newtonsoft.Json.JsonSerializer Serializer { get; }
 
-        public Task WriteAsync(Stream stream, object data)
+        public async Task WriteAsync(Stream stream, object data)
         {
             if (stream == null)
             {
@@ -40,9 +40,9 @@ namespace Bolt
             using (StreamWriter writer = CreateStreamWriter(stream))
             {
                 Serializer.Serialize(writer, data);
-            }
 
-            return CompletedTask.Done;
+                await writer.FlushAsync();
+            }
         }
 
         public Task<object> ReadAsync(Type type, Stream stream)
@@ -58,7 +58,7 @@ namespace Bolt
             }
         }
 
-        public Task WriteAsync(SerializeContext context)
+        public async Task WriteAsync(SerializeContext context)
         {
             if (context == null)
             {
@@ -72,7 +72,7 @@ namespace Bolt
 
             if (context.Values == null || context.Values.Count == 0)
             {
-                return CompletedTask.Done;
+                return;
             }
 
             using (StreamWriter streamWriter = CreateStreamWriter(context.Stream))
@@ -93,9 +93,9 @@ namespace Bolt
                         Serializer.Serialize(jsonWriter, pair.Value);
                     }
                 }
-            }
 
-            return CompletedTask.Done;
+                await streamWriter.FlushAsync();
+            }
         }
 
         public Task ReadAsync(DeserializeContext context)
@@ -122,7 +122,7 @@ namespace Bolt
 
             List<KeyValuePair<string, object>> result = new List<KeyValuePair<string, object>>();
 
-            using (StreamReader  streamReader = CreateStreamReader(context.Stream))
+            using (StreamReader streamReader = CreateStreamReader(context.Stream))
             {
                 using (JsonTextReader reader = new JsonTextReader(streamReader))
                 {
@@ -143,8 +143,8 @@ namespace Bolt
                         }
 
                         string key = reader.Value as string;
-                        KeyValuePair<string, Type> type = context.ExpectedValues.FirstOrDefault(v => v.Key.EqualsNoCase(key));
-                        if (type.Value == null)
+                        var type = context.ExpectedValues.FirstOrDefault(v => v.Name.EqualsNoCase(key));
+                        if (type == null)
                         {
                             // we will skip this value, no type definition available
                             reader.ReadAsString();
@@ -154,11 +154,11 @@ namespace Bolt
                         reader.Read();
                         try
                         {
-                            result.Add(new KeyValuePair<string, object>(key, Serializer.Deserialize(reader, type.Value)));
+                            result.Add(new KeyValuePair<string, object>(key, Serializer.Deserialize(reader, type.Type)));
                         }
                         catch (Exception e)
                         {
-                            throw new InvalidOperationException($"Invalid json structure. Failed to deserialize '{key}' property of type '{type.Value}'.", e);
+                            throw new InvalidOperationException($"Invalid json structure. Failed to deserialize '{key}' property of type '{type.Type}'.", e);
                         }
                     }
                 }
@@ -175,7 +175,7 @@ namespace Bolt
 
         private static StreamWriter CreateStreamWriter(Stream stream)
         {
-            return new StreamWriter(stream, Encoding, BufferSize, true);
+            return new StreamWriter(stream, Encoding, BufferSize, true) { AutoFlush = false };
         }
     }
 }

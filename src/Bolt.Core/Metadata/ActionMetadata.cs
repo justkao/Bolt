@@ -89,11 +89,11 @@ namespace Bolt.Metadata
                 {
                     throw new BoltException($"Expected value for parameter '{parameterMetadata.Name}' should be '{parameterMetadata.Type.Name}' instead '{parameter.GetType().Name}' was provided.");
                 }
-            }
-        }
+            }        }
 
         private IEnumerable<ParameterMetadata> GetSerializableParameters()
         {
+
             for (int i = 0; i < Parameters.Length; i++)
             {
                 if (i == CancellationTokenIndex)

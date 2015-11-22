@@ -24,6 +24,9 @@ namespace Bolt.Performance.Contracts
         Task Method_Many_Async(int intValue, string stringValue, DateTime dateValue, Person objectValue);
 
         [OperationContract]
+        Task Method_Large_Async(List<Person> largeObject);
+
+        [OperationContract]
         Task<int> Return_Int_Async();
 
         [OperationContract]
@@ -40,5 +43,8 @@ namespace Bolt.Performance.Contracts
 
         [OperationContract]
         Task<IEnumerable<string>> Return_Strings_Async();
+
+        [OperationContract]
+        Task<IEnumerable<Person>> Return_Large_Async();
     }
 }
