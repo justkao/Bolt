@@ -40,7 +40,7 @@ namespace Bolt.Server.Pipeline
             ISerializer serializer = context.GetRequiredSerializer();
 
             DeserializeContext deserializeContext = new DeserializeContext();
-            deserializeContext.Stream = context.HttpContext.Request.Body;
+            deserializeContext.Stream = await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted);
             deserializeContext.ExpectedValues = metadata.SerializableParameters;
 
             try
@@ -59,6 +59,10 @@ namespace Bolt.Server.Pipeline
                     context.Action,
                     context.RequestUrl,
                     e);
+            }
+            finally
+            {
+                deserializeContext.Stream.Dispose();
             }
 
             // now fill the invocation parameters
