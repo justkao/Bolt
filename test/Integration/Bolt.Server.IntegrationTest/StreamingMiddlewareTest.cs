@@ -207,7 +207,7 @@ namespace Bolt.Server.IntegrationTest
 
         protected override void ConfigureServices(IServiceCollection services)
         {
-            services.AddSingleton<ITestContext>(this);
+            services.AddInstance<ITestContext>(this);
             base.ConfigureServices(services);
         }
 

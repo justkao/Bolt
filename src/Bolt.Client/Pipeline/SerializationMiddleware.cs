@@ -164,7 +164,7 @@ namespace Bolt.Client.Pipeline
 
         protected virtual async Task<Exception> DeserializeExceptionAsync(ClientActionContext context, Stream stream)
         {
-            if (stream.Length == 0)
+            if (stream == null)
             {
                 return null;
             }
