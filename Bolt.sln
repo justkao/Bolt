@@ -49,9 +49,10 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Performance.Console", 
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Console", "src\Bolt.Console\Bolt.Console.xproj", "{114628A3-3C96-44A1-8604-7C7341751C79}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Core.ProtocolBuffer", "src\Bolt.Core.ProtocolBuffer\Bolt.Core.ProtocolBuffer.xproj", "{D06C9850-CBDD-4B49-B20B-8F6BB1B833F9}"
-EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -106,7 +107,6 @@ Global
 		{D85DB120-D042-4D13-AC20-AD131DB43D9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D85DB120-D042-4D13-AC20-AD131DB43D9E}.Release|Any CPU.Build.0 = Release|Any CPU
 		{542485B1-C4E6-464C-943B-3F8B01D6A3BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{542485B1-C4E6-464C-943B-3F8B01D6A3BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{542485B1-C4E6-464C-943B-3F8B01D6A3BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{542485B1-C4E6-464C-943B-3F8B01D6A3BC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F03B0831-9458-4135-9A1E-2C605B4BD2AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -129,10 +129,6 @@ Global
 		{114628A3-3C96-44A1-8604-7C7341751C79}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{114628A3-3C96-44A1-8604-7C7341751C79}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{114628A3-3C96-44A1-8604-7C7341751C79}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D06C9850-CBDD-4B49-B20B-8F6BB1B833F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D06C9850-CBDD-4B49-B20B-8F6BB1B833F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D06C9850-CBDD-4B49-B20B-8F6BB1B833F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D06C9850-CBDD-4B49-B20B-8F6BB1B833F9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -27,8 +27,8 @@
     },
     "dotnet5.4": {
       "dependencies": {
-        "System.Threading.Timer": "4.0.0-*",
-        "System.Net.Http": "4.0.0-*"
+        "System.Threading.Timer": "4.0.1-*",
+        "System.Net.Http": "4.0.1-*"
       }
     }
   }
