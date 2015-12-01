@@ -46,10 +46,10 @@ namespace Bolt
             }
 
             IEnumerable<MethodInfo> methods = contract.GetRuntimeMethods().ToList();
-            if (methods.Count() != methods.Select(m=>m.Name).Distinct().Count())
+            if (methods.Count() != methods.Select(m => m.Name).Distinct().Count())
             {
                 throw new InvalidOperationException(
-                    $"Unable to use interface '{contract.FullName}' as contract because it methods with the same name.");
+                    $"Unable to use interface '{contract.FullName}' as contract because it contains methods with the same name.");
             }
         }
 

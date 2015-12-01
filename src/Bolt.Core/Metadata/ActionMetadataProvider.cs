@@ -20,17 +20,7 @@ namespace Bolt.Metadata
             ActionMetadata descriptor = new ActionMetadata();
             descriptor.Action = method;
             descriptor.Parameters = parameters.Select(p => new ParameterMetadata(p.ParameterType, p.Name)).ToArray();
-            descriptor.HasSerializableParameters = GetSerializableParameters(method).Any();
             descriptor.ResultType = GetResultType(method);
-            descriptor.CancellationTokenIndex = -1;
-            for (int i = 0; i < parameters.Length; i++)
-            {
-                if (parameters[i].IsCancellationToken())
-                {
-                    descriptor.CancellationTokenIndex = i;
-                }
-            }
-
             descriptor.Timeout = GetTimeout(method);
             return descriptor;
         }
@@ -87,17 +77,6 @@ namespace Bolt.Metadata
             }
 
             return null;
-        }
-
-        private static IEnumerable<ParameterInfo> GetSerializableParameters(MethodInfo method)
-        {
-            ParameterInfo[] p = method.GetParameters();
-            if (p.Length == 0)
-            {
-                return Enumerable.Empty<ParameterInfo>();
-            }
-
-            return method.GetParameters().Where(info => !info.IsCancellationToken());
         }
 
         private static Type GetResultType(MethodInfo method)
