@@ -58,7 +58,7 @@ namespace Bolt.Server.Pipeline
                 await context.GetRequiredSerializer().WriteAsync(serializedException, wrappedException);
                 serializedException.Seek(0, SeekOrigin.Begin);
             }
-            catch (OperationCanceledException e)
+            catch (OperationCanceledException)
             {
                 throw;
             }

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
@@ -8,7 +7,7 @@ using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Features;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Schema;
+using Newtonsoft.Json.Serialization;
 
 namespace Bolt.Server.Metadata
 {
@@ -57,10 +56,10 @@ namespace Bolt.Server.Metadata
         {
             try
             {
-                string result = string.Empty;
-                string actionName = context.HttpContext.Request.Query["action"][0]?.Trim();
-                MethodInfo action = null;
+                string result;
+                string actionName = (context.HttpContext.Request.Query["action"]);
 
+                MethodInfo action = null;
                 if (!string.IsNullOrEmpty(actionName))
                 {
                     action = _actionResolver.Resolve(context.Contract, actionName);
@@ -69,52 +68,24 @@ namespace Bolt.Server.Metadata
                 if (action == null)
                 {
                     var contractMetadata = CrateContractMetadata(context);
-                    result = JsonConvert.SerializeObject(
-                        contractMetadata,
-                        Formatting.Indented,
-                        new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+                    result = JsonConvert.SerializeObject(contractMetadata, Formatting.Indented, CreateSettings());
                 }
                 else
                 {
                     context.Action = action;
-                    JsonSchema actionSchema = new JsonSchema
-                                                  {
-                                                      Properties = new Dictionary<string, JsonSchema>(),
-                                                      Description = $"Request and response parameters for action '{actionName}'."
-                                                  };
+                    ActionMetadata actionMetadata = new ActionMetadata();
 
                     if (context.ActionMetadata.HasSerializableParameters)
                     {
-                        JsonSchemaGenerator generator = new JsonSchemaGenerator();
-                        JsonSchema arguments = new JsonSchema
-                                                   {
-                                                       Properties =
-                                                           context.ActionMetadata.SerializableParameters.ToDictionary(
-                                                               p => p.Name,
-                                                               p => generator.Generate(p.Type)),
-                                                       Required = true,
-                                                       Type = JsonSchemaType.Object
-                                                   };
-
-                        actionSchema.Properties.Add("request", arguments);
+                        actionMetadata.Parameters = context.ActionMetadata.SerializableParameters.Select(p=>p.Name).ToArray();
                     }
 
                     if (context.ActionMetadata.HasResult)
                     {
-                        JsonSchemaGenerator generator = new JsonSchemaGenerator();
-                        actionSchema.Properties.Add("response", generator.Generate(context.ActionMetadata.ResultType));
+                        actionMetadata.Response = context.ActionMetadata.ResultType.Name;
                     }
 
-                    using (var sw = new StringWriter())
-                    {
-                        using (JsonTextWriter jw = new JsonTextWriter(sw))
-                        {
-
-                            jw.Formatting = Formatting.Indented;
-                            actionSchema.WriteTo(jw);
-                        }
-                        result = sw.GetStringBuilder().ToString();
-                    }
+                    result = JsonConvert.SerializeObject(actionMetadata, Formatting.Indented, CreateSettings());
                 }
 
                 context.HttpContext.Response.ContentType = "application/json";
@@ -143,6 +114,18 @@ namespace Bolt.Server.Metadata
                             ContentTypes = feature.ActionContext.Configuration.AvailableSerializers.Select(s => s.MediaType).ToArray()
                         };
             return m;
+        }
+
+        private static JsonSerializerSettings CreateSettings()
+        {
+            return new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, ContractResolver = new CamelCasePropertyNamesContractResolver() };
+        }
+
+        protected class ActionMetadata
+        {
+            public string[] Parameters { get; set; }
+
+            public string Response { get; set; }
         }
 
         protected class ContractMetadata
