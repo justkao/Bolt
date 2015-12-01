@@ -1,6 +1,6 @@
 @ECHO OFF
  
-set version="0.16.0-alpha1"
+set version="0.19.0-alpha1"
 
 if %errorlevel% neq 0 goto failure
 
