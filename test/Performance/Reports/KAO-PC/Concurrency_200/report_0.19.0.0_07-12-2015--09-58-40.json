@@ -1,0 +1,108 @@
+{
+  "Version": "0.19.0.0",
+  "Concurrency": 200,
+  "Repeats": 300000,
+  "Machine": "KAO-PC",
+  "Cores": 4,
+  "Time": "2015-12-07T20:36:03.3345978Z",
+  "Environment": {
+    "OperatingSystem": "Windows",
+    "OperatingSystemVersion": "6.1",
+    "RuntimeType": "Clr",
+    "RuntimeArchitecture": "x86",
+    "RuntimeVersion": "1.0.0-rc1-16202"
+  },
+  "Actions": {
+    "Method_Async": {
+      "Metrics": {
+        "Bolt(K)": 15133,
+        "Bolt(P+K)": 14438,
+        "WCF": 27175
+      }
+    },
+    "Method_Int_Async": {
+      "Metrics": {
+        "Bolt(K)": 36913,
+        "Bolt(P+K)": 35746,
+        "WCF": 27835
+      }
+    },
+    "Method_Many_Async": {
+      "Metrics": {
+        "Bolt(K)": 37090,
+        "Bolt(P+K)": 38024,
+        "WCF": 31170
+      }
+    },
+    "Method_Large_Async": {
+      "Metrics": {
+        "Bolt(K)": 79738,
+        "Bolt(P+K)": 80558,
+        "WCF": 108343
+      }
+    },
+    "Method_Object_Async": {
+      "Metrics": {
+        "Bolt(K)": 40656,
+        "Bolt(P+K)": 39262,
+        "WCF": 29877
+      }
+    },
+    "Method_String_Async": {
+      "Metrics": {
+        "Bolt(K)": 37836,
+        "Bolt(P+K)": 38062,
+        "WCF": 27497
+      }
+    },
+    "Return_Int_Async": {
+      "Metrics": {
+        "Bolt(K)": 18317,
+        "Bolt(P+K)": 17902,
+        "WCF": 27548
+      }
+    },
+    "Return_Ints_Async": {
+      "Metrics": {
+        "Bolt(K)": 19215,
+        "Bolt(P+K)": 17964,
+        "WCF": 28744
+      }
+    },
+    "Return_Object_Async": {
+      "Metrics": {
+        "Bolt(K)": 20540,
+        "Bolt(P+K)": 20266,
+        "WCF": 29083
+      }
+    },
+    "Return_Objects_Async": {
+      "Metrics": {
+        "Bolt(K)": 22335,
+        "Bolt(P+K)": 21624,
+        "WCF": 31554
+      }
+    },
+    "Return_String_Async": {
+      "Metrics": {
+        "Bolt(K)": 19102,
+        "Bolt(P+K)": 18114,
+        "WCF": 27735
+      }
+    },
+    "Return_Large_Async": {
+      "Metrics": {
+        "Bolt(K)": 65025,
+        "Bolt(P+K)": 63926,
+        "WCF": 74373
+      }
+    },
+    "Return_Strings_Async": {
+      "Metrics": {
+        "Bolt(K)": 19593,
+        "Bolt(P+K)": 17639,
+        "WCF": 28756
+      }
+    }
+  }
+}

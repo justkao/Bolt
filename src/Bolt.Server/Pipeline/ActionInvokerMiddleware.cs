@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Pipeline;
 using Bolt.Metadata;
+using Bolt.Server.Internal;
 
 namespace Bolt.Server.Pipeline
 {
@@ -36,6 +37,7 @@ namespace Bolt.Server.Pipeline
                     context.RequestUrl);
             }
 
+            /*
             if (!(context.ContractInstance.GetType().GetTypeInfo().ImplementedInterfaces.Contains(context.Contract)))
             {
                 throw new BoltServerException(
@@ -44,18 +46,38 @@ namespace Bolt.Server.Pipeline
                     context.Action,
                     context.RequestUrl);
             }
+            */
 
-            ActionDescriptor result = _actions.GetOrAdd(context.Action, a => new ActionDescriptor(a));
-            await result.Execute(context);
-            await Next(context);
+            if (context.Action == BoltFramework.SessionMetadata.InitSessionDefault ||
+                context.Action == BoltFramework.SessionMetadata.DestroySessionDefault)
+            {
+                await Next(context);
+            }
+            else
+            {
+                ActionDescriptor result = _actions.GetOrAdd(context.Action,
+                    a => new ActionDescriptor(BoltFramework.ActionMetadata.Resolve(a)));
+                await result.Execute(context);
+                await Next(context);
+            }
         }
 
-        private class ActionDescriptor : ValueCache<string, MethodInfo>
+        private class ActionDescriptor
         {
-            public ActionDescriptor(MethodInfo actionInfo)
+            private readonly Func<object, object[], object> _compiledLambda;
+            private readonly Func<Task, object> _taskResultProvider;
+            private readonly bool _isTaskResult;
+
+            public ActionDescriptor(ActionMetadata metadata)
             {
-                Parameters = actionInfo.GetParameters().ToList();
+                Parameters = metadata.Action.GetParameters().ToList();
                 ParametersTypes = Parameters.Select(p => p.ParameterType).ToArray();
+                _compiledLambda = MethodInvokerBuilder.Build(metadata.Action.DeclaringType, metadata.Action);
+                _isTaskResult = typeof (Task).IsAssignableFrom(metadata.Action.ReturnType);
+                if (_isTaskResult && metadata.Action.ReturnType.IsGenericType())
+                {
+                    _taskResultProvider = MethodInvokerBuilder.BuildTaskResultProvider(metadata.ResultType);
+                }
             }
 
             private IEnumerable<ParameterInfo> Parameters { get; }
@@ -64,51 +86,19 @@ namespace Bolt.Server.Pipeline
 
             public async Task Execute(ServerActionContext context)
             {
-                MethodInfo implementedMethod = Get(context.Action.Name, context);
-
-                if (implementedMethod == null)
+                var result = _compiledLambda(context.ContractInstance, context.Parameters);
+                if (_isTaskResult)
                 {
-                    if (context.Action == BoltFramework.SessionMetadata.InitSessionDefault)
+                    await (Task) result;
+                    if (_taskResultProvider != null)
                     {
-                        return;
-                    }
-
-                    if (context.Action == BoltFramework.SessionMetadata.DestroySessionDefault)
-                    {
-                        return;
-                    }
-
-                    throw new BoltServerException(ServerErrorCode.ActionNotImplemented, context.Action, context.RequestUrl);
-                }
-
-                object result;
-                try
-                {
-                    result = implementedMethod.Invoke(context.ContractInstance, context.Parameters);
-                }
-                catch (TargetInvocationException e)
-                {
-                    throw e.InnerException;
-                }
-
-                if (result is Task)
-                {
-                    await (result as Task);
-                    if (result.GetType().IsGenericType())
-                    {
-                        context.ActionResult = result.GetType().GetRuntimeProperty("Result").GetValue(result);
+                        context.ActionResult = _taskResultProvider((Task) result);
                     }
                 }
                 else
                 {
                     context.ActionResult = result;
                 }
-            }
-
-            protected override MethodInfo Create(string key, object context)
-            {
-                var serverContext = context as ServerActionContext;
-                return serverContext.ContractInstance.GetType().GetRuntimeMethod(key, ParametersTypes);
             }
         }
     }
