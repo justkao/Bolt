@@ -2,6 +2,7 @@
 using Microsoft.AspNet.Http.Extensions;
 using Microsoft.AspNet.Routing;
 using System;
+using System.Threading;
 
 namespace Bolt.Server
 {
@@ -14,7 +15,6 @@ namespace Bolt.Server
         public void Init(HttpContext httpContext, ServerRuntimeConfiguration configuration)
         {
             HttpContext = httpContext;
-            RequestAborted = HttpContext.RequestAborted;
 
             if (Configuration == null)
             {
@@ -38,9 +38,27 @@ namespace Bolt.Server
 
         public ServerActionContext ActionContext
         {
+            get { return this; }
+        }
+
+        public override CancellationToken RequestAborted
+        {
             get
             {
-                return this;
+                if (HttpContext == null || ActionMetadata == null || ActionMetadata.CancellationTokenIndex < 0)
+                {
+                    return CancellationToken.None;
+                }
+
+                return HttpContext.RequestAborted;
+            }
+
+            set
+            {
+                if (HttpContext != null)
+                {
+                    HttpContext.RequestAborted = value;
+                }
             }
         }
 

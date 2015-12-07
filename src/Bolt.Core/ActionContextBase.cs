@@ -14,21 +14,6 @@ namespace Bolt
         private IDictionary<object, object> _items;
         private ActionMetadata _actionMetadata;
 
-        protected ActionContextBase(ActionContextBase context)
-        {
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            Contract = context.Contract;
-            Action = context.Action;
-            Parameters = context.Parameters;
-            ActionResult = context.ActionResult;
-            RequestAborted = context.RequestAborted;
-        }
-
-        protected ActionContextBase()
-        {
-        }
-
         public Type Contract { get; set; }
 
         public MethodInfo Action { get; set; }
@@ -55,7 +40,7 @@ namespace Bolt
 
         public object[] Parameters { get; set; }
 
-        public CancellationToken RequestAborted { get; set; }
+        public virtual CancellationToken RequestAborted { get; set; }
 
         public string ContractName => this.GetContractName();
 
