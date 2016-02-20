@@ -13,6 +13,10 @@ namespace Bolt.Client.Test
 
         string Execute(string param);
 
+        void DoNothing();
+
+        Task DoNothingAsync();
+
         Task ExecuteAsync();
     }
 
@@ -36,6 +40,16 @@ namespace Bolt.Client.Test
         public string Execute(string param)
         {
             return this.Send<string>(Contract.GetMethod(nameof(Execute)), param);
+        }
+
+        public void DoNothing()
+        {
+            this.Send<string>(Contract.GetMethod(nameof(DoNothingAsync)));
+        }
+
+        public Task DoNothingAsync()
+        {
+            return this.SendAsync<string>(Contract.GetMethod(nameof(DoNothingAsync)));
         }
 
         public Task ExecuteAsync()

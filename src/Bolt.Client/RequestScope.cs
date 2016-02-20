@@ -22,9 +22,9 @@ namespace Bolt.Client
             Current = this;
         }
 
-        public TimeSpan Timeout { get; private set; }
+        public TimeSpan Timeout { get; }
 
-        public CancellationToken Cancellation { get; private set; }
+        public CancellationToken Cancellation { get; }
 
         public void Dispose()
         {

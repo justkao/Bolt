@@ -10,8 +10,8 @@ namespace Bolt
             Name = name;
         }
 
-        public Type Type { get; private set; }
+        public Type Type { get; }
 
-        public string Name { get; private set; }
+        public string Name { get; }
     }
 }

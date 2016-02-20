@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Extensions;
-using Microsoft.AspNet.Routing;
 using System;
 using System.Threading;
 
@@ -36,10 +35,7 @@ namespace Bolt.Server
 
         public ServerRuntimeConfiguration Configuration { get; set; }
 
-        public ServerActionContext ActionContext
-        {
-            get { return this; }
-        }
+        public ServerActionContext ActionContext => this;
 
         public override CancellationToken RequestAborted
         {
