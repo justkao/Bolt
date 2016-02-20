@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -7,46 +6,42 @@ namespace Bolt.Client.Helpers
 {
     internal static class TaskHelpers
     {
-        [DebuggerStepThrough]
-        public static void Sleep(TimeSpan time, CancellationToken cancellation)
-        {
-            Task.Delay(time, cancellation).Wait(cancellation);
-        }
-
         public static T Execute<T>(Func<Task<T>> asyncFunction)
         {
+            SynchronizationContext synchronizationContext = SynchronizationContext.Current;
+            if (synchronizationContext == null)
+            {
+                return asyncFunction().GetAwaiter().GetResult();
+            }
+
+            SynchronizationContext.SetSynchronizationContext(null);
             try
             {
-                SynchronizationContext synchronizationContext = SynchronizationContext.Current;
-                if (synchronizationContext == null)
-                {
-                    return asyncFunction().GetAwaiter().GetResult();
-                }
-                return Task.Run(() => asyncFunction().GetAwaiter().GetResult()).GetAwaiter().GetResult();
+                return asyncFunction().GetAwaiter().GetResult();
             }
-            catch (AggregateException e)
+            finally
             {
-                throw e.Flatten().GetBaseException();
+                SynchronizationContext.SetSynchronizationContext(synchronizationContext);
             }
         }
 
         public static void Execute(Func<Task> asyncFunction)
         {
+            SynchronizationContext synchronizationContext = SynchronizationContext.Current;
+            if (synchronizationContext == null)
+            {
+                asyncFunction().GetAwaiter().GetResult();
+                return;
+            }
+
+            SynchronizationContext.SetSynchronizationContext(null);
             try
             {
-                SynchronizationContext synchronizationContext = SynchronizationContext.Current;
-                if (synchronizationContext == null)
-                {
-                    asyncFunction().GetAwaiter().GetResult();
-                }
-                else
-                {
-                    Task.Run(() => asyncFunction().GetAwaiter().GetResult()).GetAwaiter().GetResult();
-                }
+                asyncFunction().GetAwaiter().GetResult();
             }
-            catch (AggregateException e)
+            finally
             {
-                throw e.Flatten().GetBaseException();
+                SynchronizationContext.SetSynchronizationContext(synchronizationContext);
             }
         }
     }
