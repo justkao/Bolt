@@ -38,9 +38,9 @@ namespace Bolt.Client.Pipeline
         public override async Task InvokeAsync(ClientActionContext context)
         {
             context.Request.Headers.Accept.Add(_acceptHeader);
-            if (context.EnsureRequest().Content == null)
+            if (context.GetRequestOrThrow().Content == null)
             {
-                context.EnsureRequest().Content = BuildRequestContent(context);
+                context.GetRequestOrThrow().Content = BuildRequestContent(context);
             }
 
             await Next(context);
@@ -78,7 +78,7 @@ namespace Bolt.Client.Pipeline
             }
             else
             {
-                if (context.EnsureActionMetadata().HasResult && context.ActionResult == null)
+                if (context.GetActionMetadataOrThrow().HasResult && context.ActionResult == null)
                 {
                     using (Stream stream = await GetResponseStreamAsync(context.Response))
                     {
@@ -95,7 +95,7 @@ namespace Bolt.Client.Pipeline
 
         protected virtual HttpContent BuildRequestContent(ClientActionContext context)
         {
-            ActionMetadata metadata = context.EnsureActionMetadata();
+            ActionMetadata metadata = context.GetActionMetadataOrThrow();
             if (metadata.HasSerializableParameters)
             {
                 try
@@ -150,7 +150,7 @@ namespace Bolt.Client.Pipeline
         {
             try
             {
-                return await Serializer.ReadAsync(context.EnsureActionMetadata().ResultType, stream);
+                return await Serializer.ReadAsync(context.GetActionMetadataOrThrow().ResultType, stream);
             }
             catch (Exception e)
             {

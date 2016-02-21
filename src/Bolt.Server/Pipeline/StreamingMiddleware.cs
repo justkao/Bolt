@@ -20,7 +20,7 @@ namespace Bolt.Server.Pipeline
             }
 
             // handle action parameters
-            context.Parameters = new object[context.EnsureActionMetadata().Parameters.Length];
+            context.Parameters = new object[context.GetActionMetadataOrThrow().Parameters.Length];
             if (metadata.HttpContentIndex >= 0)
             {
                 context.Parameters[metadata.HttpContentIndex] = CreateHttpContent(context, metadata);

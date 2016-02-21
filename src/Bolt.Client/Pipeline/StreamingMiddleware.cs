@@ -23,7 +23,7 @@ namespace Bolt.Client.Pipeline
 
         private static void HandleStreamingResponse(ClientActionContext context, Metadata metadata)
         {
-            context.EnsureResponse().EnsureSuccessStatusCode();
+            context.GetResponseOrThrow().EnsureSuccessStatusCode();
             if (metadata.ContentResultType != null)
             {
                 if (typeof(HttpContent).CanAssign(metadata.ContentResultType))

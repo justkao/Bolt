@@ -8,7 +8,7 @@ namespace Bolt.Client.Pipeline
     {
         public override Task InvokeAsync(ClientActionContext context)
         {
-            context.EnsureRequest().Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue(CultureInfo.CurrentCulture.Name));
+            context.GetRequestOrThrow().Headers.AcceptLanguage.Add(new StringWithQualityHeaderValue(CultureInfo.CurrentCulture.Name));
             return Next(context);
         }
     }

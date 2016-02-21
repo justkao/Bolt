@@ -58,7 +58,7 @@ namespace Bolt.Server
             }
         }
 
-        public ISerializer GetRequiredSerializer()
+        public ISerializer GetSerializerOrThrow()
         {
             var serializer = Configuration?.DefaultSerializer;
             if (serializer == null)

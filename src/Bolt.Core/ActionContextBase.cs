@@ -44,7 +44,7 @@ namespace Bolt
 
         public string ContractName => this.GetContractName();
 
-        public ActionMetadata EnsureActionMetadata()
+        public ActionMetadata GetActionMetadataOrThrow()
         {
             if (ActionMetadata == null)
             {

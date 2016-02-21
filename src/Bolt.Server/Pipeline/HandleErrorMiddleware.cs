@@ -55,7 +55,7 @@ namespace Bolt.Server.Pipeline
                     return;
                 }
 
-                await context.GetRequiredSerializer().WriteAsync(serializedException, wrappedException);
+                await context.GetSerializerOrThrow().WriteAsync(serializedException, wrappedException);
                 serializedException.Seek(0, SeekOrigin.Begin);
             }
             catch (OperationCanceledException)
@@ -79,7 +79,7 @@ namespace Bolt.Server.Pipeline
             }
 
             httpContext.Response.ContentLength = serializedException.Length;
-            httpContext.Response.ContentType = context.GetRequiredSerializer().MediaType;
+            httpContext.Response.ContentType = context.GetSerializerOrThrow().MediaType;
 
             await serializedException.CopyToAsync(httpContext.Response.Body, 4096, httpContext.RequestAborted);
         }

@@ -16,11 +16,11 @@ namespace Bolt.Server.Pipeline
 
         public override async Task InvokeAsync(ServerActionContext context)
         {
-            if (context.EnsureActionMetadata().HasParameters)
+            if (context.GetActionMetadataOrThrow().HasParameters)
             {
                 try
                 {
-                    context.EnsureActionMetadata().ValidateParameters(context.Parameters);
+                    context.GetActionMetadataOrThrow().ValidateParameters(context.Parameters);
                 }
                 catch (Exception e)
                 {

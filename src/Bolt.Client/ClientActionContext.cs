@@ -26,7 +26,7 @@ namespace Bolt.Client
 
         public IProxy Proxy { get; set; }
 
-        public HttpRequestMessage EnsureRequest()
+        public HttpRequestMessage GetRequestOrThrow()
         {
             if (Request == null)
             {
@@ -36,7 +36,7 @@ namespace Bolt.Client
             return Request;
         }
 
-        public HttpResponseMessage EnsureResponse()
+        public HttpResponseMessage GetResponseOrThrow()
         {
             if (Response == null)
             {
