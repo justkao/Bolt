@@ -18,9 +18,20 @@ namespace Bolt.Client.Pipeline
 
         public SerializationMiddleware(ISerializer serializer, IExceptionWrapper exceptionWrapper, IClientErrorProvider errorProvider)
         {
-            if (serializer == null) throw new ArgumentNullException(nameof(serializer));
-            if (exceptionWrapper == null) throw new ArgumentNullException(nameof(exceptionWrapper));
-            if (errorProvider == null) throw new ArgumentNullException(nameof(errorProvider));
+            if (serializer == null)
+            {
+                throw new ArgumentNullException(nameof(serializer));
+            }
+
+            if (exceptionWrapper == null)
+            {
+                throw new ArgumentNullException(nameof(exceptionWrapper));
+            }
+
+            if (errorProvider == null)
+            {
+                throw new ArgumentNullException(nameof(errorProvider));
+            }
 
             Serializer = serializer;
             ExceptionWrapper = exceptionWrapper;
@@ -113,7 +124,7 @@ namespace Bolt.Client.Pipeline
             }
 
             var serializeContext = CreateSerializeContext(context);
-            if (serializeContext?.Values?.Count > 0)
+            if (serializeContext?.ParameterValues?.Count > 0)
             {
                 return new SerializeParametersContent(serializeContext, Serializer, context);
             }
@@ -125,10 +136,10 @@ namespace Bolt.Client.Pipeline
         {
             SerializeContext ctxt = new SerializeContext()
             {
-                Values = new List<KeyValuePair<string, object>>()
+                ParameterValues = new List<ParameterValue>()
             };
 
-            for (int i = 0; i < context.ActionMetadata.Parameters.Length; i++)
+            for (int i = 0; i < context.ActionMetadata.Parameters.Count; i++)
             {
                 if (context.Parameters[i] == null)
                 {
@@ -140,7 +151,7 @@ namespace Bolt.Client.Pipeline
                     continue;
                 }
 
-                ctxt.Values.Add(new KeyValuePair<string, object>(context.ActionMetadata.Parameters[i].Name, context.Parameters[i]));
+                ctxt.ParameterValues.Add(new ParameterValue(context.ActionMetadata.Parameters[i], context.Parameters[i]));
             }
 
             return ctxt;

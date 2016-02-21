@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 
 using Bolt.Test.Common;
 using Xunit;
-using Bolt;
 
 namespace Bolt.Core.Test
 {

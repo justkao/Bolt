@@ -3,8 +3,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Bolt.Pipeline;
-using Microsoft.AspNet.Http;
-using Microsoft.Extensions.Primitives;
 
 namespace Bolt.Server.Pipeline
 {
@@ -20,7 +18,7 @@ namespace Bolt.Server.Pipeline
             }
 
             // handle action parameters
-            context.Parameters = new object[context.GetActionMetadataOrThrow().Parameters.Length];
+            context.Parameters = new object[context.GetActionMetadataOrThrow().Parameters.Count];
             if (metadata.HttpContentIndex >= 0)
             {
                 context.Parameters[metadata.HttpContentIndex] = CreateHttpContent(context, metadata);

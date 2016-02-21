@@ -7,6 +7,6 @@ namespace Bolt
     {
         public Stream Stream { get; set; }
 
-        public IList<KeyValuePair<string, object>> Values { get; set; }
+        public IList<ParameterValue> ParameterValues { get; set; }
     }
 }

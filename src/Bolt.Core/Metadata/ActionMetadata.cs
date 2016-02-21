@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Linq;
 using System.Threading;
@@ -8,7 +9,7 @@ namespace Bolt.Metadata
 {
     public sealed class ActionMetadata
     {
-        private ParameterMetadata[] _serializableParameters;
+        private ReadOnlyCollection<ParameterMetadata> _serializableParameters;
         private int? _cancellationTokenIndex;
 
         internal ActionMetadata()
@@ -19,7 +20,7 @@ namespace Bolt.Metadata
         public ActionMetadata(MethodInfo action, ParameterMetadata[] parameters, Type resultType)
         {
             Action = action;
-            Parameters = parameters;
+            Parameters = new ReadOnlyCollection<ParameterMetadata>(parameters);
             ResultType = resultType;
             Timeout = TimeSpan.Zero;
         }
@@ -28,15 +29,15 @@ namespace Bolt.Metadata
 
         public MethodInfo Action { get; internal set; }
 
-        public ParameterMetadata[] Parameters { get; internal set; }
+        public IReadOnlyList<ParameterMetadata> Parameters { get; internal set; }
 
-        public ParameterMetadata[] SerializableParameters
+        public IReadOnlyList<ParameterMetadata> SerializableParameters
         {
             get
             {
                 if (_serializableParameters == null)
                 {
-                    _serializableParameters = GetSerializableParameters().ToArray();
+                    _serializableParameters = new ReadOnlyCollection<ParameterMetadata>(GetSerializableParameters().ToArray());
                 }
 
                 return _serializableParameters;
@@ -53,7 +54,7 @@ namespace Bolt.Metadata
                 }
 
                 int index = -1;
-                for (int i = 0; i < Parameters.Length; i++)
+                for (int i = 0; i < Parameters.Count; i++)
                 {
                     if (typeof(CancellationToken).CanAssign(Parameters[i].Type) || typeof(CancellationToken?).CanAssign(Parameters[i].Type))
                     {
@@ -70,17 +71,17 @@ namespace Bolt.Metadata
 
         public bool HasResult => ResultType != typeof(void);
 
-        public bool HasSerializableParameters => SerializableParameters.Length > 0;
+        public bool HasSerializableParameters => SerializableParameters.Count > 0;
 
         public bool HasCancellationToken => CancellationTokenIndex >= 0;
 
-        public bool HasParameters => Parameters.Length > 0;
+        public bool HasParameters => Parameters.Count > 0;
 
         public TimeSpan Timeout { get; internal set; }
 
         public void ValidateParameters(object[] parameters)
         {
-            if (Parameters.Length == 0)
+            if (Parameters.Count == 0)
             {
                 if (parameters != null && parameters.Length > 0)
                 {
@@ -90,7 +91,7 @@ namespace Bolt.Metadata
                 return;
             }
 
-            for (int i = 0; i < Parameters.Length; i++)
+            for (int i = 0; i < Parameters.Count; i++)
             {
                 var parameterMetadata = Parameters[i];
                 object parameter = parameters[i];
@@ -114,8 +115,7 @@ namespace Bolt.Metadata
 
         private IEnumerable<ParameterMetadata> GetSerializableParameters()
         {
-
-            for (int i = 0; i < Parameters.Length; i++)
+            for (int i = 0; i < Parameters.Count; i++)
             {
                 if (i == CancellationTokenIndex)
                 {
@@ -125,5 +125,6 @@ namespace Bolt.Metadata
                 yield return Parameters[i];
             }
         }
+
     }
 }

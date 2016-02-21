@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -41,7 +40,7 @@ namespace Bolt.Server.Pipeline
 
             DeserializeContext deserializeContext = new DeserializeContext();
             deserializeContext.Stream = await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted);
-            deserializeContext.ExpectedValues = metadata.SerializableParameters;
+            deserializeContext.Parameters = metadata.SerializableParameters;
 
             try
             {
@@ -66,17 +65,17 @@ namespace Bolt.Server.Pipeline
             }
 
             // now fill the invocation parameters
-            object[] parameterValues = new object[metadata.Parameters.Length];
-            if (deserializeContext.Values != null)
+            object[] parameterValues = new object[metadata.Parameters.Count];
+            if (deserializeContext.ParameterValues != null)
             {
-                for (int i = 0; i < deserializeContext.Values.Count; i++)
+                for (int i = 0; i < deserializeContext.ParameterValues.Count; i++)
                 {
-                    KeyValuePair<string, object> pair = deserializeContext.Values[i];
-                    for (int j = 0; j < metadata.Parameters.Length; j++)
+                    var parameterValue = deserializeContext.ParameterValues[i];
+                    for (int j = 0; j < metadata.Parameters.Count; j++)
                     {
-                        if (metadata.Parameters[j].Name.EqualsNoCase(pair.Key))
+                        if (metadata.Parameters[j].Name.EqualsNoCase(parameterValue.Parameter.Name))
                         {
-                            parameterValues[j] = pair.Value;
+                            parameterValues[j] = parameterValue.Value;
                         }
                     }
                 }

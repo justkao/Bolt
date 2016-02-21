@@ -4,7 +4,6 @@ using Bolt.Performance.Contracts;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Bolt.Performance.Server
 {

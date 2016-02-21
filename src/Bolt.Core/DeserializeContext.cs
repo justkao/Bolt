@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 
 namespace Bolt
@@ -8,8 +7,8 @@ namespace Bolt
     {
         public Stream Stream { get; set; }
 
-        public IList<ParameterMetadata> ExpectedValues { get; set; }
+        public IReadOnlyList<ParameterMetadata> Parameters { get; set; }
 
-        public IList<KeyValuePair<string, object>> Values { get; set; }
+        public IList<ParameterValue> ParameterValues { get; set; }
     }
 }

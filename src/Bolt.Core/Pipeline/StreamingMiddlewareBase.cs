@@ -51,9 +51,9 @@ namespace Bolt.Pipeline
             if (contract == null) throw new ArgumentNullException(nameof(contract));
             if (method == null) throw new ArgumentNullException(nameof(method));
 
-            ActionMetadata actionMetadata =BoltFramework.ActionMetadata.Resolve(method);
+            ActionMetadata actionMetadata = BoltFramework.ActionMetadata.Resolve(method);
             var parameters = actionMetadata.Parameters;
-            if (parameters.Length > 2)
+            if (parameters.Count > 2)
             {
                 throw new ContractViolationException(
                     $"Action '{method.Name}' has invalid declaration. Only single parameter of HttpContent type is supported with optional CancellationToken parameter.",
@@ -86,7 +86,7 @@ namespace Bolt.Pipeline
                 metadata.ContentResultType = actionMetadata.ResultType;
             }
 
-            for (int i = 0; i < parameters.Length; i++)
+            for (int i = 0; i < parameters.Count; i++)
             {
                 ParameterMetadata info = parameters[i];
                 if (typeof (HttpContent).CanAssign(info.Type))
@@ -110,7 +110,7 @@ namespace Bolt.Pipeline
                 }
             }
 
-            if (metadata.HttpContentIndex >= 0 && parameters.Length > 1 && actionMetadata.CancellationTokenIndex < 0)
+            if (metadata.HttpContentIndex >= 0 && parameters.Count > 1 && actionMetadata.CancellationTokenIndex < 0)
             {
                 throw new ContractViolationException(
                     $"Action '{method.Name}' has invalid declaration. Only HttpContent parameter type witj optional cancellation token is supported.",

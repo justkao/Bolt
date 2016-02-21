@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -70,7 +69,7 @@ namespace Bolt
                 throw new ArgumentNullException(nameof(context.Stream));
             }
 
-            if (context.Values == null || context.Values.Count == 0)
+            if (context.ParameterValues == null || context.ParameterValues.Count == 0)
             {
                 return;
             }
@@ -82,15 +81,15 @@ namespace Bolt
                     jsonWriter.CloseOutput = false;
                     jsonWriter.WriteStartObject();
 
-                    foreach (KeyValuePair<string, object> pair in context.Values)
+                    foreach (var parameterValue in context.ParameterValues)
                     {
-                        if (Equals(pair.Value, null))
+                        if (Equals(parameterValue.Value, null))
                         {
                             continue;
                         }
 
-                        jsonWriter.WritePropertyName(pair.Key);
-                        Serializer.Serialize(jsonWriter, pair.Value);
+                        jsonWriter.WritePropertyName(parameterValue.Parameter.Name);
+                        Serializer.Serialize(jsonWriter, parameterValue.Value);
                     }
                 }
 
@@ -110,17 +109,17 @@ namespace Bolt
                 throw new ArgumentNullException(nameof(context.Stream));
             }
 
-            if (context.ExpectedValues == null || context.ExpectedValues.Count == 0)
+            if (context.Parameters == null || context.Parameters.Count == 0)
             {
                 return CompletedTask.Done;
             }
 
-            if (context.ExpectedValues == null)
+            if (context.Parameters == null)
             {
-                throw new ArgumentNullException(nameof(context.ExpectedValues));
+                throw new ArgumentNullException(nameof(context.Parameters));
             }
 
-            List<KeyValuePair<string, object>> result = new List<KeyValuePair<string, object>>();
+            List<ParameterValue> result = new List<ParameterValue>();
 
             using (StreamReader streamReader = CreateStreamReader(context.Stream))
             {
@@ -142,9 +141,9 @@ namespace Bolt
                             throw new InvalidOperationException($"Invalid json structure. Property name expected but '{reader.TokenType}' was found instead.");
                         }
 
-                        string key = reader.Value as string;
-                        var type = context.ExpectedValues.FirstOrDefault(v => v.Name.EqualsNoCase(key));
-                        if (type == null)
+                        string name = reader.Value as string;
+                        ParameterMetadata expectedParameter = FindParameterByName(context, name);
+                        if (expectedParameter == null)
                         {
                             // we will skip this value, no type definition available
                             reader.ReadAsString();
@@ -154,18 +153,31 @@ namespace Bolt
                         reader.Read();
                         try
                         {
-                            result.Add(new KeyValuePair<string, object>(key, Serializer.Deserialize(reader, type.Type)));
+                            result.Add(new ParameterValue(expectedParameter, Serializer.Deserialize(reader, expectedParameter.Type)));
                         }
                         catch (Exception e)
                         {
-                            throw new InvalidOperationException($"Invalid json structure. Failed to deserialize '{key}' property of type '{type.Type}'.", e);
+                            throw new InvalidOperationException($"Invalid json structure. Failed to deserialize '{name}' property of type '{expectedParameter.Type}'.", e);
                         }
                     }
                 }
             }
 
-            context.Values = result;
+            context.ParameterValues = result;
             return CompletedTask.Done;
+        }
+
+        private static ParameterMetadata FindParameterByName(DeserializeContext context, string name)
+        {
+            for (int i = 0; i < context.Parameters.Count; i++)
+            {
+                if (context.Parameters[i].Name.EqualsNoCase(name))
+                {
+                    return context.Parameters[i];
+                }
+            }
+
+            return null;
         }
 
         private static StreamReader CreateStreamReader(Stream stream)
