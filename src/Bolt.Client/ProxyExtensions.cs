@@ -1,7 +1,6 @@
 using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Bolt.Client.Helpers;
 
 namespace Bolt.Client
 {
@@ -14,7 +13,7 @@ namespace Bolt.Client
                 throw new ArgumentNullException(nameof(proxy));
             }
 
-            TaskHelpers.Execute(proxy.OpenAsync);
+            proxy.OpenAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         public static void Close(this IProxy proxy)
@@ -24,7 +23,7 @@ namespace Bolt.Client
                 throw new ArgumentNullException(nameof(proxy));
             }
 
-            TaskHelpers.Execute(proxy.CloseAsync);
+            proxy.CloseAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         public static object Send(this IProxy proxy, MethodInfo action, params object[] parameters)
@@ -34,7 +33,7 @@ namespace Bolt.Client
                 throw new ArgumentNullException(nameof(proxy));
             }
 
-            return TaskHelpers.Execute(() => proxy.SendAsync(action, parameters));
+            return proxy.SendAsync(action, parameters).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         public static T Send<T>(this IProxy proxy, MethodInfo action, params object[] parameters)
@@ -51,7 +50,7 @@ namespace Bolt.Client
         {
             if (proxy == null) throw new ArgumentNullException(nameof(proxy));
 
-            var result = await proxy.SendAsync(action, parameters);
+            var result = await proxy.SendAsync(action, parameters).ConfigureAwait(false);
             return (T) result;
         }
     }

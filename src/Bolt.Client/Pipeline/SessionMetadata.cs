@@ -7,7 +7,7 @@ namespace Bolt.Client.Pipeline
 {
     public class SessionMetadata
     {
-        private readonly AwaitableCriticalSection _syncRoot = new AwaitableCriticalSection();
+        private readonly AsyncLock _syncRoot = new AsyncLock();
 
         public SessionMetadata(SessionContractMetadata contract)
         {
@@ -48,7 +48,7 @@ namespace Bolt.Client.Pipeline
 
         public Task<IDisposable> LockAsync()
         {
-            return _syncRoot.EnterAsync();
+            return _syncRoot.LockAsync();
         }
     }
 }
