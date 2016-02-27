@@ -57,7 +57,7 @@ Task("Restore")
 Task("Clean")
     .Does(() =>
 {
-    DeleteDirectory("./packages/", recursive:true);
+    CleanDirectory("./packages/");
     
     // Clean solution directories.
     foreach(var path in solutionPaths)
