@@ -120,7 +120,6 @@ Task("Pack")
     var settings = new DNUPackSettings
     {
         Configurations = new[] { configuration },
-        Frameworks = new[] { "net451" },
         OutputDirectory = "./packages/",
         Quiet = false
     };
