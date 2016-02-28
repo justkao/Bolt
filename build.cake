@@ -74,7 +74,10 @@ Task("Build")
     
     DNUBuild("./src/*", settings);
     settings.Frameworks = null;
-    DNUBuild("./test/*", settings);
+    DNUBuild("./test/Common/*", settings);
+    DNUBuild("./test/Automatic/*", settings);
+    DNUBuild("./test/Integration/*", settings);
+    DNUBuild("./test/Performance/*", settings);    
 });
 
 Task("Test")
