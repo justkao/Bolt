@@ -8,8 +8,8 @@ using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Performance.Contracts;
-using Microsoft.Dnx.Runtime.Common.CommandLine;
 using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Framework.Runtime.Common.CommandLine;
 using Newtonsoft.Json;
 
 namespace Bolt.Performance.Console

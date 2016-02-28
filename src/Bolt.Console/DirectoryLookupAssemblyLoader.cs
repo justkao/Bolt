@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Microsoft.Dnx.Runtime.Common.CommandLine;
 using Microsoft.Extensions.PlatformAbstractions;
+using Microsoft.Framework.Runtime.Common.CommandLine;
 
 namespace Bolt.Console
 {

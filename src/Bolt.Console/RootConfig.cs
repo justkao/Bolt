@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using Bolt.Generators;
-using Microsoft.Dnx.Runtime.Common.CommandLine;
+using Microsoft.Framework.Runtime.Common.CommandLine;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 

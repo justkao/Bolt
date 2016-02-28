@@ -1,6 +1,6 @@
 ﻿{
   "dependencies": {
-    "Microsoft.Extensions.CommandLineUtils.Sources": {
+    "Microsoft.Framework.CommandLineUtils.Sources": {
       "version": "1.0.0-*",
       "type": "build"
     },

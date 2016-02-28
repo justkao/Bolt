@@ -3,7 +3,7 @@
   "description": "Bolt code generation tool used to generate client and server code.",
   "authors": [ "Martin Tomka" ],
   "dependencies": {
-    "Microsoft.Extensions.CommandLineUtils.Sources": {
+    "Microsoft.Framework.CommandLineUtils.Sources": {
       "version": "1.0.0-*",
       "type": "build"
     },
