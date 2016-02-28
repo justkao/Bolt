@@ -154,6 +154,10 @@ namespace Bolt.Client
             {
                 context.Use(_retryRequest);
             }
+            else if (_configuration.ErrorHandling != null)
+            {
+                context.Use(new ErrorHandlingMiddleware(_configuration.ErrorHandling));
+            }
 
             if (_sessionMiddleware != null)
             {

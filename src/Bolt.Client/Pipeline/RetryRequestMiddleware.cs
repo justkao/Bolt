@@ -22,8 +22,6 @@ namespace Bolt.Client.Pipeline
 
             while (true)
             {
-                tries++;
-
                 try
                 {
                     await Next(context);
@@ -41,8 +39,10 @@ namespace Bolt.Client.Pipeline
                         case ErrorHandlingResult.Recover:
                             if (tries >= Retries)
                             {
+                                (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
                                 throw;
                             }
+                            tries++;
                             break;
                         case ErrorHandlingResult.Rethrow:
                             (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Open);

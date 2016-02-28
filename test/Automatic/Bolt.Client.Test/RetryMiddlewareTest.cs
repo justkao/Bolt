@@ -81,7 +81,7 @@ namespace Bolt.Client.Test
                     }
                     else
                     {
-                        Assert.Equal(ProxyState.Ready, proxy.State);
+                        Assert.Equal(ProxyState.Closed, proxy.State);
                     }
                     break;
                 case ErrorHandlingResult.Rethrow:
