@@ -1,0 +1,1 @@
+call build.cmd -Target PublishBoltPackages

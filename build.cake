@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 var target = Argument<string>("target", "Default");
 var configuration = Argument<string>("configuration", "Release");
 var version = Argument<string>("boltVersion", "0.21.0-alpha1");
+var nugetFeed = "https://api.nuget.org/v3/index.json";
 
 ///////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
@@ -46,7 +47,7 @@ Task("Restore")
     {
         Parallel = true,
         Locked = DNULocked.Lock,
-        Sources = new [] { "https://api.nuget.org/v3/index.json" },
+        Sources = new [] { nugetFeed },
         Quiet = true
     };
                 
@@ -115,7 +116,7 @@ Task("Test")
     }
 });
 
-Task("Pack")
+Task("BuildBoltPackages")
     .IsDependentOn("Test")
     .Does(() =>
 {    
@@ -143,11 +144,19 @@ Task("UpdateBoltVersion")
     }
 });
 
+Task("PublishBoltPackages")
+    .IsDependentOn("BuildBoltPackages")
+    .Does(() =>
+{    
+    var packages = GetFiles("./Artifacts/Release/*.nupkg").Where(f => !f.FullPath.EndsWith("symbols.nupkg"));
+    NuGetPush(packages, new NuGetPushSettings());
+});
+
 ///////////////////////////////////////////////////////////////////////////////
 // TARGETS
 ///////////////////////////////////////////////////////////////////////////////
 
-Task("Default").IsDependentOn("Pack");
+Task("Default").IsDependentOn("BuildBoltPackages");
 
 ///////////////////////////////////////////////////////////////////////////////
 // EXECUTION
