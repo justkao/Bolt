@@ -44,7 +44,8 @@ Task("Restore")
     {
         Parallel = true,
         Locked = DNULocked.Lock,
-        Sources = new [] { "https://api.nuget.org/v3/index.json", "https://www.myget.org/gallery/aspnetvnext" }
+        Sources = new [] { "https://api.nuget.org/v3/index.json", "https://www.myget.org/gallery/aspnetvnext" },
+        Quiet = true
     };
                 
     var projects = GetFiles("./src/**/project.json");
@@ -58,7 +59,7 @@ Task("Restore")
 Task("Clean")
     .Does(() =>
 {
-    CleanDirectory("./packages/");
+    CleanDirectory("./artifacts/");
 });
 
 Task("Build")
@@ -69,7 +70,7 @@ Task("Build")
     var settings = new DNUBuildSettings
     {
         Configurations = new[] { configuration },
-        Quiet = false
+        Quiet = true
     };
     
     DNUBuild("./src/*", settings);
@@ -120,8 +121,8 @@ Task("Pack")
     var settings = new DNUPackSettings
     {
         Configurations = new[] { configuration },
-        OutputDirectory = "./packages/",
-        Quiet = false
+        OutputDirectory = "./artifacts/",
+        Quiet = true
     };
     
     DNUPack("./src/*", settings);
