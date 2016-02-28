@@ -51,7 +51,7 @@ Task("Restore")
     var projects = GetFiles("./src/**/project.json");
     foreach(var project in projects)
     {
-        DNURestore(project, settings);
+        DNURestore(settings);
     }
 });
 
