@@ -17,7 +17,7 @@ namespace Bolt.Client
             _options = options;
         }
 
-        public void EnsureSession(HttpRequestMessage request, string session)
+        public virtual void EnsureSession(HttpRequestMessage request, string session)
         {
             if (request == null)
             {
@@ -38,7 +38,7 @@ namespace Bolt.Client
             }
         }
 
-        public string GetSessionIdentifier(HttpResponseMessage response)
+        public virtual string GetSessionIdentifier(HttpResponseMessage response)
         {
             if (response == null)
             {

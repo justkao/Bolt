@@ -5,7 +5,7 @@ namespace Bolt.Client
 {
     public class ErrorHandling : IErrorHandling
     {
-        public ErrorHandlingResult Handle(ClientActionContext context, Exception e)
+        public virtual ErrorHandlingResult Handle(ClientActionContext context, Exception e)
         {
             if (e is NoServersAvailableException)
             {

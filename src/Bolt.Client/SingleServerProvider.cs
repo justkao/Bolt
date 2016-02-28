@@ -5,7 +5,7 @@ namespace Bolt.Client
     /// <summary>
     /// Provides Uri just for single specified server.
     /// </summary>
-    public class SingleServerProvider : IServerProvider
+    public sealed class SingleServerProvider : IServerProvider
     {
         private readonly ConnectionDescriptor _connection;
 

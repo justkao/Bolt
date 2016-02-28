@@ -22,6 +22,8 @@ namespace Bolt.Client.Pipeline
 
             while (true)
             {
+                tries++;
+
                 try
                 {
                     await Next(context);
@@ -51,7 +53,6 @@ namespace Bolt.Client.Pipeline
                 }
 
                 context.ServerConnection = null;
-                tries++;
                 await Task.Delay(RetryDelay, context.RequestAborted);
             }
         }
