@@ -1,7 +1,8 @@
 #reference "System.Net.dll"
 #reference "System.Net.Http.dll"
 
-using System.Net.Http;
+using System.IO;
+using System.Text.RegularExpressions;
 
 ///////////////////////////////////////////////////////////////////////////////
 // ARGUMENTS
@@ -9,6 +10,7 @@ using System.Net.Http;
 
 var target = Argument<string>("target", "Default");
 var configuration = Argument<string>("configuration", "Release");
+var version = Argument<string>("boltVersion", "0.21.0-alpha1");
 
 ///////////////////////////////////////////////////////////////////////////////
 // GLOBAL VARIABLES
@@ -125,6 +127,20 @@ Task("Pack")
     };
     
     DNUPack("./src/*", settings);
+});
+
+Task("UpdateBoltVersion")
+    .Does(() =>
+{    
+    var projects = GetFiles("./src/**/project.json");
+    foreach(var project in projects)
+    {
+        var regex = @"(.*""version""\s*:\s*"")(.*)("".*)";
+        var content = System.IO.File.ReadAllText(project.FullPath);
+        content = Regex.Replace(content, regex, m => m.Groups[1].Value + version + m.Groups[3].Value, RegexOptions.Multiline);
+        System.IO.File.WriteAllText(project.FullPath, content);
+        Information("Project {0} version updated to {1}", project.FullPath, version);       
+    }
 });
 
 ///////////////////////////////////////////////////////////////////////////////

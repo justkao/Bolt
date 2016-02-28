@@ -1,5 +1,5 @@
 {
-  "version": "0.19.0-alpha1",
+  "version": "0.21.0-alpha1",
   "authors": [ "Martin Tomka" ],
   "description": "Bolt portable client library used to access Bolt based services.",
   "dependencies": {
