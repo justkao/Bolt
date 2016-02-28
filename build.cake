@@ -43,7 +43,8 @@ Task("Restore")
     var settings = new DNURestoreSettings
     {
         Parallel = true,
-        Locked = DNULocked.Lock
+        Locked = DNULocked.Lock,
+        Sources = new [] { "https://api.nuget.org/v3/index.json", "https://www.myget.org/gallery/aspnetvnext" }
     };
                 
     var projects = GetFiles("./src/**/project.json");
