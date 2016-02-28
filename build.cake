@@ -51,11 +51,7 @@ Task("Restore")
         Quiet = true
     };
                 
-    var projects = GetFiles("./src/**/project.json");
-    foreach(var project in projects)
-    {
-        DNURestore(settings);
-    }
+    DNURestore(settings);
 });
 
 
