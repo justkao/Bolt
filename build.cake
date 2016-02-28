@@ -44,7 +44,7 @@ Task("Restore")
     {
         Parallel = true,
         Locked = DNULocked.Lock,
-        Sources = new [] { "https://api.nuget.org/v3/index.json", "https://www.myget.org/gallery/aspnetvnext" },
+        Sources = new [] { "https://api.nuget.org/v3/index.json" },
         Quiet = true
     };
                 
@@ -74,7 +74,6 @@ Task("Build")
     };
     
     DNUBuild("./src/*", settings);
-    settings.Frameworks = null;
     DNUBuild("./test/Common/*", settings);
     DNUBuild("./test/Automatic/*", settings);
     DNUBuild("./test/Integration/*", settings);
@@ -98,7 +97,7 @@ Task("Test")
         Information("Test execution status code: {0}", testSuccess);
         if (testSuccess != 0)
         {
-            throw new InvalidOperationException("Failed to exectute tests for " + project);
+            throw new InvalidOperationException("Failed to execute tests for " + project);
         }
     }
     
