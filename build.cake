@@ -59,14 +59,6 @@ Task("Clean")
     .Does(() =>
 {
     CleanDirectory("./packages/");
-    
-    // Clean solution directories.
-    foreach(var path in solutionPaths)
-    {
-        Information("Cleaning {0}", path);
-        CleanDirectories(path + "/**/bin/" + configuration);
-        CleanDirectories(path + "/**/obj/" + configuration);
-    }
 });
 
 Task("Build")
@@ -74,16 +66,15 @@ Task("Build")
     .IsDependentOn("Restore")
     .Does(() =>
 {
-    // Build all solutions.
-    foreach(var solution in solutions)
+    var settings = new DNUBuildSettings
     {
-        Information("Building {0}", solution);
-        MSBuild(solution, settings => 
-            settings.SetPlatformTarget(PlatformTarget.MSIL)
-                .WithProperty("TreatWarningsAsErrors","true")
-                .WithTarget("Build")
-                .SetConfiguration(configuration));
-    }
+        Configurations = new[] { configuration },
+        Quiet = false
+    };
+    
+    DNUBuild("./src/*", settings);
+    settings.Frameworks = null;
+    DNUBuild("./test/*", settings);
 });
 
 Task("Test")
@@ -125,7 +116,8 @@ Task("Pack")
 {    
     var settings = new DNUPackSettings
     {
-        Configurations = new[] { "Release" },
+        Configurations = new[] { configuration },
+        Frameworks = new[] { "net451" },
         OutputDirectory = "./packages/",
         Quiet = false
     };
