@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0-*",
+  "description": "Bolt.Console.SimpleProxy Console Application",
+  "authors": [ "mtomka" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+
+  "compilationOptions": {
+    "emitEntryPoint": true
+  },
+
+  "dependencies": {
+    "Bolt.Client.Proxy": "",
+    "Bolt.Server": "",
+    "Microsoft.AspNet.Server.Kestrel": "1.0.0-*",
+    "Microsoft.AspNet.Hosting": "1.0.0-*",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-*"
+  },
+  "commands": {
+    "Bolt.Console.SimpleProxy": "run"
+  },
+  "frameworks": {
+    "dnx451": { }
+  }
+}

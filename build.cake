@@ -73,6 +73,7 @@ Task("Build")
     };
     
     DNUBuild("./src/*", settings);
+    DNUBuild("./samples/*", settings);
     DNUBuild("./test/Common/*", settings);
     DNUBuild("./test/Automatic/*", settings);
     DNUBuild("./test/Integration/*", settings);
