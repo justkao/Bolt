@@ -143,9 +143,16 @@ namespace Bolt.Client.Proxy
 
             private static Task<T> ConvertTask<T>(Task<object> task)
             {
-                return task.ContinueWith(t => (T)t.Result,
-                    TaskContinuationOptions.NotOnFaulted | TaskContinuationOptions.NotOnCanceled |
-                    TaskContinuationOptions.ExecuteSynchronously);
+                return task.ContinueWith(t =>
+                {
+                    if (t.Exception != null)
+                    {
+                        // this will cause the exception to be thrown
+                        t.GetAwaiter().GetResult();
+                    }
+
+                    return (T) t.Result;
+                }, TaskContinuationOptions.ExecuteSynchronously);
             }
         }
     }
