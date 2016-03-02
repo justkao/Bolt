@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Reflection;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace Bolt.Metadata
 {
@@ -23,11 +24,14 @@ namespace Bolt.Metadata
             Parameters = new ReadOnlyCollection<ParameterMetadata>(parameters);
             ResultType = resultType;
             Timeout = TimeSpan.Zero;
+            IsAsync = typeof (Task).GetTypeInfo().IsAssignableFrom(action.ReturnType.GetTypeInfo());
         }
 
         public string Name => Action.Name;
 
         public MethodInfo Action { get; internal set; }
+
+        public bool IsAsync { get; internal set; }
 
         public IReadOnlyList<ParameterMetadata> Parameters { get; internal set; }
 

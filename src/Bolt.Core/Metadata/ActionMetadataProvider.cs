@@ -21,6 +21,7 @@ namespace Bolt.Metadata
             descriptor.Parameters = parameters.Select(p => new ParameterMetadata(p.ParameterType, p.Name)).ToArray();
             descriptor.ResultType = GetResultType(method);
             descriptor.Timeout = GetTimeout(method);
+            descriptor.IsAsync = typeof(Task).GetTypeInfo().IsAssignableFrom(method.ReturnType.GetTypeInfo());
             return descriptor;
         }
 
