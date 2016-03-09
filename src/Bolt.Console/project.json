@@ -4,7 +4,7 @@
   "authors": [ "Martin Tomka" ],
   "dependencies": {
     "Microsoft.Framework.CommandLineUtils.Sources": {
-      "version": "0.21.0-alpha1",
+      "version": "1.0.0-beta5",
       "type": "build"
     },
     "Newtonsoft.Json": "7.0.1",

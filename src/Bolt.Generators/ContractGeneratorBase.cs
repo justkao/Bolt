@@ -83,6 +83,37 @@ namespace Bolt.Generators
             return new ClassDescriptor(ContractDefinition.Name, ContractDefinition.Namespace);
         }
 
+        public virtual bool ShouldBeSync(MethodInfo method, bool force)
+        {
+            if (!method.IsAsync())
+            {
+                return false;
+            }
+
+            string methodName = method.Name.TrimEnd(AsyncSuffix);
+
+            List<MethodInfo> methods = ContractDefinition.GetEffectiveMethods(method.DeclaringType).ToList();
+
+            if (force)
+            {
+                return methods.All(m => m.Name != methodName);
+            }
+
+            if (!method.CustomAttributes.Any())
+            {
+                return false;
+            }
+
+            var found = method.CustomAttributes.FirstOrDefault(a => a.AttributeType.Name == BoltConstants.Core.SyncOperationAttribute.Name);
+            if (found == null)
+            {
+                return false;
+            }
+
+            return methods.All(m => m.Name != methodName);
+        }
+
+
         public virtual bool ShouldBeAsync(MethodInfo method, bool force)
         {
             if (method.IsAsync())
@@ -94,7 +125,7 @@ namespace Bolt.Generators
 
             if (force)
             {
-                return methods.All(m => m.Name != method.Name + "Async");
+                return methods.All(m => m.Name != method.Name + AsyncSuffix);
             }
 
             if (!method.CustomAttributes.Any())
@@ -108,7 +139,7 @@ namespace Bolt.Generators
                 return false;
             }
 
-            return methods.All(m => m.Name != method.Name + "Async");
+            return methods.All(m => m.Name != method.Name + AsyncSuffix);
         }
 
         public virtual ClassGenerator CreateClassGenerator(ClassDescriptor descriptor)

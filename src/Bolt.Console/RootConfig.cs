@@ -111,25 +111,25 @@ namespace Bolt.Console
                 new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, Formatting = Formatting.Indented, ContractResolver = new CamelCasePropertyNamesContractResolver() });
         }
 
-        public void AddContractsFromNamespace(string ns, GenerateContractMode mode, bool internalVisibility)
+        public IEnumerable<ProxyConfig> AddContractsFromNamespace(string ns, GenerateContractMode mode, bool internalVisibility)
         {
             foreach (var type in AssemblyCache.GetTypes(ns))
             {
-                AddContract(type.GetTypeInfo(), mode, internalVisibility);
+                yield return AddContract(type.GetTypeInfo(), mode, internalVisibility);
                 Console.WriteLine($"Contract '{type.Name.Bold()}' added.");
             }
         }
 
-        public void AddAllContracts(GenerateContractMode mode, bool internalVisibility)
+        public IEnumerable<ProxyConfig> AddAllContracts(GenerateContractMode mode, bool internalVisibility)
         {
             foreach (var type in AssemblyCache.GetTypes())
             {
-                AddContract(type.GetTypeInfo(), mode, internalVisibility);
+                yield return AddContract(type.GetTypeInfo(), mode, internalVisibility);
                 Console.WriteLine($"Contract '{type.Name.Bold()}' added.");
             }
         }
 
-        public void AddContract(string name, GenerateContractMode mode, bool internalVisibility)
+        public ProxyConfig AddContract(string name, GenerateContractMode mode, bool internalVisibility)
         {
             var type = AssemblyCache.GetType(name);
             var addedContract = AddContract(type.GetTypeInfo(), mode, internalVisibility);
@@ -141,6 +141,8 @@ namespace Bolt.Console
 			{
 				Console.WriteLine($"Contract '{type.Name.Bold()}' not found.");
 			}
+
+            return addedContract;
         }
 
         public ProxyConfig AddContract(TypeInfo type, GenerateContractMode mode, bool internalVisibility)

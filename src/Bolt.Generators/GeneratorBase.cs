@@ -10,6 +10,8 @@ namespace Bolt.Generators
 {
     public abstract class GeneratorBase
     {
+        public const string AsyncSuffix = "Async";
+
         protected GeneratorBase()
             : this(new StringWriter(), new TypeFormatter(), new IntendProvider())
         {
@@ -159,24 +161,63 @@ namespace Bolt.Generators
             return $"{info.Name}({FormatMethodParameters(info, false)})";
         }
 
-        public virtual string FormatMethodDeclaration(MethodInfo info, bool forceAsync = false)
+        public virtual string FormatToSyncMethodDeclaration(MethodInfo info)
+        {
+            if (info.ReturnType.GetTypeInfo().IsGenericType)
+            {
+                return $"{FormatType(info.ReturnType.GetTypeInfo().GenericTypeArguments[0])} {info.GetSyncName()}({FormatMethodParameters(info, true)})";
+            }
+
+            return $"void {info.GetSyncName()}({FormatMethodParameters(info, true)})";
+        }
+
+        public virtual string FormatToAsyncMethodDeclaration(MethodInfo info)
         {
             if (info.ReturnType == typeof(void))
             {
-                if (forceAsync)
-                {
-                    return $"{FormatType<Task>()} {info.GetAsyncName()}({FormatMethodParameters(info, true)})";
-                }
+                return
+                    $"Task {info.GetAsyncName()}({FormatMethodParameters(info, true)})";
+            }
 
+
+
+            return
+                $"Task<{FormatType(info.ReturnType)}> {info.GetAsyncName()}({FormatMethodParameters(info, true)})";
+        }
+
+        public virtual string FormatMethodDeclaration(MethodInfo info)
+        {
+            if (info.ReturnType == typeof(void))
+            {
                 return $"void {info.Name}({FormatMethodParameters(info, true)})";
             }
             
-            if (forceAsync && !info.IsAsync())
+            return $"{FormatType(info.ReturnType)} {info.Name}({FormatMethodParameters(info, true)})";
+        }
+
+        public virtual string FormatMethodDeclaration(MethodInfo info, MethodDeclarationFormatting formatting)
+        {
+            if (formatting == MethodDeclarationFormatting.Unchanged)
             {
-                return $"{FormatType<Task>()}<{FormatType(info.ReturnType)}> {info.GetAsyncName()}({FormatMethodParameters(info, true)})";
+                return FormatMethodDeclaration(info);
             }
 
-            return $"{FormatType(info.ReturnType)} {info.Name}({FormatMethodParameters(info, true)})";
+            if (info.IsAsync())
+            {
+                if (formatting == MethodDeclarationFormatting.ChangeToSync)
+                {
+                    return FormatToSyncMethodDeclaration(info);
+                }
+
+                return FormatMethodDeclaration(info);
+            }
+
+            if (formatting == MethodDeclarationFormatting.ChangeToAsync)
+            {
+                return FormatToAsyncMethodDeclaration(info);
+            }
+
+            return FormatMethodDeclaration(info);
         }
 
         public virtual string FormatType<T>()

@@ -20,99 +20,137 @@ namespace Bolt.Generators
             : base(output, formatter, provider)
         {
         }
-
         public event EventHandler Generated;
-
         public IEnumerable<string> GeneratedAsyncInterfaces => _generatedAsyncInterfaces;
 
         public bool ForceAsync { get; set; }
 
+        public bool ForceSync { get; set; }
+
         public List<string> ExcludedInterfaces { get; set; }
+
+        public string InterfaceSuffix { get; set; } = "Async";
 
         public override void Generate(object context)
         {
-            bool hasAsyncInterfaces = ContractDefinition.GetEffectiveContracts().Any(ShouldHaveAsyncMethods);
+            bool shouldGenerateInterface = ContractDefinition.GetEffectiveContracts().Any(ShouldGenerateInterface);
 
             foreach (var iface in ContractDefinition.GetEffectiveContracts().Except(new[] { ContractDefinition.Root }))
             {
-                if (hasAsyncInterfaces)
+                if (shouldGenerateInterface)
                 {
-                    GenerateAsyncInterface(iface, context);
+                    GenerateInterface(iface, context);
                 }
             }
 
-            GenerateAsyncInterface(ContractDefinition.Root, context);
+            GenerateInterface(ContractDefinition.Root, context);
             Generated?.Invoke(this, EventArgs.Empty);
         }
 
-        private void GenerateAsyncInterface(Type iface, object context)
+        private void GenerateInterface(Type contract, object context)
         {
             if (ExcludedInterfaces != null)
             {
-                if (ExcludedInterfaces.Contains(iface.FullName) || ExcludedInterfaces.Contains(iface.FullName + "Async"))
+                if (ExcludedInterfaces.Contains(contract.FullName) ||
+                    ExcludedInterfaces.Contains(contract.FullName + InterfaceSuffix))
                 {
                     return;
                 }
             }
 
-            if (_generatedInterfaces.Contains(iface))
+            if (_generatedInterfaces.Contains(contract))
             {
                 return;
             }
 
-            if (!ContractDefinition.GetEffectiveContracts(iface).Concat(new[] { iface }).Any(ShouldHaveAsyncMethods))
+            if (
+                !ContractDefinition.GetEffectiveContracts(contract)
+                    .Concat(new[] {contract})
+                    .Any(ShouldGenerateInterface))
             {
                 return;
             }
 
-            _generatedInterfaces.Add(iface);
-            string name = iface.Name + "Async";
+            _generatedInterfaces.Add(contract);
+            string name = contract.Name + InterfaceSuffix;
             _generatedAsyncInterfaces.Add(name);
 
-            List<string> asyncBase = ContractDefinition.GetEffectiveContracts(iface).Where(ShouldHaveAsyncMethods).Where(
-                i =>
-                {
-                    if (ExcludedInterfaces != null)
+            List<string> asyncBase =
+                ContractDefinition.GetEffectiveContracts(contract).Where(ShouldGenerateInterface).Where(
+                    i =>
                     {
-                        if (ExcludedInterfaces.Contains(i.FullName))
+                        if (ExcludedInterfaces != null)
                         {
-                            return false;
+                            if (ExcludedInterfaces.Contains(i.FullName))
+                            {
+                                return false;
+                            }
                         }
-                    }
-                    return true;
-                }).Select(t => FormatType(t) + "Async").ToList();
+                        return true;
+                    }).Select(t => FormatType(t) + InterfaceSuffix).ToList();
 
-            asyncBase.Insert(0, FormatType(iface));
+            asyncBase.Insert(0, FormatType(contract));
 
-            ClassGenerator classGenerator = CreateClassGenerator(new ClassDescriptor(name, iface.Namespace, asyncBase.ToArray()) { IsInterface = true });
+            ClassGenerator classGenerator =
+                CreateClassGenerator(new ClassDescriptor(name, contract.Namespace, asyncBase.ToArray())
+                {
+                    IsInterface = true
+                });
             classGenerator.GenerateBodyAction = g =>
-                {
-                    List<MethodInfo> methods =
-                        (from m in ContractDefinition.GetEffectiveMethods(iface)
-                         where ShouldBeAsync(m, ForceAsync)
-                         select m).ToList();
+            {
+                var methods =
+                    (from method in ContractDefinition.GetEffectiveMethods(contract)
+                        let async = ShouldBeAsync(method, ForceAsync)
+                        let sync = ShouldBeSync(method, ForceSync)
 
-                    foreach (MethodInfo method in methods)
+                        where async || sync
+                        select new {method, async, sync}).ToList();
+
+                foreach (var method in methods)
+                {
+                    if (method.async)
                     {
-                        g.WriteLine(FormatMethodDeclaration(method, true) + ";");
-                        if (!Equals(method, methods.Last()))
-                        {
-                            g.WriteLine();
-                        }
+                        g.WriteLine(FormatMethodDeclaration(method.method, MethodDeclarationFormatting.ChangeToAsync) + ";");
                     }
-                };
+                    else
+                    {
+                        g.WriteLine(FormatMethodDeclaration(method.method, MethodDeclarationFormatting.ChangeToSync) + ";");
+                    }
+
+                    if (!Equals(method, methods.Last()))
+                    {
+                        g.WriteLine();
+                    }
+                }
+            };
 
             classGenerator.Generate(context);
         }
 
-        private bool ShouldHaveAsyncMethods(Type iface)
+        private bool ShouldGenerateInterface(Type contract)
+        {
+            return ShouldHaveAsyncMethods(contract) || ShouldHaveSyncMethods(contract);
+        }
+
+
+        private bool ShouldHaveSyncMethods(Type contract)
+        {
+            if (ForceSync)
+            {
+                return true;
+            }
+
+            return ContractDefinition.GetEffectiveMethods(contract).Any(m => ShouldBeSync(m, ForceSync));
+        }
+
+        private bool ShouldHaveAsyncMethods(Type contract)
         {
             if (ForceAsync)
             {
                 return true;
             }
 
-            return ContractDefinition.GetEffectiveMethods(iface).Any(m => ShouldBeAsync(m, ForceAsync));
+            return ContractDefinition.GetEffectiveMethods(contract).Any(m => ShouldBeAsync(m, ForceAsync));
         }
     }
 }

@@ -10,6 +10,8 @@
 
             public static readonly ClassDescriptor AsyncOperationAttribute = new ClassDescriptor("AsyncOperationAttribute", Namespace);
 
+            public static readonly ClassDescriptor SyncOperationAttribute = new ClassDescriptor("SyncOperationAttribute", Namespace);
+
             public static readonly ClassDescriptor InitSessionAttribute = new ClassDescriptor("InitSessionAttribute", Namespace);
 
             public static readonly ClassDescriptor CloseSessionAttribute = new ClassDescriptor("CloseSessionAttribute", Namespace);

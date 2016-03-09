@@ -20,6 +20,7 @@ namespace Bolt.Server.IntegrationTest.Core
 
         int SimpleFunctionWithCancellation(CancellationToken cancellation);
 
+        [SyncOperation]
         List<CompositeType> FunctionReturningHugeData();
 
         void MethodTakingHugeData(List<CompositeType> arg);
@@ -30,6 +31,7 @@ namespace Bolt.Server.IntegrationTest.Core
         [AsyncOperation]
         NotSerializableType FunctionWithNotSerializableType();
 
+        [SyncOperation]
         Task<int> SimpleAsyncFunction();
 
         void MethodWithManyArguments(CompositeType arg1, CompositeType arg2, DateTime time);
@@ -44,10 +46,12 @@ namespace Bolt.Server.IntegrationTest.Core
 
         void MethodWithNullableArguments(string arg);
 
+        [SyncOperation]
         Task SimpleMethodExAsync();
 
         void SimpleMethodWithCancellation(CancellationToken cancellation);
 
+        [AsyncOperation]
         CompositeType ComplexFunction();
     }
 }

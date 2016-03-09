@@ -7,10 +7,18 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+
 using Bolt.Client;
-using Bolt.Client.Pipeline;
+using Bolt.Server.IntegrationTest.Core;
+
 
 namespace Bolt.Server.IntegrationTest.Core
 {
@@ -28,13 +36,13 @@ namespace Bolt.Server.IntegrationTest.Core
 
 namespace Bolt.Server.IntegrationTest.Core
 {
-    public partial class TestContractStateFullProxy : ProxyBase, ITestContractStateFull, ITestContractStateFullAsync
+    public partial class TestContractStateFullProxy : Bolt.Client.ProxyBase, Bolt.Server.IntegrationTest.Core.ITestContractStateFull, ITestContractStateFullAsync
     {
-        public TestContractStateFullProxy(TestContractStateFullProxy proxy) : base(proxy)
+        public TestContractStateFullProxy(Bolt.Server.IntegrationTest.Core.TestContractStateFullProxy proxy) : base(proxy)
         {
         }
 
-        public TestContractStateFullProxy(IClientPipeline channel) : base(typeof(ITestContractStateFull), channel)
+        public TestContractStateFullProxy(Bolt.Client.Pipeline.IClientPipeline channel) : base(typeof(Bolt.Server.IntegrationTest.Core.ITestContractStateFull), channel)
         {
         }
 

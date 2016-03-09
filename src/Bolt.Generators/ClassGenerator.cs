@@ -67,9 +67,9 @@ namespace Bolt.Generators
             }
         }
 
-        public void WriteMethod(MethodInfo method, bool forceAsync, Action<ClassGenerator> bodyGenerator, string modifier = "public virtual", string returnValue = null)
+        public void WriteMethod(MethodInfo method, MethodDeclarationFormatting declaration, Action<ClassGenerator> bodyGenerator, string modifier = "public virtual", string returnValue = null)
         {
-            WriteMethod(FormatMethodDeclaration(method, forceAsync), bodyGenerator, modifier, returnValue);
+            WriteMethod(FormatMethodDeclaration(method, declaration), bodyGenerator, modifier, returnValue);
         }
 
         public override void Generate(object context)

@@ -22,6 +22,8 @@ namespace Bolt.Generators
 
         public bool ForceAsync { get; set; }
 
+        public bool ForceSync { get; set; }
+
         public string Suffix { get; set; }
 
         public string Namespace { get; set; }
@@ -67,10 +69,19 @@ namespace Bolt.Generators
             {
                 MethodDescriptor descriptor = MetadataProvider.GetMethodDescriptor(ContractDefinition, method);
 
-                GenerateMethod(classGenerator, descriptor, false);
+                GenerateMethod(classGenerator, descriptor, MethodDeclarationFormatting.Unchanged);
 
-                bool generateAsync = ShouldBeAsync(method, ForceAsync);
-                if (generateAsync)
+                MethodDeclarationFormatting decl = MethodDeclarationFormatting.Unchanged;
+                if (ShouldBeSync(method, ForceSync))
+                {
+                    decl = MethodDeclarationFormatting.ChangeToSync;
+                }
+                else if (ShouldBeAsync(method, ForceAsync))
+                {
+                    decl = MethodDeclarationFormatting.ChangeToAsync;
+                }
+
+                if (decl != MethodDeclarationFormatting.Unchanged)
                 {
                     WriteLine();
                 }
@@ -82,19 +93,20 @@ namespace Bolt.Generators
                     }
                 }
 
-                if (generateAsync)
+                if (decl != MethodDeclarationFormatting.Unchanged)
                 {
-                    GenerateMethod(classGenerator, descriptor, true);
+                    GenerateMethod(classGenerator, descriptor, decl);
                     WriteLine();
                 }
             }
         }
 
-        private void GenerateMethod(ClassGenerator classGenerator, MethodDescriptor descriptor, bool forceAsync)
+        private void GenerateMethod(ClassGenerator classGenerator, MethodDescriptor descriptor,
+            MethodDeclarationFormatting declaration)
         {
             classGenerator.WriteMethod(
                 descriptor.Method,
-                forceAsync,
+                declaration,
                 g =>
                 {
                     MethodInfo method = descriptor.Method;
@@ -103,46 +115,72 @@ namespace Bolt.Generators
                     {
                         parameters = ", " + parameters;
                     }
+
                     if (HasReturnValue(method))
                     {
-                        if (IsAsync(method))
+                        MethodDeclarationFormatting targetDeclaration = method.IsAsync()
+                            ? MethodDeclarationFormatting.ChangeToAsync
+                            : MethodDeclarationFormatting.ChangeToSync;
+
+                        if (declaration == MethodDeclarationFormatting.ChangeToSync)
                         {
-                            WriteLine(
-                                "return this.SendAsync<{0}>({1}{2});",
-                                FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ?? method.ReturnType),
-                                GetStaticActionName(method),
-                                parameters);
+                            targetDeclaration = MethodDeclarationFormatting.ChangeToSync;
                         }
-                        else if (forceAsync)
+
+                        if (declaration == MethodDeclarationFormatting.ChangeToAsync)
                         {
-                            WriteLine(
-                                "return this.SendAsync<{0}>({1}{2});",
-                                FormatType(method.ReturnType),
-                                GetStaticActionName(method),
-                                parameters);
+                            targetDeclaration = MethodDeclarationFormatting.ChangeToAsync;
                         }
-                        else
+
+                        switch (targetDeclaration)
                         {
-                            WriteLine(
-                                "return this.Send<{0}>({1}{2});",
-                                FormatType(method.ReturnType),
-                                GetStaticActionName(method),
-                                parameters);
+                            case MethodDeclarationFormatting.ChangeToSync:
+                                WriteLine(
+                                    "return this.Send<{0}>({1}{2});",
+                                    FormatType(method.IsAsync()
+                                        ? method.ReturnType.GetTypeInfo().GenericTypeArguments[0]
+                                        : method.ReturnType),
+                                    GetStaticActionName(method),
+                                    parameters);
+                                break;
+                            case MethodDeclarationFormatting.ChangeToAsync:
+                                WriteLine(
+                                    "return this.SendAsync<{0}>({1}{2});",
+                                    FormatType(method.ReturnType.GenericTypeArguments.FirstOrDefault() ??
+                                               method.ReturnType),
+                                    GetStaticActionName(method),
+                                    parameters);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
                         }
                     }
                     else
                     {
-                        if (IsAsync(method))
+                        MethodDeclarationFormatting targetDeclaration = method.IsAsync()
+                            ? MethodDeclarationFormatting.ChangeToAsync
+                            : MethodDeclarationFormatting.ChangeToSync;
+
+                        if (declaration == MethodDeclarationFormatting.ChangeToSync)
                         {
-                            WriteLine("return this.SendAsync({0}{1});", GetStaticActionName(method), parameters);
+                            targetDeclaration = MethodDeclarationFormatting.ChangeToSync;
                         }
-                        else if (forceAsync)
+
+                        if (declaration == MethodDeclarationFormatting.ChangeToAsync)
                         {
-                            WriteLine("return this.SendAsync({0}{1});", GetStaticActionName(method), parameters);
+                            targetDeclaration = MethodDeclarationFormatting.ChangeToAsync;
                         }
-                        else
+
+                        switch (targetDeclaration)
                         {
-                            WriteLine("this.Send({0}{1});", GetStaticActionName(method), parameters);
+                            case MethodDeclarationFormatting.ChangeToSync:
+                                WriteLine("this.Send({0}{1});", GetStaticActionName(method), parameters);
+                                break;
+                            case MethodDeclarationFormatting.ChangeToAsync:
+                                WriteLine("return this.SendAsync({0}{1});", GetStaticActionName(method), parameters);
+                                break;
+                            default:
+                                throw new ArgumentOutOfRangeException();
                         }
                     }
                 });
@@ -160,22 +198,14 @@ namespace Bolt.Generators
                 baseClasses.AddRange(BaseInterfaces);
             }
 
-            return new ClassDescriptor(
-                Name ?? ContractDefinition.Name + Suffix,
-                Namespace ?? ContractDefinition.Namespace,
-                baseClasses.Distinct().ToArray());
+            return new ClassDescriptor(Name ?? ContractDefinition.Name + Suffix, Namespace ?? ContractDefinition.Namespace, baseClasses.Distinct().ToArray());
         }
 
         private void GenerateStaticActions(ClassGenerator generator)
         {
             foreach (MethodInfo effectiveMethod in ContractDefinition.GetEffectiveMethods())
             {
-                generator.WriteLine(
-                    "private static readonly {0} {1} = typeof({2}).GetMethod(nameof({2}.{3}));",
-                    FormatType<MethodInfo>(),
-                    GetStaticActionName(effectiveMethod),
-                    FormatType(effectiveMethod.DeclaringType),
-                    effectiveMethod.Name);
+                generator.WriteLine("private static readonly {0} {1} = typeof({2}).GetMethod(nameof({2}.{3}));", FormatType<MethodInfo>(), GetStaticActionName(effectiveMethod), FormatType(effectiveMethod.DeclaringType), effectiveMethod.Name);
             }
         }
 

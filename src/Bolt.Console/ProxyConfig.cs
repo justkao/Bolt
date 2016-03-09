@@ -21,6 +21,8 @@ namespace Bolt.Console
 
         public bool ForceAsync { get; set; }
 
+        public bool ForceSync { get; set; }
+
         public List<string> ExcludedInterfaces { get; set; }
 
         public GenerateContractMode Mode { get; set; }
@@ -33,6 +35,7 @@ namespace Bolt.Console
                 proxyGenerator = new ProxyGenerator
                 {
                     ForceAsync = ForceAsync,
+                    ForceSync =  ForceSync,
                     ContractDefinition = definition,
                     Namespace = Namespace,
                     Name = Name,
@@ -56,6 +59,7 @@ namespace Bolt.Console
                 {
                     ContractDefinition = definition,
                     ForceAsync = ForceAsync,
+                    ForceSync = ForceSync,
                     ExcludedInterfaces = ExcludedInterfaces
                 };
 

@@ -120,6 +120,8 @@ namespace Bolt.Console
                 var contractOption = c.Option("--contract <NAME>", "Additional contracts to generate, if not included in config file or assembly.", CommandOptionType.MultipleValue);
                 var modeOption = c.Option($"--mode <{rawModeValues}>", "Specifies what parts of contracts should be generated. ", CommandOptionType.SingleValue);
                 var internalSwitch = c.Option("--internal", "Generates the contracts with internal visibility.", CommandOptionType.NoValue);
+                var forceAsync = c.Option("--forceAsync", "Generates asynchronous version of methods.", CommandOptionType.NoValue);
+                var forceSync = c.Option("--forceSync", "Generates synchronous version of methods.", CommandOptionType.NoValue);
 
                 c.HelpOption("-?|-h|--help");
 
@@ -169,7 +171,7 @@ namespace Bolt.Console
                     bool asInternal = internalSwitch.HasValue();
 
                     RootConfig rootConfig;
-                    if ( inputExists)
+                    if (inputExists)
                     {
                         if (extension == ".exe" || extension == ".dll")
                         {
@@ -185,7 +187,7 @@ namespace Bolt.Console
                                 return HandleError($"Failed to read assembly: {input.Value.White().Bold()}", e);
                             }
 
-                            if (AddContracts(rootConfig, contractOption.Values, mode, asInternal) != 0)
+                            if (AddContracts(rootConfig, contractOption.Values, mode, asInternal, forceAsync.HasValue(), forceSync.HasValue()) != 0)
                             {
                                 return 1;
                             }
@@ -205,7 +207,7 @@ namespace Bolt.Console
                     else
                     {
                         rootConfig = new RootConfig(Cache);
-                        if (AddContracts(rootConfig, contractOption.Values, mode, asInternal) != 0)
+                        if (AddContracts(rootConfig, contractOption.Values, mode, asInternal, forceAsync.HasValue(), forceSync.HasValue()) != 0)
                         {
                             return 1;
                         }
@@ -236,13 +238,17 @@ namespace Bolt.Console
             }
         }
 
-        private static int AddContracts(RootConfig rootConfig, List<string> contracts, GenerateContractMode mode, bool internalVisibility)
+        private static int AddContracts(RootConfig rootConfig, List<string> contracts, GenerateContractMode mode, bool internalVisibility, bool forceAsync, bool forceSync)
         {
             if (!contracts.Any() || contracts.Any(c => c.EndsWith(".*", StringComparison.OrdinalIgnoreCase)))
             {
                 try
                 {
-                    rootConfig.AddAllContracts(mode, internalVisibility);
+                    foreach (ProxyConfig contract in rootConfig.AddAllContracts(mode, internalVisibility))
+                    {
+                        contract.ForceSync = forceSync;
+                        contract.ForceAsync = forceAsync;
+                    }
                 }
                 catch (Exception e)
                 {
@@ -259,7 +265,11 @@ namespace Bolt.Console
                     var ns = contract.TrimEnd('*', '.');
                     try
                     {
-                        rootConfig.AddContractsFromNamespace(ns, mode, internalVisibility);
+                        foreach (var config in rootConfig.AddContractsFromNamespace(ns, mode, internalVisibility))
+                        {
+                            config.ForceSync = forceSync;
+                            config.ForceAsync = forceAsync;
+                        }
                     }
                     catch (Exception e)
                     {
@@ -270,7 +280,9 @@ namespace Bolt.Console
                 {
                     try
                     {
-                        rootConfig.AddContract(contract, mode, internalVisibility);
+                        var config = rootConfig.AddContract(contract, mode, internalVisibility);
+                        config.ForceSync = forceSync;
+                        config.ForceAsync = forceAsync;
                     }
                     catch (Exception e)
                     {
