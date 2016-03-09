@@ -30,7 +30,7 @@ namespace Bolt.Server.IntegrationTest.Core
 
         Task<Bolt.Test.Common.NotSerializableType> FunctionWithNotSerializableTypeAsync();
 
-        int Simple();
+        int SimpleFunction();
     }
 }
 
@@ -113,9 +113,9 @@ namespace Bolt.Server.IntegrationTest.Core
             return this.SendAsync(__SimpleMethodWithComplexParameterAction, compositeType);
         }
 
-        public virtual int SimpleFunction()
+        public virtual int SimpleFunction2()
         {
-            return this.Send<int>(__SimpleFunctionAction);
+            return this.Send<int>(__SimpleFunction2Action);
         }
 
         public virtual int SimpleFunctionWithCancellation(CancellationToken cancellation)
@@ -153,14 +153,14 @@ namespace Bolt.Server.IntegrationTest.Core
             return this.SendAsync<Bolt.Test.Common.NotSerializableType>(__FunctionWithNotSerializableTypeAction);
         }
 
-        public virtual Task<int> SimpleAsyncFunction()
+        public virtual Task<int> SimpleFunctionAsync()
         {
-            return this.SendAsync<int>(__SimpleAsyncFunctionAction);
+            return this.SendAsync<int>(__SimpleFunctionAsyncAction);
         }
 
-        public virtual int Simple()
+        public virtual int SimpleFunction()
         {
-            return this.Send<int>(__SimpleAsyncFunctionAction);
+            return this.Send<int>(__SimpleFunctionAsyncAction);
         }
 
         public virtual void MethodWithManyArguments(Bolt.Test.Common.CompositeType arg1, Bolt.Test.Common.CompositeType arg2, DateTime time)
@@ -179,13 +179,13 @@ namespace Bolt.Server.IntegrationTest.Core
         private static readonly MethodInfo __SimpleMethodWithCancellationAction = typeof(ITestContract).GetMethod(nameof(ITestContract.SimpleMethodWithCancellation));
         private static readonly MethodInfo __ComplexFunctionAction = typeof(ITestContract).GetMethod(nameof(ITestContract.ComplexFunction));
         private static readonly MethodInfo __SimpleMethodWithComplexParameterAction = typeof(ITestContractInner).GetMethod(nameof(ITestContractInner.SimpleMethodWithComplexParameter));
-        private static readonly MethodInfo __SimpleFunctionAction = typeof(ITestContractInner).GetMethod(nameof(ITestContractInner.SimpleFunction));
+        private static readonly MethodInfo __SimpleFunction2Action = typeof(ITestContractInner).GetMethod(nameof(ITestContractInner.SimpleFunction2));
         private static readonly MethodInfo __SimpleFunctionWithCancellationAction = typeof(ITestContractInner).GetMethod(nameof(ITestContractInner.SimpleFunctionWithCancellation));
         private static readonly MethodInfo __FunctionReturningHugeDataAction = typeof(ITestContractInner).GetMethod(nameof(ITestContractInner.FunctionReturningHugeData));
         private static readonly MethodInfo __MethodTakingHugeDataAction = typeof(ITestContractInner).GetMethod(nameof(ITestContractInner.MethodTakingHugeData));
         private static readonly MethodInfo __MethodWithNotSerializableTypeAction = typeof(ITestContractInner).GetMethod(nameof(ITestContractInner.MethodWithNotSerializableType));
         private static readonly MethodInfo __FunctionWithNotSerializableTypeAction = typeof(ITestContractInner).GetMethod(nameof(ITestContractInner.FunctionWithNotSerializableType));
-        private static readonly MethodInfo __SimpleAsyncFunctionAction = typeof(ITestContractInner).GetMethod(nameof(ITestContractInner.SimpleAsyncFunction));
+        private static readonly MethodInfo __SimpleFunctionAsyncAction = typeof(ITestContractInner).GetMethod(nameof(ITestContractInner.SimpleFunctionAsync));
         private static readonly MethodInfo __MethodWithManyArgumentsAction = typeof(ITestContractInner).GetMethod(nameof(ITestContractInner.MethodWithManyArguments));
         private static readonly MethodInfo __ThisMethodShouldBeExcludedAction = typeof(IExcludedContract).GetMethod(nameof(IExcludedContract.ThisMethodShouldBeExcluded));
     }

@@ -13,7 +13,12 @@ namespace Bolt.Generators
                 return text;
             }
 
-            int index = text.IndexOf(suffix, StringComparison.Ordinal);
+            if (!text.EndsWith(suffix))
+            {
+                return text;
+            }
+
+            int index = text.LastIndexOf(suffix, StringComparison.Ordinal);
             if (index < 0)
             {
                 return text;

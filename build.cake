@@ -61,9 +61,27 @@ Task("Clean")
     CleanDirectory("./artifacts/");
 });
 
+Task("GenerateInterfaces")
+    .Does(() =>
+{      
+    var exitCode = StartProcess("dnx", new ProcessSettings{ WorkingDirectory = "./Test/Integration/Bolt.Server.IntegrationTest.Core", Arguments = "gen" });
+    if (exitCode != 0)
+    {
+        throw new Exception("Failed to generate Bolt Proxy for integration tests.");
+    }
+    
+    exitCode = StartProcess("dnx", new ProcessSettings{ WorkingDirectory = "./Test/Performance/Bolt.Performance.Core", Arguments = "gen" });
+    if (exitCode != 0)
+    {
+        throw new Exception("Failed to generate Bolt Proxy for performance tests.");
+    }
+    
+});
+
 Task("Build")
     .IsDependentOn("Clean")
     .IsDependentOn("Restore")
+    .IsDependentOn("GenerateInterfaces")
     .Does(() =>
 {
     var settings = new DNUBuildSettings

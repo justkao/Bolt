@@ -66,6 +66,37 @@ namespace Bolt.Server.IntegrationTest
             await client2.SimpleMethodAsync();
         }
 
+
+        [Fact]
+        public void ValidateGeneratedSyncMethod()
+        {
+            var pipeline = CreatePipeline();
+
+            var client1 = CreateChannel(pipeline);
+
+            Mock<ITestContract> server = Server();
+            server.Setup(s => s.SimpleMethodExAsync()).Returns(Task.FromResult(true)).Verifiable();
+            client1.SimpleMethodEx();
+            (client1 as IDisposable)?.Dispose();
+
+            server.Verify();
+        }
+
+        [Fact]
+        public void ValidateGeneratedSyncFunction()
+        {
+            var pipeline = CreatePipeline();
+
+            var client1 = CreateChannel(pipeline);
+
+            Mock<ITestContract> server = Server();
+            server.Setup(s => s.SimpleFunctionAsync()).Returns(Task.FromResult(99)).Verifiable();
+            Assert.Equal(99, client1.SimpleFunction());
+            (client1 as IDisposable)?.Dispose();
+
+            server.Verify();
+        }
+
         [Fact]
         public async Task CloseAsync_EnsureClosed()
         {
@@ -131,13 +162,13 @@ namespace Bolt.Server.IntegrationTest
             var client = CreateChannel();
             Mock<ITestContract> server = Server();
 
-            server.Setup(v => v.SimpleAsyncFunction()).Returns(async () =>
+            server.Setup(v => v.SimpleFunctionAsync()).Returns(async () =>
             {
                 await Task.Delay(1);
                 return 10;
             });
 
-            int result = await client.SimpleAsyncFunction();
+            int result = await client.SimpleFunctionAsync();
             Assert.Equal(10, result);
         }
 
@@ -174,8 +205,8 @@ namespace Bolt.Server.IntegrationTest
 
             int value = 99;
 
-            server.Setup(v => v.SimpleFunction()).Returns(value);
-            Assert.Equal(value, client.SimpleFunction());
+            server.Setup(v => v.SimpleFunction2()).Returns(value);
+            Assert.Equal(value, client.SimpleFunction2());
         }
 
         [Fact]
