@@ -150,15 +150,15 @@ Task("BuildBoltPackages")
 Task("UpdateBoltVersion")
     .Does(() =>
 {    
+    if (AppVeyor.IsRunningOnAppVeyor)
+    {
+        version += "-" + buildNumber;
+        Information("Build number {0} detected. Version of nuget packages will be: {1}.", buildNumber, version);     
+    }
+
     var projects = GetFiles("./src/**/project.json");
     foreach(var project in projects)
-    {
-        if (AppVeyor.IsRunningOnAppVeyor)
-        {
-            version += "-" + buildNumber;
-            Information("Build number {0} detected. Version of nuget packages will be: {1}.", buildNumber, version);     
-        }
-    
+    {    
         var regex = @"(.*""version""\s*:\s*"")(.*)("".*)";
         var content = System.IO.File.ReadAllText(project.FullPath);
         bool replaced = false;
