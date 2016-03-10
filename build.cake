@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 var target = Argument<string>("target", "Default");
 var configuration = Argument<string>("configuration", "Release");
-var version = Argument<string>("boltVersion", "0.21.0-alpha1");
+var version = Argument<string>("boltVersion", "0.22.0-alpha1");
 var nugetFeed = "https://api.nuget.org/v3/index.json";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -19,6 +19,7 @@ var nugetFeed = "https://api.nuget.org/v3/index.json";
 
 var solutions = GetFiles("./**/*.sln");
 var solutionPaths = solutions.Select(solution => solution.GetDirectory());
+var buildNumber = AppVeyor.Environment.Build.Number;
 
 ///////////////////////////////////////////////////////////////////////////////
 // SETUP / TEARDOWN
@@ -133,6 +134,7 @@ Task("Test")
 
 Task("BuildBoltPackages")
     .IsDependentOn("Test")
+    .IsDependentOn("UpdateBoltVersion")
     .Does(() =>
 {    
     var settings = new DNUPackSettings
@@ -151,9 +153,28 @@ Task("UpdateBoltVersion")
     var projects = GetFiles("./src/**/project.json");
     foreach(var project in projects)
     {
+        if (AppVeyor.IsRunningOnAppVeyor)
+        {
+            version += "-" + buildNumber;
+            Information("Build number {0} detected. Version of nuget packages will be: {1}.", buildNumber, version);     
+        }
+    
         var regex = @"(.*""version""\s*:\s*"")(.*)("".*)";
         var content = System.IO.File.ReadAllText(project.FullPath);
-        content = Regex.Replace(content, regex, m => m.Groups[1].Value + version + m.Groups[3].Value, RegexOptions.Multiline);
+        bool replaced = false;
+        content = Regex.Replace(content, regex, m => 
+        { 
+            if (replaced)
+            {
+                return m.Groups[1].Value + m.Groups[2].Value + m.Groups[3].Value;
+            }
+            else
+            {
+                // replace only first occurence
+                replaced = true;
+                return m.Groups[1].Value + version + m.Groups[3].Value;
+            }
+        }, RegexOptions.Multiline);
         System.IO.File.WriteAllText(project.FullPath, content);
         Information("Project {0} version updated to {1}", project.FullPath, version);       
     }
