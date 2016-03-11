@@ -1,23 +1,16 @@
 {
-  "version": "0.22.0-alpha1",
+  "version": "0.30.0-alpha1",
   "authors": [ "Martin Tomka" ],
   "description": "Bolt portable client library used to access Bolt based services.",
   "dependencies": {
     "Bolt.Sources": { "type": "build" },
-    "Bolt.Core": ""
+    "Bolt.Core": "",
+    "Castle.Core": "3.3.3"
   },
   "frameworks": {
     "net451": {
       "frameworkAssemblies": {
         "System.Net.Http": ""
-      }
-    },
-    "dotnet5.4": {
-      "dependencies": {
-        "System.Net.Http": "4.0.1-*",
-        "System.Threading": "4.0.11-*",
-        "System.Reflection.Extensions": "4.0.1-*",
-        "System.Collections.Concurrent": "4.0.11-*"
       }
     }
   }

@@ -1,7 +1,6 @@
 using System.Globalization;
 using System.Linq;
 using System.Threading;
-using Bolt.Client.Proxy;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Localization;
 using Moq;
@@ -11,11 +10,6 @@ namespace Bolt.Server.IntegrationTest
 {
     public class AcceptLanguageFilterTest : FiltersTestBase
     {
-        public AcceptLanguageFilterTest()
-        {
-            ClientConfiguration.UseDynamicProxy();
-        }
-
         [Fact(Skip = "Not working... investigate ")]
         public void SendCulture_EnsureProperCultureOnServer()
         {

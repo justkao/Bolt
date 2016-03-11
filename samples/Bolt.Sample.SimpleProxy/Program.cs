@@ -2,7 +2,6 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client;
-using Bolt.Client.Proxy;
 using Bolt.Server;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
@@ -60,7 +59,7 @@ namespace Bolt.Sample.SimpleProxy
             await Task.Delay(2500, cancellationToken);
 
             // create Bolt proxy
-            ClientConfiguration configuration = new ClientConfiguration().UseDynamicProxy();
+            ClientConfiguration configuration = new ClientConfiguration();
             IDummyContract proxy = configuration.CreateProxy<IDummyContract>("http://localhost:5000");
 
             logger.LogInformation("Testing Bolt Proxy ... ");

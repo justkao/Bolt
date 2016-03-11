@@ -1,7 +1,6 @@
 ﻿using System;
 using System.ServiceModel;
 using Bolt.Client;
-using Bolt.Client.Proxy;
 using Bolt.Performance.Contracts;
 
 namespace Bolt.Performance.Console
@@ -10,17 +9,12 @@ namespace Bolt.Performance.Console
     {
         public static readonly ClientConfiguration Config = new ClientConfiguration
         {
-            ProxyFactory = new DynamicProxyFactory()
+            ProxyFactory = new ProxyFactory()
         };
-
-        public static IPerformanceContract CreateDynamicProxy(Uri server)
-        {
-            return Config.CreateProxy<IPerformanceContract>(server);
-        }
 
         public static IPerformanceContract CreateProxy(Uri server)
         {
-            return Config.CreateProxy<PerformanceContractProxy>(server);
+            return Config.CreateProxy<IPerformanceContract>(server);
         }
 
         public static IPerformanceContract CreateWcf()

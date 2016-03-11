@@ -3,7 +3,6 @@
   "dependencies": {
     "Bolt.Server": "",
     "Bolt.Client": "",
-    "Bolt.Client.Proxy": "",
     "Bolt.Server.IntegrationTest.Core": "",
     "Bolt.Test.Common": "",
     "xunit.runner.dnx": "2.1.0-*",

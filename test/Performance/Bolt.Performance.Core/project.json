@@ -12,8 +12,5 @@
     "dnx451": {
       "frameworkAssemblies": { "System.ServiceModel": "" }
     }
-  },
-  "commands": {
-    "gen": "Bolt.Console code --contract IPerformanceContract --output ../Bolt.Performance.Console/Generated/ --mode Proxy"
   }
 }

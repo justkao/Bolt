@@ -6,7 +6,6 @@
     "Bolt.Client": "",
     "Bolt.Sources": "",
     "Bolt.Test.Common": "",
-    "Bolt.Generators": "",
     "Bolt.Console": ""
   },
   "compileExclude": "Generated\\*.*",

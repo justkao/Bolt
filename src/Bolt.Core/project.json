@@ -1,5 +1,5 @@
 {
-  "version": "0.22.0-alpha1",
+  "version": "0.30.0-alpha1",
   "authors": [ "Martin Tomka" ],
   "description": "Bolt Core library containing common classes shared by client and server.",
   "dependencies": {

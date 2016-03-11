@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Bolt.Client;
-using Bolt.Client.Proxy;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Http;
 using Microsoft.AspNet.Http.Features;
@@ -17,11 +16,6 @@ namespace Bolt.Server.IntegrationTest
 {
     public class DistributedSessionTest : IntegrationTestBase, ITestContext
     {
-        public DistributedSessionTest()
-        {
-            ClientConfiguration.UseDynamicProxy();
-        }
-
         [Fact]
         public void Execute_EnsureHasSession()
         {

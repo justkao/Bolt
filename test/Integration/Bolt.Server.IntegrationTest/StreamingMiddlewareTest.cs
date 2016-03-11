@@ -4,7 +4,6 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using Bolt.Client.Proxy;
 using Bolt.Server.Pipeline;
 using Microsoft.AspNet.Builder;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +16,6 @@ namespace Bolt.Server.IntegrationTest
     {
         public StreamingMiddlewareTest()
         {
-            ClientConfiguration.UseDynamicProxy();
             InstanceProvider.CurrentInstance = Callback.Object;
         }
 

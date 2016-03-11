@@ -3,7 +3,6 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client;
-using Bolt.Client.Proxy;
 using Bolt.Server.IntegrationTest.Core;
 using Moq;
 using Xunit;
@@ -16,7 +15,7 @@ namespace Bolt.Server.IntegrationTest
         {
             ErrorHandling = new Mock<IErrorHandling>();
             MessageHandler = new DummyMessageHandler();
-            ClientConfiguration configuration = new ClientConfiguration().UseDynamicProxy();
+            ClientConfiguration configuration = new ClientConfiguration();
             configuration.HttpMessageHandler = MessageHandler;
 
             Proxy = configuration.ProxyBuilder()

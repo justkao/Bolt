@@ -1,6 +1,5 @@
 ﻿using System.Threading;
 using System.Threading.Tasks;
-using Bolt.Client.Proxy;
 using Microsoft.AspNet.Builder;
 using Moq;
 using Xunit;
@@ -10,11 +9,6 @@ namespace Bolt.Server.IntegrationTest
     public class AsyncInterfaceTest : IntegrationTestBase
     {
         public Mock<IDummy> Contract = new Mock<IDummy>();
-
-        public AsyncInterfaceTest()
-        {
-            ClientConfiguration.UseDynamicProxy();
-        }
 
         [Fact]
         public void CreateProxy_DoesNotThrow()

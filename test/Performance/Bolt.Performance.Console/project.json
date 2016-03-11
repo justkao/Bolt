@@ -6,9 +6,7 @@
     },
     "Newtonsoft.Json": "7.0.1",
     "Bolt.Sources": { "type": "build" },
-    "Bolt.Generators": "",
     "Bolt.Client": "",
-    "Bolt.Client.Proxy": "",
     "Bolt.Performance.Core": "",
     "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*"
   },
