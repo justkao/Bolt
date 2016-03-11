@@ -3,8 +3,6 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using Bolt.Client;
-using Bolt.Client.Proxy;
-
 using Microsoft.AspNet.Builder;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,11 +14,6 @@ namespace Bolt.Server.IntegrationTest
 {
     public class RequestScopeTest : IntegrationTestBase, ITestContext
     {
-        public RequestScopeTest()
-        {
-            ClientConfiguration.UseDynamicProxy();
-        }
-
         [Fact]
         public void Execute_WithTimeout_EnsureTimeoutException()
         {

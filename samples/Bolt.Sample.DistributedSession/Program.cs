@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Bolt.Client;
-using Bolt.Client.Proxy;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Hosting.Internal;
 using Microsoft.Extensions.Configuration;
@@ -43,7 +42,7 @@ namespace Bolt.Sample.DistributedSession
             Console.WriteLine("Starting Client ... ");
 
             IServerProvider serverProvider = new RandomServerProvider(new Uri("http://localhost:5000"), new Uri("http://localhost:5001"));
-            ClientConfiguration configuration = new ClientConfiguration().UseDynamicProxy();
+            ClientConfiguration configuration = new ClientConfiguration();
 
             IDummyContract proxy1 = CreateProxy(configuration, serverProvider);
             TestProxy(proxy1).GetAwaiter().GetResult();

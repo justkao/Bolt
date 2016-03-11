@@ -399,7 +399,7 @@ namespace Bolt.Server.IntegrationTest
 
         public virtual ITestContractStateFullAsync GetProxy(IClientPipeline pipeline = null, bool open = true)
         {
-            var proxy = new TestContractStateFullProxy(pipeline ?? CreatePipeline());
+            var proxy = ClientConfiguration.ProxyFactory.CreateProxy<ITestContractStateFullAsync>(pipeline ?? CreatePipeline());
             if (open)
             {
                 proxy.OpenSessionAsync("arg").GetAwaiter().GetResult();

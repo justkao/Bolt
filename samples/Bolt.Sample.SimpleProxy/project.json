@@ -11,7 +11,7 @@
   },
 
   "dependencies": {
-    "Bolt.Client.Proxy": "",
+    "Bolt.Client": "",
     "Bolt.Server": "",
     "Microsoft.AspNet.Server.Kestrel": "1.0.0-*",
     "Microsoft.AspNet.Hosting": "1.0.0-*",

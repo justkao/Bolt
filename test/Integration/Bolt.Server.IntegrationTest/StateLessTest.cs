@@ -364,10 +364,10 @@ namespace Bolt.Server.IntegrationTest
         {
             for (int i = 0; i < 10; i++)
             {
-                ClientConfiguration.ProxyBuilder()
+                (ClientConfiguration.ProxyBuilder()
                     .Url(ServerUrl)
                     .Recoverable(10, TimeSpan.FromSeconds(1))
-                    .Build<TestContractProxy>().Dispose();
+                    .Build<ITestContractAsync>() as IDisposable)?.Dispose();
             }
 
             int cnt = 10000;
@@ -376,10 +376,10 @@ namespace Bolt.Server.IntegrationTest
 
             for (int i = 0; i < cnt; i++)
             {
-                ClientConfiguration.ProxyBuilder()
+                (ClientConfiguration.ProxyBuilder()
                     .Url(ServerUrl)
                     .Recoverable(10, TimeSpan.FromSeconds(1))
-                    .Build<TestContractProxy>().Dispose();
+                    .Build<ITestContractAsync>() as IDisposable)?.Dispose();
             }
 
             System.Console.WriteLine("Creating {0} proxies by ProxyBuilder has taken {1}ms", 10000, watch.ElapsedMilliseconds);
@@ -482,7 +482,7 @@ namespace Bolt.Server.IntegrationTest
 
         public virtual ITestContractAsync CreateChannel(IClientPipeline pipeline = null)
         {
-            return new TestContractProxy(pipeline ?? CreatePipeline());
+            return ClientConfiguration.ProxyFactory.CreateProxy<ITestContractAsync>(pipeline ?? CreatePipeline());
         }
 
         protected IClientPipeline CreatePipeline(int recoveries = 0)

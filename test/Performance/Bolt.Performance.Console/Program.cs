@@ -168,8 +168,7 @@ namespace Bolt.Performance.Console
         {
             if (IsPortUsed(Servers.KestrelBoltServer.Port))
             {
-                yield return new Tuple<string, IPerformanceContract>(Proxies.BoltKestrel, ClientFactory.CreateDynamicProxy(Servers.KestrelBoltServer));
-                yield return new Tuple<string, IPerformanceContract>(Proxies.BoltKestrelProxy, ClientFactory.CreateProxy(Servers.KestrelBoltServer));
+                yield return new Tuple<string, IPerformanceContract>(Proxies.BoltKestrel, ClientFactory.CreateProxy(Servers.KestrelBoltServer));
             }
 
             if (IsPortUsed(Servers.WcfServer.Port))

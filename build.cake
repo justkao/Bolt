@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 var target = Argument<string>("target", "Default");
 var configuration = Argument<string>("configuration", "Release");
-var version = Argument<string>("boltVersion", "0.22.0-alpha1");
+var version = Argument<string>("boltVersion", "0.30.0-alpha1");
 var nugetFeed = "https://api.nuget.org/v3/index.json";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -69,14 +69,7 @@ Task("GenerateInterfaces")
     if (exitCode != 0)
     {
         throw new Exception("Failed to generate Bolt Proxy for integration tests.");
-    }
-    
-    exitCode = StartProcess("dnx", new ProcessSettings{ WorkingDirectory = "./Test/Performance/Bolt.Performance.Core", Arguments = "gen" });
-    if (exitCode != 0)
-    {
-        throw new Exception("Failed to generate Bolt Proxy for performance tests.");
-    }
-    
+    }   
 });
 
 Task("Build")

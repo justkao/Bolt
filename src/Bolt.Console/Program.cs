@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Bolt.Console.Configuration;
+using Bolt.Console.Generators;
 using Microsoft.Extensions.PlatformAbstractions;
 using Microsoft.Framework.Runtime.Common.CommandLine;
 
@@ -86,7 +88,7 @@ namespace Bolt.Console
 
                     try
                     {
-                        string json = RootConfig.CreateFromAssembly(Cache, input.Value, GenerateContractMode.All, false).Serialize();
+                        string json = RootConfiguration.CreateFromAssembly(Cache, input.Value, false).Serialize();
                         var outputFile = PathHelpers.GetOutput(Path.GetDirectoryName(input.Value), output.Value(), "bolt.configuration.json");
                         bool exist = File.Exists(outputFile);
                         File.WriteAllText(outputFile, json);
@@ -110,15 +112,11 @@ namespace Bolt.Console
 
             app.Command("code", c =>
             {
-                var values = Enum.GetValues(typeof(GenerateContractMode)).OfType<GenerateContractMode>().Select(v => v.ToString());
-                var rawModeValues = string.Join(",", values);
-
                 c.Description = "Generates code from assembly or from configuration file.";
                 var input = c.Argument("[input]", "Path to the assembly or configuration file.");
                 var output = c.Option("--output <DIRECTORY>", "Directory where the Bolt code will be generated. If directory is not specified then the input path directory will be used instead.", CommandOptionType.SingleValue);
                 var dirOption = c.Option("--dir <PATH>", "Directories where contract assemblies are located.", CommandOptionType.MultipleValue);
                 var contractOption = c.Option("--contract <NAME>", "Additional contracts to generate, if not included in config file or assembly.", CommandOptionType.MultipleValue);
-                var modeOption = c.Option($"--mode <{rawModeValues}>", "Specifies what parts of contracts should be generated. ", CommandOptionType.SingleValue);
                 var internalSwitch = c.Option("--internal", "Generates the contracts with internal visibility.", CommandOptionType.NoValue);
                 var forceAsync = c.Option("--forceAsync", "Generates asynchronous version of methods.", CommandOptionType.NoValue);
                 var forceSync = c.Option("--forceSync", "Generates synchronous version of methods.", CommandOptionType.NoValue);
@@ -157,37 +155,26 @@ namespace Bolt.Console
                         }
                     }
 
-                    GenerateContractMode mode;
-                    try
-                    {
-                        mode = modeOption.HasValue() ? (GenerateContractMode)Enum.Parse(typeof(GenerateContractMode), modeOption.Value(), true) : GenerateContractMode.All;
-                    }
-                    catch (Exception)
-                    {
-                        Console.WriteLine($"Invalid mode option specified: {modeOption.Value().White().Bold()}, Available options: {rawModeValues.Bold()}".Yellow());
-                        return 1;
-                    }
-
                     bool asInternal = internalSwitch.HasValue();
 
-                    RootConfig rootConfig;
+                    RootConfiguration rootConfiguration;
                     if (inputExists)
                     {
                         if (extension == ".exe" || extension == ".dll")
                         {
-                            rootConfig = new RootConfig(Cache);
+                            rootConfiguration = new RootConfiguration(Cache);
                             try
                             {
                                 Console.WriteLine($"Loading all contracts from assembly: ${input.Value}");
                                 Cache.Loader.Load(input.Value);
-                                rootConfig.Assemblies.Add(input.Value);
+                                rootConfiguration.Assemblies.Add(input.Value);
                             }
                             catch (Exception e)
                             {
                                 return HandleError($"Failed to read assembly: {input.Value.White().Bold()}", e);
                             }
 
-                            if (AddContracts(rootConfig, contractOption.Values, mode, asInternal, forceAsync.HasValue(), forceSync.HasValue()) != 0)
+                            if (AddContracts(rootConfiguration, contractOption.Values, asInternal, forceAsync.HasValue(), forceSync.HasValue()) != 0)
                             {
                                 return 1;
                             }
@@ -196,7 +183,7 @@ namespace Bolt.Console
                         {
                             try
                             {
-                                rootConfig = RootConfig.CreateFromConfig(Cache, input.Value);
+                                rootConfiguration = RootConfiguration.CreateFromConfig(Cache, input.Value);
                             }
                             catch (Exception e)
                             {
@@ -206,8 +193,8 @@ namespace Bolt.Console
                     }
                     else
                     {
-                        rootConfig = new RootConfig(Cache);
-                        if (AddContracts(rootConfig, contractOption.Values, mode, asInternal, forceAsync.HasValue(), forceSync.HasValue()) != 0)
+                        rootConfiguration = new RootConfiguration(Cache);
+                        if (AddContracts(rootConfiguration, contractOption.Values, asInternal, forceAsync.HasValue(), forceSync.HasValue()) != 0)
                         {
                             return 1;
                         }
@@ -215,14 +202,14 @@ namespace Bolt.Console
 
                     if (output.HasValue())
                     {
-                        rootConfig.OutputDirectory = output.Value();
+                        rootConfiguration.OutputDirectory = output.Value();
                     }
                     else
                     {
-                        rootConfig.OutputDirectory = Path.GetDirectoryName(input.Value);
+                        rootConfiguration.OutputDirectory = Path.GetDirectoryName(input.Value);
                     }
 
-                    return rootConfig.Generate();
+                    return rootConfiguration.Generate();
                 });
             });
 
@@ -238,13 +225,13 @@ namespace Bolt.Console
             }
         }
 
-        private static int AddContracts(RootConfig rootConfig, List<string> contracts, GenerateContractMode mode, bool internalVisibility, bool forceAsync, bool forceSync)
+        private static int AddContracts(RootConfiguration rootConfiguration, List<string> contracts, bool internalVisibility, bool forceAsync, bool forceSync)
         {
             if (!contracts.Any() || contracts.Any(c => c.EndsWith(".*", StringComparison.OrdinalIgnoreCase)))
             {
                 try
                 {
-                    foreach (ProxyConfig contract in rootConfig.AddAllContracts(mode, internalVisibility))
+                    foreach (InterfaceConfiguration contract in rootConfiguration.AddAllContracts(internalVisibility))
                     {
                         contract.ForceSync = forceSync;
                         contract.ForceAsync = forceAsync;
@@ -265,7 +252,7 @@ namespace Bolt.Console
                     var ns = contract.TrimEnd('*', '.');
                     try
                     {
-                        foreach (var config in rootConfig.AddContractsFromNamespace(ns, mode, internalVisibility))
+                        foreach (var config in rootConfiguration.AddContractsFromNamespace(ns, internalVisibility))
                         {
                             config.ForceSync = forceSync;
                             config.ForceAsync = forceAsync;
@@ -280,7 +267,7 @@ namespace Bolt.Console
                 {
                     try
                     {
-                        var config = rootConfig.AddContract(contract, mode, internalVisibility);
+                        var config = rootConfiguration.AddContract(contract, internalVisibility);
                         config.ForceSync = forceSync;
                         config.ForceAsync = forceAsync;
                     }
@@ -304,46 +291,28 @@ namespace Bolt.Console
             return 1;
         }
 
-        private static RootConfig CreateSampleConfiguration(AssemblyCache cache)
+        private static RootConfiguration CreateSampleConfiguration(AssemblyCache cache)
         {
-            RootConfig rootConfig = new RootConfig(cache);
-            rootConfig.Modifier = "<public|internal>";
-            rootConfig.Assemblies = new List<string> { "<AssemblyPath>", "<AssemblyPath>", "<AssemblyPath>" };
-            rootConfig.Generators = new List<GeneratorConfig>
-                                        {
-                                            new GeneratorConfig
-                                                {
-                                                    Name = "<GeneratorName>",
-                                                    Type = "<FullTypeName>",
-                                                    Properties =
-                                                        new Dictionary<string, string>
-                                                            {
-                                                                {
-                                                                    "<Name>",
-                                                                    "<Value>"
-                                                                }
-                                                            }
-                                                }
-                                        };
+            RootConfiguration rootConfiguration = new RootConfiguration(cache);
+            rootConfiguration.Modifier = "<public|internal>";
+            rootConfiguration.Assemblies = new List<string> { "<AssemblyPath>", "<AssemblyPath>", "<AssemblyPath>" };
+            rootConfiguration.Contracts = new List<InterfaceConfiguration>();
+            rootConfiguration.Contracts.Add(
+                new InterfaceConfiguration
+                {
+                    Contract = "<Type>",
+                    Modifier = "<public|internal>",
+                    Excluded = new List<string> {"<FullTypeName>", "<FullTypeName>"},
+                    ForceAsync = true,
+                    ForceSync = true,
+                    Output = "<Path>",
+                    Suffix = $"<Suffix> // suffix for generated interface, defaults to '{GeneratorBase.AsyncSuffix}'",
+                    Namespace = "<Namespace> // namespace of generated interface, defaults to contract namespace if null",
+                    Name = "<InterfaceName> // name of generated interface, defaults to '<ContractName><Suffix>' if null",
+                    ExcludedInterfaces = new List<string> {"<FullTypeName>", "<FullTypeName>"}
+                });
 
-            rootConfig.Contracts = new List<ProxyConfig>();
-            rootConfig.Contracts.Add(
-                new ProxyConfig
-                    {
-                        Contract = "<Type>",
-                        Modifier = "<public|internal>",
-                        Context = "<Context> // passed to user code generators",
-                        Excluded = new List<string> { "<FullTypeName>", "<FullTypeName>" },
-                        ForceAsync = true,
-                        Generator = "<GeneratorName>",
-                        Output = "<Path>",
-                        Suffix = "<Suffix> // suffix for generated client proxy, defaults to 'Proxy'",
-                        Namespace = "<Namespace> // namespace of generated proxy, defaults to contract namespace if null",
-                        Name = "<ProxyName> // name of generated proxy, defaults to 'ContractName + Suffix' if null",
-                        ExcludedInterfaces = new List<string> { "<FullTypeName>", "<FullTypeName>" }
-                    });
-
-            return rootConfig;
+            return rootConfiguration;
         }
 
         private static string GetVersion()
