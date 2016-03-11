@@ -22,13 +22,21 @@ namespace Bolt.Performance.Console
         {
             ServicePointManager.DefaultConnectionLimit = 1000;
             ServicePointManager.MaxServicePoints = 1000;
-            var proxies = CreateClients().ToList();
-            if (!proxies.Any())
-            {
-                Console.WriteLine("No Bolt servers running ...".Red());
-                return 1;
-            }
+            List<Tuple<string, IPerformanceContract>> proxies = null;
 
+            int tries = 0;
+            while (!(proxies = CreateClients().ToList()).Any())
+            {
+                if (tries > 15)
+                {
+                    Console.WriteLine("No Bolt servers running ...".Red());
+                    return 1;
+                }
+
+                tries++;
+                Thread.Sleep(1000);
+            }
+ 
             var app = new CommandLineApplication();
             app.Name = "bolt";
             app.OnExecute(() =>
