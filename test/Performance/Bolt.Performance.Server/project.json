@@ -21,6 +21,6 @@
     }
   },
   "commands": {
-    "kestrel": "Microsoft.AspNet.Server.Kestrel --server.urls http://localhost:9003"
+    "kestrel": "Microsoft.AspNet.Server.Kestrel"
   }
 }

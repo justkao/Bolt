@@ -33,6 +33,7 @@ namespace Bolt.Performance.Console
                     return 1;
                 }
 
+                Console.WriteLine("No Bolt servers detected, waiting ...".Red());
                 tries++;
                 Thread.Sleep(1000);
             }
