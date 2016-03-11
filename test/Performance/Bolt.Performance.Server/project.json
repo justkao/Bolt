@@ -21,6 +21,6 @@
     }
   },
   "commands": {
-    "kestrel": "Microsoft.AspNet.Server.Kestrel"
+    "kestrel": "Bolt.Performance.Server"
   }
 }

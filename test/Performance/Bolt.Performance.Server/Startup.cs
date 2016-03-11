@@ -4,6 +4,7 @@ using Bolt.Performance.Contracts;
 using Microsoft.AspNet.Builder;
 using Microsoft.AspNet.Hosting;
 using Microsoft.AspNet.Hosting.Internal;
+using Microsoft.AspNet.Server.Kestrel;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Bolt.Performance.Server
@@ -48,6 +49,7 @@ namespace Bolt.Performance.Server
 
             IApplication app = server.Start();
             System.Console.WriteLine("Server running ... ");
+            System.Console.ReadLine();
             app.Dispose();
             return 0;
         }
