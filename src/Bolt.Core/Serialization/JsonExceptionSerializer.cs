@@ -2,11 +2,11 @@
 using System.Runtime.Serialization.Formatters;
 using Newtonsoft.Json;
 
-namespace Bolt
+namespace Bolt.Serialization
 {
-    public class JsonExceptionWrapper : ExceptionWrapper<string>
+    public class JsonExceptionSerializer : ExceptionSerializer<string>
     {
-        public JsonExceptionWrapper()
+        public JsonExceptionSerializer()
         {
             ExceptionSerializerSettings = new JsonSerializerSettings
                                               {
@@ -19,12 +19,12 @@ namespace Bolt
 
         public JsonSerializerSettings ExceptionSerializerSettings { get; }
 
-        protected override Exception UnwrapCore(string wrappedException)
+        protected override Exception UnwrapCore(string wrappedException, ReadExceptionContext actionContext)
         {
             return JsonConvert.DeserializeObject<Exception>(wrappedException, ExceptionSerializerSettings);
         }
 
-        protected override string WrapCore(Exception exception)
+        protected override string WrapCore(Exception exception, WriteExceptionContext actionContext)
         {
             return JsonConvert.SerializeObject(exception, ExceptionSerializerSettings);
         }

@@ -125,8 +125,42 @@ Task("Test")
     }
 });
 
+Task("RunSample")
+    .Does(() =>
+{    
+    var exitCode = StartProcess("dnx", new ProcessSettings{ WorkingDirectory = "./samples/Bolt.Sample.ContentProtection", Arguments = "run" });
+    if (exitCode != 0)
+    {
+        throw new Exception("Failed to run ContentProtection sample.");
+    } 
+});
+
+Task("RunQuickPerformance")
+    .Does(() =>
+{    
+    var serverProcess = StartAndReturnProcess("dnx", new ProcessSettings{ WorkingDirectory = "./test/Performance/Bolt.Performance.Server", Arguments = "run" });
+    System.Threading.Thread.Sleep(500);
+    var clientReturnCode = StartProcess("dnx", new ProcessSettings{ WorkingDirectory = "./test/Performance/Bolt.Performance.Console", Arguments = "quick" });
+    try
+    {
+        serverProcess.Kill();
+    }
+    catch(Exception e)
+    {
+        // OK
+    }
+
+    if (clientReturnCode != 0)
+    {
+        throw new Exception("Failed to run quick performance tests.");
+    } 
+});
+
+
 Task("BuildBoltPackages")
     .IsDependentOn("Test")
+    .IsDependentOn("RunSample")
+    .IsDependentOn("RunQuickPerformance")
     .IsDependentOn("UpdateBoltVersion")
     .Does(() =>
 {    

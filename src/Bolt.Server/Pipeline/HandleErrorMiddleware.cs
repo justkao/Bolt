@@ -2,6 +2,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Bolt.Pipeline;
+using Bolt.Serialization;
 
 namespace Bolt.Server.Pipeline
 {
@@ -48,14 +49,14 @@ namespace Bolt.Server.Pipeline
 
             try
             {
-                object wrappedException = context.Configuration.ExceptionWrapper.Wrap(error);
+                object wrappedException = context.Configuration.ExceptionSerializer.Write(new WriteExceptionContext(context, error));
                 if (wrappedException == null)
                 {
                     httpContext.Response.Body.Dispose();
                     return;
                 }
 
-                await context.GetSerializerOrThrow().WriteAsync(serializedException, wrappedException);
+                await context.GetSerializerOrThrow().WriteAsync(new WriteValueContext(httpContext.Response.Body, context, wrappedException));
                 serializedException.Seek(0, SeekOrigin.Begin);
             }
             catch (OperationCanceledException)

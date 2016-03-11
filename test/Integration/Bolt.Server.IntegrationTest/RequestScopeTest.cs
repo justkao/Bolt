@@ -21,7 +21,7 @@ namespace Bolt.Server.IntegrationTest
             Callback.Setup(c => c.OnExecute(It.IsAny<object>())).Callback<object>(
                 v =>
                     {
-                        Task.Delay(TimeSpan.FromSeconds(4)).GetAwaiter().GetResult();
+                        Task.Delay(TimeSpan.FromSeconds(5)).GetAwaiter().GetResult();
                     }).Verifiable();
 
             using (new RequestScope(TimeSpan.FromSeconds(1)))

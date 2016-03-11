@@ -84,20 +84,31 @@ namespace Bolt.Client.Pipeline
                     {
                         timeoutToken = new CancellationTokenSource(responseTimeout).Token;
                         token = token != CancellationToken.None
-                                    ? CancellationTokenSource.CreateLinkedTokenSource(token, timeoutToken).Token
-                                    : timeoutToken;
+                            ? CancellationTokenSource.CreateLinkedTokenSource(token, timeoutToken).Token
+                            : timeoutToken;
                     }
 
                     var response = await SendAsync(request, token);
                     if (response.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
                     {
-                        cancellationToken.ThrowIfCancellationRequested();
                         throw new TimeoutException();
                     }
+
+                    timeoutToken.ThrowIfCancellationRequested();
+                    cancellationToken.ThrowIfCancellationRequested();
 
                     return response;
                 }
                 catch (OperationCanceledException)
+                {
+                    if (timeoutToken.IsCancellationRequested)
+                    {
+                        throw new TimeoutException();
+                    }
+
+                    throw;
+                }
+                catch (Exception)
                 {
                     if (timeoutToken.IsCancellationRequested)
                     {

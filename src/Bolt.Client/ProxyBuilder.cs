@@ -169,7 +169,7 @@ namespace Bolt.Client
                 context.Use(_streamingMiddleware);
             }
 
-            context.Use(new SerializationMiddleware(_configuration.Serializer, _configuration.ExceptionWrapper, _configuration.ErrorProvider));
+            context.Use(new SerializationMiddleware(_configuration.Serializer, _configuration.ExceptionSerializer, _configuration.ErrorProvider));
             if (_acceptLanguageMiddleware != null)
             {
                 context.Use(_acceptLanguageMiddleware);

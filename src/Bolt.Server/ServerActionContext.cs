@@ -2,6 +2,7 @@
 using Microsoft.AspNet.Http.Extensions;
 using System;
 using System.Threading;
+using Bolt.Serialization;
 
 namespace Bolt.Server
 {

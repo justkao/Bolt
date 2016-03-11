@@ -1,5 +1,6 @@
 using System;
 using System.Net.Http;
+using Bolt.Serialization;
 
 namespace Bolt.Client
 {
@@ -12,7 +13,7 @@ namespace Bolt.Client
         {
             Options = options ?? new BoltOptions();
             Serializer = new JsonSerializer();
-            ExceptionWrapper = new JsonExceptionWrapper();
+            ExceptionSerializer = new JsonExceptionSerializer();
             EndpointProvider = new EndpointProvider(Options);
             SessionHandler = new ClientSessionHandler(Options);
             ProxyFactory = new ProxyFactory();
@@ -30,7 +31,7 @@ namespace Bolt.Client
 
         public ISerializer Serializer { get; set; }
 
-        public IExceptionWrapper ExceptionWrapper { get; set; }
+        public IExceptionSerializer ExceptionSerializer { get; set; }
 
         public IEndpointProvider EndpointProvider { get; set; }
 

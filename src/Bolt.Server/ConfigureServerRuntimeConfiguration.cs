@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.OptionsModel;
 using System.Collections.Generic;
+using Bolt.Serialization;
 
 namespace Bolt.Server
 {
@@ -36,7 +37,7 @@ namespace Bolt.Server
 
             options.Options = _provider.GetRequiredService<IOptions<BoltServerOptions>>().Value;
             options.AvailableSerializers = _provider.GetRequiredService<IEnumerable<ISerializer>>().ToList();
-            options.ExceptionWrapper = _provider.GetRequiredService<IExceptionWrapper>();
+            options.ExceptionSerializer = _provider.GetRequiredService<IExceptionSerializer>();
             options.ErrorHandler = _provider.GetRequiredService<IServerErrorHandler>();
         }
     }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Bolt.Serialization;
 
 namespace Bolt.Server
 {
@@ -18,7 +19,7 @@ namespace Bolt.Server
 
             AvailableSerializers = other.AvailableSerializers;
             DefaultSerializer = other.DefaultSerializer;
-            ExceptionWrapper = other.ExceptionWrapper;
+            ExceptionSerializer = other.ExceptionSerializer;
             Options = other.Options;
             ErrorHandler = other.ErrorHandler;
         }
@@ -27,7 +28,7 @@ namespace Bolt.Server
 
         public IReadOnlyList<ISerializer> AvailableSerializers { get; set; }
 
-        public IExceptionWrapper ExceptionWrapper { get; set; }
+        public IExceptionSerializer ExceptionSerializer { get; set; }
 
         public BoltServerOptions Options { get; set; }
 
@@ -37,7 +38,7 @@ namespace Bolt.Server
         {
             DefaultSerializer = null;
             AvailableSerializers = null;
-            ExceptionWrapper = null;
+            ExceptionSerializer = null;
             Options = null;
             ErrorHandler = null;
         }
@@ -53,9 +54,9 @@ namespace Bolt.Server
             {
                 AvailableSerializers = other.AvailableSerializers;
             }
-            if (other.ExceptionWrapper != null)
+            if (other.ExceptionSerializer != null)
             {
-                ExceptionWrapper = other.ExceptionWrapper;
+                ExceptionSerializer = other.ExceptionSerializer;
             }
             if (other.Options != null)
             {

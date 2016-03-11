@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Bolt.Client.Pipeline;
 using Bolt.Metadata;
 using Bolt.Pipeline;
+using Bolt.Serialization;
 using Moq;
 
 namespace Bolt.Client.Test

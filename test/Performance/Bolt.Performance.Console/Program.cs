@@ -37,6 +37,19 @@ namespace Bolt.Performance.Console
                 return 2;
             });
 
+            app.Command("quick", c =>
+            {
+                c.Description = "Quick tests Bolt performance.";
+
+                c.OnExecute(() =>
+                {
+                    ExecuteConcurrencyTest(proxies, 10, 10, false);
+
+                    Console.WriteLine("Test finished. ");
+                    return 0;
+                });
+            });
+
             app.Command("performance", c =>
             {
                 c.Description = "Tests the Bolt performance.";
@@ -44,6 +57,7 @@ namespace Bolt.Performance.Console
 
                 c.OnExecute(() =>
                 {
+
                     if (argConcurrency.HasValue())
                     {
                         ExecuteConcurrencyTest(proxies, int.Parse(argConcurrency.Value()), 200000);
@@ -106,7 +120,7 @@ namespace Bolt.Performance.Console
             return app.Execute(args);
         }
 
-        private static void ExecuteConcurrencyTest(List<Tuple<string, IPerformanceContract>> proxies, int concurrency,  int repeats)
+        private static void ExecuteConcurrencyTest(List<Tuple<string, IPerformanceContract>> proxies, int concurrency,  int repeats, bool writeReport = true)
         {
             var result = CreateEmptyReport(concurrency, repeats);
 
@@ -114,25 +128,31 @@ namespace Bolt.Performance.Console
             var reportsDirectory = GetReportsDirectory(testCase);
 
             PerformanceResultHandler handler = new PerformanceResultHandler();
-            PerformanceResult previous = handler.ReadLatestReport(reportsDirectory, repeats, concurrency);
-            if (previous != null)
+            PerformanceResult previous = null;
+            if (writeReport)
             {
-                Console.WriteLine(
-                    $"Detected previous report for version '{previous.Version}' from '{previous.Time.ToLocalTime()}' that will be used to compare the performance."
-                        .Yellow());
+                previous = handler.ReadLatestReport(reportsDirectory, repeats, concurrency);
+                if (previous != null)
+                {
+                    Console.WriteLine(
+                        $"Detected previous report for version '{previous.Version}' from '{previous.Time.ToLocalTime()}' that will be used to compare the performance."
+                            .Yellow());
+                }
             }
 
             ExecuteActions(proxies, repeats, concurrency, result, previous);
-
-            string file = $"{reportsDirectory}/performance_{result.Version}.json";
-            if (!Directory.Exists(reportsDirectory))
+            if (writeReport)
             {
-                Directory.CreateDirectory(reportsDirectory);
-            }
+                string file = $"{reportsDirectory}/performance_{result.Version}.json";
+                if (!Directory.Exists(reportsDirectory))
+                {
+                    Directory.CreateDirectory(reportsDirectory);
+                }
 
-            Console.WriteLine($"Writing performance overview to '{file.Yellow().Bold()}'");
-            handler.WriteReportToDirectory(reportsDirectory, result);
-            Console.WriteLine(string.Empty);
+                Console.WriteLine($"Writing performance overview to '{file.Yellow().Bold()}'");
+                handler.WriteReportToDirectory(reportsDirectory, result);
+                Console.WriteLine(string.Empty);
+            }
         }
 
         private static void ExecuteActions(IEnumerable<Tuple<string, IPerformanceContract>> proxies, int cnt, int degree, PerformanceResult result, PerformanceResult previous)

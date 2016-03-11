@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 using Newtonsoft.Json;
 
-namespace Bolt
+namespace Bolt.Serialization
 {
     public class JsonSerializer : ISerializer
     {
@@ -29,35 +29,45 @@ namespace Bolt
 
         public Newtonsoft.Json.JsonSerializer Serializer { get; }
 
-        public async Task WriteAsync(Stream stream, object data)
+        public async Task WriteAsync(WriteValueContext context)
         {
-            if (stream == null)
+            if (context == null)
             {
-                throw new ArgumentNullException(nameof(stream));
+                throw new ArgumentNullException(nameof(context));
             }
 
-            using (StreamWriter writer = CreateStreamWriter(stream))
+            if (context.Stream == null)
             {
-                Serializer.Serialize(writer, data);
+                throw new ArgumentNullException(nameof(context.Stream));
+            }
+
+            using (StreamWriter writer = CreateStreamWriter(context.Stream))
+            {
+                Serializer.Serialize(writer, context.Value);
 
                 await writer.FlushAsync();
             }
         }
 
-        public Task<object> ReadAsync(Type type, Stream stream)
+        public Task<object> ReadAsync(ReadValueContext context)
         {
-            if (stream == null)
+            if (context == null)
             {
-                throw new ArgumentNullException(nameof(stream));
+                throw new ArgumentNullException(nameof(context));
             }
 
-            using (TextReader reader = CreateStreamReader(stream))
+            if (context.Stream == null)
             {
-                return Task.FromResult(Serializer.Deserialize(reader, type));
+                throw new ArgumentNullException(nameof(context.Stream));
+            }
+
+            using (TextReader reader = CreateStreamReader(context.Stream))
+            {
+                return Task.FromResult(Serializer.Deserialize(reader, context.ValueType));
             }
         }
 
-        public async Task WriteAsync(SerializeContext context)
+        public async Task WriteAsync(WriteParametersContext context)
         {
             if (context == null)
             {
@@ -97,7 +107,7 @@ namespace Bolt
             }
         }
 
-        public Task ReadAsync(DeserializeContext context)
+        public Task<IList<ParameterValue>> ReadAsync(ReadParametersContext context)
         {
             if (context == null)
             {
@@ -110,11 +120,6 @@ namespace Bolt
             }
 
             if (context.Parameters == null || context.Parameters.Count == 0)
-            {
-                return CompletedTask.Done;
-            }
-
-            if (context.Parameters == null)
             {
                 throw new ArgumentNullException(nameof(context.Parameters));
             }
@@ -164,16 +169,16 @@ namespace Bolt
             }
 
             context.ParameterValues = result;
-            return CompletedTask.Done;
+            return Task.FromResult((IList<ParameterValue>)result);
         }
 
-        private static ParameterMetadata FindParameterByName(DeserializeContext context, string name)
+        private static ParameterMetadata FindParameterByName(ReadParametersContext parametersContext, string name)
         {
-            for (int i = 0; i < context.Parameters.Count; i++)
+            for (int i = 0; i < parametersContext.Parameters.Count; i++)
             {
-                if (context.Parameters[i].Name.EqualsNoCase(name))
+                if (parametersContext.Parameters[i].Name.EqualsNoCase(name))
                 {
-                    return context.Parameters[i];
+                    return parametersContext.Parameters[i];
                 }
             }
 

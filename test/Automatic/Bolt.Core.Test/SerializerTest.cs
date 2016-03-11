@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-
+using Bolt.Serialization;
 using Bolt.Test.Common;
 using Xunit;
 
@@ -20,85 +20,112 @@ namespace Bolt.Core.Test
         [Fact]
         public Task Write_NullStream_ThrowsArgumentNullException()
         {
-            return Assert.ThrowsAsync<ArgumentNullException>(() => Serializer.WriteAsync(null, null));
-        }
-
-        [Fact]
-        public Task Read_NullArgument_ThrowsArgumentNullException()
-        {
-            return Assert.ThrowsAsync<ArgumentNullException>(() => Serializer.ReadAsync<string>(null));
-        }
-
-        [Fact]
-        public Task Write_NullObject_DoesNotThrow()
-        {
-            MemoryStream stream = new MemoryStream();
-            return Serializer.WriteAsync(stream, null);
+            return Assert.ThrowsAsync<ArgumentNullException>(() => Serializer.WriteAsync(new WriteValueContext(null, null, null)));
         }
 
         [Fact]
         public async Task Read_NullObject_DoesNotThrow()
         {
+            // arrange
             MemoryStream stream = new MemoryStream();
-            await Serializer.WriteAsync(stream, null);
+            await Serializer.WriteAsync(new WriteValueContext(stream, new TestActionContext(), null));
 
-            CompositeType result = await Serializer.ReadAsync<CompositeType>(new MemoryStream(stream.ToArray()));
+            // act 
+            CompositeType result =
+                (CompositeType)
+                    await Serializer.ReadAsync(new ReadValueContext(new MemoryStream(stream.ToArray()), new TestActionContext(), typeof (CompositeType)));
+
+            // assert
             Assert.Null(result);
         }
 
         [Fact]
         public async Task WriteRead_ComplexType_EnsureDeserializedProperly()
         {
+            // arrange
             CompositeType obj = CompositeType.CreateRandom();
             MemoryStream stream = new MemoryStream();
-            await Serializer.WriteAsync(stream, obj);
-            CompositeType deserialized = await Serializer.ReadAsync<CompositeType>(new MemoryStream(stream.ToArray()));
-            Assert.Equal(obj, deserialized);
+            await Serializer.WriteAsync(new WriteValueContext(stream, new TestActionContext(), obj));
+
+            // act 
+            CompositeType result =
+                (CompositeType)
+                    await Serializer.ReadAsync(new ReadValueContext(new MemoryStream(stream.ToArray()), new TestActionContext(), typeof(CompositeType)));
+
+            // assert
+            Assert.Equal(obj, result);
         }
 
         [Fact]
         public async Task WriteRead_SpecificType_EnsureDeserializedProperly()
         {
+            // arrange
             SimpleCustomType obj = new SimpleCustomType { BoolProperty = false };
             MemoryStream stream = new MemoryStream();
-            await Serializer.WriteAsync(stream, obj);
-            SimpleCustomType deserialized = await Serializer.ReadAsync<SimpleCustomType>(new MemoryStream(stream.ToArray()));
 
+            // act
+            await Serializer.WriteAsync(new WriteValueContext(stream, new TestActionContext(), obj));
+            SimpleCustomType deserialized =
+                (SimpleCustomType) (await
+                    Serializer.ReadAsync(new ReadValueContext(new MemoryStream(stream.ToArray()),
+                        new TestActionContext(), typeof (SimpleCustomType))));
+
+            // assert
             Assert.Equal(obj, deserialized);
         }
 
         [Fact]
         public async Task WriteRead_ComplexTypeAndSameStream_EnsureDeserializedProperly()
         {
+            // arrange
             CompositeType obj = CompositeType.CreateRandom();
             MemoryStream stream = new MemoryStream();
-            await Serializer.WriteAsync(stream, obj);
+            await Serializer.WriteAsync(new WriteValueContext(stream, new TestActionContext(), obj));
             stream.Seek(0, SeekOrigin.Begin);
-            CompositeType deserialized = await Serializer.ReadAsync<CompositeType>(stream);
 
-            Assert.Equal(obj, deserialized);
+            // act 
+            CompositeType result =
+                (CompositeType)
+                    await Serializer.ReadAsync(new ReadValueContext(stream, new TestActionContext(), typeof(CompositeType)));
+
+            // assert
+            Assert.Equal(obj, result);
         }
 
         [Fact]
         public async Task ReadWrite_SimpleType_EnsureValidResult()
         {
+            // arrange
+            int obj = 10;
             MemoryStream stream = new MemoryStream();
-            await Serializer.WriteAsync(stream, 10);
 
-            var result = await Serializer.ReadAsync<int>(new MemoryStream(stream.ToArray()));
-            Assert.Equal(10, result);
+            // act
+            await Serializer.WriteAsync(new WriteValueContext(stream, new TestActionContext(), obj));
+            int deserialized =
+                (int)(await
+                    Serializer.ReadAsync(new ReadValueContext(new MemoryStream(stream.ToArray()),
+                        new TestActionContext(), typeof(int))));
+
+            // assert
+            Assert.Equal(obj, deserialized);
         }
 
         [Fact]
         public async Task ReadWrite_SimpleList_EnsureValidResult()
         {
+            // arrange
+            List<int> obj = new List<int>() {1, 2, 3};
             MemoryStream stream = new MemoryStream();
-            await Serializer.WriteAsync(stream, new List<int> { 1, 2, 3 });
 
-            var result = await Serializer.ReadAsync<List<int>>(new MemoryStream(stream.ToArray()));
-            Assert.Equal(result[0], 1);
-            Assert.Equal(result[1], 2);
-            Assert.Equal(result[2], 3);
+            // act
+            await Serializer.WriteAsync(new WriteValueContext(stream, new TestActionContext(), obj));
+            List<int> deserialized =
+                (List<int>)(await
+                    Serializer.ReadAsync(new ReadValueContext(new MemoryStream(stream.ToArray()),
+                        new TestActionContext(), typeof(List<int>))));
+
+            // assert
+            Assert.Equal(obj, deserialized);
         }
     }
 }

@@ -23,6 +23,7 @@
   "commands": {
     "run": "Bolt.Performance.Console",
     "test": "Bolt.Performance.Console test",
+    "quick": "Bolt.Performance.Console quick",
     "performance": "Bolt.Performance.Console performance"
   }
 }
