@@ -6,42 +6,53 @@ using System.Collections.Concurrent;
 
 namespace Bolt.Client
 {
-    public abstract class ProxyBase : IProxy, IPipelineCallback
+    public class ProxyBase : IProxy, IPipelineCallback
     {
         private IClientPipeline _pipeline;
         private readonly ConcurrentQueue<ClientActionContext> _contexts = new ConcurrentQueue<ClientActionContext>();
         private readonly int _poolSize = Environment.ProcessorCount * 5;
+        private Type _contract;
 
-        protected ProxyBase()
+        public ProxyBase()
         {
+            State = ProxyState.Ready;
         }
 
-        protected ProxyBase(Type contract, IClientPipeline pipeline)
+        public ProxyBase(Type contract, IClientPipeline pipeline)
         {
             if (contract == null) throw new ArgumentNullException(nameof(contract));
             if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
 
-            Contract = contract;
+            State = ProxyState.Ready;
+            _contract = contract;
             _pipeline = pipeline;
         }
 
-        protected ProxyBase(ProxyBase proxy)
+        public ProxyBase(ProxyBase proxy)
         {
             if (proxy == null)
             {
                 throw new ArgumentNullException(nameof(proxy));
             }
 
-            Contract = proxy.Contract;
+            State = ProxyState.Ready;
+            _contract = proxy.Contract;
             _pipeline = proxy.Pipeline;
-            State = proxy.State;
         }
 
-        public Type Contract { get; protected set; }
+        public Type Contract
+        {
+            get { return _contract; }
+            set
+            {
+                EnsureReady();
+                _contract = value;
+            }
+        }
 
         public ProxyState State { get; private set; }
 
-        protected IClientPipeline Pipeline
+        public IClientPipeline Pipeline
         {
             get
             {
@@ -53,7 +64,11 @@ namespace Bolt.Client
                 return _pipeline;
             }
 
-            set { _pipeline = value; }
+            set
+            {
+                EnsureReady();
+                _pipeline = value;
+            }
         }
 
         public async Task OpenAsync()
@@ -141,6 +156,14 @@ namespace Bolt.Client
             {
                 context.Reset();
                 _contexts.Enqueue(context);
+            }
+        }
+
+        private void EnsureReady()
+        {
+            if (State != ProxyState.Ready)
+            {
+                throw new InvalidOperationException("Enable to update the proxy because it has already been used for communication.");
             }
         }
     }
