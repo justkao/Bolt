@@ -7,6 +7,11 @@ namespace Bolt.Client
     {
         public virtual ErrorHandlingResult Handle(ClientActionContext context, Exception e)
         {
+            if (context.Proxy.State == ProxyState.Closed)
+            {
+                return ErrorHandlingResult.Close;
+            }
+
             if (e is NoServersAvailableException)
             {
                 return ErrorHandlingResult.Recover;
