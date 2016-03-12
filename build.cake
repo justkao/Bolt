@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 var target = Argument<string>("target", "Default");
 var configuration = Argument<string>("configuration", "Release");
-var version = Argument<string>("boltVersion", "0.30.0-alpha1");
+var version = Argument<string>("boltVersion", "0.32.0-alpha1");
 var nugetFeed = "https://api.nuget.org/v3/index.json";
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -158,7 +158,7 @@ Task("RunQuickPerformance")
 
 
 Task("BuildBoltPackages")
-    .IsDependentOn("Test")
+	.IsDependentOn("Test")
     .IsDependentOn("RunSample")
     .IsDependentOn("RunQuickPerformance")
     .IsDependentOn("UpdateBoltVersion")
@@ -167,11 +167,12 @@ Task("BuildBoltPackages")
     var settings = new DNUPackSettings
     {
         Configurations = new[] { configuration },
-        OutputDirectory = "./artifacts/",
-        Quiet = true
+		Quiet = true
     };
     
     DNUPack("./src/*", settings);
+	CleanDirectory($"./artifacts/{configuration}");
+	CopyFiles($"./src/**/*{version}*.nupkg", $"./artifacts/{configuration}");
 });
 
 Task("UpdateBoltVersion")
