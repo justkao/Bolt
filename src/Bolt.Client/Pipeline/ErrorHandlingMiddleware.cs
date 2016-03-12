@@ -22,7 +22,7 @@ namespace Bolt.Client.Pipeline
 
             try
             {
-                await Next(context);
+                await Next(context).ConfigureAwait(false);
             }
             catch (Exception e)
             {

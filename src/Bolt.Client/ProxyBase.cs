@@ -76,7 +76,7 @@ namespace Bolt.Client
             ClientActionContext ctxt = CreateContext(BoltFramework.SessionMetadata.Resolve(Contract).InitSession.Action, null);
             try
             {
-                await Pipeline.Instance(ctxt);
+                await Pipeline.Instance(ctxt).ConfigureAwait(false);
                 State = ProxyState.Open;
             }
             finally
@@ -92,7 +92,7 @@ namespace Bolt.Client
                 ClientActionContext ctxt =  CreateContext(BoltFramework.SessionMetadata.Resolve(Contract).DestroySession.Action, null);
                 try
                 {
-                    await Pipeline.Instance(ctxt);
+                    await Pipeline.Instance(ctxt).ConfigureAwait(false);
                     State = ProxyState.Closed;
                 }
                 finally
@@ -113,7 +113,7 @@ namespace Bolt.Client
             ClientActionContext ctxt = CreateContext(action, parameters);
             try
             {
-                await Pipeline.Instance(ctxt);
+                await Pipeline.Instance(ctxt).ConfigureAwait(false);
                 return ctxt.ActionResult;
             }
             finally

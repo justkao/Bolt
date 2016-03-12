@@ -55,7 +55,7 @@ namespace Bolt.Client.Pipeline
                 context.GetRequestOrThrow().Content = BuildRequestContent(context);
             }
 
-            await Next(context);
+            await Next(context).ConfigureAwait(false);
 
             if (context.Response == null)
             {
@@ -67,7 +67,7 @@ namespace Bolt.Client.Pipeline
 
             TryHandleBoltServerError(context);
 
-            await HandleResponseAsync(context);
+            await HandleResponseAsync(context).ConfigureAwait(false);
         }
 
         protected virtual async Task HandleResponseAsync(ClientActionContext context)
@@ -75,9 +75,9 @@ namespace Bolt.Client.Pipeline
             if (!context.Response.IsSuccessStatusCode)
             {
                 Exception errorOnServer;
-                using (Stream stream = await GetResponseStreamAsync(context.Response))
+                using (Stream stream = await GetResponseStreamAsync(context.Response).ConfigureAwait(false))
                 {
-                    errorOnServer = await DeserializeExceptionAsync(context, stream);
+                    errorOnServer = await DeserializeExceptionAsync(context, stream).ConfigureAwait(false);
                 }
 
                 if (errorOnServer != null)
@@ -92,9 +92,9 @@ namespace Bolt.Client.Pipeline
             {
                 if (context.GetActionMetadataOrThrow().HasResult && context.ActionResult == null)
                 {
-                    using (Stream stream = await GetResponseStreamAsync(context.Response))
+                    using (Stream stream = await GetResponseStreamAsync(context.Response).ConfigureAwait(false))
                     {
-                        context.ActionResult = await DeserializeResponseAsync(context, stream);
+                        context.ActionResult = await DeserializeResponseAsync(context, stream).ConfigureAwait(false);
                     }
                 }
             }
@@ -102,7 +102,7 @@ namespace Bolt.Client.Pipeline
 
         protected virtual async Task<Stream> GetResponseStreamAsync(HttpResponseMessage response)
         {
-            return await response.Content.ReadAsStreamAsync();
+            return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
         }
 
         protected virtual HttpContent BuildRequestContent(ClientActionContext context)
@@ -165,7 +165,7 @@ namespace Bolt.Client.Pipeline
             try
             {
                 var readContext = new ReadValueContext(stream, context, context.ActionMetadata.ResultType);
-                await Serializer.ReadAsync(readContext);
+                await Serializer.ReadAsync(readContext).ConfigureAwait(false);
                 return readContext.Value;
             }
             catch (Exception e)
@@ -188,7 +188,7 @@ namespace Bolt.Client.Pipeline
             try
             {
                 var readContext = new ReadValueContext(stream, context, ExceptionSerializer.Type);
-                await Serializer.ReadAsync(readContext);
+                await Serializer.ReadAsync(readContext).ConfigureAwait(false);
                 if (readContext.Value == null)
                 {
                     return null;
@@ -235,7 +235,7 @@ namespace Bolt.Client.Pipeline
             {
                 try
                 {
-                    await _serializer.WriteAsync(new WriteParametersContext(stream, _clientContext, _parameters));
+                    await _serializer.WriteAsync(new WriteParametersContext(stream, _clientContext, _parameters)).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {

@@ -29,8 +29,11 @@ namespace Bolt.Client.Pipeline
         {
             context.GetRequestOrThrow().Headers.Connection.Add("Keep-Alive");
             context.GetRequestOrThrow().Method = HttpMethod.Post;
-            context.Response = await _handler.SendAsync(context.Request, GetCancellationToken(context.RequestAborted), GetResponseTimeout(context, ResponseTimeout));
-            await Next(context);
+            context.Response =
+                await
+                    _handler.SendAsync(context.Request, GetCancellationToken(context.RequestAborted),
+                        GetResponseTimeout(context, ResponseTimeout)).ConfigureAwait(false);
+            await Next(context).ConfigureAwait(false);
         }
 
         protected virtual CancellationToken GetCancellationToken(CancellationToken defaultToken)
@@ -88,7 +91,7 @@ namespace Bolt.Client.Pipeline
                             : timeoutToken;
                     }
 
-                    var response = await SendAsync(request, token);
+                    var response = await SendAsync(request, token).ConfigureAwait(false);
                     if (response.StatusCode == System.Net.HttpStatusCode.RequestTimeout)
                     {
                         throw new TimeoutException();

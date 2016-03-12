@@ -19,7 +19,7 @@ namespace Bolt.Client.Pipeline
                 throw new ProxyClosedException("Proxy object is already closed.");
             }
 
-            await Next(context);
+            await Next(context).ConfigureAwait(false);
 
             if (proxyState == ProxyState.Ready)
             {

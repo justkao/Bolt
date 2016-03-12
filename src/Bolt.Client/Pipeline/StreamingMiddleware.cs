@@ -12,12 +12,12 @@ namespace Bolt.Client.Pipeline
             Metadata metadata = TryGetMetadata(context.Action);
             if (metadata == null)
             {
-                await Next(context);
+                await Next(context).ConfigureAwait(false);
                 return;
             }
 
             PrepareStreamingContent(context, metadata);
-            await Next(context);
+            await Next(context).ConfigureAwait(false);
             HandleStreamingResponse(context, metadata);
         }
 

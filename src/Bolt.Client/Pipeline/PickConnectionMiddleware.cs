@@ -30,7 +30,7 @@ namespace Bolt.Client.Pipeline
             context.GetRequestOrThrow().RequestUri = EndpointProvider.GetEndpoint(context.ServerConnection.Server, context.Contract, context.Action);
             try
             {
-                await Next(context);
+                await Next(context).ConfigureAwait(false);
             }
             catch (HttpRequestException)
             {

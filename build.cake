@@ -10,7 +10,7 @@ using System.Text.RegularExpressions;
 
 var target = Argument<string>("target", "Default");
 var configuration = Argument<string>("configuration", "Release");
-var version = Argument<string>("boltVersion", "0.32.0-alpha1");
+var version = Argument<string>("boltVersion", "0.33.0-alpha1");
 var nugetFeed = "https://api.nuget.org/v3/index.json";
 
 ///////////////////////////////////////////////////////////////////////////////

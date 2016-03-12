@@ -45,7 +45,7 @@ namespace Bolt.Serialization
             {
                 Serializer.Serialize(writer, context.Value);
 
-                await writer.FlushAsync();
+                await writer.FlushAsync().ConfigureAwait(false);
             }
         }
 
@@ -105,7 +105,7 @@ namespace Bolt.Serialization
                     }
                 }
 
-                await streamWriter.FlushAsync();
+                await streamWriter.FlushAsync().ConfigureAwait(false);
             }
         }
 

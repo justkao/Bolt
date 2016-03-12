@@ -24,7 +24,7 @@ namespace Bolt.Client.Pipeline
             {
                 try
                 {
-                    await Next(context);
+                    await Next(context).ConfigureAwait(false);
                     (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Open);
                     return;
                 }
@@ -53,7 +53,7 @@ namespace Bolt.Client.Pipeline
                 }
 
                 context.ServerConnection = null;
-                await Task.Delay(RetryDelay, context.RequestAborted);
+                await Task.Delay(RetryDelay, context.RequestAborted).ConfigureAwait(false);
             }
         }
     }

@@ -47,7 +47,7 @@ namespace Bolt.Client.Pipeline
             if (session.State != ProxyState.Open)
             {
                 // we need to open proxy
-                await EnsureConnectionAsync(context, session);
+                await EnsureConnectionAsync(context, session).ConfigureAwait(false);
             }
 
             if (!UseDistributedSession)
@@ -96,7 +96,7 @@ namespace Bolt.Client.Pipeline
                 {
                     // execute destroy session and close proxy
                     ClientSessionHandler.EnsureSession(context.GetRequestOrThrow(), session.SessionId);
-                    await Next(context);
+                    await Next(context).ConfigureAwait(false);
                 }
                 finally
                 {
@@ -113,7 +113,7 @@ namespace Bolt.Client.Pipeline
                 try
                 {
                     // execute pipeline
-                    await Next(context);
+                    await Next(context).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
@@ -190,7 +190,7 @@ namespace Bolt.Client.Pipeline
                 throw new ProxyClosedException();
             }
 
-            using (await sessionMetadata.LockAsync())
+            using (await sessionMetadata.LockAsync().ConfigureAwait(false))
             {
                 // check connections tate again when under lock
                 if (sessionMetadata.State == ProxyState.Open)
@@ -249,7 +249,7 @@ namespace Bolt.Client.Pipeline
                 try
                 {
                     // execute whole pipeline
-                    await Next(initSessionContext);
+                    await Next(initSessionContext).ConfigureAwait(false);
 
                     // extract connection and session id from response
                     string sessionId = ClientSessionHandler.GetSessionIdentifier(initSessionContext.Response);
