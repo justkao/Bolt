@@ -32,13 +32,16 @@ namespace Bolt.Sample.ContentProtection
             await context.Stream.WriteAsync(data, 0, data.Length);
         }
 
-        public async Task<object> ReadAsync(ReadValueContext context)
+        public async Task ReadAsync(ReadValueContext context)
         {
             MemoryStream tempStream = new MemoryStream();
             await context.Stream.CopyToAsync(tempStream);
             byte[] data = _protector.Unprotect(tempStream.ToArray());
             _logger.LogInformation("Result: Received {0}B of protected data, Original: {1}B", tempStream.ToArray().Length, data.Length);
-            return await _serializer.ReadAsync(new ReadValueContext(new MemoryStream(data), context.ActionContext, context.ValueType ));
+
+            ReadValueContext readContext = new ReadValueContext(new MemoryStream(data), context.ActionContext, context.ValueType);
+            await _serializer.ReadAsync(readContext);
+            context.Value = readContext.Value;
         }
 
         public async Task WriteAsync(WriteParametersContext context)
@@ -51,7 +54,7 @@ namespace Bolt.Sample.ContentProtection
             await context.Stream.WriteAsync(data, 0, data.Length);
         }
 
-        public async Task<IList<ParameterValue>> ReadAsync(ReadParametersContext context)
+        public async Task ReadAsync(ReadParametersContext context)
         {
             MemoryStream tempStream = new MemoryStream();
             await context.Stream.CopyToAsync(tempStream);
@@ -61,7 +64,6 @@ namespace Bolt.Sample.ContentProtection
             ReadParametersContext ctxt = new ReadParametersContext(new MemoryStream(data), context.ActionContext, context.Parameters);
             await _serializer.ReadAsync(ctxt);
             context.ParameterValues = ctxt.ParameterValues;
-            return context.ParameterValues;
         }
     }
 }

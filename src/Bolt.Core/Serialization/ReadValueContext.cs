@@ -16,5 +16,17 @@ namespace Bolt.Serialization
         }
 
         public Type ValueType { get; }
+
+        public object Value { get; set; }
+
+        public T GetValue<T>()
+        {
+            if (Value == null)
+            {
+                return default(T);
+            }
+
+            return (T)Value;
+        }
     }
 }

@@ -49,7 +49,7 @@ namespace Bolt.Serialization
             }
         }
 
-        public Task<object> ReadAsync(ReadValueContext context)
+        public Task ReadAsync(ReadValueContext context)
         {
             if (context == null)
             {
@@ -63,8 +63,10 @@ namespace Bolt.Serialization
 
             using (TextReader reader = CreateStreamReader(context.Stream))
             {
-                return Task.FromResult(Serializer.Deserialize(reader, context.ValueType));
+                context.Value = Serializer.Deserialize(reader, context.ValueType);
             }
+
+            return CompletedTask.Done;
         }
 
         public async Task WriteAsync(WriteParametersContext context)
@@ -107,7 +109,7 @@ namespace Bolt.Serialization
             }
         }
 
-        public Task<IList<ParameterValue>> ReadAsync(ReadParametersContext context)
+        public Task ReadAsync(ReadParametersContext context)
         {
             if (context == null)
             {
@@ -169,7 +171,7 @@ namespace Bolt.Serialization
             }
 
             context.ParameterValues = result;
-            return Task.FromResult((IList<ParameterValue>)result);
+            return CompletedTask.Done;
         }
 
         private static ParameterMetadata FindParameterByName(ReadParametersContext parametersContext, string name)

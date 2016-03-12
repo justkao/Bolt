@@ -14,10 +14,10 @@ namespace Bolt.Serialization
 
         Task WriteAsync(WriteValueContext context);
 
-        Task<object> ReadAsync(ReadValueContext context);
+        Task ReadAsync(ReadValueContext context);
 
         Task WriteAsync(WriteParametersContext context);
 
-        Task<IList<ParameterValue>> ReadAsync(ReadParametersContext context);
+        Task ReadAsync(ReadParametersContext context);
     }
 }

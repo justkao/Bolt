@@ -164,7 +164,9 @@ namespace Bolt.Client.Pipeline
         {
             try
             {
-                return await Serializer.ReadAsync(new ReadValueContext(stream, context, context.ActionMetadata.ResultType));
+                var readContext = new ReadValueContext(stream, context, context.ActionMetadata.ResultType);
+                await Serializer.ReadAsync(readContext);
+                return readContext.Value;
             }
             catch (Exception e)
             {
@@ -185,13 +187,14 @@ namespace Bolt.Client.Pipeline
 
             try
             {
-                object result = await Serializer.ReadAsync(new ReadValueContext(stream, context, ExceptionSerializer.Type));
-                if (result == null)
+                var readContext = new ReadValueContext(stream, context, ExceptionSerializer.Type);
+                await Serializer.ReadAsync(readContext);
+                if (readContext.Value == null)
                 {
                     return null;
                 }
 
-                return ExceptionSerializer.Read(new ReadExceptionContext(context, result));
+                return ExceptionSerializer.Read(new ReadExceptionContext(context, readContext.Value));
             }
             catch (Exception e)
             {

@@ -16,6 +16,6 @@ namespace Bolt.Serialization
 
         public object SerializedException { get; }
 
-        public Exception Exception { get;set ; }
+        public Exception Exception { get; set ; }
     }
 }
