@@ -171,8 +171,8 @@ Task("BuildBoltPackages")
     };
     
     DNUPack("./src/*", settings);
-	CleanDirectory($"./artifacts/{configuration}");
-	CopyFiles($"./src/**/*{version}*.nupkg", $"./artifacts/{configuration}");
+	CleanDirectory(string.Format("./artifacts/{0}", configuration));
+	CopyFiles(string.Format("./src/**/*{0}*.nupkg", version), string.Format("./artifacts/{0}", configuration));
 });
 
 Task("UpdateBoltVersion")
