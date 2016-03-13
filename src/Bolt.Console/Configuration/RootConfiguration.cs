@@ -168,7 +168,7 @@ namespace Bolt.Console.Configuration
                 Modifier = internalVisibility ? "internal" : "public",
                 ForceAsync = true,
                 ForceSync = true,
-                Namespace = type.Namespace,
+                Namespace = type.Namespace
             };
 
             Contracts.Add(c);

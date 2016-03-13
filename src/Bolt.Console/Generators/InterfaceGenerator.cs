@@ -22,6 +22,8 @@ namespace Bolt.Console.Generators
 
         public string Name { get; set; }
 
+        public string Modifier { get; set; }
+
         public override void Generate(object context)
         {
             bool shouldGenerateInterface = ContractDefinition.GetEffectiveContracts().Any(ShouldGenerateInterface);
@@ -88,6 +90,7 @@ namespace Bolt.Console.Generators
                 {
                     IsInterface = true
                 });
+            classGenerator.Modifier = Modifier;
             classGenerator.GenerateBodyAction = g =>
             {
                 var methods =

@@ -117,9 +117,12 @@ namespace Bolt.Console
                 var output = c.Option("--output <DIRECTORY>", "Directory where the Bolt code will be generated. If directory is not specified then the input path directory will be used instead.", CommandOptionType.SingleValue);
                 var dirOption = c.Option("--dir <PATH>", "Directories where contract assemblies are located.", CommandOptionType.MultipleValue);
                 var contractOption = c.Option("--contract <NAME>", "Additional contracts to generate, if not included in config file or assembly.", CommandOptionType.MultipleValue);
+                var excludedContractOption = c.Option("--excluded-contract <NAME>", "Contracts that will be exluded when generating interfaces.", CommandOptionType.MultipleValue);
                 var internalSwitch = c.Option("--internal", "Generates the contracts with internal visibility.", CommandOptionType.NoValue);
-                var forceAsync = c.Option("--forceAsync", "Generates asynchronous version of methods.", CommandOptionType.NoValue);
-                var forceSync = c.Option("--forceSync", "Generates synchronous version of methods.", CommandOptionType.NoValue);
+                var forceAsync = c.Option("--force-async", "Generates asynchronous version of methods.", CommandOptionType.NoValue);
+                var forceSync = c.Option("--force-sync", "Generates synchronous version of methods.", CommandOptionType.NoValue);
+                var suffix = c.Option("--suffix", "Suffix for generated interfaces. Default value is 'Async'.", CommandOptionType.SingleValue);
+
 
                 c.HelpOption("-?|-h|--help");
 
@@ -174,7 +177,7 @@ namespace Bolt.Console
                                 return HandleError($"Failed to read assembly: {input.Value.White().Bold()}", e);
                             }
 
-                            if (AddContracts(rootConfiguration, contractOption.Values, asInternal, forceAsync.HasValue(), forceSync.HasValue()) != 0)
+                            if (AddContracts(rootConfiguration, contractOption.Values, excludedContractOption.Values, asInternal, forceAsync.HasValue(), forceSync.HasValue(), suffix.Value()) != 0)
                             {
                                 return 1;
                             }
@@ -194,7 +197,7 @@ namespace Bolt.Console
                     else
                     {
                         rootConfiguration = new RootConfiguration(Cache);
-                        if (AddContracts(rootConfiguration, contractOption.Values, asInternal, forceAsync.HasValue(), forceSync.HasValue()) != 0)
+                        if (AddContracts(rootConfiguration, contractOption.Values, excludedContractOption.Values, asInternal, forceAsync.HasValue(), forceSync.HasValue(), suffix.Value()) != 0)
                         {
                             return 1;
                         }
@@ -225,7 +228,7 @@ namespace Bolt.Console
             }
         }
 
-        private static int AddContracts(RootConfiguration rootConfiguration, List<string> contracts, bool internalVisibility, bool forceAsync, bool forceSync)
+        private static int AddContracts(RootConfiguration rootConfiguration, List<string> contracts, List<string> excludedContracts, bool internalVisibility, bool forceAsync, bool forceSync, string suffix)
         {
             if (!contracts.Any() || contracts.Any(c => c.EndsWith(".*", StringComparison.OrdinalIgnoreCase)))
             {
@@ -233,8 +236,10 @@ namespace Bolt.Console
                 {
                     foreach (InterfaceConfiguration contract in rootConfiguration.AddAllContracts(internalVisibility))
                     {
+                        contract.Suffix = suffix;
                         contract.ForceSync = forceSync;
                         contract.ForceAsync = forceAsync;
+                        contract.AddExcluded(excludedContracts);
                     }
                 }
                 catch (Exception e)
@@ -254,8 +259,10 @@ namespace Bolt.Console
                     {
                         foreach (var config in rootConfiguration.AddContractsFromNamespace(ns, internalVisibility))
                         {
+                            config.Suffix = suffix;
                             config.ForceSync = forceSync;
                             config.ForceAsync = forceAsync;
+                            config.AddExcluded(excludedContracts);
                         }
                     }
                     catch (Exception e)
@@ -270,6 +277,8 @@ namespace Bolt.Console
                         var config = rootConfiguration.AddContract(contract, internalVisibility);
                         config.ForceSync = forceSync;
                         config.ForceAsync = forceAsync;
+                        config.Suffix = suffix;
+                        config.AddExcluded(excludedContracts);
                     }
                     catch (Exception e)
                     {

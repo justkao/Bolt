@@ -29,7 +29,8 @@ namespace Bolt.Console.Configuration
                 ForceSync = ForceSync,
                 InterfaceSuffix = Suffix,
                 ExcludedInterfaces = ExcludedInterfaces,
-                Name = Name
+                Name = Name,
+                Modifier = Modifier
             };
 
             if (!string.IsNullOrEmpty(Suffix))
@@ -43,6 +44,38 @@ namespace Bolt.Console.Configuration
         public override string GetFileName(ContractDefinition definition)
         {
             return $"{definition.Name}.Designer.cs";
+        }
+
+        public InterfaceConfiguration AddExcluded(List<string> excludedContracts)
+        {
+            if (excludedContracts == null || !excludedContracts.Any())
+            {
+                return this;
+            }
+
+            List<Type> excluded = excludedContracts.Select(c =>
+            {
+                try
+                {
+                    return Parent.AssemblyCache.GetType(c);
+                }
+                catch (Exception)
+                {
+                    return null;
+                }
+            }).Where(t => t != null).ToList();
+
+            if (excluded.Any())
+            {
+                if (ExcludedInterfaces == null)
+                {
+                    ExcludedInterfaces = new List<string>();
+                }
+
+                ExcludedInterfaces.AddRange(excluded.Select(c => c.FullName));
+            }
+
+            return this;
         }
 
         [JsonIgnore]
