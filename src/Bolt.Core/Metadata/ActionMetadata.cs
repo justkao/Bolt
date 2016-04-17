@@ -110,7 +110,7 @@ namespace Bolt.Metadata
                     continue;
                 }
 
-                if (!parameterMetadata.Type.IsAssignableFrom(parameter.GetType()))
+                if (!parameterMetadata.Type.GetTypeInfo().IsAssignableFrom(parameter.GetType().GetTypeInfo()))
                 {
                     throw new BoltException($"Expected value for parameter '{parameterMetadata.Name}' should be '{parameterMetadata.Type.Name}' instead '{parameter.GetType().Name}' was provided.");
                 }

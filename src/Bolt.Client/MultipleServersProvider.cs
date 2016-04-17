@@ -23,7 +23,7 @@ namespace Bolt.Client
 
         public MultipleServersProvider(params Uri[] servers)
         {
-            _servers = servers.EmptyIfNull().ToList();
+            _servers = servers?.ToList();
         }
 
         public ConnectionDescriptor GetServer()
@@ -53,7 +53,7 @@ namespace Bolt.Client
 
         public virtual IEnumerable<Uri> GetAvailableServers()
         {
-            return _servers.EmptyIfNull();
+            return _servers ?? Enumerable.Empty<Uri>();
         }
 
         protected virtual Uri PickNewServer(Uri lastServer, IReadOnlyList<Uri> serverPool)

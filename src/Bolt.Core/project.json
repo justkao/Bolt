@@ -1,21 +1,27 @@
 {
   "version": "0.33.0-alpha1",
-  "authors": [ "Martin Tomka" ],
+  "authors": [
+    "Martin Tomka"
+  ],
   "description": "Bolt Core library containing common classes shared by client and server.",
+  "compilationOptions": {
+    "warningsAsErrors": true
+  },
   "dependencies": {
-    "Bolt.Sources": { "type": "build" },
-    "Newtonsoft.Json": "7.0.1"
+    "Newtonsoft.Json": "8.0.3"
   },
   "frameworks": {
-    "dotnet5.4": {
+    "netstandard1.3": {
+      "imports": [
+        "portable-net45+wp80+win8+wpa81+dnxcore50"
+      ],
       "dependencies": {
         "System.Collections": "4.0.11-*",
-        "System.Collections.Concurrent": "4.0.11-*",
-        "System.Linq": "4.0.1-*",
+        "System.Collections.Concurrent": "4.0.12-*",
+        "System.Linq": "4.1.0-*",
         "System.Net.Http": "4.0.1-*",
         "System.Reflection": "4.1.0-*",
         "System.Reflection.Extensions": "4.0.1-*",
-        "System.Runtime.Serialization.Primitives": "4.0.11-*",
         "System.Text.Encoding": "4.0.11-*",
         "System.Threading": "4.0.11-*"
       }

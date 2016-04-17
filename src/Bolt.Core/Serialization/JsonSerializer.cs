@@ -10,6 +10,8 @@ namespace Bolt.Serialization
 {
     public class JsonSerializer : ISerializer
     {
+        private static readonly Task Done = Task.FromResult(true);
+        
         private const int BufferSize = 4 * 1024;
 
         private static readonly Encoding Encoding = Encoding.UTF8;
@@ -66,7 +68,7 @@ namespace Bolt.Serialization
                 context.Value = Serializer.Deserialize(reader, context.ValueType);
             }
 
-            return CompletedTask.Done;
+            return Done;
         }
 
         public async Task WriteAsync(WriteParametersContext context)
@@ -171,14 +173,14 @@ namespace Bolt.Serialization
             }
 
             context.ParameterValues = result;
-            return CompletedTask.Done;
+            return Done;
         }
 
         private static ParameterMetadata FindParameterByName(ReadParametersContext parametersContext, string name)
         {
             for (int i = 0; i < parametersContext.Parameters.Count; i++)
             {
-                if (parametersContext.Parameters[i].Name.EqualsNoCase(name))
+                if (string.Equals(parametersContext.Parameters[i].Name, name, StringComparison.OrdinalIgnoreCase))
                 {
                     return parametersContext.Parameters[i];
                 }

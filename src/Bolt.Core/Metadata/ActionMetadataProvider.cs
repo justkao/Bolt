@@ -7,6 +7,8 @@ namespace Bolt.Metadata
 {
     public class ActionMetadataProvider : ValueCache<MethodInfo, ActionMetadata>, IActionMetadataProvider
     {
+        private static readonly Type TaskGenericType = typeof(Task<>);
+        
         public ActionMetadata Resolve(MethodInfo action)
         {
             return Get(action);
@@ -81,12 +83,28 @@ namespace Bolt.Metadata
 
         private static Type GetResultType(MethodInfo method)
         {
-            if (typeof(Task).IsAssignableFrom(method.ReturnType))
+            if (typeof(Task).GetTypeInfo().IsAssignableFrom(method.ReturnType.GetTypeInfo()))
             {
-                return TypeHelper.GetTaskInnerTypeOrNull(method.ReturnType) ?? typeof(void);
+                return GetTaskInnerTypeOrNull(method.ReturnType) ?? typeof(void);
             }
 
             return method.ReturnType;
+        }
+        
+        private static Type GetTaskInnerTypeOrNull(Type type)
+        {
+            if (type.GetTypeInfo().IsGenericType && !type.GetTypeInfo().IsGenericTypeDefinition)
+            {
+                var genericTypeDefinition = type.GetGenericTypeDefinition();
+                var genericArguments = type.GetTypeInfo().GenericTypeArguments;
+                if (genericArguments.Length == 1 && TaskGenericType == genericTypeDefinition)
+                {
+                    // Only Return if there is a single argument.
+                    return genericArguments[0];
+                }
+            }
+
+            return null;
         }
     }
 }

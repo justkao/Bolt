@@ -3,8 +3,7 @@
   "authors": [ "Martin Tomka" ],
   "description": "Bolt portable client library used to access Bolt based services.",
   "dependencies": {
-    "Bolt.Sources": { "type": "build" },
-    "Bolt.Core": "",
+    "Bolt.Core": "*",
     "Castle.Core": "3.3.3"
   },
   "frameworks": {

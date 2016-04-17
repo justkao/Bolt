@@ -93,5 +93,9 @@ namespace Bolt
             coercedName = name.Substring(0, index);
             return true;
         }
+        internal static bool CanAssign(this Type type, Type other)
+        {
+            return type.GetTypeInfo().IsAssignableFrom(other.GetTypeInfo());
+        }
     }
 }

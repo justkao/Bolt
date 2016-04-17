@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Bolt.Client
+﻿namespace Bolt.Client
 {
     /// <summary>
     /// Helper used to extract Exception from response.

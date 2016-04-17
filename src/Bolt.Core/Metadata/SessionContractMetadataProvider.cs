@@ -33,7 +33,9 @@ namespace Bolt.Metadata
         {
             foreach (Type type in types)
             {
-                MethodInfo found = type.GetRuntimeMethods().Where(m => m.DeclaringType == type).FirstOrDefault(m => m.GetCustomAttributes<Attribute>().Any(a => a.GetType().Name.EqualsNoCase(attributeName)));
+                MethodInfo found = type.GetRuntimeMethods()
+                                       .Where(m => m.DeclaringType == type)
+                                       .FirstOrDefault(m => FindByAttribute(m, attributeName));
                 if (found != null)
                 {
                     return found;
@@ -41,6 +43,12 @@ namespace Bolt.Metadata
             }
 
             return null;
+        }
+
+        private bool FindByAttribute(MethodInfo method, string name)
+        {
+            return method.GetCustomAttributes<Attribute>()
+                            .Any(a => string.Equals(a.GetType().Name, name, StringComparison.OrdinalIgnoreCase));
         }
 
         private static readonly MethodInfo InitSessionAction =
