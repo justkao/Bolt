@@ -1,6 +1,6 @@
 ##Bolt
 
-[![Build status](https://ci.appveyor.com/api/projects/status/b97hsk15u6cw000m?svg=true)](https://ci.appveyor.com/project/justkao/bolt)
+[![Build status](https://ci.appveyor.com/api/projects/status/b97hsk15u6cw000m/branch/master?svg=true)](https://ci.appveyor.com/project/justkao/bolt)
 
 Lean and lightweight http communication library based on ASP.Net Core. The main focus of project 
 was to create multiplatform, simple and powerfull replacement for WCF library.
