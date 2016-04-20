@@ -1,14 +1,16 @@
 ﻿{
   "version": "1.0.0-*",
+  "compilationOptions": {
+     "emitEntryPoint": true
+  },
   "dependencies": {
-    "Bolt.Core": "",
-    "Bolt.Test.Common": "",
-    "Bolt.Performance.Core": "",
-    "Bolt.Console": ""
+    "Bolt.Core": "*",
+    "Bolt.Test.Common": "*",
+    "Bolt.Performance.Core": "*",
   },
   "frameworks": {
-    "dnx451": {
-      "frameworkAssemblies": { "System.ServiceModel": "" }
+    "net451": {
+      "frameworkAssemblies": { "System.ServiceModel": {"type": "build"} }
     }
   },
   "commands": {

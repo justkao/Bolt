@@ -1,16 +1,18 @@
 ﻿{
   "version": "1.0.0-*",
   "dependencies": {
-    "Bolt.Core": "",
-    "Bolt.Test.Common": "",
-    "Bolt.Console": "",
-
-    "Newtonsoft.Json": "7.0.1"
+    "Bolt.Core": "*",
+    "Bolt.Test.Common": "*",
+    "Newtonsoft.Json": "8.0.3"
   },
   "compileExclude": "Generated\\*.*",
   "frameworks": {
-    "dnx451": {
-      "frameworkAssemblies": { "System.ServiceModel": "" }
+    "net451": {
+      "frameworkAssemblies": {
+        "System.ServiceModel": { 
+          "type": "build"
+        }
+      }
     }
   }
 }

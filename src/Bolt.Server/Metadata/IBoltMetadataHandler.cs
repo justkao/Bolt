@@ -5,8 +5,8 @@ namespace Bolt.Server.Metadata
 {
     public interface IBoltMetadataHandler
     {
-        Task<bool> HandleBoltMetadataAsync(ServerActionContext context, IEnumerable<IContractInvoker> contracts);
+        Task HandleBoltMetadataAsync(ServerActionContext context, IEnumerable<IContractInvoker> contracts);
 
-        Task<bool> HandleContractMetadataAsync(ServerActionContext context);
+        Task HandleContractMetadataAsync(ServerActionContext context);
     }
 }

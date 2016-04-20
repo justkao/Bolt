@@ -7,20 +7,19 @@
   "licenseUrl": "",
 
   "compilationOptions": {
-    "emitEntryPoint": true
+    "emitEntryPoint": true,
+    "debugType": "portable"
   },
 
   "dependencies": {
-    "Bolt.Client": "",
-    "Bolt.Server": "",
-    "Microsoft.AspNet.Server.Kestrel": "1.0.0-*",
-    "Microsoft.AspNet.Hosting": "1.0.0-*",
+    "Bolt.Client": "0.33.0-alpha1",
+    "Bolt.Server": "0.33.0-alpha1",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*",
+    "Microsoft.AspNetCore.Hosting": "1.0.0-*",
     "Microsoft.Extensions.Logging.Console": "1.0.0-*"
   },
-  "commands": {
-    "Bolt.Console.SimpleProxy": "run"
-  },
   "frameworks": {
-    "dnx451": { }
+    "net451": {
+    }
   }
 }

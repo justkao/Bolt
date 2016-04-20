@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Bolt.Server.Session;
-using Microsoft.AspNet.Http.Features;
 
 namespace Bolt.Server.InstanceProviders
 {

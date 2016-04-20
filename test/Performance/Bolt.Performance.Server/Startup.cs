@@ -1,10 +1,10 @@
 ﻿using System.Threading;
 using Bolt.Server;
 using Bolt.Performance.Contracts;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Hosting.Internal;
-using Microsoft.AspNet.Server.Kestrel;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Internal;
+using Microsoft.AspNetCore.Server.Kestrel;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Bolt.Performance.Server
@@ -21,6 +21,7 @@ namespace Bolt.Performance.Server
                 ThreadPool.SetMinThreads(100, 100);
                 ThreadPool.SetMinThreads(1000, 1000);
 
+                services.AddRouting();
                 services.AddLogging();
                 services.AddOptions();
                 services.AddBolt();
@@ -41,16 +42,13 @@ namespace Bolt.Performance.Server
         // Entry point for the application.
         public static int Main(string[] args)
         {
-            IHostingEngine server =
-                new WebHostBuilder()
-                    .UseServer("Microsoft.AspNet.Server.Kestrel")
+            var host = new WebHostBuilder()
+                    .UseKestrel()
+                    .UseDefaultHostingConfiguration(args)
                     .UseStartup<Startup>()
                     .Build();
 
-            IApplication app = server.Start();
-            System.Console.WriteLine("Server running ... ");
-            System.Console.ReadLine();
-            app.Dispose();
+            host.Run();
             return 0;
         }
     }

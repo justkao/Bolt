@@ -4,7 +4,7 @@ using Bolt.Pipeline;
 using Bolt.Server.InstanceProviders;
 using Bolt.Server.Pipeline;
 using Bolt.Server.Session;
-using Microsoft.AspNet.Session;
+using Microsoft.AspNetCore.Session;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;

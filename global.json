@@ -5,6 +5,7 @@
         "samples",
         "test/Service",
         "test/Automatic",
+        "test/Common",
         "test/Integration",
         "wrap"
     ],

@@ -1,29 +1,25 @@
 ﻿{
+  "compilationOptions": {
+     "emitEntryPoint": true
+  },
   "dependencies": {
-    "Microsoft.Framework.CommandLineUtils.Sources": {
+    "Microsoft.Extensions.CommandLineUtils": {
       "version": "1.0.0-*",
       "type": "build"
     },
-    "Newtonsoft.Json": "7.0.1",
-    "Bolt.Sources": { "type": "build" },
-    "Bolt.Client": "",
-    "Bolt.Performance.Core": "",
+    "Newtonsoft.Json": "8.0.3",
+    "Bolt.Client": "*",
+    "Bolt.Performance.Core": "*",
     "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*"
   },
   "frameworks": {
-    "dnx451": {
+    "net451": {
       "frameworkAssemblies": {
-        "System.Runtime": "",
-        "System.Collections": "",
-        "System.Runtime.Serialization": "",
-        "System.ServiceModel": ""
+        "System.Runtime": {"type": "build"},
+        "System.Collections": {"type": "build"},
+        "System.Runtime.Serialization": {"type": "build"},
+        "System.ServiceModel": {"type": "build"}
       }
     }
-  },
-  "commands": {
-    "run": "Bolt.Performance.Console",
-    "test": "Bolt.Performance.Console test",
-    "quick": "Bolt.Performance.Console quick",
-    "performance": "Bolt.Performance.Console performance"
   }
 }

@@ -8,10 +8,10 @@ using System.Net;
 using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Server.Metadata;
-using Microsoft.AspNet.Http.Features;
-using Microsoft.AspNet.Routing;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 
 namespace Bolt.Server
@@ -32,8 +32,12 @@ namespace Bolt.Server
 
         private readonly int _poolSize = Environment.ProcessorCount * 10;
 
-        public BoltRouteHandler(ILoggerFactory factory, IOptions<ServerRuntimeConfiguration> defaultConfiguration, IBoltMetadataHandler metadataHandler,
-             IServiceProvider applicationServices, IActionResolver actionResolver, IContractResolver contractResolver)
+        public BoltRouteHandler(ILoggerFactory factory, 
+                                ServerRuntimeConfiguration defaultConfiguration, 
+                                IBoltMetadataHandler metadataHandler,
+                                IServiceProvider applicationServices, 
+                                IActionResolver actionResolver, 
+                                IContractResolver contractResolver)
         {
             if (factory == null)
             {
@@ -63,7 +67,7 @@ namespace Bolt.Server
             Logger = factory.CreateLogger<BoltRouteHandler>();
             MetadataHandler = metadataHandler;
             ApplicationServices = applicationServices;
-            Configuration = defaultConfiguration.Value;
+            Configuration = defaultConfiguration;
             _actionResolver = actionResolver;
             _contractResolver = contractResolver;
         }
@@ -96,7 +100,7 @@ namespace Bolt.Server
 
             foreach (MethodInfo action in BoltFramework.GetContractActions(invoker.Contract))
             {
-                Logger.LogVerbose("Action: {0}", action.Name);
+                Logger.LogDebug("Action: {0}", action.Name);
             }
         }
 
@@ -115,81 +119,98 @@ namespace Bolt.Server
             return GetEnumerator();
         }
 
-        public virtual async Task RouteAsync(RouteContext routeContext)
+        public virtual Task RouteAsync(RouteContext routeContext)
         {
             StringSegment contract = default(StringSegment);
             StringSegment action = default(StringSegment);
             if (!Parse(routeContext.HttpContext.Request.Path, ref contract, ref action))
             {
-                return;
+                return CompletedTask.Done;
             }
 
-            ServerActionContext actionContext = CreateContext(routeContext);
-            AssignBoltFeature(actionContext);
+            var boltFeature = AssignBoltFeature(CreateContext(routeContext));
+            
+            // we have accessed Bolt root
+            if (!contract.HasValue && !action.HasValue)
+            {
+                if (MetadataHandler !=null && !string.IsNullOrEmpty(Options.Prefix))
+                {
+                    routeContext.Handler = HandleBoltRootAsync;
+                }
 
+                return CompletedTask.Done;
+            }
+
+            var found = FindContract(_invokers, contract);
+            if (found == null)
+            {
+                if (!string.IsNullOrEmpty(Options.Prefix))
+                {
+                    routeContext.Handler = (ctxt) => ReportContractNotFound(ctxt, contract); 
+                }
+
+                // just pass to next middleware in chain
+                return CompletedTask.Done;
+            }
+
+            boltFeature.ActionContext.ContractInvoker = found;
+            boltFeature.ActionContext.Contract = found.Contract;
+
+            // handle action
+            if (!action.HasValue)
+            {
+                if (!string.IsNullOrEmpty(Options.Prefix))
+                {
+                    routeContext.Handler = (ctxt) => HandleContractRootAsync(ctxt, found);
+                }
+
+                return CompletedTask.Done;
+            }
+            
+            // at this point Bolt will handle the request
+            boltFeature.ActionContext.Action = FindAction(boltFeature.ActionContext, action);
+            if (boltFeature.ActionContext.Action == null)
+            {
+                Logger.LogWarning(BoltLogId.ContractNotFound, 
+                        "Action with name '{0}' not found on contract '{1}'", 
+                        action, 
+                        boltFeature.ActionContext.ContractName);    
+            }
+            
+            routeContext.Handler = HandleRequest;
+            return CompletedTask.Done;
+        }
+
+        private async Task HandleRequest(HttpContext context)
+        {
+            var boltFeature = context.Features.Get<IBoltFeature>();
+            
             try
             {
-
-                // we have accessed Bolt root
-                if (!contract.HasValue && !action.HasValue)
-                {
-                    if (!string.IsNullOrEmpty(Options.Prefix))
-                    {
-                        await HandleBoltRootAsync(routeContext);
-                    }
-
-                    return;
+                if (boltFeature.ActionContext.Action == null)
+                {                                      
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    context.Response.Headers[Options.ServerErrorHeader] = ServerErrorCode.ActionNotFound.ToString();
                 }
-
-                var found = FindContract(_invokers, contract);
-                if (found == null)
+                else
                 {
-                    if (!string.IsNullOrEmpty(Options.Prefix))
-                    {
-                        Logger.LogWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", contract, routeContext.HttpContext.Request.Path);
-                        actionContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                        actionContext.HttpContext.Response.Headers[Options.ServerErrorHeader] = ServerErrorCode.ContractNotFound.ToString();
-                        routeContext.IsHandled = true;
-                    }
-
-                    // just pass to next middleware in chain
-                    return;
+                    await Execute(boltFeature.ActionContext);
                 }
-
-                actionContext.ContractInvoker = found;
-                actionContext.Contract = found.Contract;
-
-                if (!action.HasValue)
-                {
-                    if (!string.IsNullOrEmpty(Options.Prefix))
-                    {
-                        await HandleContractRootAsync(routeContext, found);
-                    }
-
-                    return;
-                }
-
-                // at this point Bolt will handle the request
-                routeContext.IsHandled = true;
-                var actionName = action;
-                var actionDescriptor = FindAction(actionContext, actionName);
-                if (actionDescriptor == null)
-                {
-                    Logger.LogWarning(BoltLogId.ContractNotFound, "Action with name '{0}' not found on contract '{1}'", actionName, actionContext.ContractName);
-
-                    actionContext.HttpContext.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                    actionContext.HttpContext.Response.Headers[Options.ServerErrorHeader] = ServerErrorCode.ActionNotFound.ToString();
-                    routeContext.IsHandled = true;
-                    return;
-                }
-
-                actionContext.Action = actionDescriptor;
-                await Execute(actionContext);
             }
             finally
             {
-                ReleaseContext(actionContext);
+                ReleaseContext(boltFeature.ActionContext);
             }
+        }
+
+        private Task ReportContractNotFound(HttpContext context, StringSegment contract)
+        {
+            Logger.LogWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", contract, context.Request.Path);
+            
+            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+            context.Response.Headers[Options.ServerErrorHeader] = ServerErrorCode.ContractNotFound.ToString();
+            
+            return CompletedTask.Done;
         }
 
         protected virtual async Task Execute(ServerActionContext ctxt)
@@ -197,7 +218,7 @@ namespace Bolt.Server
             using (Logger.BeginScope("Execute"))
             {
                 Stopwatch watch = null;
-                if (Logger.IsEnabled(LogLevel.Verbose))
+                if (Logger.IsEnabled(LogLevel.Debug))
                 {
                     watch = Stopwatch.StartNew();
                 }
@@ -224,7 +245,7 @@ namespace Bolt.Server
                 {
                     if (watch != null)
                     {
-                        Logger.LogVerbose(BoltLogId.RequestExecutionTime, "Execution of '{0}' has taken '{1}ms'", ctxt.Action.Name, watch.ElapsedMilliseconds);
+                        Logger.LogDebug(BoltLogId.RequestExecutionTime, "Execution of '{0}' has taken '{1}ms'", ctxt.Action.Name, watch.ElapsedMilliseconds);
                     }
                 }
             }
@@ -270,22 +291,18 @@ namespace Bolt.Server
             return action;
         }
 
-        protected virtual async Task HandleContractRootAsync(RouteContext context, IContractInvoker descriptor)
+        protected virtual async Task HandleContractRootAsync(HttpContext context, IContractInvoker descriptor)
         {
             if (MetadataHandler == null)
             {
                 return;
             }
 
-            var feature = context.HttpContext.Features.Get<IBoltFeature>();
+            var feature = context.Features.Get<IBoltFeature>();
 
             try
             {
-                var handled = await MetadataHandler.HandleContractMetadataAsync(feature.ActionContext);
-                if (handled)
-                {
-                    context.IsHandled = true;
-                }
+                await MetadataHandler.HandleContractMetadataAsync(feature.ActionContext);
             }
             catch (Exception e)
             {
@@ -293,22 +310,13 @@ namespace Bolt.Server
             }
         }
 
-        protected virtual async Task HandleBoltRootAsync(RouteContext context)
+        protected virtual async Task HandleBoltRootAsync(HttpContext context)
         {
-            if (MetadataHandler == null)
-            {
-                return;
-            }
-
-            var feature = context.HttpContext.Features.Get<IBoltFeature>();
+            var feature = context.Features.Get<IBoltFeature>();
 
             try
             {
-                var handled = await MetadataHandler.HandleBoltMetadataAsync(feature.ActionContext, _invokers);
-                if (handled)
-                {
-                    context.IsHandled = true;
-                }
+                await MetadataHandler.HandleBoltMetadataAsync(feature.ActionContext, _invokers);
             }
             catch (Exception e)
             {

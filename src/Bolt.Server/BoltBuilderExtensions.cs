@@ -1,10 +1,11 @@
 ﻿using System;
 using Bolt.Server;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 // ReSharper disable once CheckNamespace
-namespace Microsoft.AspNet.Builder
+namespace Microsoft.AspNetCore.Builder
 {
     public static class BoltBuilderExtensions
     {
@@ -29,7 +30,7 @@ namespace Microsoft.AspNet.Builder
             var bolt = app.ApplicationServices.GetRequiredService<IBoltRouteHandler>();
             var logger = app.ApplicationServices.GetRequiredService<ILoggerFactory>().CreateLogger("Bolt");
 
-            logger.LogInformation(BoltLogId.BoltRegistration, "Registering Bolt middleware. Prefix: {0}", bolt.Configuration.Options.Prefix);
+            logger.LogInformation(BoltLogId.BoltRegistration, "Registering Bolt middleware. Prefix: {0}", bolt.Configuration?.Options?.Prefix);
             configure(bolt);
 
             return app.UseRouter(bolt);

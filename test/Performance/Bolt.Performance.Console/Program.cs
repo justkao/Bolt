@@ -8,8 +8,8 @@ using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Performance.Contracts;
+using Microsoft.Extensions.CommandLineUtils;
 using Microsoft.Extensions.PlatformAbstractions;
-using Microsoft.Framework.Runtime.Common.CommandLine;
 using Newtonsoft.Json;
 
 namespace Bolt.Performance.Console
@@ -17,6 +17,7 @@ namespace Bolt.Performance.Console
     public static class Program
     {
         private static AnsiConsole Console = AnsiConsole.GetOutput(true);
+
 
         public static int Main(params string[] args)
         {

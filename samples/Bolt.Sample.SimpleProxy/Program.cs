@@ -3,11 +3,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client;
 using Bolt.Server;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Hosting.Internal;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Bolt.Sample.SimpleProxy
 {
@@ -15,28 +15,30 @@ namespace Bolt.Sample.SimpleProxy
     {
         public static void Main(string[] args)
         {
-            IHostingEngine server =
-                new WebHostBuilder()
-                    .UseServer("Microsoft.AspNet.Server.Kestrel")
+            var host = new WebHostBuilder()
+                    .UseKestrel()
+                    .UseDefaultHostingConfiguration(args)
                     .UseStartup<Startup>()
                     .Build();
 
-            IApplication app = server.Start();
-            var serverLifetime = app.Services.GetService<IApplicationLifetime>();
+            host.Start();
+            
+            var serverLifetime = host.Services.GetService<IApplicationLifetime>();
             serverLifetime.ApplicationStarted.Register(() =>
             {
-                TestBolt(app.Services.GetRequiredService<ILogger<Program>>(), serverLifetime.ApplicationStopping);
+                TestBolt(host.Services.GetRequiredService<ILogger<Program>>(), serverLifetime.ApplicationStopping);
             });
 
             Console.WriteLine("Server running ... ");
             Console.ReadLine();
-            app.Dispose();
+            host.Dispose();
         }
 
         public class Startup
         {
             public void ConfigureServices(IServiceCollection serviceCollection)
             {
+                serviceCollection.AddRouting();
                 serviceCollection.AddBolt();
                 serviceCollection.AddOptions();
                 serviceCollection.AddLogging();
@@ -44,9 +46,9 @@ namespace Bolt.Sample.SimpleProxy
 
             public void Configure(IApplicationBuilder builder)
             {
+                
                 ILoggerFactory factory = builder.ApplicationServices.GetRequiredService<ILoggerFactory>();
-                factory.MinimumLevel = LogLevel.Debug;
-                factory.AddConsole();
+                factory.AddConsole(LogLevel.Debug);
 
                 // we will add IDummyContract endpoint to Bolt
                 builder.UseBolt(r => r.Use<IDummyContract, DummyContract>());

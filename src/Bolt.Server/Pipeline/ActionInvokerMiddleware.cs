@@ -74,7 +74,7 @@ namespace Bolt.Server.Pipeline
                 ParametersTypes = Parameters.Select(p => p.ParameterType).ToArray();
                 _compiledLambda = MethodInvokerBuilder.Build(metadata.Action.DeclaringType, metadata.Action);
                 _isTaskResult = typeof (Task).IsAssignableFrom(metadata.Action.ReturnType);
-                if (_isTaskResult && metadata.Action.ReturnType.IsGenericType())
+                if (_isTaskResult && metadata.Action.ReturnType.GetTypeInfo().IsGenericType)
                 {
                     _taskResultProvider = MethodInvokerBuilder.BuildTaskResultProvider(metadata.ResultType);
                 }

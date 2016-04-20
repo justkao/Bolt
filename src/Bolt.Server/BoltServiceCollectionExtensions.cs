@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using Bolt;
 using Bolt.Serialization;
 using Bolt.Server;
@@ -6,23 +8,33 @@ using Bolt.Server.Metadata;
 using Bolt.Server.Pipeline;
 using Bolt.Server.Session;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 
 // ReSharper disable once CheckNamespace
 namespace Microsoft.Extensions.DependencyInjection
 {
     public static class BoltServiceCollectionExtensions
     {
-        public static IServiceCollection ConfigureBolt(this IServiceCollection services, Action<BoltServerOptions> configure)
+        public static IServiceCollection AddBolt(this IServiceCollection services, Action<BoltServerOptions> configure = null)
         {
-            services.Configure(configure);
-
-            return services;
-        }
-
-        public static IServiceCollection AddBolt(this IServiceCollection services)
-        {
-            services.ConfigureOptions<ConfigureServerRuntimeConfiguration>();
-
+            if (configure != null)
+            {
+                services.Configure(configure);
+            }
+            
+            services.TryAddSingleton<ServerRuntimeConfiguration>(s => 
+            {
+                var configuration = new ServerRuntimeConfiguration();
+                
+                configuration.Options = s.GetRequiredService<IOptions<BoltServerOptions>>().Value;
+                configuration.AvailableSerializers = s.GetRequiredService<IEnumerable<ISerializer>>().ToList();
+                configuration.ExceptionSerializer = s.GetRequiredService<IExceptionSerializer>();
+                configuration.ErrorHandler = s.GetRequiredService<IServerErrorHandler>();
+            
+                return configuration;
+            });
+            
+            
             services.TryAddTransient<IBoltRouteHandler, BoltRouteHandler>();
             services.TryAddTransient<IExceptionSerializer, JsonExceptionSerializer>();
             services.TryAddTransient<IBoltMetadataHandler, BoltMetadataHandler>();
