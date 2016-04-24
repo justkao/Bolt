@@ -9,7 +9,11 @@
     },
     "Newtonsoft.Json": "7.0.1",
     "Bolt.Sources": { "type": "build" },
-    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*"
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*",
+    "Microsoft.NETCore.App": {
+      "type": "platform",
+      "version": "1.0.0-*"
+    }
   },
   "frameworks": {
     "dnx451": {

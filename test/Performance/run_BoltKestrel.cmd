@@ -1,3 +1,3 @@
 @ECHO OFF
 
-dnx -p Bolt.Performance.Server --configuration Release kestrel
+dotnet run -p Bolt.Performance.Server --configuration Release

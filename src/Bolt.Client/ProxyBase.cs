@@ -10,7 +10,7 @@ namespace Bolt.Client
     {
         private IClientPipeline _pipeline;
         private readonly ConcurrentQueue<ClientActionContext> _contexts = new ConcurrentQueue<ClientActionContext>();
-        private readonly int _poolSize = Environment.ProcessorCount * 5;
+        private readonly int _poolSize = 128;
         private Type _contract;
 
         public ProxyBase()
