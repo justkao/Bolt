@@ -40,6 +40,6 @@ namespace Bolt.Test.Common
             base.GetObjectData(info, context);
         }
 #endif
-        public int CustomData { get; }
+        public int CustomData { get; private set; }
     }
 }

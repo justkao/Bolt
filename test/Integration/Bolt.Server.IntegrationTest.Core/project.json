@@ -1,19 +1,25 @@
 ﻿{
   "version": "1.0.0-*",
   "dependencies": {
-    "Bolt.Core": "",
-    "Bolt.Server": "",
-    "Bolt.Client": "",
-    "Bolt.Sources": "",
-    "Bolt.Test.Common": "",
-    "Bolt.Console": ""
+    "Bolt.Server": "0.33.0-*",
+    "Bolt.Client": "0.33.0-*",
+    "Bolt.Test.Common": "0.33.0-*"
   },
-  "compileExclude": "Generated\\*.*",
+  "tools": {
+    "Bolt.Tools": "0.33.0-*"
+  },
   "frameworks": {
-    "dnx451": {
+    "netstandard1.3": {
+      "imports": [
+        "portable-net45+wp80+win8+wpa81+dnxcore50",
+        "portable-net45+wp80+win8+wpa81",
+        "dotnet5.4"
+      ],
+      "dependencies": {
+        "System.Threading.Timer": "4.0.1-*"
+      }
+    },
+    "net451": {
     }
-  },
-  "commands": {
-    "gen": "Bolt.Console code --contract *.* --output ../Bolt.Server.IntegrationTest/Generated/"
   }
 }

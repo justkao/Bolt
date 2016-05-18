@@ -4,14 +4,24 @@
     "Martin Tomka"
   ],
   "description": "Bolt Core library containing common classes shared by client and server.",
-  "compilationOptions": {
+  "packOptions": {
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/justkao/bolt"
+    },
+    "tags": [
+      "bolt",
+      "core"
+    ]
+  },
+  "buildOptions": {
     "warningsAsErrors": true
   },
   "dependencies": {
     "Newtonsoft.Json": "8.0.3"
   },
   "frameworks": {
-    "netstandard1.3": {
+    "netstandard1.1": {
       "imports": [
         "portable-net45+wp80+win8+wpa81+dnxcore50"
       ],
@@ -22,14 +32,13 @@
         "System.Net.Http": "4.0.1-*",
         "System.Reflection": "4.1.0-*",
         "System.Reflection.Extensions": "4.0.1-*",
-        "System.Text.Encoding": "4.0.11-*",
         "System.Threading": "4.0.11-*"
       }
     },
     "net451": {
       "frameworkAssemblies": {
-        "System.Runtime.Serialization": "",
-        "System.Net.Http": ""
+        "System.Runtime.Serialization": { "type": "build" },
+        "System.Net.Http": { "type": "build" }
       }
     }
   }

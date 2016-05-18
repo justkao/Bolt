@@ -4,8 +4,18 @@
   "authors": [
     "Martin Tomka"
   ],
+  "packOptions": {
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/justkao/bolt"
+    },
+    "tags": [
+      "bolt",
+      "server"
+    ]
+  },
   "dependencies": {
-    "Bolt.Core": "*",
+    "Bolt.Core": "0.33.0-*",
     "Microsoft.AspNetCore.Hosting.Abstractions": "1.0.0-*",
     "Microsoft.AspNetCore.Session": "1.0.0-*",
     "Microsoft.AspNetCore.Http.Abstractions": "1.0.0-*",
@@ -19,7 +29,7 @@
     "Microsoft.Extensions.Primitives": "1.0.0-*"
   },
   "frameworks": {
-    "net451": {},
+    "net451": { },
     "netstandard1.3": {
       "imports": [
         "portable-net45+wp80+win8+wpa81+dnxcore50"

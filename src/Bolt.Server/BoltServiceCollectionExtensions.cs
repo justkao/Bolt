@@ -21,19 +21,14 @@ namespace Microsoft.Extensions.DependencyInjection
             {
                 services.Configure(configure);
             }
-            
-            services.TryAddSingleton<ServerRuntimeConfiguration>(s => 
+
+            services.TryAddSingleton(s => new ServerRuntimeConfiguration
             {
-                var configuration = new ServerRuntimeConfiguration();
-                
-                configuration.Options = s.GetRequiredService<IOptions<BoltServerOptions>>().Value;
-                configuration.AvailableSerializers = s.GetRequiredService<IEnumerable<ISerializer>>().ToList();
-                configuration.ExceptionSerializer = s.GetRequiredService<IExceptionSerializer>();
-                configuration.ErrorHandler = s.GetRequiredService<IServerErrorHandler>();
-            
-                return configuration;
+                Options = s.GetRequiredService<IOptions<BoltServerOptions>>().Value,
+                AvailableSerializers = s.GetRequiredService<IEnumerable<ISerializer>>().ToList(),
+                ExceptionSerializer = s.GetRequiredService<IExceptionSerializer>(),
+                ErrorHandler = s.GetRequiredService<IServerErrorHandler>()
             });
-            
             
             services.TryAddTransient<IBoltRouteHandler, BoltRouteHandler>();
             services.TryAddTransient<IExceptionSerializer, JsonExceptionSerializer>();
