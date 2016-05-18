@@ -1,5 +1,5 @@
 ﻿{
-  "compilationOptions": {
+  "buildOptions": {
      "emitEntryPoint": true
   },
   "dependencies": {
@@ -8,17 +8,32 @@
       "type": "build"
     },
     "Newtonsoft.Json": "8.0.3",
-    "Bolt.Client": "*",
-    "Bolt.Performance.Core": "*",
-    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*"
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*",
+    "Bolt.Client": "0.33.0-*",
+    "Bolt.Performance.Core": "1.0.0-*"
   },
   "frameworks": {
     "net451": {
       "frameworkAssemblies": {
-        "System.Runtime": {"type": "build"},
-        "System.Collections": {"type": "build"},
-        "System.Runtime.Serialization": {"type": "build"},
-        "System.ServiceModel": {"type": "build"}
+        "System.Runtime": { "type": "build" },
+        "System.Collections": { "type": "build" },
+        "System.Runtime.Serialization": { "type": "build" },
+        "System.ServiceModel": { "type": "build" }
+      }
+    },
+    "netcoreapp1.0": {
+      "imports": [
+        "dnxcore50",
+        "portable-net451+win8"
+      ],
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.0.0-*",
+          "type": "platform"
+        },
+        "System.ServiceModel.Http": "4.0.10",
+        "System.ServiceModel.Primitives": "4.0.0",
+        "System.Net.NetworkInformation": "4.0.10-*"
       }
     }
   }

@@ -7,10 +7,12 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Threading;
 using System.Threading.Tasks;
-using Bolt.Performance.Contracts;
+using Bolt.Performance.Core;
+using Bolt.Performance.Core.Contracts;
 using Microsoft.Extensions.CommandLineUtils;
 using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json;
+using RuntimeEnvironment = Microsoft.Extensions.PlatformAbstractions.RuntimeEnvironment;
 
 namespace Bolt.Performance.Console
 {
@@ -18,11 +20,8 @@ namespace Bolt.Performance.Console
     {
         private static AnsiConsole Console = AnsiConsole.GetOutput(true);
 
-
         public static int Main(params string[] args)
         {
-            ServicePointManager.DefaultConnectionLimit = 1000;
-            ServicePointManager.MaxServicePoints = 1000;
             List<Tuple<string, IPerformanceContract>> proxies = null;
 
             int tries = 0;
@@ -172,9 +171,9 @@ namespace Bolt.Performance.Console
             {
                 threads = 25;
             }
-
+#if NET451
             ThreadPool.SetMinThreads(threads, threads);
-
+#endif
             Person person = Person.Create(10);
             List<Person> large = Enumerable.Repeat(person, 100).ToList();
             DateTime dateArg = DateTime.UtcNow;
@@ -362,7 +361,6 @@ namespace Bolt.Performance.Console
             // in our TcpClient is occupied, we will set isAvailable to false.
             IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
             var tcpConnInfoArray = ipGlobalProperties.GetActiveTcpListeners();
-
             foreach (var tcpi in tcpConnInfoArray)
             {
                 if (tcpi.Port == port)
@@ -395,7 +393,7 @@ namespace Bolt.Performance.Console
                 Repeats = repeats,
                 Time = DateTime.UtcNow,
                 Actions = new Dictionary<string, ActionMetadata>(),
-                Environment = new RuntimeEnvironment()
+                Environment = new SerializableRuntimeEnvironment()
             };
 
             result.Environment.Update(PlatformServices.Default.Runtime);

@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Bolt.Server.Session;
-using Microsoft.AspNet.Http.Internal;
 using Moq;
 using Xunit;
+using Bolt.Server;
+using Bolt.Server.Session;
+using Microsoft.AspNetCore.Http;
 
 namespace Bolt.Server.Test
 {

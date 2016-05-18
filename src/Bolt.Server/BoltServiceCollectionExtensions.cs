@@ -29,7 +29,7 @@ namespace Microsoft.Extensions.DependencyInjection
                 ExceptionSerializer = s.GetRequiredService<IExceptionSerializer>(),
                 ErrorHandler = s.GetRequiredService<IServerErrorHandler>()
             });
-            
+
             services.TryAddTransient<IBoltRouteHandler, BoltRouteHandler>();
             services.TryAddTransient<IExceptionSerializer, JsonExceptionSerializer>();
             services.TryAddTransient<IBoltMetadataHandler, BoltMetadataHandler>();

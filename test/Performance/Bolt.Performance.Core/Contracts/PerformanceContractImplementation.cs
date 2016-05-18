@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Bolt.Performance.Contracts
+namespace Bolt.Performance.Core.Contracts
 {
     public class PerformanceContractImplementation : IPerformanceContract
     {

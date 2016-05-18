@@ -1,18 +1,35 @@
 ﻿{
   "dependencies": {
-    "Bolt.Server": "",
-    "Bolt.Test.Common": "",
-    "Microsoft.AspNet.Http": "1.0.0-*",
-    "Moq": "4.2.1502.0911",
-    "xunit.core": "2.1.0-*",
-    "xunit.assert": "2.1.0-*"
-  },
-  "frameworks": {
-    "dnx451": {
+    "dotnet-test-xunit": "1.0.0-*",
+    "Bolt.Server": "0.33.0-*",
+    "xunit": "2.1.0-*",
+    "Bolt.Test.Common": "1.0.0-*",
+    "Microsoft.AspNetCore.Http": "1.0.0-*"
 
-    }
   },
-  "commands": {
-    "test": "xunit.runner.dnx -parallel none"
+  "testRunner": "xunit",
+
+  "frameworks": {
+    "netcoreapp1.0": {
+      "imports": [
+        "dnxcore50",
+        "portable-net451+win8"
+      ],
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.0.0-*",
+          "type": "platform"
+        },
+        "System.Diagnostics.Process": "4.1.0-*",
+        "System.Diagnostics.TraceSource": "4.0.0-*",
+        "moq.netcore": "4.4.0-beta8",
+        "System.Reflection.Extensions": "4.0.1-*"
+      }
+    },
+    "net451": {
+      "dependencies": {
+        "Moq": "4.2.1502.911"
+      }
+    }
   }
 }

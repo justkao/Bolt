@@ -47,7 +47,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Sample.ContentProtecti
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Sample.DistributedSession", "samples\Bolt.Sample.DistributedSession\Bolt.Sample.DistributedSession.xproj", "{2E97D2FE-6C9F-49C8-9196-94D1CD265889}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Sample.SimpleProxy", "samples\Bolt.Sample.SimpleProxy\Bolt.Sample.SimpleProxy.xproj", "{C19D098A-E5EA-41BB-AE86-D7AADB3CB101}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Sample.SimpleProxy", "samples\Bolt.Sample.SimpleProxy\Bolt.Sample.SimpleProxy.xproj", "{F8089028-54BE-40A0-8EFF-65AB546FF60A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -119,10 +119,10 @@ Global
 		{2E97D2FE-6C9F-49C8-9196-94D1CD265889}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E97D2FE-6C9F-49C8-9196-94D1CD265889}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E97D2FE-6C9F-49C8-9196-94D1CD265889}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C19D098A-E5EA-41BB-AE86-D7AADB3CB101}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C19D098A-E5EA-41BB-AE86-D7AADB3CB101}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C19D098A-E5EA-41BB-AE86-D7AADB3CB101}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C19D098A-E5EA-41BB-AE86-D7AADB3CB101}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8089028-54BE-40A0-8EFF-65AB546FF60A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8089028-54BE-40A0-8EFF-65AB546FF60A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8089028-54BE-40A0-8EFF-65AB546FF60A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8089028-54BE-40A0-8EFF-65AB546FF60A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -144,6 +144,6 @@ Global
 		{1620494C-1D20-4CCE-A87A-B54D4E9EAA83} = {F63AC733-201C-43F7-9C13-FFB262BAB3AE}
 		{7B585983-DF3E-4594-B06E-9D545FEB53DA} = {87264C94-6FE7-4CCC-B955-A99B3845C8F3}
 		{2E97D2FE-6C9F-49C8-9196-94D1CD265889} = {87264C94-6FE7-4CCC-B955-A99B3845C8F3}
-		{C19D098A-E5EA-41BB-AE86-D7AADB3CB101} = {87264C94-6FE7-4CCC-B955-A99B3845C8F3}
+		{F8089028-54BE-40A0-8EFF-65AB546FF60A} = {87264C94-6FE7-4CCC-B955-A99B3845C8F3}
 	EndGlobalSection
 EndGlobal

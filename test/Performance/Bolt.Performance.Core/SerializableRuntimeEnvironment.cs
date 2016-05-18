@@ -1,6 +1,6 @@
-namespace Bolt.Performance
+namespace Bolt.Performance.Core
 {
-    public class RuntimeEnvironment
+    public class SerializableRuntimeEnvironment
     {
         public string OperatingSystem { get; set; }
 

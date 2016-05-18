@@ -2,26 +2,30 @@
   "version": "1.0.0-*",
   "description": "Bolt.Console.SimpleProxy Console Application",
   "authors": [ "mtomka" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
-
-  "compilationOptions": {
+  "buildOptions": {
     "emitEntryPoint": true
   },
-
   "dependencies": {
-    "Bolt.Client": "",
-    "Bolt.Server": "",
-    "Microsoft.AspNet.Server.Kestrel": "1.0.0-*",
-    "Microsoft.AspNet.Hosting": "1.0.0-*",
+    "Bolt.Client": "0.33.0-*",
+    "Bolt.Server": "0.33.0-*",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*",
+    "Microsoft.AspNetCore.Hosting": "1.0.0-*",
     "Microsoft.Extensions.Logging.Console": "1.0.0-*",
-    "Microsoft.AspNet.DataProtection": "1.0.0-rc1-final"
-  },
-  "commands": {
-    "Bolt.Console.SimpleProxy": "run"
+    "Microsoft.AspNetCore.DataProtection": "1.0.0-*"
   },
   "frameworks": {
-    "dnx451": { }
+    "net451": { },
+    "netcoreapp1.0": {
+      "imports": [
+        "dnxcore50",
+        "portable-net451+win8"
+      ],
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.0.0-*",
+          "type": "platform"
+        }
+      }
+    }
   }
 }

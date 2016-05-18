@@ -1,6 +1,6 @@
 using System;
 
-namespace Bolt.Performance.Contracts
+namespace Bolt.Performance.Core.Contracts
 {
     public class AsyncOperationAttribute : Attribute
     {

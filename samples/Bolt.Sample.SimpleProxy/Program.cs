@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 
 namespace Bolt.Sample.SimpleProxy
 {
@@ -17,7 +16,6 @@ namespace Bolt.Sample.SimpleProxy
         {
             var host = new WebHostBuilder()
                     .UseKestrel()
-                    .UseDefaultHostingConfiguration(args)
                     .UseStartup<Startup>()
                     .Build();
 

@@ -1,6 +1,6 @@
 ﻿using System.Threading;
+using Bolt.Performance.Core.Contracts;
 using Bolt.Server;
-using Bolt.Performance.Contracts;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Hosting.Internal;
@@ -17,9 +17,6 @@ namespace Bolt.Performance.Server
             public void ConfigureServices(IServiceCollection services)
             {
                 System.Console.WriteLine("Process: {0}", System.Diagnostics.Process.GetCurrentProcess().Id);
-
-                ThreadPool.SetMinThreads(100, 100);
-                ThreadPool.SetMinThreads(1000, 1000);
 
                 services.AddRouting();
                 services.AddLogging();
@@ -43,10 +40,9 @@ namespace Bolt.Performance.Server
         public static int Main(string[] args)
         {
             var host = new WebHostBuilder()
-                    .UseKestrel()
-                    .UseDefaultHostingConfiguration(args)
-                    .UseStartup<Startup>()
-                    .Build();
+                .UseKestrel()
+                .UseStartup<Startup>()
+                .Build();
 
             host.Run();
             return 0;

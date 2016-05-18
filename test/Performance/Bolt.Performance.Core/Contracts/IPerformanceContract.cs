@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
-namespace Bolt.Performance.Contracts
-{    
+namespace Bolt.Performance.Core.Contracts
+{
     [ServiceContract]
     public interface IPerformanceContract
     {

@@ -1,20 +1,16 @@
 ﻿{
   "version": "1.0.0-*",
-  "compilationOptions": {
-     "emitEntryPoint": true
+  "buildOptions": {
+    "emitEntryPoint": true
   },
   "dependencies": {
-    "Bolt.Core": "*",
-    "Bolt.Test.Common": "*",
-    "Bolt.Performance.Core": "*",
+    "Bolt.Performance.Core": "1.0.0-*",
+    "Bolt.Server": "0.33.0-alpha1",
+    "Bolt.Test.Common": "1.0.0-*"
   },
   "frameworks": {
     "net451": {
-      "frameworkAssemblies": { "System.ServiceModel": {"type": "build"} }
+      "frameworkAssemblies": { "System.ServiceModel": { "type": "build" } }
     }
-  },
-  "commands": {
-    "run": "run",
-    "web": "Bolt.Performance.Server.Wcf"
   }
 }

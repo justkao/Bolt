@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Threading.Tasks;
 using Bolt.Serialization;
-using Microsoft.AspNet.DataProtection;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Logging;
+using JsonSerializer = Bolt.Serialization.JsonSerializer;
 
 namespace Bolt.Sample.ContentProtection
 {

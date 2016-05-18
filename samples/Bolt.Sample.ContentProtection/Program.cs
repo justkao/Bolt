@@ -5,10 +5,9 @@ using System.Threading.Tasks;
 using Bolt.Client;
 using Bolt.Serialization;
 using Bolt.Server;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.DataProtection;
-using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Hosting.Internal;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
@@ -22,22 +21,22 @@ namespace Bolt.Sample.ContentProtection
 
         public static int Main(string[] args)
         {
-            IHostingEngine server =
+            var server =
                 new WebHostBuilder()
-                    .UseServer("Microsoft.AspNet.Server.Kestrel")
+                    .UseKestrel()
                     .UseStartup<Startup>()
                     .Build();
 
-            IApplication app = server.Start();
-            var serverLifetime = app.Services.GetService<IApplicationLifetime>();
+            var serverLifetime = server.Services.GetService<IApplicationLifetime>();
             serverLifetime.ApplicationStarted.Register(() =>
             {
-                TestBolt(app.Services.GetRequiredService<ILogger<Program>>(), app.Services.GetRequiredService<ISerializer>(), serverLifetime.ApplicationStopping);
+                TestBolt(server.Services.GetRequiredService<ILogger<Program>>(), server.Services.GetRequiredService<ISerializer>(), serverLifetime.ApplicationStopping);
             });
 
+            server.Run();
             Console.WriteLine("Server running ... ");
             TestingFinished.WaitOne();
-            app.Dispose();
+            server.Dispose();
 
             return Result;
         }
@@ -46,6 +45,7 @@ namespace Bolt.Sample.ContentProtection
         {
             public void ConfigureServices(IServiceCollection serviceCollection)
             {
+                serviceCollection.AddRouting();
                 serviceCollection.AddBolt();
                 serviceCollection.Replace(new ServiceDescriptor(typeof (ISerializer), (p) =>
                 {
@@ -62,8 +62,7 @@ namespace Bolt.Sample.ContentProtection
             public void Configure(IApplicationBuilder builder)
             {
                 ILoggerFactory factory = builder.ApplicationServices.GetRequiredService<ILoggerFactory>();
-                factory.MinimumLevel = LogLevel.Debug;
-                factory.AddConsole();
+                factory.AddConsole(LogLevel.Debug);
 
                 // we will add IDummyContract endpoint to Bolt
                 builder.UseBolt(r => r.Use<IDummyContract, DummyContract>());

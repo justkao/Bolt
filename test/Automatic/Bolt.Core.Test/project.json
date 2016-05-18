@@ -2,8 +2,8 @@
   "dependencies": {
     "dotnet-test-xunit": "1.0.0-*",
     "Bolt.Core": "0.33.0-*",
-    "Bolt.Test.Common": "*",
-    "xunit": "2.1.0-*"
+    "xunit": "2.1.0-*",
+    "Bolt.Test.Common": "1.0.0-*"
   },
   "testRunner": "xunit",
 

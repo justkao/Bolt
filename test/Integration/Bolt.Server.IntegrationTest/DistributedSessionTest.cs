@@ -2,10 +2,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Bolt.Client;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Features;
-using Microsoft.AspNet.Session;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Session;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -127,7 +127,7 @@ namespace Bolt.Server.IntegrationTest
             Callback = new Mock<IDummyContract>();
 
             DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>())).Returns(Task.FromResult(true)).Verifiable();
-            DistributedCache.Setup(c => c.GetAsync(It.IsAny<string>())).Returns(Task.FromResult((byte[])null)).Verifiable();
+            DistributedCache.Setup(c => c.Get(It.IsAny<string>())).Returns(((byte[])null)).Verifiable();
 
             Callback.Setup(c => c.OnExecute(It.IsAny<object>())).Callback<object>(
                 v =>
@@ -147,6 +147,7 @@ namespace Bolt.Server.IntegrationTest
                 .Returns(Task.FromResult(true))
                 .Verifiable();
             DistributedCache.Setup(c => c.GetAsync(It.IsAny<string>())).Returns(Task.FromResult((byte[])null)).Verifiable();
+            DistributedCache.Setup(c => c.Get(It.IsAny<string>())).Returns(((byte[])null)).Verifiable();
 
             Callback.Setup(c => c.OnExecute(It.IsAny<object>())).Callback<object>(
                 v =>

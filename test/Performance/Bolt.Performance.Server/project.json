@@ -1,25 +1,30 @@
 ﻿{
   "version": "1.0.0-*",
-  "compilationOptions": {
-     "emitEntryPoint": true
-  },
   "dependencies": {
-    "Bolt.Performance.Core": "*",
-    "Bolt.Server": "*",
     "Microsoft.Framework.ConfigurationModel.Json": "1.0.0-*",
     "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*",
     "Microsoft.Extensions.Logging.Console": "1.0.0-*",
-    "Microsoft.AspNet.Hosting": "1.0.0-*"
+    "Microsoft.AspNet.Hosting": "1.0.0-*",
+    "Bolt.Server": "0.33.0-*",
+    "Bolt.Performance.Core": "1.0.0-*"
   },
-  "compile": [
-    "*.cs",
-    "../TestService.Core/Generated/TestContract.Contract.Designer.cs",
-    "../TestService.Core/Generated/TestContract.Server.Designer.cs"
-  ],
+  "buildOptions": { "emitEntryPoint": true },
   "frameworks": {
     "net451": {
       "frameworkAssemblies": {
-        "System.ServiceModel": {"type": "build"}
+        "System.ServiceModel": { "type": "build" }
+      }
+    },
+    "netcoreapp1.0": {
+      "imports": [
+        "dnxcore50",
+        "portable-net451+win8"
+      ],
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.0.0-*",
+          "type": "platform"
+        }
       }
     }
   }

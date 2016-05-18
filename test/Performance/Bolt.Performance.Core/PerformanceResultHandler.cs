@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace Bolt.Performance
+namespace Bolt.Performance.Core
 {
     public class PerformanceResultHandler
     {

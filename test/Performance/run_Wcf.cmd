@@ -1,3 +1,3 @@
 @ECHO OFF
 
-dnx -p Bolt.Performance.Server.Wcf --configuration Release web
+dotnet run -p Bolt.Performance.Server.Wcf --configuration Release
