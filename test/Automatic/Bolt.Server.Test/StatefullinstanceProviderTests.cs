@@ -4,7 +4,6 @@ using System.Threading.Tasks;
 using Bolt.Server.Session;
 using Moq;
 using Xunit;
-using Microsoft.AspNetCore.Http.Features;
 
 namespace Bolt.Server.Test
 {

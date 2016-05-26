@@ -5,8 +5,14 @@
     "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*",
     "Microsoft.Extensions.Logging.Console": "1.0.0-*",
     "Microsoft.AspNet.Hosting": "1.0.0-*",
-    "Bolt.Server": "0.33.0-*",
-    "Bolt.Performance.Core": "1.0.0-*"
+    "Bolt.Server": {
+      "target": "project",
+      "version": ""
+    },
+    "Bolt.Performance.Core": {
+      "target": "project",
+      "version": ""
+    }
   },
   "buildOptions": { "emitEntryPoint": true },
   "frameworks": {

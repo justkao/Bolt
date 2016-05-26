@@ -132,6 +132,10 @@ namespace Bolt.Performance.Console
         private static void ExecuteConcurrencyTest(List<Tuple<string, IPerformanceContract>> proxies, int concurrency,  int repeats, bool writeReport = true)
         {
             var result = CreateEmptyReport(concurrency, repeats);
+            Console.WriteLine($"Runtime: {PlatformServices.Default.Runtime.RuntimeVersion}");
+            Console.WriteLine($"RuntimeArchitecture: {PlatformServices.Default.Runtime.RuntimeArchitecture}");
+            Console.WriteLine($"RuntimeVersion: {PlatformServices.Default.Runtime.RuntimeVersion}");
+            Console.WriteLine($"RuntimeFramework: {PlatformServices.Default.Application.RuntimeFramework.FullName}");
 
             string testCase = $"Concurrency_{concurrency}";
             var reportsDirectory = GetReportsDirectory(testCase);
@@ -353,24 +357,31 @@ namespace Bolt.Performance.Console
 
         private static bool IsPortUsed(int port)
         {
-            bool isAvailable = true;
-
-            // Evaluate current system tcp connections. This is the same information provided
-            // by the netstat command line application, just in .Net strongly-typed object
-            // form.  We will look through the list, and if our port we would like to use
-            // in our TcpClient is occupied, we will set isAvailable to false.
-            IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-            var tcpConnInfoArray = ipGlobalProperties.GetActiveTcpListeners();
-            foreach (var tcpi in tcpConnInfoArray)
+            try 
             {
-                if (tcpi.Port == port)
-                {
-                    isAvailable = false;
-                    break;
-                }
-            }
+                bool isAvailable = true;
 
-            return !isAvailable;
+                // Evaluate current system tcp connections. This is the same information provided
+                // by the netstat command line application, just in .Net strongly-typed object
+                // form.  We will look through the list, and if our port we would like to use
+                // in our TcpClient is occupied, we will set isAvailable to false.
+                IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
+                var tcpConnInfoArray = ipGlobalProperties.GetActiveTcpListeners();
+                foreach (var tcpi in tcpConnInfoArray)
+                {
+                    if (tcpi.Port == port)
+                    {
+                        isAvailable = false;
+                        break;
+                    }
+                }    
+
+                return !isAvailable;            
+            }
+            catch(Exception)
+            {
+                return false;
+            }
         }
 
         private static string GetReportsDirectory(string testCase)

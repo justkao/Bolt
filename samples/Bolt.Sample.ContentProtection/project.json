@@ -6,8 +6,14 @@
     "emitEntryPoint": true
   },
   "dependencies": {
-    "Bolt.Client": "0.33.0-*",
-    "Bolt.Server": "0.33.0-*",
+    "Bolt.Client": {
+      "target": "project",
+      "version": ""
+    },
+    "Bolt.Server": {
+      "target": "project",
+      "version": ""
+    },
     "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*",
     "Microsoft.AspNetCore.Hosting": "1.0.0-*",
     "Microsoft.Extensions.Logging.Console": "1.0.0-*",

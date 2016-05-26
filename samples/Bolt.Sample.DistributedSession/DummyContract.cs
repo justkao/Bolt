@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Bolt.Server;
-using Microsoft.AspNet.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace Bolt.Sample.DistributedSession
 {

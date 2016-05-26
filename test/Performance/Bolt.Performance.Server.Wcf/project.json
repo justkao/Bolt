@@ -4,9 +4,18 @@
     "emitEntryPoint": true
   },
   "dependencies": {
-    "Bolt.Performance.Core": "1.0.0-*",
-    "Bolt.Server": "0.33.0-alpha1",
-    "Bolt.Test.Common": "1.0.0-*"
+    "Bolt.Performance.Core": {
+      "target": "project",
+      "version": ""
+    },
+    "Bolt.Server": {
+      "target": "project",
+      "version": ""
+    },
+    "Bolt.Test.Common": {
+      "target": "project",
+      "version": ""
+    }
   },
   "frameworks": {
     "net451": {

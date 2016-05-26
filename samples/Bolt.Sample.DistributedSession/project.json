@@ -2,20 +2,27 @@
   "webroot": "wwwroot",
   "version": "1.0.0-*",
   "dependencies": {
-    "Microsoft.AspNet.Server.Kestrel": "1.0.0-*",
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0-*",
     "Microsoft.Extensions.Caching.Abstractions": "1.0.0-*",
-    "Microsoft.Extensions.Caching.SqlConfig": "1.0.0-*",
     "Microsoft.Extensions.Options": "1.0.0-*",
     "Microsoft.Extensions.Caching.Memory": "1.0.0-*",
-    "Bolt.Server": "0.33.0-*",
-    "Bolt.Client": "0.33.0-*"
+    "Microsoft.Extensions.Caching.SqlServer": "1.0.0-*",
+    "Microsoft.Extensions.Logging.Console": "1.0.0-*",
+
+    "Bolt.Server": {
+      "target": "project",
+      "version": ""
+    },
+    "Bolt.Client": {
+      "target": "project",
+      "version": ""
+    }
   },
   "frameworks": {
     "net451": { },
     "netcoreapp1.0": {
       "imports": [
-        "dnxcore50",
-        "portable-net451+win8"
+        "dnxcore50"
       ],
       "dependencies": {
         "Microsoft.NETCore.App": {

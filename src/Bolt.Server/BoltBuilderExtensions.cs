@@ -1,6 +1,5 @@
 ﻿using System;
 using Bolt.Server;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 

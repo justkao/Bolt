@@ -7,10 +7,15 @@
       "version": "1.0.0-*",
       "type": "build"
     },
-    "Newtonsoft.Json": "8.0.3",
     "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*",
-    "Bolt.Client": "0.33.0-*",
-    "Bolt.Performance.Core": "1.0.0-*"
+    "Bolt.Client": {
+      "target": "project",
+      "version": ""
+    },
+    "Bolt.Performance.Core": {
+      "target": "project",
+      "version": ""
+    }
   },
   "frameworks": {
     "net451": {
@@ -32,8 +37,10 @@
           "type": "platform"
         },
         "System.ServiceModel.Http": "4.0.10",
+        "System.Runtime.Serialization.Primitives": "4.1.1-*",
         "System.ServiceModel.Primitives": "4.0.0",
-        "System.Net.NetworkInformation": "4.0.10-*"
+        "System.Net.NetworkInformation": "4.0.10-*",
+        "System.Diagnostics.TraceSource": "4.0.0-*"
       }
     }
   }

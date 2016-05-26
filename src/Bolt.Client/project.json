@@ -1,5 +1,5 @@
 {
-  "version": "0.33.0-alpha1",
+  "version": "0.40.0-alpha1",
   "authors": [
     "Martin Tomka"
   ],
@@ -15,7 +15,10 @@
     ]
   },
   "dependencies": {
-    "Bolt.Core": "0.33.0-alpha1",
+    "Bolt.Core": {
+      "target": "project",
+      "version": ""
+    },
     "Castle.Core": "4.0.0-*"
   },
   "frameworks": {
