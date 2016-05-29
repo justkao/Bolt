@@ -1,15 +1,15 @@
 ﻿{
   "dependencies": {
-    "dotnet-test-xunit": "1.0.0-*",
     "Bolt.Core": {
       "target": "project",
       "version": ""
     },
-    "xunit": "2.1.0-*",
     "Bolt.Test.Common": {
       "target": "project",
       "version": ""
-    }
+    },
+    "xunit": "2.1.0-*",
+    "dotnet-test-xunit": "1.0.0-*"
   },
   "testRunner": "xunit",
 

@@ -29,7 +29,6 @@
     },
     "netstandard1.3": {
       "imports": [
-        "portable-net45+wp80+win8+wpa81",
         "dotnet5.4"
       ],
       "dependencies": {

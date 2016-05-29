@@ -14,6 +14,9 @@
       "version": ""
     }
   },
+  "tools": {
+    "Bolt.Tools": "0.40.0-*"
+  },
   "frameworks": {
     "netstandard1.3": {
       "imports": [

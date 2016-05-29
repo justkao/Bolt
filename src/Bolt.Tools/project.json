@@ -1,6 +1,6 @@
 {
   "version": "0.40.0-alpha1",
-  "description": "Bolt Tool used to generate client-side code.",
+  "description": "Bolt Tools used to generate client-side code.",
   "authors": [ "Martin Tomka" ],
   "packOptions": {
     "repository": {
@@ -21,17 +21,12 @@
   "dependencies": {
     "Microsoft.Extensions.CommandLineUtils": "1.0.0-*",
     "Newtonsoft.Json": "8.0.4-beta1"
-
   },
   "frameworks": {
     "netcoreapp1.0": {
       "buildOptions": {
         "define": [ "FEATURE_ASSEMBLY_LOAD_CONTEXT" ] 
       },
-      "imports": [
-        "dnxcore50",
-        "portable-net451+win8"
-      ],
       "dependencies": {
         "Microsoft.NETCore.App": {
           "version": "1.0.0-*",

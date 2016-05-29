@@ -49,6 +49,8 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Sample.DistributedSess
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Bolt.Sample.SimpleProxy", "samples\Bolt.Sample.SimpleProxy\Bolt.Sample.SimpleProxy.xproj", "{F8089028-54BE-40A0-8EFF-65AB546FF60A}"
 EndProject
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "build", "build\build.xproj", "{EC688E45-D3C7-4E16-9CD2-20E6A0A41543}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -123,6 +125,10 @@ Global
 		{F8089028-54BE-40A0-8EFF-65AB546FF60A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8089028-54BE-40A0-8EFF-65AB546FF60A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8089028-54BE-40A0-8EFF-65AB546FF60A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EC688E45-D3C7-4E16-9CD2-20E6A0A41543}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC688E45-D3C7-4E16-9CD2-20E6A0A41543}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC688E45-D3C7-4E16-9CD2-20E6A0A41543}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC688E45-D3C7-4E16-9CD2-20E6A0A41543}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

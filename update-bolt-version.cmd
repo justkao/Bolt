@@ -1,1 +1,1 @@
-call build.cmd -Target UpdateBoltVersion
+dotnet run -p .\build\ UpdateBoltVersion

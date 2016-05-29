@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -18,8 +19,7 @@ namespace Bolt.Tools
 
         public static int Main(string[] args)
         {
-            var app = new CommandLineApplication();
-            app.Name = "bolt";
+            var app = new CommandLineApplication { Name = "bolt" };
             app.VersionOption("--version", GetVersion());
             app.OnExecute(() =>
             {
