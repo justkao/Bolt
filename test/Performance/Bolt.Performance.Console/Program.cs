@@ -22,6 +22,10 @@ namespace Bolt.Performance.Console
 
         public static int Main(params string[] args)
         {
+#if NET451
+            ServicePointManager.DefaultConnectionLimit = 1000;		
+            ServicePointManager.MaxServicePoints = 1000;
+#endif
             List<Tuple<string, IPerformanceContract>> proxies = null;
 
             int tries = 0;

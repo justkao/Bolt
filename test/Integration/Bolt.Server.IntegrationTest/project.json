@@ -20,7 +20,8 @@
     },
     "Microsoft.AspNetCore.Http": "1.0.0-*",
     "Microsoft.AspNetCore.TestHost": "1.0.0-*",
-    "Microsoft.AspNetCore.Localization": "1.0.0-*"
+    "Microsoft.AspNetCore.Localization": "1.0.0-*",
+    "Moq": "4.6.23-*"
   },
   "testRunner": "xunit",
 
@@ -37,14 +38,10 @@
         },
         "System.Diagnostics.Process": "4.1.0-*",
         "System.Diagnostics.TraceSource": "4.0.0-*",
-        "moq.netcore": "4.4.0-beta8",
         "System.Reflection.Extensions": "4.0.1-*"
       }
     },
     "net451": {
-      "dependencies": {
-        "Moq": "4.2.1502.911"
-      }
     }
   }
 }

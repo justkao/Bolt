@@ -1,4 +1,4 @@
 @ECHO OFF
 
 cd Bolt.Performance.Console
-dotnet run
+dotnet run -f net451 --configuration Release performance

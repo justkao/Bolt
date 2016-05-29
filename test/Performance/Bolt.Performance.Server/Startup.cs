@@ -39,6 +39,11 @@ namespace Bolt.Performance.Server
         // Entry point for the application.
         public static int Main(string[] args)
         {
+#if NET451
+                ThreadPool.SetMinThreads(100, 100);
+                ThreadPool.SetMinThreads(1000, 1000);
+#endif 
+            
             var host = new WebHostBuilder()
                 .UseKestrel()
                 .UseStartup<Startup>()
