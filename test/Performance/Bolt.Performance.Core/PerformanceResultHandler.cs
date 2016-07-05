@@ -63,7 +63,5 @@ namespace Bolt.Performance.Core
 
             return Directory.GetFiles(directory).Select(TryReadReport).Where(r => r != null);
         }
-
-
     }
 }

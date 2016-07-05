@@ -5,7 +5,7 @@
       "target": "project",
       "version": ""
     },
-    "xunit": "2.1.0-*",
+    "xunit": "2.1.0",
     "Bolt.Test.Common": {
       "target": "project",
       "version": ""
@@ -22,11 +22,11 @@
       ],
       "dependencies": {
         "Microsoft.NETCore.App": {
-          "version": "1.0.0-*",
+          "version": "1.0.0",
           "type": "platform"
         },
-        "System.Diagnostics.Process": "4.1.0-*",
-        "System.Diagnostics.TraceSource": "4.0.0-*"
+        "System.Diagnostics.Process": "4.1.0",
+        "System.Diagnostics.TraceSource": "4.0.0"
       }
     },
     "net451": {

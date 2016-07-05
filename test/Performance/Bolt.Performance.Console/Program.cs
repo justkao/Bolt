@@ -5,6 +5,8 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Performance.Core;
@@ -12,7 +14,6 @@ using Bolt.Performance.Core.Contracts;
 using Microsoft.Extensions.CommandLineUtils;
 using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json;
-using RuntimeEnvironment = Microsoft.Extensions.PlatformAbstractions.RuntimeEnvironment;
 
 namespace Bolt.Performance.Console
 {
@@ -57,6 +58,19 @@ namespace Bolt.Performance.Console
                 c.OnExecute(() =>
                 {
                     ExecuteConcurrencyTest(proxies, 10, 10, false);
+
+                    Console.WriteLine("Test finished. ");
+                    return 0;
+                });
+            });
+
+            app.Command("dev", c =>
+            {
+                CommandArgument filterArgument = c.Argument("filter", "specifies which action should be executed");
+
+                c.OnExecute(() =>
+                {
+                    ExecuteConcurrencyTest(proxies, 1, 50000, true, "Dev", filterArgument.Value);
 
                     Console.WriteLine("Test finished. ");
                     return 0;
@@ -115,7 +129,7 @@ namespace Bolt.Performance.Console
 
                     PerformanceResult result = CreateEmptyReport(degree, cnt);
                
-                    ExecuteActions(proxies, cnt, degree, result, null);
+                    ExecuteActions(proxies, cnt, degree, result, null, null);
 
                     if (output.HasValue())
                     {
@@ -133,15 +147,15 @@ namespace Bolt.Performance.Console
             return app.Execute(args);
         }
 
-        private static void ExecuteConcurrencyTest(List<Tuple<string, IPerformanceContract>> proxies, int concurrency,  int repeats, bool writeReport = true)
+        private static void ExecuteConcurrencyTest(List<Tuple<string, IPerformanceContract>> proxies, int concurrency,  int repeats, bool writeReport = true, string reportPrefix = null, string filter = null)
         {
             var result = CreateEmptyReport(concurrency, repeats);
-            Console.WriteLine($"Runtime: {PlatformServices.Default.Runtime.RuntimeVersion}");
-            Console.WriteLine($"RuntimeArchitecture: {PlatformServices.Default.Runtime.RuntimeArchitecture}");
-            Console.WriteLine($"RuntimeVersion: {PlatformServices.Default.Runtime.RuntimeVersion}");
-            Console.WriteLine($"RuntimeFramework: {PlatformServices.Default.Application.RuntimeFramework.FullName}");
+            Console.WriteLine($"OSArchitecture: {RuntimeInformation.OSArchitecture}");
+            Console.WriteLine($"FrameworkDescription: {RuntimeInformation.FrameworkDescription}");
+            Console.WriteLine($"ProcessArchitecture: {RuntimeInformation.ProcessArchitecture}");
+            Console.WriteLine($"OSDescription: {RuntimeInformation.OSDescription}");
 
-            string testCase = $"Concurrency_{concurrency}";
+            string testCase = $"{reportPrefix}Concurrency_{concurrency}";
             var reportsDirectory = GetReportsDirectory(testCase);
 
             PerformanceResultHandler handler = new PerformanceResultHandler();
@@ -157,7 +171,7 @@ namespace Bolt.Performance.Console
                 }
             }
 
-            ExecuteActions(proxies, repeats, concurrency, result, previous);
+            ExecuteActions(proxies, repeats, concurrency, result, previous, filter);
             if (writeReport)
             {
                 string file = $"{reportsDirectory}/performance_{result.Version}.json";
@@ -172,7 +186,7 @@ namespace Bolt.Performance.Console
             }
         }
 
-        private static void ExecuteActions(IEnumerable<Tuple<string, IPerformanceContract>> proxies, int cnt, int degree, PerformanceResult result, PerformanceResult previous)
+        private static void ExecuteActions(IEnumerable<Tuple<string, IPerformanceContract>> proxies, int cnt, int degree, PerformanceResult result, PerformanceResult previous, string actionFilter)
         {
             int threads = degree * 3;
             if (threads < 25)
@@ -186,19 +200,24 @@ namespace Bolt.Performance.Console
             List<Person> large = Enumerable.Repeat(person, 100).ToList();
             DateTime dateArg = DateTime.UtcNow;
 
-            ExecuteAsync(proxies, c => c.Method_Async(), cnt, degree, nameof(IPerformanceContract.Method_Async), result, previous);
-            ExecuteAsync(proxies, c => c.Method_Int_Async(10), cnt, degree, nameof(IPerformanceContract.Method_Int_Async), result, previous);
-            ExecuteAsync(proxies, c => c.Method_Many_Async(5, "dummy", dateArg, person), cnt, degree, nameof(IPerformanceContract.Method_Many_Async), result, previous);
-            ExecuteAsync(proxies, c => c.Method_Large_Async(large), cnt, degree, nameof(IPerformanceContract.Method_Large_Async), result, previous);
-            ExecuteAsync(proxies, c => c.Method_Object_Async(person), cnt, degree, nameof(IPerformanceContract.Method_Object_Async), result, previous);
-            ExecuteAsync(proxies, c => c.Method_String_Async("dummy"), cnt, degree, nameof(IPerformanceContract.Method_String_Async), result, previous);
-            ExecuteAsync(proxies, c => c.Return_Int_Async(), cnt, degree, nameof(IPerformanceContract.Return_Int_Async), result, previous);
-            ExecuteAsync(proxies, c => c.Return_Ints_Async(), cnt, degree, nameof(IPerformanceContract.Return_Ints_Async), result, previous);
-            ExecuteAsync(proxies, c => c.Return_Object_Async(), cnt, degree, nameof(IPerformanceContract.Return_Object_Async), result, previous);
-            ExecuteAsync(proxies, c => c.Return_Objects_Async(), cnt, degree, nameof(IPerformanceContract.Return_Objects_Async), result, previous);
-            ExecuteAsync(proxies, c => c.Return_String_Async(), cnt, degree, nameof(IPerformanceContract.Return_String_Async), result, previous);
-            ExecuteAsync(proxies, c => c.Return_Large_Async(), cnt, degree, nameof(IPerformanceContract.Return_Large_Async), result, previous);
-            ExecuteAsync(proxies, c => c.Return_Strings_Async(), cnt, degree, nameof(IPerformanceContract.Return_Strings_Async), result, previous);
+            if (!string.IsNullOrEmpty(actionFilter))
+            {
+                Console.WriteLine($"Filter: '{actionFilter.Yellow()}'");
+            }
+
+            ExecuteAsync(proxies, c => c.Method_Async(), cnt, degree, nameof(IPerformanceContract.Method_Async), result, previous, actionFilter);
+            ExecuteAsync(proxies, c => c.Method_Int_Async(10), cnt, degree, nameof(IPerformanceContract.Method_Int_Async), result, previous, actionFilter);
+            ExecuteAsync(proxies, c => c.Method_Many_Async(5, "dummy", dateArg, person), cnt, degree, nameof(IPerformanceContract.Method_Many_Async), result, previous, actionFilter);
+            ExecuteAsync(proxies, c => c.Method_Large_Async(large), cnt, degree, nameof(IPerformanceContract.Method_Large_Async), result, previous, actionFilter);
+            ExecuteAsync(proxies, c => c.Method_Object_Async(person), cnt, degree, nameof(IPerformanceContract.Method_Object_Async), result, previous, actionFilter);
+            ExecuteAsync(proxies, c => c.Method_String_Async("dummy"), cnt, degree, nameof(IPerformanceContract.Method_String_Async), result, previous, actionFilter);
+            ExecuteAsync(proxies, c => c.Return_Int_Async(), cnt, degree, nameof(IPerformanceContract.Return_Int_Async), result, previous, actionFilter);
+            ExecuteAsync(proxies, c => c.Return_Ints_Async(), cnt, degree, nameof(IPerformanceContract.Return_Ints_Async), result, previous, actionFilter);
+            ExecuteAsync(proxies, c => c.Return_Object_Async(), cnt, degree, nameof(IPerformanceContract.Return_Object_Async), result, previous, actionFilter);
+            ExecuteAsync(proxies, c => c.Return_Objects_Async(), cnt, degree, nameof(IPerformanceContract.Return_Objects_Async), result, previous, actionFilter);
+            ExecuteAsync(proxies, c => c.Return_String_Async(), cnt, degree, nameof(IPerformanceContract.Return_String_Async), result, previous, actionFilter);
+            ExecuteAsync(proxies, c => c.Return_Large_Async(), cnt, degree, nameof(IPerformanceContract.Return_Large_Async), result, previous, actionFilter);
+            ExecuteAsync(proxies, c => c.Return_Strings_Async(), cnt, degree, nameof(IPerformanceContract.Return_Strings_Async), result, previous, actionFilter);
         }
 
         private static IEnumerable<Tuple<string, IPerformanceContract>> CreateClients()
@@ -214,8 +233,16 @@ namespace Bolt.Performance.Console
             }
         }
 
-        private static void ExecuteAsync(IEnumerable<Tuple<string, IPerformanceContract>> contracts, Func<IPerformanceContract, Task> action, int count, int degree, string actionName,  PerformanceResult result, PerformanceResult previous)
+        private static void ExecuteAsync(IEnumerable<Tuple<string, IPerformanceContract>> contracts, Func<IPerformanceContract, Task> action, int count, int degree, string actionName, PerformanceResult result, PerformanceResult previous, string actionFilter)
         {
+            if (!string.IsNullOrEmpty(actionFilter))
+            {
+                if (actionName.IndexOf(actionFilter, StringComparison.OrdinalIgnoreCase) == -1)
+                {
+                    return;
+                }
+            }
+
             Console.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}, Concurrency = {degree.ToString().Bold()}");
 
             result.Actions[actionName] = new ActionMetadata();
@@ -361,30 +388,21 @@ namespace Bolt.Performance.Console
 
         private static bool IsPortUsed(int port)
         {
-            try 
+            TcpListener listerner = null;
+            try
             {
-                bool isAvailable = true;
-
-                // Evaluate current system tcp connections. This is the same information provided
-                // by the netstat command line application, just in .Net strongly-typed object
-                // form.  We will look through the list, and if our port we would like to use
-                // in our TcpClient is occupied, we will set isAvailable to false.
-                IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
-                var tcpConnInfoArray = ipGlobalProperties.GetActiveTcpListeners();
-                foreach (var tcpi in tcpConnInfoArray)
-                {
-                    if (tcpi.Port == port)
-                    {
-                        isAvailable = false;
-                        break;
-                    }
-                }    
-
-                return !isAvailable;            
-            }
-            catch(Exception)
-            {
+                listerner = new TcpListener(IPAddress.IPv6Any, port);
+                listerner.ExclusiveAddressUse = true;
+                listerner.Start();
                 return false;
+            }
+            catch (Exception)
+            {
+                return true;
+            }
+            finally
+            {
+                listerner?.Stop();
             }
         }
 
@@ -411,7 +429,7 @@ namespace Bolt.Performance.Console
                 Environment = new SerializableRuntimeEnvironment()
             };
 
-            result.Environment.Update(PlatformServices.Default.Runtime);
+            result.Environment.Update();
             result.UpdateVersion();
             return result;
         }

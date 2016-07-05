@@ -10,6 +10,7 @@
       "version": ""
     },
     "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*"
+
   },
   "buildOptions": {
   },
@@ -28,7 +29,8 @@
         "portable-net45+wp80+win8+wpa81+dnxcore50"
       ],
       "dependencies": {
-        "System.IO": "4.1.0-*",
+        "System.IO": "4.1.0",
+        "System.IO.FileSystem": "4.0.1",
         "System.ServiceModel.Http": "4.0.10",
         "System.ServiceModel.Primitives": "4.0.0"
       }

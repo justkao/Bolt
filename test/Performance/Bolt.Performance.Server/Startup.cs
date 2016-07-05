@@ -42,10 +42,13 @@ namespace Bolt.Performance.Server
 #if NET451
                 ThreadPool.SetMinThreads(100, 100);
                 ThreadPool.SetMinThreads(1000, 1000);
-#endif 
-            
+#endif
+
             var host = new WebHostBuilder()
-                .UseKestrel()
+                .UseKestrel(o =>
+                {
+                    o.ThreadCount = 100;
+                })
                 .UseStartup<Startup>()
                 .Build();
 

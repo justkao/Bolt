@@ -19,8 +19,8 @@
     "warningsAsErrors": true
   },
   "dependencies": {
-    "Microsoft.Extensions.CommandLineUtils": "1.0.0-*",
-    "Newtonsoft.Json": "8.0.4-beta1"
+    "Microsoft.Extensions.CommandLineUtils": "1.0.0",
+    "Newtonsoft.Json": "9.0.1"
   },
   "frameworks": {
     "netcoreapp1.0": {
@@ -29,10 +29,10 @@
       },
       "dependencies": {
         "Microsoft.NETCore.App": {
-          "version": "1.0.0-*",
+          "version": "1.0.0",
           "type": "platform"
         },
-        "System.Runtime.Loader": "4.0.0-*"
+        "System.Runtime.Loader": "4.0.0"
       }
     }
   }
