@@ -1,5 +1,7 @@
+using System.Reflection;
+using System.Runtime.InteropServices;
 using Bolt.Client;
-using Microsoft.Extensions.PlatformAbstractions;
+using Bolt.Performance.Core;
 
 namespace Bolt.Performance.Console
 {
@@ -7,16 +9,15 @@ namespace Bolt.Performance.Console
     {
         public static void UpdateVersion(this PerformanceResult source)
         {
-            source.Version = typeof(IProxy).Assembly.GetName().Version.ToString();
+            source.Version = typeof(IProxy).GetTypeInfo().Assembly.GetName().Version.ToString();
         }
 
-        public static void Update(this RuntimeEnvironment source, IRuntimeEnvironment environment)
+        public static void Update(this SerializableRuntimeEnvironment source)
         {
-            source.OperatingSystem = environment.OperatingSystem;
-            source.OperatingSystemVersion = environment.OperatingSystemVersion;
-            source.RuntimeArchitecture = environment.RuntimeArchitecture;
-            source.RuntimeType = environment.RuntimeType;
-            source.RuntimeVersion = environment.RuntimeVersion;
+            source.OSDescription = RuntimeInformation.OSDescription;
+            source.ProcessArchitecture = RuntimeInformation.ProcessArchitecture.ToString();
+            source.OSArchitecture = RuntimeInformation.OSArchitecture.ToString();
+            source.FrameworkDescription = RuntimeInformation.FrameworkDescription;
         }
     }
 }

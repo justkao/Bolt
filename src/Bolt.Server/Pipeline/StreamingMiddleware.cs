@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Pipeline;
 
@@ -37,7 +38,7 @@ namespace Bolt.Server.Pipeline
             // handle result
             if (metadata.ContentResultType != null)
             {
-                if (typeof (HttpContent).CanAssign(metadata.ContentResultType))
+                if (typeof(HttpContent).GetTypeInfo().IsAssignableFrom(metadata.ContentResultType.GetTypeInfo()))
                 {
                     await HandleContent(context, (HttpContent) context.ActionResult);
                 }

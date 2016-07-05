@@ -11,8 +11,7 @@ namespace Bolt.Server.Test
         [Fact]
         public void BuildVoidMethod_NoArguments()
         {
-            MethodInfo method = typeof (IDummyInterface).GetTypeInfo()
-                .GetRuntimeMethod(nameof(IDummyInterface.VoidMethod_NoArguments), new Type[0]);
+            MethodInfo method = GetMethod(nameof(IDummyInterface.VoidMethod_NoArguments));
 
             var lambda = MethodInvokerBuilder.Build(typeof (IDummyInterface), method);
 
@@ -27,8 +26,7 @@ namespace Bolt.Server.Test
         [Fact]
         public void BuildFunc_NoArguments()
         {
-            MethodInfo method = typeof(IDummyInterface).GetTypeInfo()
-                .GetRuntimeMethod(nameof(IDummyInterface.Func_NoArguments), new Type[0]);
+            MethodInfo method = GetMethod(nameof(IDummyInterface.Func_NoArguments));
 
             var lambda = MethodInvokerBuilder.Build(typeof(IDummyInterface), method);
 
@@ -40,8 +38,7 @@ namespace Bolt.Server.Test
         [Fact]
         public void BuildFunc_Arguments()
         {
-            MethodInfo method = typeof (IDummyInterface).GetTypeInfo()
-                .GetRuntimeMethod(nameof(IDummyInterface.Func_Arguments), new[] {typeof (int), typeof (string)});
+            MethodInfo method = GetMethod(nameof(IDummyInterface.Func_Arguments), typeof (int), typeof (string));
 
             var lambda = MethodInvokerBuilder.Build(typeof(IDummyInterface), method);
 
@@ -53,8 +50,7 @@ namespace Bolt.Server.Test
         [Fact]
         public void BuildVoidMethod_Arguments()
         {
-            MethodInfo method = typeof(IDummyInterface).GetTypeInfo()
-                .GetRuntimeMethod(nameof(IDummyInterface.VoidMethod_Arguments), new[] { typeof(int), typeof(string) });
+            MethodInfo method = GetMethod(nameof(IDummyInterface.VoidMethod_Arguments), typeof (int), typeof (string));
 
             var lambda = MethodInvokerBuilder.Build(typeof(IDummyInterface), method);
 
@@ -70,6 +66,11 @@ namespace Bolt.Server.Test
 
             Assert.Equal(10, provider(Task.FromResult(10)));
             Assert.Equal(11, provider(Task.FromResult(11)));
+        }
+
+        private static MethodInfo GetMethod(string name, params Type[] parameters)
+        {
+            return typeof(IDummyInterface).GetTypeInfo().GetMethod(name, parameters);
         }
 
         public interface IDummyInterface

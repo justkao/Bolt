@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNet.Http.Features;
+﻿using Microsoft.AspNetCore.Http;
 
 namespace Bolt.Server
 {

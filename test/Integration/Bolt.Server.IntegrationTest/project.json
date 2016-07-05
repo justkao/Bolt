@@ -1,25 +1,47 @@
 ﻿{
-  "version": "1.0.0-*",
   "dependencies": {
-    "Bolt.Server": "",
-    "Bolt.Client": "",
-    "Bolt.Server.IntegrationTest.Core": "",
-    "Bolt.Test.Common": "",
-    "xunit.runner.dnx": "2.1.0-*",
-    "xunit.core": "2.1.0-*",
-    "xunit.assert": "2.1.0-*",
-    "Microsoft.AspNet.TestHost": "1.0.0-*",
-    "Microsoft.AspNet.Localization": "1.0.0-*",
-    "Microsoft.AspNet.Session": "1.0.0-*",
-    "Microsoft.Extensions.Caching.SqlServer": "1.0.0-*",
-    "EntityFramework.InMemory": "7.0.0-*",
-    "Moq": "4.2.1502.911",
-    "Castle.Core": "3.3.3"
+    "dotnet-test-xunit": "1.0.0-*",
+    "Bolt.Server": {
+      "target": "project",
+      "version": ""
+    },
+    "Bolt.Client": {
+      "target": "project",
+      "version": ""
+    },
+    "xunit": "2.1.0-*",
+    "Bolt.Test.Common": {
+      "target": "project",
+      "version": ""
+    },
+    "Bolt.Server.IntegrationTest.Core": {
+      "target": "project",
+      "version": ""
+    },
+    "Microsoft.AspNetCore.Http": "1.0.0-*",
+    "Microsoft.AspNetCore.TestHost": "1.0.0-*",
+    "Microsoft.AspNetCore.Localization": "1.0.0-*",
+    "Moq": "4.6.23-*"
   },
+  "testRunner": "xunit",
+
   "frameworks": {
-    "dnx451": { }
-  },
-  "commands": {
-    "test": "xunit.runner.dnx -maxthreads unlimited"
+    "netcoreapp1.0": {
+      "imports": [
+        "dnxcore50",
+        "portable-net451+win8"
+      ],
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.0.0-*",
+          "type": "platform"
+        },
+        "System.Diagnostics.Process": "4.1.0-*",
+        "System.Diagnostics.TraceSource": "4.0.0-*",
+        "System.Reflection.Extensions": "4.0.1-*"
+      }
+    },
+    "net451": {
+    }
   }
 }

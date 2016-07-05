@@ -1,4 +1,4 @@
-namespace Bolt.Performance
+namespace Bolt.Performance.Core
 {
     public class AnalyzeActionResult
     {

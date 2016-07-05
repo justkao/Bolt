@@ -68,7 +68,7 @@ namespace Bolt.Server
         {
             return candidates.OrderBy(m =>
             {
-                if (typeof(Task).IsAssignableFrom(m.ReturnType))
+                if (typeof(Task).GetTypeInfo().IsAssignableFrom(m.ReturnType.GetTypeInfo()))
                 {
                     return 0;
                 }

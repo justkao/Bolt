@@ -29,7 +29,7 @@ namespace Bolt.Client
                 throw new ArgumentNullException(nameof(baseProxy));
             }
 
-            if (!typeof (ProxyBase).IsAssignableFrom(baseProxy))
+            if (!typeof(ProxyBase).GetTypeInfo().IsAssignableFrom(baseProxy.GetTypeInfo()))
             {
                 throw new ArgumentException(
                     $"Invalid base proxy type. The base class must derive from {typeof (ProxyBase).FullName}.");
@@ -47,7 +47,7 @@ namespace Bolt.Client
                 throw new ArgumentNullException(nameof(pipeline));
             }
 
-            if (!contract.IsInterface)
+            if (!contract.GetTypeInfo().IsInterface)
             {
                 throw new ArgumentException("Proxy can obly be created from interfaces.");
             }

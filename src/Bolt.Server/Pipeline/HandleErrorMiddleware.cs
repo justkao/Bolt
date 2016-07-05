@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Bolt.Pipeline;
 using Bolt.Serialization;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace Bolt.Server.Pipeline
 {
@@ -82,7 +83,7 @@ namespace Bolt.Server.Pipeline
             httpContext.Response.ContentLength = serializedException.Length;
             httpContext.Response.ContentType = context.GetSerializerOrThrow().MediaType;
 
-            await serializedException.CopyToAsync(httpContext.Response.Body, 4096, httpContext.RequestAborted);
+            await StreamCopyOperation.CopyToAsync(serializedException, httpContext.Response.Body, null, httpContext.RequestAborted);
         }
     }
 }

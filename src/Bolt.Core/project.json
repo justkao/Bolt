@@ -1,29 +1,42 @@
 {
-  "version": "0.33.0-alpha1",
-  "authors": [ "Martin Tomka" ],
+  "version": "0.40.0-alpha1",
+  "authors": [
+    "Martin Tomka"
+  ],
   "description": "Bolt Core library containing common classes shared by client and server.",
+  "packOptions": {
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/justkao/bolt"
+    },
+    "tags": [
+      "bolt",
+      "core"
+    ]
+  },
+  "buildOptions": {
+    "warningsAsErrors": true
+  },
   "dependencies": {
-    "Bolt.Sources": { "type": "build" },
-    "Newtonsoft.Json": "7.0.1"
+    "Newtonsoft.Json": "9.0.1",
+    "System.Buffers": "4.0.0"
   },
   "frameworks": {
-    "dotnet5.4": {
+    "netstandard1.1": {
       "dependencies": {
-        "System.Collections": "4.0.11-*",
-        "System.Collections.Concurrent": "4.0.11-*",
-        "System.Linq": "4.0.1-*",
-        "System.Net.Http": "4.0.1-*",
-        "System.Reflection": "4.1.0-*",
-        "System.Reflection.Extensions": "4.0.1-*",
-        "System.Runtime.Serialization.Primitives": "4.0.11-*",
-        "System.Text.Encoding": "4.0.11-*",
-        "System.Threading": "4.0.11-*"
+        "System.Collections": "4.0.11",
+        "System.Collections.Concurrent": "4.0.12",
+        "System.Linq": "4.1.0",
+        "System.Net.Http": "4.1.0",
+        "System.Reflection": "4.1.0",
+        "System.Reflection.Extensions": "4.0.1",
+        "System.Threading": "4.0.11"
       }
     },
     "net451": {
       "frameworkAssemblies": {
-        "System.Runtime.Serialization": "",
-        "System.Net.Http": ""
+        "System.Runtime.Serialization": { "type": "build" },
+        "System.Net.Http": { "type": "build" }
       }
     }
   }

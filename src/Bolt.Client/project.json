@@ -1,16 +1,46 @@
 {
-  "version": "0.33.0-alpha1",
-  "authors": [ "Martin Tomka" ],
+  "version": "0.40.0-alpha1",
+  "authors": [
+    "Martin Tomka"
+  ],
   "description": "Bolt portable client library used to access Bolt based services.",
+  "packOptions": {
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/justkao/bolt"
+    },
+    "tags": [
+      "bolt",
+      "client"
+    ]
+  },
   "dependencies": {
-    "Bolt.Sources": { "type": "build" },
-    "Bolt.Core": "",
-    "Castle.Core": "3.3.3"
+    "Bolt.Core": {
+      "target": "project",
+      "version": ""
+    },
+    "Castle.Core": "4.0.0-*"
   },
   "frameworks": {
     "net451": {
       "frameworkAssemblies": {
-        "System.Net.Http": ""
+        "System.Net.Http": {"type": "build"}
+      }
+    },
+    "netstandard1.3": {
+      "imports": [
+        "dotnet5.4"
+      ],
+      "dependencies": {
+        "System.Collections": "4.0.11",
+        "System.Collections.Concurrent": "4.0.12",
+        "System.Linq": "4.1.0",
+        "System.Linq.Expressions": "4.1.0",
+        "System.Net.Http": "4.1.0",
+        "System.Reflection": "4.1.0",
+        "System.Reflection.Extensions": "4.0.1",
+        "System.Text.Encoding": "4.0.11",
+        "System.Threading": "4.0.11"
       }
     }
   }

@@ -8,7 +8,7 @@ using Bolt.Client;
 using Bolt.Client.Pipeline;
 using Bolt.Server.IntegrationTest.Core;
 using Bolt.Test.Common;
-using Microsoft.AspNet.Builder;
+using Microsoft.AspNetCore.Builder;
 using Moq;
 using Xunit;
 

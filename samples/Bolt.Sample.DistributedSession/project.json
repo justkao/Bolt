@@ -2,19 +2,34 @@
   "webroot": "wwwroot",
   "version": "1.0.0-*",
   "dependencies": {
-    "Microsoft.AspNet.Server.Kestrel": "1.0.0-*",
-    "Microsoft.Extensions.Caching.Abstractions": "1.0.0-*",
-    "Microsoft.Extensions.Caching.SqlServer": "1.0.0-*",
-    "Microsoft.Extensions.Caching.SqlConfig": "1.0.0-*",
-    "Microsoft.Extensions.OptionsModel": "1.0.0-*",
-    "Bolt.Server": "",
-    "Bolt.Client": ""
-  },
-  "commands": {
-    "Bolt.Sample.DistributedSession": "run",
-    "db": "Microsoft.Extensions.Caching.SqlConfig create \"Server=localhost;Database=BoltDistributedCachedTestDb;user=sa;password=sa;\" dbo Entries"
+    "Microsoft.AspNetCore.Server.Kestrel": "1.0.0",
+    "Microsoft.Extensions.Caching.Abstractions": "1.0.0",
+    "Microsoft.Extensions.Options": "1.0.0",
+    "Microsoft.Extensions.Caching.Memory": "1.0.0",
+    "Microsoft.Extensions.Caching.SqlServer": "1.0.0",
+    "Microsoft.Extensions.Logging.Console": "1.0.0",
+
+    "Bolt.Server": {
+      "target": "project",
+      "version": ""
+    },
+    "Bolt.Client": {
+      "target": "project",
+      "version": ""
+    }
   },
   "frameworks": {
-    "dnx451": { }
+    "net451": { },
+    "netcoreapp1.0": {
+      "imports": [
+        "dnxcore50"
+      ],
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.0.0",
+          "type": "platform"
+        }
+      }
+    }
   }
 }

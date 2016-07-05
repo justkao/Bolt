@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Bolt.Performance.Contracts
+namespace Bolt.Performance.Core.Contracts
 {
     [DataContract]
     public class Person

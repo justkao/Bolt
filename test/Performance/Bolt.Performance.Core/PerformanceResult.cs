@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Bolt.Performance
+namespace Bolt.Performance.Core
 {
     public class PerformanceResult
     {
@@ -25,7 +25,7 @@ namespace Bolt.Performance
 
         public DateTime Time { get; set; }
 
-        public RuntimeEnvironment Environment { get; set; }
+        public SerializableRuntimeEnvironment Environment { get; set; }
 
         public Dictionary<string, ActionMetadata> Actions { get; set; }
     }

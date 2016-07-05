@@ -1,5 +1,5 @@
 ﻿using Bolt.Client;
-using Microsoft.AspNet.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 

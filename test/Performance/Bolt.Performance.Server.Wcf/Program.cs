@@ -1,6 +1,7 @@
 ﻿using System.Threading;
 using System.ServiceModel;
-using Bolt.Performance.Contracts;
+using Bolt.Performance.Core;
+using Bolt.Performance.Core.Contracts;
 
 namespace Bolt.Performance.Server.Wcf
 {

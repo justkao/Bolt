@@ -1,0 +1,39 @@
+{
+  "version": "0.40.0-alpha1",
+  "description": "Bolt Tools used to generate client-side code.",
+  "authors": [ "Martin Tomka" ],
+  "packOptions": {
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/justkao/bolt"
+    },
+    "tags": [
+      "bolt",
+      "tool",
+      "console"
+    ]
+  },
+  "buildOptions": {
+    "emitEntryPoint": true,
+    "outputName": "dotnet-bolt",
+    "warningsAsErrors": true
+  },
+  "dependencies": {
+    "Microsoft.Extensions.CommandLineUtils": "1.0.0",
+    "Newtonsoft.Json": "9.0.1"
+  },
+  "frameworks": {
+    "netcoreapp1.0": {
+      "buildOptions": {
+        "define": [ "FEATURE_ASSEMBLY_LOAD_CONTEXT" ] 
+      },
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.0.0",
+          "type": "platform"
+        },
+        "System.Runtime.Loader": "4.0.0"
+      }
+    }
+  }
+}

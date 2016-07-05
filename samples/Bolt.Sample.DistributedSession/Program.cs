@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Bolt.Client;
-using Microsoft.AspNet.Hosting;
-using Microsoft.AspNet.Hosting.Internal;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Hosting.Internal;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 
 namespace Bolt.Sample.DistributedSession
@@ -123,9 +124,9 @@ namespace Bolt.Sample.DistributedSession
             configurationBuilder.AddInMemoryCollection(new[]
             {new KeyValuePair<string, string>("server.urls", $"http://localhost:{port}")});
 
-            IHostingEngine server =
-                new WebHostBuilder(configurationBuilder.Build())
-                    .UseServer("Microsoft.AspNet.Server.Kestrel")
+            var server =
+                new WebHostBuilder()
+                    .UseKestrel()
                     .UseStartup<Startup>()
                     .Build();
 

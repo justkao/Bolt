@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Features;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -33,7 +32,7 @@ namespace Bolt.Server.Metadata
 
         public ILogger Logger { get; }
 
-        public virtual async Task<bool> HandleBoltMetadataAsync(ServerActionContext context, IEnumerable<IContractInvoker> contracts)
+        public virtual async Task HandleBoltMetadataAsync(ServerActionContext context, IEnumerable<IContractInvoker> contracts)
         {
             try
             {
@@ -43,16 +42,14 @@ namespace Bolt.Server.Metadata
                     new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 
                 await context.HttpContext.Response.WriteAsync(result);
-                return true;
             }
             catch (Exception e)
             {
                 Logger.LogWarning(BoltLogId.HandleBoltRootError, "Failed to generate Bolt root metadata. Error: {0}", e);
-                return false;
             }
         }
 
-        public virtual async Task<bool> HandleContractMetadataAsync(ServerActionContext context)
+        public virtual async Task HandleContractMetadataAsync(ServerActionContext context)
         {
             try
             {
@@ -91,7 +88,6 @@ namespace Bolt.Server.Metadata
                 context.HttpContext.Response.ContentType = "application/json";
                 context.HttpContext.Response.StatusCode = 200;
                 await context.HttpContext.Response.WriteAsync(result);
-                return true;
             }
             catch (Exception e)
             {
@@ -100,7 +96,6 @@ namespace Bolt.Server.Metadata
                     "Failed to generate Bolt metadata for contract '{0}'. Error: {1}",
                     context.Contract.Name,
                     e);
-                return false;
             }
         }
 

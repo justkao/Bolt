@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Pipeline;
 
@@ -26,7 +27,7 @@ namespace Bolt.Client.Pipeline
             context.GetResponseOrThrow().EnsureSuccessStatusCode();
             if (metadata.ContentResultType != null)
             {
-                if (typeof(HttpContent).CanAssign(metadata.ContentResultType))
+                if (typeof(HttpContent).GetTypeInfo().IsAssignableFrom(metadata.ContentResultType.GetTypeInfo()))
                 {
                     // since we are not supoprting HttpResponseMEssage we will try copy headers to HttpContent
                     foreach (KeyValuePair<string, IEnumerable<string>> header in context.Response.Headers)

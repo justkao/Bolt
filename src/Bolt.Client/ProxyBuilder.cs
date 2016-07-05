@@ -15,7 +15,6 @@ namespace Bolt.Client
         private SessionMiddleware _sessionMiddleware;
         private IServerProvider _serverProvider;
         private HttpMessageHandler _messageHandler;
-        private AcceptLanguageMiddleware _acceptLanguageMiddleware;
         private StreamingMiddleware _streamingMiddleware;
         private TimeSpan? _timeout;
         private IRequestTimeoutProvider _timeoutProvider;
@@ -111,13 +110,6 @@ namespace Bolt.Client
             return this;
         }
 
-        public virtual ProxyBuilder PreserveCultureInfo()
-        {
-            _acceptLanguageMiddleware = new AcceptLanguageMiddleware();
-
-            return this;
-        }
-
         public virtual ProxyBuilder OnSending(Func<ActionDelegate<ClientActionContext>, ClientActionContext, Task> handler)
         {
             if (handler == null) throw new ArgumentNullException(nameof(handler));
@@ -170,11 +162,6 @@ namespace Bolt.Client
             }
 
             context.Use(new SerializationMiddleware(_configuration.Serializer, _configuration.ExceptionSerializer, _configuration.ErrorProvider));
-            if (_acceptLanguageMiddleware != null)
-            {
-                context.Use(_acceptLanguageMiddleware);
-            }
-
             context.Use(new PickConnectionMiddleware(_serverProvider, _configuration.EndpointProvider));
             foreach (IMiddleware<ClientActionContext> middleware in _beforeSend)
             {

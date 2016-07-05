@@ -3,7 +3,8 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Server.InstanceProviders;
 using Bolt.Server.Session;
-using Microsoft.AspNet.Http.Internal;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
 using Moq;
 
 namespace Bolt.Server.Test
@@ -69,13 +70,13 @@ namespace Bolt.Server.Test
             protected override Task OnInstanceCreatedAsync(ServerActionContext context, string sessionId)
             {
                 _actions.Object.OnInstanceCreated(context, sessionId);
-                return CompletedTask.Done;
+                return Task.FromResult(true);
             }
 
             protected override Task OnInstanceReleasedAsync(ServerActionContext context, string sessionId)
             {
                 _actions.Object.OnInstanceReleased(context, sessionId);
-                return CompletedTask.Done;
+                return Task.FromResult(true);
             }
 
             private class ServerSessionHandlerInternal : ServerSessionHandler

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Bolt.Performance
+namespace Bolt.Performance.Core
 {
     public class ActionMetadata
     {

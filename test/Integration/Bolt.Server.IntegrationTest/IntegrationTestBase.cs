@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Net.Http;
 using Bolt.Client;
-using Microsoft.AspNet.Builder;
-using Microsoft.AspNet.TestHost;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNet.Http;
-using Microsoft.AspNet.Http.Internal;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 
 namespace Bolt.Server.IntegrationTest
 {
@@ -16,11 +19,13 @@ namespace Bolt.Server.IntegrationTest
         protected IntegrationTestBase()
         {
             ServerUrl = new Uri("http://localhost");
-            _runningServer = TestServer.Create(Configure, s =>
-            {
-                s.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-                ConfigureServices(s);
-            });
+            _runningServer = new TestServer(new WebHostBuilder().Configure(Configure).ConfigureServices(
+                s =>
+                {
+                    s.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+                    s.AddRouting();
+                    ConfigureServices(s);
+                }));
 
             ClientConfiguration = new ClientConfiguration();
             HttpMessageHandler handler = _runningServer.CreateHandler();

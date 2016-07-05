@@ -1,11 +1,9 @@
 version: 1.0.{build}
 os: Visual Studio 2015
-install:
-- dnvm upgrade -r clr
 init:
   - git config --global core.autocrlf true
 build_script:
-- ps: .\build.ps1
+- build.cmd
 test: off
 artifacts:
 - path: artifacts\Release\*.nupkg

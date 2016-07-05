@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace Bolt.Performance.Contracts
+namespace Bolt.Performance.Core.Contracts
 {
     [DataContract]
     public enum AddresType

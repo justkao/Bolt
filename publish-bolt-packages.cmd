@@ -1,1 +1,1 @@
-call build.cmd -Target PublishBoltPackages
+dotnet run -p .\build\ PublishBoltPackages

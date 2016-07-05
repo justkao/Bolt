@@ -1,5 +1,5 @@
 ﻿using System;
-using Microsoft.Extensions.OptionsModel;
+using Microsoft.Extensions.Options;
 
 namespace Bolt.Server
 {

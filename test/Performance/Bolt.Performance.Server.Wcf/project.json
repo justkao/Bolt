@@ -1,18 +1,25 @@
 ﻿{
   "version": "1.0.0-*",
-  "dependencies": {
-    "Bolt.Core": "",
-    "Bolt.Test.Common": "",
-    "Bolt.Performance.Core": "",
-    "Bolt.Console": ""
+  "buildOptions": {
+    "emitEntryPoint": true
   },
-  "frameworks": {
-    "dnx451": {
-      "frameworkAssemblies": { "System.ServiceModel": "" }
+  "dependencies": {
+    "Bolt.Performance.Core": {
+      "target": "project",
+      "version": ""
+    },
+    "Bolt.Server": {
+      "target": "project",
+      "version": ""
+    },
+    "Bolt.Test.Common": {
+      "target": "project",
+      "version": ""
     }
   },
-  "commands": {
-    "run": "run",
-    "web": "Bolt.Performance.Server.Wcf"
+  "frameworks": {
+    "net451": {
+      "frameworkAssemblies": { "System.ServiceModel": { "type": "build" } }
+    }
   }
 }

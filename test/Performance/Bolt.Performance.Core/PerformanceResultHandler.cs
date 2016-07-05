@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 
-namespace Bolt.Performance
+namespace Bolt.Performance.Core
 {
     public class PerformanceResultHandler
     {
@@ -63,7 +63,5 @@ namespace Bolt.Performance
 
             return Directory.GetFiles(directory).Select(TryReadReport).Where(r => r != null);
         }
-
-
     }
 }

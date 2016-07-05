@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Bolt.Performance
+namespace Bolt.Performance.Core
 {
     public static class Servers
     {

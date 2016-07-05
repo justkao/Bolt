@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Bolt.Serialization
+﻿namespace Bolt.Serialization
 {
     public class SerializeExceptionContext
     {

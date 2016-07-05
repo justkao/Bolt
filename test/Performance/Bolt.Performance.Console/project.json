@@ -1,29 +1,47 @@
 ﻿{
+  "buildOptions": {
+    "emitEntryPoint": true
+  },
   "dependencies": {
-    "Microsoft.Framework.CommandLineUtils.Sources": {
+    "Microsoft.Extensions.CommandLineUtils": {
       "version": "1.0.0-*",
       "type": "build"
     },
-    "Newtonsoft.Json": "7.0.1",
-    "Bolt.Sources": { "type": "build" },
-    "Bolt.Client": "",
-    "Bolt.Performance.Core": "",
-    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*"
+    "Microsoft.Extensions.PlatformAbstractions": "1.0.0-*",
+    "Bolt.Client": {
+      "target": "project",
+      "version": ""
+    },
+    "Bolt.Performance.Core": {
+      "target": "project",
+      "version": ""
+    },
+    "System.Runtime.InteropServices.RuntimeInformation": "4.0.0"
   },
   "frameworks": {
-    "dnx451": {
+    "net451": {
       "frameworkAssemblies": {
-        "System.Runtime": "",
-        "System.Collections": "",
-        "System.Runtime.Serialization": "",
-        "System.ServiceModel": ""
+        "System.Runtime": { "type": "build" },
+        "System.Collections": { "type": "build" },
+        "System.Runtime.Serialization": { "type": "build" },
+        "System.ServiceModel": { "type": "build" }
+      }
+    },
+    "netcoreapp1.0": {
+      "imports": [
+        "dnxcore50",
+        "portable-net451+win8"
+      ],
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "version": "1.0.0",
+          "type": "platform"
+        },
+        "System.ServiceModel.Http": "4.0.10",
+        "System.Runtime.Serialization.Primitives": "4.1.1",
+        "System.ServiceModel.Primitives": "4.0.0",
+        "System.Diagnostics.TraceSource": "4.0.0"
       }
     }
-  },
-  "commands": {
-    "run": "Bolt.Performance.Console",
-    "test": "Bolt.Performance.Console test",
-    "quick": "Bolt.Performance.Console quick",
-    "performance": "Bolt.Performance.Console performance"
   }
 }

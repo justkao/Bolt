@@ -1,3 +1,5 @@
+using System;
+using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Client.Pipeline;
 
@@ -29,32 +31,37 @@ namespace Bolt.Client.Test
 
         public Task<string> OpenSession(string param)
         {
-            return this.SendAsync<string>(Contract.GetMethod(nameof(OpenSession)), param);
+            return this.SendAsync<string>(GetMethod(nameof(OpenSession), typeof(string)), param);
         }
 
         public Task<string> CloseSession(string param)
         {
-            return this.SendAsync<string>(Contract.GetMethod(nameof(CloseSession)), param);
+            return this.SendAsync<string>(GetMethod(nameof(CloseSession), typeof(string)), param);
         }
 
         public string Execute(string param)
         {
-            return this.Send<string>(Contract.GetMethod(nameof(Execute)), param);
+            return this.Send<string>(GetMethod(nameof(Execute), typeof(string)), param);
         }
 
         public void DoNothing()
         {
-            this.Send<string>(Contract.GetMethod(nameof(DoNothingAsync)));
+            this.Send<string>(GetMethod(nameof(DoNothingAsync)));
         }
 
         public Task DoNothingAsync()
         {
-            return this.SendAsync<string>(Contract.GetMethod(nameof(DoNothingAsync)));
+            return this.SendAsync<string>(GetMethod(nameof(DoNothingAsync)));
         }
 
         public Task ExecuteAsync()
         {
-            return SendAsync(Contract.GetMethod(nameof(ExecuteAsync)));
+            return SendAsync(GetMethod(nameof(ExecuteAsync)));
+        }
+
+        private MethodInfo GetMethod(string name, params Type[] paramters)
+        {
+            return Contract.GetTypeInfo().GetMethod(name, paramters);
         }
     }
 }

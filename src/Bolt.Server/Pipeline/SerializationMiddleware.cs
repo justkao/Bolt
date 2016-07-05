@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Threading.Tasks;
 
 using Bolt.Metadata;
@@ -40,8 +39,8 @@ namespace Bolt.Server.Pipeline
             if (metadata.SerializableParameters?.Count > 0)
             {
                 ISerializer serializer = context.GetSerializerOrThrow();
-                var stream = await context.HttpContext.Request.Body.CopyAsync(context.RequestAborted);
-                var readParametersContext = new ReadParametersContext(stream, context, metadata.SerializableParameters);
+                // TODO: copy body to another stream to prevent blocking in json deserialization
+                var readParametersContext = new ReadParametersContext(context.HttpContext.Request.Body, context, metadata.SerializableParameters);
 
                 try
                 {
@@ -60,10 +59,6 @@ namespace Bolt.Server.Pipeline
                         context.RequestUrl,
                         e);
                 }
-                finally
-                {
-                    stream.Dispose();
-                }
 
                 // now fill the invocation parameters
                 object[] parameterValues = new object[metadata.Parameters.Count];
@@ -74,7 +69,7 @@ namespace Bolt.Server.Pipeline
                         var parameterValue = readParametersContext.ParameterValues[i];
                         for (int j = 0; j < metadata.Parameters.Count; j++)
                         {
-                            if (metadata.Parameters[j].Name.EqualsNoCase(parameterValue.Parameter.Name))
+                            if (string.Equals(metadata.Parameters[j].Name, parameterValue.Parameter.Name, StringComparison.OrdinalIgnoreCase))
                             {
                                 parameterValues[j] = parameterValue.Value;
                             }

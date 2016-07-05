@@ -29,3 +29,4 @@ nuget.exe
 *.nupkg
 project.lock.json
 debugSettings.json
+/tools/Cake

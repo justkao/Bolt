@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Bolt.Client.Pipeline;
 using Moq;
 using Xunit;
@@ -58,7 +59,7 @@ namespace Bolt.Client.Proxy.Test
             pipeline.Setup(p => p.Instance).Returns((ctxt) =>
             {
                 ctxt.ActionResult = 5;
-                return CompletedTask.Done;
+                return Task.FromResult(true);
             });
             IDummyInterface proxy = factory.CreateProxy<IDummyInterface>(pipeline.Object);
             Assert.Equal(5, proxy.Execute2());
