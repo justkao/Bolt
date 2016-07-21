@@ -217,6 +217,8 @@ namespace Bolt.Tools
         {
             if (!contracts.Any() || contracts.Any(c => c.EndsWith(".*", StringComparison.OrdinalIgnoreCase)))
             {
+                Console.WriteLine("Adding all contracts ... ");
+
                 try
                 {
                     foreach (InterfaceConfiguration contract in rootConfiguration.AddAllContracts(internalVisibility))

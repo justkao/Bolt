@@ -6,10 +6,6 @@
         "test/Service",
         "test/Automatic",
         "test/Common",
-        "test/Integration",
-        "wrap"
-    ],
-    "sdk": {
-        "version": "1.0.0-preview1-002702"
-    }
+        "test/Integration"
+    ]
 }

@@ -28,18 +28,12 @@
       }
     },
     "netcoreapp1.0": {
-      "imports": [
-        "dnxcore50",
-        "portable-net451+win8"
-      ],
       "dependencies": {
         "Microsoft.NETCore.App": {
           "version": "1.0.0",
           "type": "platform"
         },
-        "System.ServiceModel.Http": "4.0.10",
         "System.Runtime.Serialization.Primitives": "4.1.1",
-        "System.ServiceModel.Primitives": "4.0.0",
         "System.Diagnostics.TraceSource": "4.0.0"
       }
     }

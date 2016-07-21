@@ -68,7 +68,7 @@ namespace Bolt.Tools
 #else
             loadedAssembly = Assembly.LoadFile(assembly);
 #endif
-            // TODO: load assembly from assembly
+            _loadedAssemblies[assemblyName] = loadedAssembly;
             Console.WriteLine($"Assembly loaded: {assemblyName.Bold()}");
             return loadedAssembly;
         }

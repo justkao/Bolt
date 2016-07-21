@@ -1,25 +1,21 @@
 ﻿{
   "dependencies": {
-    "dotnet-test-xunit": "1.0.0-*",
+    "dotnet-test-xunit": "2.2.0-*",
+    "Moq": "4.6.25-*",
+    "xunit": "2.2.0-*",
     "Bolt.Client": {
       "target": "project",
       "version": ""
     },
-    "xunit": "2.1.0",
     "Bolt.Test.Common": {
       "target": "project",
       "version": ""
-    },
-    "Moq": "4.6.23-*"
+    }
   },
   "testRunner": "xunit",
 
   "frameworks": {
     "netcoreapp1.0": {
-      "imports": [
-        "dnxcore50",
-        "portable-net451+win8"
-      ],
       "dependencies": {
         "Microsoft.NETCore.App": {
           "version": "1.0.0",

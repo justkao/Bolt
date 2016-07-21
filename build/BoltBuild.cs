@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.FileSystemGlobbing;
 
@@ -10,7 +11,10 @@ namespace build
 {
     public class BoltBuild
     {
-        private const string BoltVersion = "0.40.0-alpha1";
+        private const string NugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe";
+        private const string NugetSourceUrl = "https://www.nuget.org/api/v2/package";
+        
+        private const string BoltVersion = "0.50.0-alpha1";
         private readonly string _root;
 
         public BoltBuild()
@@ -23,9 +27,10 @@ namespace build
             Clean();
             RestoreProjects();
             BuildProjects();
+            // TODO: fix contract generation
             // GenerateInterfaces();
-            // RunSample();
-            // RunQuickPerformanceTest();
+            RunSample();
+            RunQuickPerformanceTest();
             Test();
             UpdateBoltVersion();
             PackPackages();
@@ -156,7 +161,8 @@ namespace build
             Process process =
                 Process.Start(new ProcessStartInfo(fileName, arguments)
                 {
-                    WorkingDirectory = Path.GetFullPath(workingDirectory ?? _root)
+                    WorkingDirectory = Path.GetFullPath(workingDirectory ?? _root),
+                    RedirectStandardInput = true
                 });
 
             return process;
@@ -171,14 +177,39 @@ namespace build
         {
             var serverProcess = StartExecute("dotnet", "run -p test/Performance/Bolt.Performance.Server");
             System.Threading.Thread.Sleep(500);
-            Execute("dotnet", "run -p test/Performance/Bolt.Performance.Console run quick");
+            Execute("dotnet", "run -p test/Performance/Bolt.Performance.Console quick");
             try
             {
-                serverProcess.Kill();
+                Console.WriteLine("Stopping the server ... ");
+                serverProcess.StandardInput.Write("stop");
+                serverProcess.WaitForExit();
+                Console.WriteLine("Server stoppped");
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                Console.WriteLine("Failed to stop the server: {0}", e);
                 // OK
+            }
+        }
+
+        public void PublishBoltPackages()
+        {
+            Console.WriteLine("Downloading nuget ... ");
+            HttpClient client = new HttpClient();
+            byte[] nuget = client.GetAsync(NugetUrl).GetAwaiter().GetResult().Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
+            File.WriteAllBytes("artifacts/release/nuget.exe", nuget);
+            try
+            {
+
+                foreach (string package in GetPaths("artifacts/release/*.nupkg").Where(p => !p.EndsWith("symbols.nupkg")))
+                {
+                    Console.WriteLine("Publishing {0} ... ", package);
+                    Execute("artifacts/release/nuget.exe", $"push {Path.GetFileName(package)} -source {NugetSourceUrl}", "artifacts/release/");
+                }
+            }
+            finally
+            {
+                // File.Delete("artifacts/release/nuget.exe");
             }
         }
 

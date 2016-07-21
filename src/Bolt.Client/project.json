@@ -1,5 +1,5 @@
 {
-  "version": "0.40.0-alpha1",
+  "version": "0.50.0-alpha1",
   "authors": [
     "Martin Tomka"
   ],
@@ -19,7 +19,7 @@
       "target": "project",
       "version": ""
     },
-    "Castle.Core": "4.0.0-*"
+    "Castle.Core": "4.0.0-beta001"
   },
   "frameworks": {
     "net451": {
@@ -28,9 +28,6 @@
       }
     },
     "netstandard1.3": {
-      "imports": [
-        "dotnet5.4"
-      ],
       "dependencies": {
         "System.Collections": "4.0.11",
         "System.Collections.Concurrent": "4.0.12",

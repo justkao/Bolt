@@ -18,6 +18,7 @@ namespace Bolt.Sample.ContentProtection
     {
         private static readonly AutoResetEvent TestingFinished = new AutoResetEvent(false);
         private static int Result;
+        private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
         public static int Main(string[] args)
         {
@@ -33,8 +34,15 @@ namespace Bolt.Sample.ContentProtection
                 TestBolt(server.Services.GetRequiredService<ILogger<Program>>(), server.Services.GetRequiredService<ISerializer>(), serverLifetime.ApplicationStopping);
             });
 
-            server.Run();
             Console.WriteLine("Server running ... ");
+            try
+            {
+                server.Run(CancellationTokenSource.Token);
+            }
+            catch (OperationCanceledException)
+            {
+            }
+
             TestingFinished.WaitOne();
             server.Dispose();
 
@@ -108,6 +116,7 @@ namespace Bolt.Sample.ContentProtection
 
             Console.WriteLine("Test finished. Press any key to exit the application ... ");
             TestingFinished.Set();
+            CancellationTokenSource.Cancel();
         }
     }
 }

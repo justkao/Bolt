@@ -11,10 +11,11 @@
     },
     "Microsoft.Extensions.FileSystemGlobbing": "1.0.0"
   },
-
+  "tools": {
+    "Bolt.Tools": "0.50.0-*"
+  },
   "frameworks": {
     "netcoreapp1.0": {
-      "imports": "dnxcore50"
     }
   }
 }

@@ -1,4 +1,5 @@
-﻿using System.Threading;
+﻿using System;
+using System.Threading;
 using Bolt.Performance.Core.Contracts;
 using Bolt.Server;
 using Microsoft.AspNetCore.Builder;
@@ -52,7 +53,9 @@ namespace Bolt.Performance.Server
                 .UseStartup<Startup>()
                 .Build();
 
-            host.Run();
+            host.Start();
+            Console.WriteLine("Press any key to stop the server ... ");
+            Console.Read();
             return 0;
         }
     }
