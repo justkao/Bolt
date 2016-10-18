@@ -1,5 +1,5 @@
 {
-  "version": "0.50.0-alpha1",
+  "version": "0.60.0-alpha1",
   "authors": [
     "Martin Tomka"
   ],
@@ -15,7 +15,8 @@
     ]
   },
   "buildOptions": {
-    "warningsAsErrors": true
+    "warningsAsErrors": true,
+    "keyFile": "../../Bolt.snk"
   },
   "dependencies": {
     "Newtonsoft.Json": "9.0.1",

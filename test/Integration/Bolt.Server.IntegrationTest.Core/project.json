@@ -24,6 +24,6 @@
     }
   },
   "tools": {
-    "Bolt.Tools": "0.50.0-*"
+    "Bolt.Tools": "0.50.0-alpha1"
   }
 }

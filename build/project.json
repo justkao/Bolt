@@ -12,7 +12,7 @@
     "Microsoft.Extensions.FileSystemGlobbing": "1.0.0"
   },
   "tools": {
-    "Bolt.Tools": "0.50.0-*"
+    "Bolt.Tools": "0.50.0-alpha1"
   },
   "frameworks": {
     "netcoreapp1.0": {

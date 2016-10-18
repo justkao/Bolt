@@ -1,5 +1,5 @@
 {
-  "version": "0.50.0-alpha1",
+  "version": "0.60.0-alpha1",
   "description": "Bolt Tools used to generate client-side code.",
   "authors": [ "Martin Tomka" ],
   "packOptions": {
@@ -16,7 +16,8 @@
   "buildOptions": {
     "emitEntryPoint": true,
     "outputName": "dotnet-bolt",
-    "warningsAsErrors": true
+    "warningsAsErrors": true,
+    "keyFile": "../../Bolt.snk"
   },
   "dependencies": {
     "Microsoft.Extensions.CommandLineUtils": "1.0.0",

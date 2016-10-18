@@ -1,5 +1,5 @@
 {
-  "version": "0.50.0-alpha1",
+  "version": "0.60.0-alpha1",
   "authors": [
     "Martin Tomka"
   ],
@@ -14,6 +14,10 @@
       "client"
     ]
   },
+  "buildOptions": {
+    "warningsAsErrors": true,
+    "keyFile": "../../Bolt.snk"
+  },
   "dependencies": {
     "Bolt.Core": {
       "target": "project",
@@ -24,7 +28,7 @@
   "frameworks": {
     "net451": {
       "frameworkAssemblies": {
-        "System.Net.Http": {"type": "build"}
+        "System.Net.Http": { "type": "build" }
       }
     },
     "netstandard1.3": {

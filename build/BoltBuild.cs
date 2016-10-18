@@ -12,9 +12,9 @@ namespace build
     public class BoltBuild
     {
         private const string NugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe";
-        private const string NugetSourceUrl = "https://www.nuget.org/api/v2/package";
+        private const string NugetSourceUrl = "https://api.nuget.org/v3/index.json";
         
-        private const string BoltVersion = "0.50.0-alpha1";
+        private const string BoltVersion = "0.60.0-alpha1";
         private readonly string _root;
 
         public BoltBuild()
