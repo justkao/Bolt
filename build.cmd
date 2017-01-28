@@ -1,2 +1,2 @@
 dotnet restore .\build
-dotnet run -p .\build\
+dotnet run -p .\build\build.csproj

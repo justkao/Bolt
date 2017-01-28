@@ -24,8 +24,8 @@ namespace build
 
         public void Build()
         {
-            Clean();
-            RestoreProjects();
+            // Clean();
+            // RestoreProjects();
             BuildProjects();
             // TODO: fix contract generation
             // GenerateInterfaces();
@@ -38,7 +38,7 @@ namespace build
 
         private void PackPackages()
         {
-            foreach (string path in GetPaths(@"src\**\project.json"))
+            foreach (string path in GetPaths(@"src\**\*.csproj"))
             {
                 Execute("dotnet", $@"pack ""{path}"" --output artifacts\Release --configuration RELEASE");
             }
@@ -46,7 +46,7 @@ namespace build
 
         public void Test()
         {
-            foreach (string path in GetPaths(@"test\Automatic\**\project.json"))
+            foreach (string path in GetPaths(@"test\Automatic\**\*.csproj"))
             {
                 try
                 {
@@ -58,7 +58,7 @@ namespace build
                 }
             }
 
-            foreach (string path in GetPaths(@"test\Integration\**\project.json"))
+            foreach (string path in GetPaths(@"test\Integration\**\*.csproj"))
             {
                 try
                 {
@@ -72,10 +72,22 @@ namespace build
         }
 
         public void BuildProjects()
-        {
-            Execute("dotnet", @"build src\**\project.json");
-            Execute("dotnet", @"build test\**\project.json");
-            Execute("dotnet", @"build samples\**\project.json");
+        {		
+            foreach (string path in GetPaths(@"src\**\*.csproj"))
+            {
+                Execute("dotnet", $"build {path}");
+            }
+
+            foreach (string path in GetPaths(@"test\**\*.csproj"))
+            {
+                Execute("dotnet", $"build {path}");
+            }
+
+            foreach (string path in GetPaths(@"samples\**\*.csproj"))
+            {
+                Execute("dotnet", $"build {path}");
+            }
+
         }
 
         public void GenerateInterfaces()
@@ -122,7 +134,7 @@ namespace build
 
         public IEnumerable<string> GetProjects()
         {
-            return GetPaths(@"\**\project.json");
+            return GetPaths(@"\**\*.csproj");
         }
 
         public void Clean()
@@ -223,7 +235,7 @@ namespace build
                 Console.WriteLine("Build number {0} detected. Version of nuget packages will be: {1}.", buildNumber, version);
             }
 
-            var projects = GetPaths("src/**/project.json");
+            var projects = GetPaths("src/**/*.csproj");
             foreach (var project in projects)
             {
                 var regex = @"(.*""version""\s*:\s*"")(.*)("".*)";

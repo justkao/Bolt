@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFrameworks>netcoreapp1.0;net451</TargetFrameworks>
+    <AssemblyName>Bolt.Server.IntegrationTest</AssemblyName>
+    <PackageId>Bolt.Server.IntegrationTest</PackageId>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.0.0-preview-20170106-08" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-beta5-build1225" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="1.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="1.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Localization" Version="1.0.1" />
+    <PackageReference Include="Moq" Version="4.6.36-alpha" />
+    <PackageReference Include="xunit" Version="2.2.0-beta5-build3474" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
+    <PackageReference Include="Microsoft.NETCore.App" Version="1.0.3" />
+    <PackageReference Include="System.Diagnostics.Process" Version="4.1.0-*" />
+    <PackageReference Include="System.Diagnostics.TraceSource" Version="4.0.0-*" />
+    <PackageReference Include="System.Reflection.Extensions" Version="4.0.1-*" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+    <Reference Include="System" />
+    <Reference Include="Microsoft.CSharp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Bolt.Client\Bolt.Client.csproj" />
+    <ProjectReference Include="..\..\..\src\Bolt.Server\Bolt.Server.csproj" />
+    <ProjectReference Include="..\Bolt.Server.IntegrationTest.Core\Bolt.Server.IntegrationTest.Core.csproj" />
+  </ItemGroup>
+</Project>
