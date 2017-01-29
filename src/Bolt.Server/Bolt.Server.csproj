@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Bolt Server side libraries based on ASP.NET 5. The Bolt is portable and lightweight alternative to WCF library.</Description>
-    <VersionPrefix>0.60.0-alpha1</VersionPrefix>
+    <VersionPrefix>0.61.0-alpha1</VersionPrefix>
     <Authors>Martin Tomka</Authors>
     <TargetFrameworks>net451;netstandard1.3</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>

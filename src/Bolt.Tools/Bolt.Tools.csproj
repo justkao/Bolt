@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Bolt Tools used to generate client-side code.</Description>
-    <VersionPrefix>0.60.0-alpha1</VersionPrefix>
+    <VersionPrefix>0.61.0-alpha1</VersionPrefix>
     <Authors>Martin Tomka</Authors>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <WarningsAsErrors>true</WarningsAsErrors>

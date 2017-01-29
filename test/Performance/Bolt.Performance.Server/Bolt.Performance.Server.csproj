@@ -16,9 +16,6 @@
     <Reference Include="System" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
-    <PackageReference Include="Microsoft.NETCore.App" Version="1.0.3" />
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Bolt.Server\Bolt.Server.csproj" />
     <ProjectReference Include="..\Bolt.Performance.Core\Bolt.Performance.Core.csproj" />

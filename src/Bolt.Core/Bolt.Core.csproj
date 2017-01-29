@@ -1,8 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Bolt Core library containing common classes shared by client and server.</Description>
-    <VersionPrefix>0.60.0-alpha1</VersionPrefix>
-    <Authors>Martin Tomka</Authors>
+    <VersionPrefix>0.61.0-alpha1</VersionPrefix>    <Authors>Martin Tomka</Authors>
     <TargetFrameworks>netstandard1.1;net451</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <AssemblyName>Bolt.Core</AssemblyName>

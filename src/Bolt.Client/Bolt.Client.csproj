@@ -1,7 +1,7 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <Description>Bolt portable client library used to access Bolt based services.</Description>
-    <VersionPrefix>0.60.0-alpha1</VersionPrefix>
+    <VersionPrefix>0.61.0-alpha1</VersionPrefix>
     <Authors>Martin Tomka</Authors>
     <TargetFrameworks>net451;netstandard1.3</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>

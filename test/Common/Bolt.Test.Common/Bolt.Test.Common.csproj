@@ -6,10 +6,6 @@
     <PackageId>Bolt.Test.Common</PackageId>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="NETStandard.Library" Version="1.6.0" />
-  </ItemGroup>
-
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System" />

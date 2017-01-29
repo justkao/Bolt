@@ -15,7 +15,6 @@
     <PackageReference Include="xunit" Version="2.2.0-beta5-build3474" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
-    <PackageReference Include="Microsoft.NETCore.App" Version="1.0.3" />
     <PackageReference Include="System.Diagnostics.Process" Version="4.1.0-*" />
     <PackageReference Include="System.Diagnostics.TraceSource" Version="4.0.0-*" />
     <PackageReference Include="System.Reflection.Extensions" Version="4.0.1-*" />

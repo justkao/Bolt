@@ -14,8 +14,12 @@ namespace build
         private const string NugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe";
         private const string NugetSourceUrl = "https://api.nuget.org/v3/index.json";
         
-        private const string BoltVersion = "0.60.0-alpha1";
+        private const string BoltVersion = "0.61.0-alpha1";
         private readonly string _root;
+
+        private const string net451 = "net451";
+        private const string netcoreapp1_0 = "netcoreapp1.0";
+
 
         public BoltBuild()
         {
@@ -24,13 +28,15 @@ namespace build
 
         public void Build()
         {
-            // Clean();
-            // RestoreProjects();
+            Clean();
+            RestoreProjects();
             BuildProjects();
             // TODO: fix contract generation
             // GenerateInterfaces();
             RunSample();
-            RunQuickPerformanceTest();
+            RunQuickPerformanceTest(netcoreapp1_0);
+            RunQuickPerformanceTest(net451);
+
             Test();
             UpdateBoltVersion();
             PackPackages();
@@ -40,7 +46,7 @@ namespace build
         {
             foreach (string path in GetPaths(@"src\**\*.csproj"))
             {
-                Execute("dotnet", $@"pack ""{path}"" --output artifacts\Release --configuration RELEASE");
+                Execute("dotnet", $@"pack ""{path}"" --output ""{Path.GetFullPath(@"artifacts\Release")}"" --configuration RELEASE");
             }
         }
 
@@ -182,14 +188,15 @@ namespace build
 
         public void RunSample()
         {
-            Execute("dotnet", "run -p samples/Bolt.Sample.ContentProtection");
+            Execute("dotnet", $"run -p samples/Bolt.Sample.ContentProtection/Bolt.Sample.ContentProtection.csproj -f {net451}");
+            Execute("dotnet", $"run -p samples/Bolt.Sample.ContentProtection/Bolt.Sample.ContentProtection.csproj -f {netcoreapp1_0}");
         }
 
-        public void RunQuickPerformanceTest()
+        public void RunQuickPerformanceTest(string framework)
         {
-            var serverProcess = StartExecute("dotnet", "run -p test/Performance/Bolt.Performance.Server");
+            var serverProcess = StartExecute("dotnet", $"run -p test/Performance/Bolt.Performance.Server/Bolt.Performance.Server.csproj -f {framework}");
             System.Threading.Thread.Sleep(500);
-            Execute("dotnet", "run -p test/Performance/Bolt.Performance.Console quick");
+            Execute("dotnet", $"run -f {framework} -p test/Performance/Bolt.Performance.Console/Bolt.Performance.Console.csproj quick");
             try
             {
                 Console.WriteLine("Stopping the server ... ");
@@ -238,20 +245,21 @@ namespace build
             var projects = GetPaths("src/**/*.csproj");
             foreach (var project in projects)
             {
-                var regex = @"(.*""version""\s*:\s*"")(.*)("".*)";
-                var content = System.IO.File.ReadAllText(project);
+                var regex = "(?<before>.*<VersionPrefix>)(?<version>.*)(?<after></VersionPrefix>.*)";
+
+                var content = File.ReadAllText(project);
                 bool replaced = false;
                 content = Regex.Replace(content, regex, m =>
                 {
                     if (replaced)
                     {
-                        return m.Groups[1].Value + m.Groups[2].Value + m.Groups[3].Value;
+                        return m.Groups["before"].Value + m.Groups["version"].Value + m.Groups["after"].Value;
                     }
                     else
                     {
                         // replace only first occurence
                         replaced = true;
-                        return m.Groups[1].Value + version + m.Groups[3].Value;
+                        return m.Groups["before"].Value + version + m.Groups["after"].Value;
                     }
                 }, RegexOptions.Multiline);
 
