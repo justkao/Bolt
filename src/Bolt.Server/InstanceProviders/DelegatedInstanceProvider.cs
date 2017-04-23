@@ -9,12 +9,7 @@ namespace Bolt.Server.InstanceProviders
 
         public DelegatedInstanceProvider(Func<ServerActionContext, TImplementation> factory)
         {
-            if (factory == null)
-            {
-                throw new ArgumentNullException(nameof(factory));
-            }
-
-            _factory = factory;
+            _factory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
         public Task<object> GetInstanceAsync(ServerActionContext context, Type type)

@@ -6,13 +6,9 @@ namespace Bolt.Metadata
     {
         public SessionContractMetadata(Type contract, ActionMetadata initSession, ActionMetadata destroySession)
         {
-            if (contract == null) throw new ArgumentNullException(nameof(contract));
-            if (initSession == null) throw new ArgumentNullException(nameof(initSession));
-            if (destroySession == null) throw new ArgumentNullException(nameof(destroySession));
-
-            Contract = contract;
-            InitSession = initSession;
-            DestroySession = destroySession;
+            Contract = contract ?? throw new ArgumentNullException(nameof(contract));
+            InitSession = initSession ?? throw new ArgumentNullException(nameof(initSession));
+            DestroySession = destroySession ?? throw new ArgumentNullException(nameof(destroySession));
         }
 
         public Type Contract { get; private set; }

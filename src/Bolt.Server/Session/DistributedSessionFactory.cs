@@ -14,18 +14,8 @@ namespace Bolt.Server.Session
 
         public DistributedSessionFactory(BoltServerOptions options, ISessionStore  sessionStore, IServerSessionHandler sessionHandler = null)
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            if (sessionStore == null)
-            {
-                throw new ArgumentNullException(nameof(sessionStore));
-            }
-
-            _options = options;
-            _sessionStore = sessionStore;
+            _options = options ?? throw new ArgumentNullException(nameof(options));
+            _sessionStore = sessionStore ?? throw new ArgumentNullException(nameof(sessionStore));
             _sessionHandler = sessionHandler ?? new ServerSessionHandler(options);
             if (_options.SessionTimeout <= TimeSpan.Zero)
             {

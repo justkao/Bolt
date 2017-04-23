@@ -20,12 +20,9 @@ namespace Bolt.Client
 
         public ProxyBase(Type contract, IClientPipeline pipeline)
         {
-            if (contract == null) throw new ArgumentNullException(nameof(contract));
-            if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
-
             State = ProxyState.Ready;
-            _contract = contract;
-            _pipeline = pipeline;
+            _contract = contract ?? throw new ArgumentNullException(nameof(contract));
+            _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
         }
 
         public ProxyBase(ProxyBase proxy)

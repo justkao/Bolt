@@ -13,11 +13,8 @@ namespace Bolt.Server
 
         public ConfigureContractContext(IContractInvoker contractInvoker, IServiceProvider applicationServices)
         {
-            if (contractInvoker == null) throw new ArgumentNullException(nameof(contractInvoker));
-            if (applicationServices == null) throw new ArgumentNullException(nameof(applicationServices));
-
-            ContractInvoker = contractInvoker;
-            _applicationServices = applicationServices;
+            ContractInvoker = contractInvoker ?? throw new ArgumentNullException(nameof(contractInvoker));
+            _applicationServices = applicationServices ?? throw new ArgumentNullException(nameof(applicationServices));
         }
 
         public IContractInvoker ContractInvoker { get; }

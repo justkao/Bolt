@@ -19,24 +19,9 @@ namespace Bolt.Client.Pipeline
 
         public SerializationMiddleware(ISerializer serializer, IExceptionSerializer exceptionSerializer, IClientErrorProvider errorProvider)
         {
-            if (serializer == null)
-            {
-                throw new ArgumentNullException(nameof(serializer));
-            }
-
-            if (exceptionSerializer == null)
-            {
-                throw new ArgumentNullException(nameof(exceptionSerializer));
-            }
-
-            if (errorProvider == null)
-            {
-                throw new ArgumentNullException(nameof(errorProvider));
-            }
-
-            Serializer = serializer;
-            ExceptionSerializer = exceptionSerializer;
-            ErrorProvider = errorProvider;
+            Serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
+            ExceptionSerializer = exceptionSerializer ?? throw new ArgumentNullException(nameof(exceptionSerializer));
+            ErrorProvider = errorProvider ?? throw new ArgumentNullException(nameof(errorProvider));
 
             _acceptHeader = new MediaTypeWithQualityHeaderValue(Serializer.MediaType);
         }

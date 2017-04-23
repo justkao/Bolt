@@ -53,14 +53,10 @@ namespace Bolt.Client.Pipeline
             if (metadata.HttpContentIndex >= 0)
             {
                 HttpContent content = (HttpContent)context.Parameters[metadata.HttpContentIndex];
-                if (content == null)
-                {
-                    throw new BoltClientException(
+                context.Request.Content = content ?? throw new BoltClientException(
                         $"Action '{context.Action.Name}' requires not null HttpContent parameter.",
                         ClientErrorCode.SerializeParameters,
                         context.Action);
-                }
-                context.Request.Content = content;
             }
         }
     }

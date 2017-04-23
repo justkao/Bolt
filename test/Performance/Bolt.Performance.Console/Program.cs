@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -12,7 +11,6 @@ using System.Threading.Tasks;
 using Bolt.Performance.Core;
 using Bolt.Performance.Core.Contracts;
 using Microsoft.Extensions.CommandLineUtils;
-using Microsoft.Extensions.PlatformAbstractions;
 using Newtonsoft.Json;
 
 namespace Bolt.Performance.Console
@@ -27,7 +25,7 @@ namespace Bolt.Performance.Console
             ServicePointManager.DefaultConnectionLimit = 1000;		
             ServicePointManager.MaxServicePoints = 1000;
 #endif
-            List<Tuple<string, IPerformanceContract>> proxies = null;
+            List<(string name, IPerformanceContract proxy)> proxies = null;
 
             int tries = 0;
             while (!(proxies = CreateClients().ToList()).Any())
@@ -147,7 +145,7 @@ namespace Bolt.Performance.Console
             return app.Execute(args);
         }
 
-        private static void ExecuteConcurrencyTest(List<Tuple<string, IPerformanceContract>> proxies, int concurrency,  int repeats, bool writeReport = true, string reportPrefix = null, string filter = null)
+        private static void ExecuteConcurrencyTest(List<(string, IPerformanceContract)> proxies, int concurrency,  int repeats, bool writeReport = true, string reportPrefix = null, string filter = null)
         {
             var result = CreateEmptyReport(concurrency, repeats);
             Console.WriteLine($"OSArchitecture: {RuntimeInformation.OSArchitecture}");
@@ -186,7 +184,7 @@ namespace Bolt.Performance.Console
             }
         }
 
-        private static void ExecuteActions(IEnumerable<Tuple<string, IPerformanceContract>> proxies, int cnt, int degree, PerformanceResult result, PerformanceResult previous, string actionFilter)
+        private static void ExecuteActions(IEnumerable<(string name, IPerformanceContract proxy)> proxies, int cnt, int degree, PerformanceResult result, PerformanceResult previous, string actionFilter)
         {
             int threads = degree * 3;
             if (threads < 25)
@@ -220,20 +218,20 @@ namespace Bolt.Performance.Console
             ExecuteAsync(proxies, c => c.Return_Strings_Async(), cnt, degree, nameof(IPerformanceContract.Return_Strings_Async), result, previous, actionFilter);
         }
 
-        private static IEnumerable<Tuple<string, IPerformanceContract>> CreateClients()
+        private static IEnumerable<(string name, IPerformanceContract proxy)> CreateClients()
         {
             if (IsPortUsed(Servers.KestrelBoltServer.Port))
             {
-                yield return new Tuple<string, IPerformanceContract>(Proxies.BoltKestrel, ClientFactory.CreateProxy(Servers.KestrelBoltServer));
+                yield return (Proxies.BoltKestrel, ClientFactory.CreateProxy(Servers.KestrelBoltServer));
             }
 
             if (IsPortUsed(Servers.WcfServer.Port))
             {
-                yield return new Tuple<string, IPerformanceContract>(Proxies.WCF, ClientFactory.CreateWcf());
+                yield return (Proxies.WCF, ClientFactory.CreateWcf());
             }
         }
 
-        private static void ExecuteAsync(IEnumerable<Tuple<string, IPerformanceContract>> contracts, Func<IPerformanceContract, Task> action, int count, int degree, string actionName, PerformanceResult result, PerformanceResult previous, string actionFilter)
+        private static void ExecuteAsync(IEnumerable<(string name, IPerformanceContract proxy)> contracts, Func<IPerformanceContract, Task> action, int count, int degree, string actionName, PerformanceResult result, PerformanceResult previous, string actionFilter)
         {
             if (!string.IsNullOrEmpty(actionFilter))
             {
@@ -267,7 +265,7 @@ namespace Bolt.Performance.Console
             Console.WriteLine(Environment.NewLine);
         }
 
-        private static void Execute(IEnumerable<Tuple<string, IPerformanceContract>> contracts, Action<IPerformanceContract> action, int count, int degree, string actionName,  PerformanceResult result, PerformanceResult previous)
+        private static void Execute(IEnumerable<(string name, IPerformanceContract proxy)> contracts, Action<IPerformanceContract> action, int count, int degree, string actionName,  PerformanceResult result, PerformanceResult previous)
         {
             Console.WriteLine($"Executing {actionName.White().Bold()}, Repeats = {count.ToString().Bold()}, Concurrency = {degree.ToString().Bold()}");
 

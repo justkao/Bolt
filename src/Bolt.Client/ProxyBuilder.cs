@@ -23,12 +23,7 @@ namespace Bolt.Client
 
         public ProxyBuilder(ClientConfiguration configuration)
         {
-            if (configuration == null)
-            {
-                throw new ArgumentNullException(nameof(configuration));
-            }
-
-            _configuration = configuration;
+            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         }
 
         public virtual ProxyBuilder Recoverable(int retries, TimeSpan retryDelay, IErrorHandling errorHandling = null)
@@ -53,12 +48,7 @@ namespace Bolt.Client
 
         public virtual ProxyBuilder Url(IServerProvider serverProvider)
         {
-            if (serverProvider == null)
-            {
-                throw new ArgumentNullException(nameof(serverProvider));
-            }
-
-            _serverProvider = serverProvider;
+            _serverProvider = serverProvider ?? throw new ArgumentNullException(nameof(serverProvider));
             return this;
         }
 
@@ -105,8 +95,7 @@ namespace Bolt.Client
 
         public virtual ProxyBuilder UseHttpMessageHandler(HttpMessageHandler messageHandler)
         {
-            if (messageHandler == null) throw new ArgumentNullException(nameof(messageHandler));
-            _messageHandler = messageHandler;
+            _messageHandler = messageHandler ?? throw new ArgumentNullException(nameof(messageHandler));
             return this;
         }
 

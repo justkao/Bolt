@@ -8,12 +8,7 @@ namespace Bolt.Serialization
     {
         public WriteParametersContext(Stream stream, ActionContextBase actionContext, IList<ParameterValue> parameterValues) : base(stream, actionContext)
         {
-            if (parameterValues == null)
-            {
-                throw new ArgumentNullException(nameof(parameterValues));
-            }
-
-            ParameterValues = parameterValues;
+            ParameterValues = parameterValues ?? throw new ArgumentNullException(nameof(parameterValues));
         }
 
         public IList<ParameterValue> ParameterValues { get;}

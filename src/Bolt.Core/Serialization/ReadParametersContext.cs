@@ -8,12 +8,7 @@ namespace Bolt.Serialization
     {
         public ReadParametersContext(Stream stream, ActionContextBase actionContext, IReadOnlyList<ParameterMetadata> parameters) : base(stream, actionContext)
         {
-            if (parameters == null)
-            {
-                throw new ArgumentNullException(nameof(parameters));
-            }
-
-            Parameters = parameters;
+            Parameters = parameters ?? throw new ArgumentNullException(nameof(parameters));
         }
 
         public IReadOnlyList<ParameterMetadata> Parameters { get; }

@@ -10,12 +10,7 @@ namespace Bolt.Client
 
         public EndpointProvider(BoltOptions options)
         {
-            if (options == null)
-            {
-                throw new ArgumentNullException(nameof(options));
-            }
-
-            _options = options;
+            _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
         public virtual Uri GetEndpoint(Uri server, Type contract, MethodInfo action)

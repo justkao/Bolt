@@ -253,14 +253,6 @@ namespace Bolt.Client.Pipeline
 
                     // extract connection and session id from response
                     string sessionId = ClientSessionHandler.GetSessionIdentifier(initSessionContext.Response);
-                    if (sessionId == null)
-                    {
-                        throw new BoltServerException(
-                            ServerErrorCode.SessionIdNotReceived,
-                            sessionMetadata.Contract.InitSession.Action,
-                            initSessionContext.Request?.RequestUri?.ToString());
-                    }
-
                     if (initSessionContext.ServerConnection == null)
                     {
                         throw new BoltClientException(ClientErrorCode.ConnectionUnavailable, initSessionContext.Action);
@@ -268,7 +260,10 @@ namespace Bolt.Client.Pipeline
 
                     sessionMetadata.InitSessionResult = initSessionContext.ActionResult;
                     sessionMetadata.InitSessionParameters = initSessionContext.Parameters;
-                    sessionMetadata.SessionId = sessionId;
+                    sessionMetadata.SessionId = sessionId ?? throw new BoltServerException(
+                            ServerErrorCode.SessionIdNotReceived,
+                            sessionMetadata.Contract.InitSession.Action,
+                            initSessionContext.Request?.RequestUri?.ToString());
                     sessionMetadata.ServerConnection = initSessionContext.ServerConnection;
                     sessionMetadata.ChangeState(context.Proxy, ProxyState.Open);
                 }

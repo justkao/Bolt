@@ -8,11 +8,8 @@ namespace Bolt.Pipeline
     {
         public PipelineResult(ActionDelegate<T> pipeline, IReadOnlyCollection<IMiddleware<T>> middlewares)
         {
-            if (pipeline == null) throw new ArgumentNullException(nameof(pipeline));
-            if (middlewares == null) throw new ArgumentNullException(nameof(middlewares));
-
-            Instance = pipeline;
-            Middlewares = middlewares;
+            Instance = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
+            Middlewares = middlewares ?? throw new ArgumentNullException(nameof(middlewares));
         }
 
         public ActionDelegate<T> Instance { get; }

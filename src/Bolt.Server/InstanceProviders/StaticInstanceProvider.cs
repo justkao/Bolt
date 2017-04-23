@@ -9,12 +9,7 @@ namespace Bolt.Server.InstanceProviders
 
         public StaticInstanceProvider(object instance)
         {
-            if (instance == null)
-            {
-                throw new ArgumentNullException(nameof(instance));
-            }
-
-            _instance = instance;
+            _instance = instance ?? throw new ArgumentNullException(nameof(instance));
         }
 
         public Task<object> GetInstanceAsync(ServerActionContext context, Type type)

@@ -41,12 +41,6 @@ namespace Bolt.Client
         public T CreateProxy<T>(IClientPipeline pipeline) where T : class
         {
             Type contract = typeof(T);
-
-            if (pipeline == null)
-            {
-                throw new ArgumentNullException(nameof(pipeline));
-            }
-
             if (!contract.GetTypeInfo().IsInterface)
             {
                 throw new ArgumentException("Proxy can obly be created from interfaces.");
@@ -67,7 +61,7 @@ namespace Bolt.Client
 
             ProxyBase proxyBase = ((ProxyBase) (object) proxy);
             proxyBase.Contract = contract;
-            proxyBase.Pipeline = pipeline;
+            proxyBase.Pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
 
             interceptor.Proxy = proxyBase;
             interceptor.Metadata = metadata;

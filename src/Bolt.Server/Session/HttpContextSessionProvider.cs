@@ -10,12 +10,7 @@ namespace Bolt.Server.Session
 
         public HttpContextSessionProvider(IHttpContextAccessor httpContextAccessor)
         {
-            if (httpContextAccessor == null)
-            {
-                throw new ArgumentNullException(nameof(httpContextAccessor));
-            }
-
-            _httpContextAccessor = httpContextAccessor;
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         public string SessionId

@@ -10,12 +10,7 @@ namespace Bolt.Pipeline
 
         public DelegatedMiddleware(Func<ActionDelegate<T>, T, Task> action)
         {
-            if (action == null)
-            {
-                throw new ArgumentNullException(nameof(action));
-            }
-
-            _action = action;
+            _action = action ?? throw new ArgumentNullException(nameof(action));
         }
 
         public sealed override Task InvokeAsync(T context)

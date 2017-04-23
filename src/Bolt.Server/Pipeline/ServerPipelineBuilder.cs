@@ -8,12 +8,7 @@ namespace Bolt.Server.Pipeline
     {
         public ServerPipelineBuilder(IBoltRouteHandler parent)
         {
-            if (parent == null)
-            {
-                throw new ArgumentNullException(nameof(parent));
-            }
-
-            Parent = parent;
+            Parent = parent ?? throw new ArgumentNullException(nameof(parent));
         }
 
         public IBoltRouteHandler Parent { get; }

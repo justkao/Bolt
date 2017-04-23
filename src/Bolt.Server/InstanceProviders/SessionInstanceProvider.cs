@@ -11,12 +11,7 @@ namespace Bolt.Server.InstanceProviders
 
         public SessionInstanceProvider(ISessionFactory factory)
         {
-            if (factory == null)
-            {
-                throw new ArgumentNullException(nameof(factory));
-            }
-
-            _sessionFactory = factory;
+            _sessionFactory = factory ?? throw new ArgumentNullException(nameof(factory));
         }
 
         public sealed override async Task<object> GetInstanceAsync(ServerActionContext context, Type type)

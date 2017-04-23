@@ -43,32 +43,12 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            if (defaultConfiguration == null)
-            {
-                throw new ArgumentNullException(nameof(defaultConfiguration));
-            }
-
-            if (applicationServices == null)
-            {
-                throw new ArgumentNullException(nameof(applicationServices));
-            }
-
-            if (actionResolver == null)
-            {
-                throw new ArgumentNullException(nameof(actionResolver));
-            }
-
-            if (contractResolver == null)
-            {
-                throw new ArgumentNullException(nameof(contractResolver));
-            }
-
             Logger = factory.CreateLogger<BoltRouteHandler>();
             MetadataHandler = metadataHandler;
-            ApplicationServices = applicationServices;
-            Configuration = defaultConfiguration;
-            _actionResolver = actionResolver;
-            _contractResolver = contractResolver;
+            ApplicationServices = applicationServices ?? throw new ArgumentNullException(nameof(applicationServices));
+            Configuration = defaultConfiguration ?? throw new ArgumentNullException(nameof(defaultConfiguration));
+            _actionResolver = actionResolver ?? throw new ArgumentNullException(nameof(actionResolver));
+            _contractResolver = contractResolver ?? throw new ArgumentNullException(nameof(contractResolver));
         }
 
         public IServiceProvider ApplicationServices { get; }

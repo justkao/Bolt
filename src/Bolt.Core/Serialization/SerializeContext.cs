@@ -7,19 +7,8 @@ namespace Bolt.Serialization
     {
         public SerializeContext(Stream stream, ActionContextBase actionContext)
         {
-            if (stream == null)
-            {
-                throw new ArgumentNullException(nameof(stream));
-            }
-
-            if (actionContext == null)
-            {
-                throw new ArgumentNullException(nameof(actionContext));
-            }
-
-
-            Stream = stream;
-            ActionContext = actionContext;
+            Stream = stream ?? throw new ArgumentNullException(nameof(stream));
+            ActionContext = actionContext ?? throw new ArgumentNullException(nameof(actionContext));
         }
 
         public Stream Stream { get;  }

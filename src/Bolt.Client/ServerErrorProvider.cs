@@ -9,12 +9,7 @@ namespace Bolt.Client
 
         public ClientErrorProvider(string errorCodeHeader)
         {
-            if (errorCodeHeader == null)
-            {
-                throw new ArgumentNullException(nameof(errorCodeHeader));
-            }
-
-            _errorCodeHeader = errorCodeHeader;
+            _errorCodeHeader = errorCodeHeader ?? throw new ArgumentNullException(nameof(errorCodeHeader));
         }
 
         public virtual BoltServerException TryReadServerError(ClientActionContext context)

@@ -9,12 +9,7 @@ namespace Bolt.Server
     {
         public ServerErrorHandler(ILoggerFactory loggerFactory)
         {
-            if (loggerFactory == null)
-            {
-                throw new ArgumentNullException(nameof(loggerFactory));
-            }
-
-            LoggerFactory = loggerFactory;
+            LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             Logger = loggerFactory.CreateLogger<HandleErrorMiddleware>();
         }
 

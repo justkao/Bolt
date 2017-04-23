@@ -6,12 +6,7 @@ namespace Bolt.Client
     {
         public ConnectionDescriptor(Uri server)
         {
-            if (server == null)
-            {
-                throw new ArgumentNullException(nameof(server));
-            }
-
-            Server = server;
+            Server = server ?? throw new ArgumentNullException(nameof(server));
         }
 
         public Uri Server { get; set; }

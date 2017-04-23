@@ -21,12 +21,7 @@ namespace Bolt.Server.Metadata
                 throw new ArgumentNullException(nameof(factory));
             }
 
-            if (actionResolver == null)
-            {
-                throw new ArgumentNullException(nameof(actionResolver));
-            }
-
-            _actionResolver = actionResolver;
+            _actionResolver = actionResolver ?? throw new ArgumentNullException(nameof(actionResolver));
             Logger = factory.CreateLogger<BoltMetadataHandler>();
         }
 

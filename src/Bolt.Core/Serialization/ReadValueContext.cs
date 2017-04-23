@@ -7,12 +7,7 @@ namespace Bolt.Serialization
     {
         public ReadValueContext(Stream stream, ActionContextBase actionContext, Type valueType) : base(stream, actionContext)
         {
-            if (valueType == null)
-            {
-                throw new ArgumentNullException(nameof(valueType));
-            }
-
-            ValueType = valueType;
+            ValueType = valueType ?? throw new ArgumentNullException(nameof(valueType));
         }
 
         public Type ValueType { get; }

@@ -6,12 +6,7 @@ namespace Bolt.Serialization
     {
         public ReadExceptionContext(ActionContextBase actionContext, object serializedException) : base(actionContext)
         {
-            if (serializedException == null)
-            {
-                throw new ArgumentNullException(nameof(serializedException));
-            }
-
-            SerializedException = serializedException;
+            SerializedException = serializedException ?? throw new ArgumentNullException(nameof(serializedException));
         }
 
         public object SerializedException { get; }

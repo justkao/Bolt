@@ -9,12 +9,7 @@ namespace Bolt.Client.Pipeline
 
         public ErrorHandlingMiddleware(IErrorHandling errorHandling)
         {
-            if (errorHandling == null)
-            {
-                throw new ArgumentNullException(nameof(errorHandling));
-            }
-
-            _errorHandling = errorHandling;
+            _errorHandling = errorHandling ?? throw new ArgumentNullException(nameof(errorHandling));
         }
 
         public override async Task InvokeAsync(ClientActionContext context)

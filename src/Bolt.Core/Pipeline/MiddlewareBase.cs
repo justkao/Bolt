@@ -7,8 +7,7 @@ namespace Bolt.Pipeline
     {
         public void Init(ActionDelegate<T> next)
         {
-            if (next == null) throw new ArgumentNullException(nameof(next));
-            Next = next;
+            Next = next ?? throw new ArgumentNullException(nameof(next));
         }
 
         public virtual void Validate(Type contract)

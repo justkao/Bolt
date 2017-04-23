@@ -9,11 +9,8 @@ namespace Bolt.Client.Pipeline
         public PickConnectionMiddleware(IServerProvider serverProvider,
             IEndpointProvider endpointProvider)
         {
-            if (serverProvider == null) throw new ArgumentNullException(nameof(serverProvider));
-            if (endpointProvider == null) throw new ArgumentNullException(nameof(endpointProvider));
-
-            ServerProvider = serverProvider;
-            EndpointProvider = endpointProvider;
+            ServerProvider = serverProvider ?? throw new ArgumentNullException(nameof(serverProvider));
+            EndpointProvider = endpointProvider ?? throw new ArgumentNullException(nameof(endpointProvider));
         }
 
         public IServerProvider ServerProvider { get; }
