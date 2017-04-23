@@ -1,24 +1,18 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  
+  <Import Project="..\..\build\common.props" />
+
   <PropertyGroup>
     <Description>Bolt Server side libraries based on ASP.NET 5. The Bolt is portable and lightweight alternative to WCF library.</Description>
-    <VersionPrefix>0.61.0-alpha1</VersionPrefix>
-    <Authors>Martin Tomka</Authors>
-    <TargetFrameworks>net451;netstandard1.3</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
-    <AssemblyName>Bolt.Server</AssemblyName>
-    <AssemblyOriginatorKeyFile>../../Bolt.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition=" '$(OS)' != 'Windows_NT' ">true</PublicSign>
-    <PackageId>Bolt.Server</PackageId>
     <PackageTags>bolt;server</PackageTags>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>git://github.com/justkao/bolt</RepositoryUrl>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
+    <TargetFrameworks>net451;netstandard1.3</TargetFrameworks>
   </PropertyGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\Bolt.Core\Bolt.Core.csproj" />
   </ItemGroup>
+  
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Hosting.Abstractions" Version="1.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Session" Version="1.0.1" />
@@ -32,12 +26,15 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="1.0.1" />
     <PackageReference Include="Microsoft.Extensions.Primitives" Version="1.0.1" />
   </ItemGroup>
+  
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
     <Reference Include="System" />
-	<Reference Include="System.Net.Http" />
+	  <Reference Include="System.Net.Http" />
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
+  
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
     <PackageReference Include="System.Threading.Timer" Version="4.0.1" />
   </ItemGroup>
+  
 </Project>

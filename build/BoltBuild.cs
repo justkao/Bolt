@@ -14,11 +14,10 @@ namespace build
         private const string NugetUrl = "https://dist.nuget.org/win-x86-commandline/latest/nuget.exe";
         private const string NugetSourceUrl = "https://api.nuget.org/v3/index.json";
         
-        private const string BoltVersion = "0.61.0-alpha1";
         private readonly string _root;
 
         private const string net451 = "net451";
-        private const string netcoreapp1_0 = "netcoreapp1.0";
+        private const string netcoreapp1_0 = "netcoreapp1.1";
 
 
         public BoltBuild()
@@ -38,7 +37,6 @@ namespace build
             RunQuickPerformanceTest(net451);
 
             Test();
-            UpdateBoltVersion();
             PackPackages();
         }
 
@@ -64,7 +62,7 @@ namespace build
                 }
             }
 
-            foreach (string path in GetPaths(@"test\Integration\**\*.csproj"))
+            foreach (string path in GetPaths(@"test\Integration\Bolt.Server.IntegrationTest\*.csproj"))
             {
                 try
                 {
@@ -229,42 +227,6 @@ namespace build
             finally
             {
                 // File.Delete("artifacts/release/nuget.exe");
-            }
-        }
-
-        public void UpdateBoltVersion()
-        {
-            string version = BoltVersion;
-            string buildNumber = TryGetBuildNumber();
-            if (!string.IsNullOrEmpty(buildNumber))
-            {
-                version += "-" + buildNumber;
-                Console.WriteLine("Build number {0} detected. Version of nuget packages will be: {1}.", buildNumber, version);
-            }
-
-            var projects = GetPaths("src/**/*.csproj");
-            foreach (var project in projects)
-            {
-                var regex = "(?<before>.*<VersionPrefix>)(?<version>.*)(?<after></VersionPrefix>.*)";
-
-                var content = File.ReadAllText(project);
-                bool replaced = false;
-                content = Regex.Replace(content, regex, m =>
-                {
-                    if (replaced)
-                    {
-                        return m.Groups["before"].Value + m.Groups["version"].Value + m.Groups["after"].Value;
-                    }
-                    else
-                    {
-                        // replace only first occurence
-                        replaced = true;
-                        return m.Groups["before"].Value + version + m.Groups["after"].Value;
-                    }
-                }, RegexOptions.Multiline);
-
-                File.WriteAllText(project, content);
-                Console.WriteLine("Project {0} version updated to {1}", project, version);
             }
         }
 

@@ -1,26 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net451;netcoreapp1.0</TargetFrameworks>
-    <AssemblyName>Bolt.Sample.DistributedSession</AssemblyName>
-    <PackageId>Bolt.Sample.DistributedSession</PackageId>
-  </PropertyGroup>
+
+  <Import Project="..\..\build\executable.props" />
+  
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="1.0.2" />
     <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="1.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="1.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Options" Version="1.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.0.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="1.0.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.SqlServer" Version="1.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.0.1" />
   </ItemGroup>
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\Bolt.Client\Bolt.Client.csproj" />
     <ProjectReference Include="..\..\src\Bolt.Core\Bolt.Core.csproj" />
     <ProjectReference Include="..\..\src\Bolt.Server\Bolt.Server.csproj" />
   </ItemGroup>
+
 </Project>
