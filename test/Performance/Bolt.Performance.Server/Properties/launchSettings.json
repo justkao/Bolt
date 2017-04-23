@@ -8,11 +8,8 @@
     }
   },
   "profiles": {
-    "IIS Express": {
-      "commandName": "IISExpress",
-      "environmentVariables": {
-        "ASPNET_ENV": "Development"
-      }
+    "Bolt.Performance.Server": {
+      "commandName": "Project"
     }
   }
 }
