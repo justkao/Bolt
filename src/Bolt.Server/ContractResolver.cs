@@ -41,7 +41,7 @@ namespace Bolt.Server
         }
 
         private static Type Find(IEnumerable<Type> contracts, string name)
-        { 
+        {
             return contracts.FirstOrDefault(i => string.CompareOrdinal(BoltFramework.GetContractName(i).ToLowerInvariant(), name) == 0);
         }
 

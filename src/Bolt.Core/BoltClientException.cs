@@ -26,8 +26,8 @@ namespace Bolt
             Error = error;
         }
 
-        public ClientErrorCode Error { get; private set; }
+        public ClientErrorCode Error { get; }
 
-        public MethodInfo Action { get; private set; }
+        public MethodInfo Action { get; }
     }
 }

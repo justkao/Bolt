@@ -61,23 +61,23 @@ namespace Bolt.Server
 
         private BoltServerOptions Options => Configuration.Options;
 
-        public virtual void Add(IContractInvoker invoker)
+        public virtual void Add(IContractInvoker contractInvoker)
         {
-            if (invoker == null)
+            if (contractInvoker == null)
             {
-                throw new ArgumentNullException(nameof(invoker));
+                throw new ArgumentNullException(nameof(contractInvoker));
             }
 
-            if (_invokers.FirstOrDefault(i => i.Contract.Name == invoker.Contract.Name) != null)
+            if (_invokers.FirstOrDefault(i => i.Contract.Name == contractInvoker.Contract.Name) != null)
             {
-                throw new InvalidOperationException($"Invoker for contract '{invoker.Contract.Name}' already registered.");
+                throw new InvalidOperationException($"Invoker for contract '{contractInvoker.Contract.Name}' already registered.");
             }
 
-            invoker.Pipeline.Validate(invoker.Contract);
-            Logger.LogInformation(BoltLogId.ContractAdded, "Adding contract: {0}", invoker.Contract.Name);
-            _invokers.Add(invoker);
+            contractInvoker.Pipeline.Validate(contractInvoker.Contract);
+            Logger.LogInformation(BoltLogId.ContractAdded, "Adding contract: {0}", contractInvoker.Contract.Name);
+            _invokers.Add(contractInvoker);
 
-            foreach (MethodInfo action in BoltFramework.GetContractActions(invoker.Contract))
+            foreach (MethodInfo action in BoltFramework.GetContractActions(contractInvoker.Contract))
             {
                 Logger.LogDebug("Action: {0}", action.Name);
             }

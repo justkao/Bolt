@@ -11,10 +11,10 @@ namespace Bolt.Metadata
             DestroySession = destroySession ?? throw new ArgumentNullException(nameof(destroySession));
         }
 
-        public Type Contract { get; private set; }
+        public Type Contract { get; }
 
-        public ActionMetadata InitSession { get; private set; }
+        public ActionMetadata InitSession { get; }
 
-        public ActionMetadata DestroySession { get; private set; }
+        public ActionMetadata DestroySession { get; }
     }
 }

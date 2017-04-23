@@ -59,11 +59,11 @@ namespace Bolt
             Url = url;
         }
 
-        public ServerErrorCode? Error { get; private set; }
+        public ServerErrorCode? Error { get; }
 
         public int? ErrorCode { get; set; }
 
-        public MethodInfo Action { get; private set; }
+        public MethodInfo Action { get; }
 
         public string Url { get; set; }
     }

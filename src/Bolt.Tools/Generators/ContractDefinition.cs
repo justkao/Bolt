@@ -31,9 +31,9 @@ namespace Bolt.Tools.Generators
 
         public Type Root { get; }
 
-        public string Name { get; private set; }
+        public string Name { get; }
 
-        public string Namespace { get; private set; }
+        public string Namespace { get; }
 
         public IReadOnlyCollection<Type> ExcludedContracts
         {

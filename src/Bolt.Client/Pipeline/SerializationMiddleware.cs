@@ -85,9 +85,9 @@ namespace Bolt.Client.Pipeline
             }
         }
 
-        protected virtual async Task<Stream> GetResponseStreamAsync(HttpResponseMessage response)
+        protected virtual Task<Stream> GetResponseStreamAsync(HttpResponseMessage response)
         {
-            return await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            return response.Content.ReadAsStreamAsync();
         }
 
         protected virtual HttpContent BuildRequestContent(ClientActionContext context)
