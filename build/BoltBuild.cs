@@ -4,8 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
-using System.Text.RegularExpressions;
 using Microsoft.Extensions.FileSystemGlobbing;
+using System.Threading.Tasks;
 
 namespace build
 {
@@ -76,7 +76,7 @@ namespace build
         }
 
         public void BuildProjects()
-        {		
+        {
             foreach (string path in GetPaths(@"src\**\*.csproj"))
             {
                 Execute("dotnet", $"build {path}");
@@ -174,14 +174,11 @@ namespace build
         {
             Console.WriteLine("Executing process: {0} {1}", fileName, arguments);
 
-            Process process =
-                Process.Start(new ProcessStartInfo(fileName, arguments)
-                {
-                    WorkingDirectory = Path.GetFullPath(workingDirectory ?? _root),
-                    RedirectStandardInput = true
-                });
-
-            return process;
+            return Process.Start(new ProcessStartInfo(fileName, arguments)
+            {
+                WorkingDirectory = Path.GetFullPath(workingDirectory ?? _root),
+                RedirectStandardInput = true
+            });
         }
 
         public void RunSample()
@@ -211,22 +208,32 @@ namespace build
 
         public void PublishBoltPackages()
         {
-            Console.WriteLine("Downloading nuget ... ");
-            HttpClient client = new HttpClient();
-            byte[] nuget = client.GetAsync(NugetUrl).GetAwaiter().GetResult().Content.ReadAsByteArrayAsync().GetAwaiter().GetResult();
-            File.WriteAllBytes("artifacts/release/nuget.exe", nuget);
-            try
-            {
+            PublishBoltPackagesAsync().GetAwaiter().GetResult();
+        }
 
-                foreach (string package in GetPaths("artifacts/release/*.nupkg").Where(p => !p.EndsWith("symbols.nupkg")))
-                {
-                    Console.WriteLine("Publishing {0} ... ", package);
-                    Execute("artifacts/release/nuget.exe", $"push {Path.GetFileName(package)} -source {NugetSourceUrl}", "artifacts/release/");
-                }
-            }
-            finally
+        private async Task PublishBoltPackagesAsync()
+        {
+            Console.WriteLine("Downloading nuget ... ");
+
+            using (HttpClient client = new HttpClient())
             {
-                // File.Delete("artifacts/release/nuget.exe");
+                using (HttpResponseMessage response = await client.GetAsync(NugetUrl))
+                {
+                    File.WriteAllBytes("artifacts/release/nuget.exe", await response.Content.ReadAsByteArrayAsync());
+
+                    try
+                    {
+                        foreach (string package in GetPaths("artifacts/release/*.nupkg").Where(p => !p.EndsWith("symbols.nupkg")))
+                        {
+                            Console.WriteLine("Publishing {0} ... ", package);
+                            Execute("artifacts/release/nuget.exe", $"push {Path.GetFileName(package)} -source {NugetSourceUrl}", "artifacts/release/");
+                        }
+                    }
+                    finally
+                    {
+                        // File.Delete("artifacts/release/nuget.exe");
+                    }
+                }
             }
         }
 

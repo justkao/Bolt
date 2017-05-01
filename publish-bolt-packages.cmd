@@ -1,1 +1,1 @@
-dotnet run -p .\build\ PublishBoltPackages
+dotnet run -p .\build\build.csproj PublishBoltPackages
