@@ -3,18 +3,19 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 
 namespace Bolt.Server.Session
 {
     public class MemorySessionFactory : ISessionFactory, IDisposable
     {
-        private readonly BoltServerOptions _options;
+        private readonly IOptions<BoltServerOptions> _options;
         private Timer _timer;
         private readonly ConcurrentDictionary<string, ContractSession> _items = new ConcurrentDictionary<string, ContractSession>();
         private readonly IServerSessionHandler _sessionHandler;
         private TimeSpan _timeoutCheckInterval;
 
-        public MemorySessionFactory(BoltServerOptions options, IServerSessionHandler sessionHandler = null)
+        public MemorySessionFactory(IOptions<BoltServerOptions> options, IServerSessionHandler sessionHandler = null)
         {
             _options = options;
             _sessionHandler = sessionHandler ?? new ServerSessionHandler(options);
@@ -36,10 +37,10 @@ namespace Bolt.Server.Session
 
         public TimeSpan SessionTimeout
         {
-            get { return _options.SessionTimeout; }
+            get { return _options.Value.SessionTimeout; }
             set
             {
-                _options.SessionTimeout = value;
+                _options.Value.SessionTimeout = value;
                 ResetTimer();
             }
         }

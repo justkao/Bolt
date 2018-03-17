@@ -6,9 +6,9 @@ namespace Bolt.Server
 {
     public class ContractInvoker : IContractInvoker
     {
-        public ContractInvoker()
+        public ContractInvoker(ServerRuntimeConfiguration configuration)
         {
-            Configuration = new ServerRuntimeConfiguration();
+            Configuration = configuration ?? new ServerRuntimeConfiguration();
         }
 
         public IPipeline<ServerActionContext> Pipeline { get; set; }

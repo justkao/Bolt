@@ -10,7 +10,7 @@ namespace Bolt.Server
             if (pipelineBuilder == null) throw new ArgumentNullException(nameof(pipelineBuilder));
         }
 
-        public IContractInvoker Create(Type contract, IInstanceProvider instanceProvider)
+        public IContractInvoker Create(Type contract, IInstanceProvider instanceProvider, ServerRuntimeConfiguration configuration)
         {
             if (contract == null)
             {
@@ -22,7 +22,12 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(instanceProvider));
             }
 
-            return new ContractInvoker { Contract = contract, InstanceProvider = instanceProvider };
+            if (instanceProvider == null)
+            {
+                throw new ArgumentNullException(nameof(instanceProvider));
+            }
+
+            return new ContractInvoker(configuration) { Contract = contract, InstanceProvider = instanceProvider };
         }
     }
 }

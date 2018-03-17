@@ -3,27 +3,28 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Session;
+using Microsoft.Extensions.Options;
 
 namespace Bolt.Server.Session
 {
     public class DistributedSessionFactory : ISessionFactory
     {
-        private readonly BoltServerOptions _options;
+        private readonly IOptions<BoltServerOptions> _options;
         private readonly ISessionStore _sessionStore;
         private readonly IServerSessionHandler _sessionHandler;
 
-        public DistributedSessionFactory(BoltServerOptions options, ISessionStore  sessionStore, IServerSessionHandler sessionHandler = null)
+        public DistributedSessionFactory(IOptions<BoltServerOptions> options, ISessionStore  sessionStore, IServerSessionHandler sessionHandler = null)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _sessionStore = sessionStore ?? throw new ArgumentNullException(nameof(sessionStore));
             _sessionHandler = sessionHandler ?? new ServerSessionHandler(options);
-            if (_options.SessionTimeout <= TimeSpan.Zero)
+            if (SessionTimeout <= TimeSpan.Zero)
             {
                 throw new InvalidOperationException("Session timeout is not set.");
             }
         }
 
-        public TimeSpan SessionTimeout => _options.SessionTimeout;
+        public TimeSpan SessionTimeout => _options.Value.SessionTimeout;
 
         public Task<IContractSession> CreateAsync(HttpContext context, object instance)
         {

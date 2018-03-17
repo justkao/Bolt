@@ -22,43 +22,43 @@ namespace Bolt.Server
 
         public static IContractInvoker UseMemorySession<TContract, TContractImplementation>(
             this IBoltRouteHandler bolt,
-            BoltServerOptions options = null,
             Action<ConfigureContractContext> configure = null) where TContractImplementation : TContract
         {
+            var config = new ServerRuntimeConfiguration(bolt.Configuration);
             var factory = new MemorySessionFactory(
-                options ?? bolt.Configuration.Options,
+                config,
                 bolt.ApplicationServices.GetRequiredService<IServerSessionHandler>());
 
-            return bolt.UseSession<TContract, TContractImplementation>(factory, configure);
+            return bolt.Use<TContract>(new SessionInstanceProvider<TContractImplementation>(factory), configure, config);
         }
 
         public static IContractInvoker UseDistributedSession<TContract, TContractImplementation>(
             this IBoltRouteHandler bolt,
-            BoltServerOptions options = null,
             Action<ConfigureContractContext> configure = null) where TContractImplementation : TContract
         {
+            var config = new ServerRuntimeConfiguration(bolt.Configuration);
             DistributedSessionFactory factory = new DistributedSessionFactory(
-                options ?? bolt.Configuration.Options,
+                config,
                 new DistributedSessionStore(
                     bolt.ApplicationServices.GetRequiredService<IDistributedCache>(),
                     bolt.ApplicationServices.GetRequiredService<ILoggerFactory>()),
                 bolt.ApplicationServices.GetRequiredService<IServerSessionHandler>());
 
-            return bolt.UseSession<TContract, TContractImplementation>(factory, configure);
+            return bolt.Use<TContract>(new SessionInstanceProvider<TContractImplementation>(factory), configure, config);
         }
 
         public static IContractInvoker UseDistributedSession<TContract, TContractImplementation>(
             this IBoltRouteHandler bolt,
             ISessionStore sessionStore,
-            BoltServerOptions options = null,
             Action<ConfigureContractContext> configure = null) where TContractImplementation : TContract
         {
+            var config = new ServerRuntimeConfiguration(bolt.Configuration);
             var factory = new DistributedSessionFactory(
-                options ?? bolt.Configuration.Options,
+                config,
                 sessionStore,
                 bolt.ApplicationServices.GetRequiredService<IServerSessionHandler>());
 
-            return bolt.UseSession<TContract, TContractImplementation>(factory, configure);
+            return bolt.Use<TContract>(new SessionInstanceProvider<TContractImplementation>(factory), configure, config);
         }
 
         public static IContractInvoker UseSession<TContract, TContractImplementation>(
@@ -72,7 +72,8 @@ namespace Bolt.Server
         public static IContractInvoker Use<TContract>(
             this IBoltRouteHandler bolt,
             IInstanceProvider instanceProvider,
-            Action<ConfigureContractContext> configure = null)
+            Action<ConfigureContractContext> configure = null,
+            ServerRuntimeConfiguration configuration = null)
         {
             if (bolt == null)
             {
@@ -86,9 +87,9 @@ namespace Bolt.Server
             }
 
             var factory = bolt.ApplicationServices.GetRequiredService<IContractInvokerFactory>();
+            configuration = configuration ?? new ServerRuntimeConfiguration(bolt.Configuration);
 
-            IContractInvoker invoker = factory.Create(typeof (TContract), instanceProvider);
-            invoker.Configuration.Merge(bolt.Configuration);
+            IContractInvoker invoker = factory.Create(typeof(TContract), instanceProvider, configuration);
             IPipeline<ServerActionContext> pipeline = null;
             if (configure != null)
             {
@@ -109,7 +110,7 @@ namespace Bolt.Server
             else if (invoker.Pipeline == null)
             {
                 // build default pipeline
-                invoker.Pipeline =  bolt.ApplicationServices.GetRequiredService<IServerPipelineBuilder>().Build();
+                invoker.Pipeline = bolt.ApplicationServices.GetRequiredService<IServerPipelineBuilder>().Build();
             }
             bolt.Add(invoker);
 

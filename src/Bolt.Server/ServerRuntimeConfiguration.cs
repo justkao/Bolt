@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Bolt.Serialization;
+using Microsoft.Extensions.Options;
 
 namespace Bolt.Server
 {
-    public class ServerRuntimeConfiguration
+    public class ServerRuntimeConfiguration : IOptions<BoltServerOptions>
     {
         public ServerRuntimeConfiguration()
         {
@@ -33,6 +34,8 @@ namespace Bolt.Server
         public BoltServerOptions Options { get; set; }
 
         public IServerErrorHandler ErrorHandler { get; set; }
+
+        BoltServerOptions IOptions<BoltServerOptions>.Value => Options;
 
         public void Reset()
         {
