@@ -1,3 +1,3 @@
 @ECHO OFF
 
-dotnet run -p Bolt.Performance.Server --configuration Release -f net451
+dotnet run -p Bolt.Performance.Server --configuration Release

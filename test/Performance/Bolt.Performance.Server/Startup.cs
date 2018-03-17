@@ -7,6 +7,7 @@ using Microsoft.AspNetCore;
 using System.Threading;
 using System.Linq;
 using System;
+using Microsoft.Extensions.Logging;
 
 namespace Bolt.Performance.Server
 {
@@ -25,8 +26,6 @@ namespace Bolt.Performance.Server
 
             public void Configure(IApplicationBuilder app)
             {
-                // app.ApplicationServices.GetRequiredService<ILoggerFactory>().AddConsole(minLevel: LogLevel.Debug);
-
                 app.UseBolt(
                     b =>
                     {
@@ -47,11 +46,17 @@ namespace Bolt.Performance.Server
 
             var server = WebHost.CreateDefaultBuilder()
                  .UseStartup<Startup>()
+                 .ConfigureLogging(ConfigureLog)
                  .Build();
 
             server.RunAsync(cancellationToken).GetAwaiter().GetResult();
 
             return 0;
+        }
+
+        private static void ConfigureLog(ILoggingBuilder builder)
+        {
+            builder.SetMinimumLevel(LogLevel.Error);
         }
     }
 }

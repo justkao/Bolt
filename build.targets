@@ -7,6 +7,7 @@
   
   <Target Name="Build">
     <CallTarget Targets="CleanSolution"/>
+    <CallTarget Targets="RestoreSolution"/>
     <CallTarget Targets="BuildSolution"/>
     <CallTarget Targets="GenerateInterfaces"/>
     <CallTarget Targets="RunPerformanceTest"/>
@@ -78,6 +79,11 @@
   <Target Name="BuildSolution">
     <Message Importance="high" Text="Building solution ... "/>
     <MSBuild Projects="Bolt.sln"/>
+  </Target>
+
+  <Target Name="RestoreSolution">
+    <Message Importance="high" Text="Restoring solution ... "/>
+    <Exec Command="dotnet restore bolt.sln"  />
   </Target>
 
 </Project>
