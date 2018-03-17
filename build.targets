@@ -3,6 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" $(Configuration) == '' ">Release</Configuration>
     <DefaultOutput></DefaultOutput>
+    <PublishPackages Condition=" $(PublishPackages) == '' ">false</PublishPackages>
   </PropertyGroup>
   
   <Target Name="Build">
@@ -14,6 +15,7 @@
     <CallTarget Targets="RunSamples"/>
     <CallTarget Targets="RunTests"/>
     <CallTarget Targets="PackPackages"/>
+    <CallTarget Targets="PublishPackages"/>
   </Target>
 
   <Target Name="RunSamples">
@@ -68,7 +70,16 @@
     </ItemGroup>
 
     <RemoveDir Directories="artifacts\$(Configuration)" />
-    <Exec Command='dotnet pack "%(PackagesPath.Identity)" --output "$(MSBuildThisFileDirectory)artifacts\$(Configuration)" --configuration $(Configuration)' />
+    <Exec Command='dotnet pack "%(PackagesPath.Identity)" --output "$(MSBuildThisFileDirectory)artifacts\$(Configuration)" --configuration $(Configuration) --include-source' />
+  </Target>
+
+  <Target Name="PublishPackages" Condition="$(PublishPackages)">
+    <ItemGroup>
+      <PackagesToPublish Include="artifacts\$(Configuration)\*.nupkg"/>
+    </ItemGroup>
+
+    <Message Importance="high" Text="Publishing packages ... @(PackagesToPublish) "/>
+    <Exec Command='dotnet nuget push "%(PackagesToPublish.Identity)" --source https://www.nuget.org --api-key $(NugetApiKey)'  />
   </Target>
 
   <Target Name="CleanSolution">

@@ -1,1 +1,1 @@
-dotnet run -p .\build\build.csproj PublishBoltPackages
+dotnet msbuild build.targets /property:PublishPackages=true /property:NugetApiKey=%1

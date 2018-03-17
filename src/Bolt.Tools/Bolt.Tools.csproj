@@ -6,7 +6,7 @@
     <AssemblyName>dotnet-bolt</AssemblyName>
     <PackageType>DotnetTool</PackageType>
     <OutputType>Exe</OutputType>
-    <PackageTags>bolt;tool;console</PackageTags>
+    <PackageTags>bolt;tool;code generation;</PackageTags>
     <StartupObject>Bolt.Tools.Program</StartupObject>
   </PropertyGroup>
 
