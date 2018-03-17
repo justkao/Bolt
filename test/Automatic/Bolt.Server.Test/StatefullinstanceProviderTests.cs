@@ -60,7 +60,7 @@ namespace Bolt.Server.Test
 
                 await Subject.GetInstanceAsync(ctxt, typeof(IMockContract));
 
-                Assert.NotNull(ctxt.HttpContext.Response.Headers[SessionHeader]);
+                Assert.True(ctxt.HttpContext.Response.Headers[SessionHeader].Count > 0);
             }
 
             [Fact]

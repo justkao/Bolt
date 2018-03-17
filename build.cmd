@@ -1,2 +1,1 @@
-dotnet restore .\build
-dotnet run -p .\build\build.csproj
+dotnet msbuild build.targets

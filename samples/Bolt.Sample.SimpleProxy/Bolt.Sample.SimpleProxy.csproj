@@ -1,16 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\build\executable.props" />
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Server.Kestrel" Version="1.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="1.0.1" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\Bolt.Client\Bolt.Client.csproj" />
-    <ProjectReference Include="..\..\src\Bolt.Core\Bolt.Core.csproj" />
-    <ProjectReference Include="..\..\src\Bolt.Server\Bolt.Server.csproj" />
-  </ItemGroup>
+  <PropertyGroup>
+    <TargetFramework>$(TargetFramework)</TargetFramework>
+  </PropertyGroup>
   
 </Project>

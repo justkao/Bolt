@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Bolt.Client;
 using Bolt.Serialization;
 using Bolt.Server;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
@@ -16,36 +17,25 @@ namespace Bolt.Sample.ContentProtection
 {
     public class Program
     {
-        private static readonly AutoResetEvent TestingFinished = new AutoResetEvent(false);
         private static int Result;
-        private static readonly CancellationTokenSource CancellationTokenSource = new CancellationTokenSource();
 
         public static int Main(string[] args)
         {
-            var server =
-                new WebHostBuilder()
-                    .UseKestrel()
-                    .UseStartup<Startup>()
-                    .Build();
+            CancellationTokenSource cancellation = new CancellationTokenSource();
+
+            var server = WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>()
+                .UseUrls("http://localhost:5000")
+                .Build();
 
             var serverLifetime = server.Services.GetService<IApplicationLifetime>();
-            serverLifetime.ApplicationStarted.Register(() =>
+            serverLifetime.ApplicationStarted.Register(async () =>
             {
-                TestBolt(server.Services.GetRequiredService<ILogger<Program>>(), server.Services.GetRequiredService<ISerializer>(), serverLifetime.ApplicationStopping);
+                await TestBolt(server.Services.GetRequiredService<ILogger<Program>>(), server.Services.GetRequiredService<ISerializer>(), serverLifetime.ApplicationStopping);
+                cancellation.Cancel();
             });
 
-            Console.WriteLine("Server running ... ");
-            try
-            {
-                server.Run(CancellationTokenSource.Token);
-            }
-            catch (OperationCanceledException)
-            {
-            }
-
-            TestingFinished.WaitOne();
-            server.Dispose();
-
+            server.RunAsync(cancellation.Token).GetAwaiter().GetResult();
             return Result;
         }
 
@@ -77,7 +67,7 @@ namespace Bolt.Sample.ContentProtection
             }
         }
 
-        private static async void TestBolt(ILogger<Program> logger, ISerializer serializer, CancellationToken cancellationToken)
+        private static async Task TestBolt(ILogger<Program> logger, ISerializer serializer, CancellationToken cancellationToken)
         {
             // create Bolt proxy
             ClientConfiguration configuration = new ClientConfiguration() {Serializer = serializer};
@@ -85,7 +75,7 @@ namespace Bolt.Sample.ContentProtection
 
             logger.LogInformation("Testing Bolt Proxy ... ");
 
-            for (int i = 0; i < 2; i++)
+            for (int i = 0; i < 10; i++)
             {
                 try
                 {
@@ -114,9 +104,7 @@ namespace Bolt.Sample.ContentProtection
                 }
             }
 
-            Console.WriteLine("Test finished. Press any key to exit the application ... ");
-            TestingFinished.Set();
-            CancellationTokenSource.Cancel();
+            Console.WriteLine("Test finished. Application will now exit ... ");
         }
     }
 }

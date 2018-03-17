@@ -5,6 +5,8 @@ namespace Bolt.Client
 {
     public class RequestScope : IDisposable
     {
+        private static readonly AsyncLocal<RequestScope> RequestScopeCurrent = new AsyncLocal<RequestScope>();
+
         public RequestScope(CancellationToken cancellation)
             : this(TimeSpan.Zero, cancellation)
         {
@@ -31,22 +33,10 @@ namespace Bolt.Client
             Current = null;
         }
 
-#if !NETSTANDARD1_3
-        private const string LogicalDataKey = "__Bolt_RequestScope_Current__";
-
-        public static RequestScope Current
-        {
-            get { return System.Runtime.Remoting.Messaging.CallContext.LogicalGetData(LogicalDataKey) as RequestScope; }
-            set { System.Runtime.Remoting.Messaging.CallContext.LogicalSetData(LogicalDataKey, value); }
-        }
-#else
-        private static readonly AsyncLocal<RequestScope> RequestScopeCurrent = new AsyncLocal<RequestScope>();
-
         public static RequestScope Current
         {
             get { return RequestScopeCurrent.Value; }
             set { RequestScopeCurrent.Value = value; }
         }
-#endif
     }
 }

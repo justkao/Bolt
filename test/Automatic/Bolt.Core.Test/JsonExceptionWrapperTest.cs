@@ -5,7 +5,6 @@ using Xunit;
 
 namespace Bolt.Core.Test
 {
-#if NET451
     public class JsonExceptionWrapperTest
     {
         public JsonExceptionWrapperTest()
@@ -87,5 +86,4 @@ namespace Bolt.Core.Test
             Assert.Equal(ex.InnerException.Message, deserializedException.InnerException.Message);
         }
     }
-#endif
 }

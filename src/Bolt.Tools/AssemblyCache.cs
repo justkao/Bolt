@@ -9,7 +9,13 @@ namespace Bolt.Tools
     {
         public AssemblyCache()
         {
+            AppDomain.CurrentDomain.AssemblyResolve += OnResolveAssembly;
             Loader = new DirectoryLookupAssemblyLoader();
+        }
+
+        private void OnLoadAssembly(object sender, AssemblyLoadEventArgs args)
+        {
+            throw new NotImplementedException();
         }
 
         public DirectoryLookupAssemblyLoader Loader { get; }
@@ -139,6 +145,12 @@ namespace Bolt.Tools
         {
             // first return explicitely loaded assemblies
             return Loader;
+        }
+
+
+        private Assembly OnResolveAssembly(object sender, ResolveEventArgs args)
+        {
+            return Loader.Load(new AssemblyName(args.Name).Name);
         }
     }
 }

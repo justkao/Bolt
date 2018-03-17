@@ -160,7 +160,7 @@ namespace Bolt.Tools.Configuration
             InterfaceConfiguration c = new InterfaceConfiguration
             {
                 Parent = this,
-                Contract = type.AssemblyQualifiedName,
+                Contract = type.FullName,
                 Modifier = internalVisibility ? "internal" : "public",
                 ForceAsync = true,
                 ForceSync = true,

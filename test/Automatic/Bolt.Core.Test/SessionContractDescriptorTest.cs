@@ -12,7 +12,7 @@ namespace Bolt.Core.Test
         public void Resolve_Ok()
         {
             Assert.NotNull(Provider.Resolve<IWithoutAttributes>());
-            Assert.Equal(Provider.Resolve<IWithoutAttributes>().Contract, typeof(IWithoutAttributes));
+            Assert.Equal(typeof(IWithoutAttributes), Provider.Resolve<IWithoutAttributes>().Contract);
         }
 
         [Fact]

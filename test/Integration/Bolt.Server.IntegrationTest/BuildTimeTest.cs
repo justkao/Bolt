@@ -6,7 +6,9 @@ namespace Bolt.Server.IntegrationTest
     {
         static BuildTimeTest()
         {
+#pragma warning disable CS0219 // Variable is assigned but its value is never used
             var tmp = nameof(ITestContractInnerAsync.SimpleFunction2);
+#pragma warning restore CS0219 // Variable is assigned but its value is never used
             tmp = nameof(ITestContractInnerAsync.SimpleMethodWithComplexParameterAsync);
             tmp = nameof(ITestContractInnerAsync.MethodWithNotSerializableTypeAsync);
             tmp = nameof(ITestContractInnerAsync.FunctionWithNotSerializableTypeAsync);

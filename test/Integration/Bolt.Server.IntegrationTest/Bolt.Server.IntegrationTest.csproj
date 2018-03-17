@@ -1,15 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  
-  <Import Project="..\..\..\build\test.app.props" />
 
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+  
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="1.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="2.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Bolt.Client\Bolt.Client.csproj" />
     <ProjectReference Include="..\..\..\src\Bolt.Server\Bolt.Server.csproj" />
     <ProjectReference Include="..\Bolt.Server.IntegrationTest.Core\Bolt.Server.IntegrationTest.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Generated\" />
   </ItemGroup>
   
 </Project>

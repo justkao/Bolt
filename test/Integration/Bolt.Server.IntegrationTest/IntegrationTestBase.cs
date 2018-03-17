@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Net.Http;
 using Bolt.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Internal;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using System.Net.Http;
 
 namespace Bolt.Server.IntegrationTest
 {

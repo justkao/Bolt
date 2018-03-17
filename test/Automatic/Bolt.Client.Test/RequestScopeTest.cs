@@ -70,7 +70,7 @@ namespace Bolt.Client.Test
         {
             RequestScope scope = new RequestScope();
             scope.Dispose();
-            Assert.Equal(RequestScope.Current, null);
+            Assert.Null(RequestScope.Current);
         }
 
         [Fact]
@@ -82,7 +82,7 @@ namespace Bolt.Client.Test
             Task.Run(
                 () =>
                     {
-                        Assert.Equal(RequestScope.Current, null);
+                        Assert.Null(RequestScope.Current);
                     }).GetAwaiter().GetResult();
         }
     }

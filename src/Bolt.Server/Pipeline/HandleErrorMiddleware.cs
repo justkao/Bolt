@@ -69,7 +69,7 @@ namespace Bolt.Server.Pipeline
                 throw new BoltServerException(
                     $"Failed to serialize exception response for action {context.Action.Name}.",
                     ServerErrorCode.SerializeException,
-                    context.Action,
+                    context.Action.Name,
                     context.RequestUrl,
                     e);
             }

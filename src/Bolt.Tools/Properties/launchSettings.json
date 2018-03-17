@@ -1,7 +1,8 @@
 {
   "profiles": {
     "Bolt.Tools": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "code g:\\Projects\\GitHub\\Bolt\\test\\Integration\\Bolt.Server.IntegrationTest.Core\\bin\\Debug\\netstandard2.0\\Bolt.Server.IntegrationTest.Core.dll"
     }
   }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Bolt.Client;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 
@@ -118,16 +119,12 @@ namespace Bolt.Sample.DistributedSession
         private static void StartServer(int port)
         {
             ConfigurationBuilder configurationBuilder = new ConfigurationBuilder();
-            configurationBuilder.AddInMemoryCollection(new[]
-            {new KeyValuePair<string, string>("server.urls", $"http://localhost:{port}")});
+            var server = WebHost.CreateDefaultBuilder()
+                .UseUrls($"http://localhost:{port}")
+                .UseStartup<Startup>()
+                .Build();
 
-            var server =
-                new WebHostBuilder()
-                    .UseKestrel()
-                    .UseStartup<Startup>()
-                    .Build();
-
-            server.Start();
+            server.Run();
         }
     }
 }

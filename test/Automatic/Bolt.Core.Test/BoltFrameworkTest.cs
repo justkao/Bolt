@@ -22,10 +22,8 @@ namespace Bolt.Core.Test
         [InlineData("AbcAsyncSomething", "AbcAsyncSomething")]
         [InlineData("AbcAsyncA", "AbcAsyncA")]
         [InlineData("AbcAsyn", "AbcAsyn")]
-        [InlineData("Async", "Async")]
         [InlineData("AbcASYNC", "Abc")]
         [InlineData("AbcASYNCSomething", "AbcASYNCSomething")]
-        [InlineData("AbcAsyn", "AbcAsyn")]
         [Theory]
         public void TrimAsyncPostFix(string input, string expected)
         {

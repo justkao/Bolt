@@ -121,7 +121,7 @@ namespace Bolt.Server.IntegrationTest
             }
             catch (BoltServerException e)
             {
-                Assert.Equal(e.Error, ServerErrorCode.SessionNotFound);
+                Assert.Equal(ServerErrorCode.SessionNotFound, e.ServerError);
             }
         }
 
@@ -193,7 +193,7 @@ namespace Bolt.Server.IntegrationTest
             }
             catch (BoltServerException e)
             {
-                Assert.Equal(e.Error, ServerErrorCode.SessionNotFound);
+                Assert.Equal(ServerErrorCode.SessionNotFound, e.ServerError);
             }
         }
 

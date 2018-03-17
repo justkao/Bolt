@@ -24,7 +24,7 @@ namespace Bolt.Server.Pipeline
                 }
                 catch (Exception e)
                 {
-                    throw new BoltServerException(ServerErrorCode.DeserializeParameters, context.Action, context.RequestUrl, e);
+                    throw new BoltServerException(ServerErrorCode.DeserializeParameters, context.Action.Name, context.RequestUrl, e);
                 }
             }
 
@@ -33,7 +33,7 @@ namespace Bolt.Server.Pipeline
                 throw new BoltServerException(
                     $"There is no contract instance assigned for action '{context.Action.Name}'.",
                     ServerErrorCode.NoContractInstance,
-                    context.Action,
+                    context.Action.Name,
                     context.RequestUrl);
             }
 

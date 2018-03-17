@@ -1,7 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\..\build\test.core.props" />
-  
   <ItemGroup>
     <DotNetCliToolReference Include="Bolt.Tools" Version="0.50.0-alpha1" />
   </ItemGroup>

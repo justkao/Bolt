@@ -1,7 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   
-  <Import Project="..\..\..\build\test.app.props" />
-  
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Bolt.Core\Bolt.Core.csproj" />
     <ProjectReference Include="..\..\Common\Bolt.Test.Common\Bolt.Test.Common.csproj" />

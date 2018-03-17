@@ -1,0 +1,83 @@
+<Project DefaultTargets="Build">
+
+  <PropertyGroup>
+    <Configuration Condition=" $(Configuration) == '' ">Release</Configuration>
+    <DefaultOutput></DefaultOutput>
+  </PropertyGroup>
+  
+  <Target Name="Build">
+    <CallTarget Targets="CleanSolution"/>
+    <CallTarget Targets="BuildSolution"/>
+    <CallTarget Targets="GenerateInterfaces"/>
+    <CallTarget Targets="RunPerformanceTest"/>
+    <CallTarget Targets="RunSamples"/>
+    <CallTarget Targets="RunTests"/>
+    <CallTarget Targets="PackPackages"/>
+  </Target>
+
+  <Target Name="RunSamples">
+    <Message Importance="high" Text="Running Content Protection Sample ... "/>
+    <Exec Command="dotnet run -p samples/Bolt.Sample.ContentProtection/Bolt.Sample.ContentProtection.csproj" StandardOutputImportance="low" StandardErrorImportance="low" />
+    
+    <Message Importance="high" Text="Running Simple Proxy Sample ... "/>
+    <Exec Command="dotnet run -p samples/Bolt.Sample.SimpleProxy/Bolt.Sample.SimpleProxy.csproj" StandardOutputImportance="low" StandardErrorImportance="low" />
+
+    <OnError ExecuteTargets="RunSamplesError" />
+  </Target>
+
+  <Target Name="RunSamplesError">
+    <Message Importance="high" Text="Failed to run the sample"/>
+  </Target>
+
+  <Target Name="RunTests">
+    <ItemGroup>
+      <TestProjectPath Include="test/automatic/**/*.csproj"/>
+      <TestProjectPath Include="test/integration/Bolt.Server.IntegrationTest/*.csproj"/>
+    </ItemGroup>
+
+    <Exec Command="dotnet test %(TestProjectPath.Identity)" />
+    <OnError ExecuteTargets="RunTestsError" />
+
+  </Target>
+
+  <Target Name="RunTestsError">
+    <Message Importance="high" Text="Failed to run the tests"/>
+  </Target>
+
+  <Target Name="GenerateInterfaces">
+    <ItemGroup>
+      <InterfaceAssemblies Include="$(MSBuildThisFileDirectory)test\Integration\Bolt.Server.IntegrationTest.Core\bin\**\Bolt.Server.IntegrationTest.Core.dll"/>
+    </ItemGroup>
+    <Message Importance="high" Text="Generating interfaces ... "/>
+
+    <Exec Command='dotnet run -p src\Bolt.Tools\Bolt.Tools.csproj code "%(InterfaceAssemblies.Identity)" --contract ITestContract --contract ITestContractStateFull --output "$(MSBuildThisFileDirectory)test\Integration\Bolt.Server.IntegrationTest\Generated" ' StandardOutputImportance="low" StandardErrorImportance="low" />
+  </Target>
+
+  <Target Name="RunPerformanceTest">
+    <PropertyGroup>
+      <ServerPath>$(MSBuildThisFileDirectory)test\Performance\Bolt.Performance.Server\Bolt.Performance.Server.csproj</ServerPath>
+    </PropertyGroup>
+    <Message Importance="high" Text="Running quick performance test "/>
+    <Exec Command="dotnet run -p test\Performance\Bolt.Performance.Console\Bolt.Performance.Console.csproj quick -serverPath $(ServerPath)" StandardOutputImportance="low" StandardErrorImportance="low"  />
+  </Target>
+
+  <Target Name="PackPackages">
+    <ItemGroup>
+      <PackagesPath Include="src/**/*.csproj"/>
+    </ItemGroup>
+
+    <RemoveDir Directories="artifacts\$(Configuration)" />
+    <Exec Command='dotnet pack "%(PackagesPath.Identity)" --output "$(MSBuildThisFileDirectory)artifacts\$(Configuration)" --configuration $(Configuration)' />
+  </Target>
+
+  <Target Name="CleanSolution">
+    <Message Importance="high" Text="Cleaning solution ... "/>
+    <Exec Command="dotnet clean bolt.sln"  />
+  </Target>
+
+  <Target Name="BuildSolution">
+    <Message Importance="high" Text="Building solution ... "/>
+    <MSBuild Projects="Bolt.sln"/>
+  </Target>
+
+</Project>

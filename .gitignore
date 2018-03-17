@@ -30,3 +30,4 @@ nuget.exe
 project.lock.json
 debugSettings.json
 /tools/Cake
+/.vs/Bolt/v15

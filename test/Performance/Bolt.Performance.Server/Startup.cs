@@ -1,12 +1,12 @@
-﻿using System;
-using System.Threading;
-using Bolt.Performance.Core.Contracts;
+﻿using Bolt.Performance.Core.Contracts;
 using Bolt.Server;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Internal;
-using Microsoft.AspNetCore.Server.Kestrel;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore;
+using System.Threading;
+using System.Linq;
+using System;
 
 namespace Bolt.Performance.Server
 {
@@ -17,8 +17,6 @@ namespace Bolt.Performance.Server
             // For more information on how to configure your application, visit http://go.microsoft.com/fwlink/?LinkID=398940
             public void ConfigureServices(IServiceCollection services)
             {
-                System.Console.WriteLine("Process: {0}", System.Diagnostics.Process.GetCurrentProcess().Id);
-
                 services.AddRouting();
                 services.AddLogging();
                 services.AddOptions();
@@ -40,22 +38,19 @@ namespace Bolt.Performance.Server
         // Entry point for the application.
         public static int Main(string[] args)
         {
-#if NET451
-                ThreadPool.SetMinThreads(100, 100);
-                ThreadPool.SetMinThreads(1000, 1000);
-#endif
+            CancellationToken cancellationToken;
+            if (int.TryParse(args.FirstOrDefault(), out var delay))
+            {
+                Console.WriteLine("Server will automatically shut down after {0}s", delay);
+                cancellationToken = new CancellationTokenSource(TimeSpan.FromSeconds(delay)).Token;
+            }
 
-            var host = new WebHostBuilder()
-                .UseKestrel(o =>
-                {
-                    o.ThreadCount = 100;
-                })
-                .UseStartup<Startup>()
-                .Build();
+            var server = WebHost.CreateDefaultBuilder()
+                 .UseStartup<Startup>()
+                 .Build();
 
-            host.Start();
-            Console.WriteLine("Press any key to stop the server ... ");
-            Console.Read();
+            server.RunAsync(cancellationToken).GetAwaiter().GetResult();
+
             return 0;
         }
     }

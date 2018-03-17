@@ -1,17 +1,18 @@
 <Project>
-  <Import Project="..\version.props" />
+  <Import Project="version.props" />
 
   <PropertyGroup>
     <Product>Bolt</Product>
+    <IsTestProject>false</IsTestProject>
     <RepositoryUrl>https://github.com/justkao/bolt</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <AssemblyOriginatorKeyFile>$(MSBuildThisFileDirectory)\..\Bolt.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>$(MSbuildThisFileDirectory)Bolt.snk</AssemblyOriginatorKeyFile>
     <SignAssembly>true</SignAssembly>
     <PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign>
     <VersionSuffix Condition="'$(VersionSuffix)'!='' AND '$(BuildNumber)' != ''">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>
     <Authors>Martin Tomka</Authors>
     <WarningsAsErrors>true</WarningsAsErrors>
-    <TargetFrameworks>netstandard1.1;net451</TargetFrameworks>
+    <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
-
+  
 </Project>

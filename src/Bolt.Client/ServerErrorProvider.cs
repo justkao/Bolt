@@ -17,20 +17,20 @@ namespace Bolt.Client
             ServerErrorCode? result = TryReadBoltError(context);
             if (result != null)
             {
-                return new BoltServerException(result.Value, context.Action, context.Request.RequestUri.ToString());
+                return new BoltServerException(result.Value, context.Action.Name, context.Request.RequestUri.ToString());
             }
 
             int? code = TryReadErrorCode(context);
             if (code != null)
             {
-                return new BoltServerException(code.Value, context.Action, context.Request.RequestUri.ToString());
+                return new BoltServerException(code.Value, context.Action.Name, context.Request.RequestUri.ToString());
             }
 
             if (context.Response?.StatusCode == HttpStatusCode.NotFound)
             {
                 return new BoltServerException(
                     ServerErrorCode.BoltUnavailable,
-                    context.Action,
+                    context.Action.Name,
                     context.Request.RequestUri.ToString());
             }
 

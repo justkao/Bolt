@@ -36,7 +36,7 @@ namespace Bolt.Server.Session
             sessionId = _sessionHandler.Initialize(context);
 
             // establish session
-            ISession session = _sessionStore.Create(sessionId, SessionTimeout, () => true, true);
+            ISession session = _sessionStore.Create(sessionId, SessionTimeout, SessionTimeout, () => true, true);
             context.Features.Set<ISessionFeature>(new SessionFeature());
             context.Session = session;
 
@@ -53,7 +53,7 @@ namespace Bolt.Server.Session
             }
 
             // establish session
-            ISession session = _sessionStore.Create(sessionId, SessionTimeout, () => true, false);
+            ISession session = _sessionStore.Create(sessionId, SessionTimeout, SessionTimeout, () => true, false);
             context.Features.Set<ISessionFeature>(new SessionFeature());
             context.Session = session;
 

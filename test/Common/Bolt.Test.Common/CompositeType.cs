@@ -6,7 +6,9 @@ using System.Runtime.Serialization;
 namespace Bolt.Test.Common
 {
     [DataContract]
+#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
     public class CompositeType
+#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
     {
         public static CompositeType CreateRandom(bool createInner = true)
         {

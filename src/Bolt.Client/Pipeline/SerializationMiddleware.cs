@@ -47,7 +47,7 @@ namespace Bolt.Client.Pipeline
                 throw new BoltClientException(
                     $"Unable to process result for action '{context.Action.Name}' because response from server '{context.Request.RequestUri}' was not received.",
                     ClientErrorCode.DeserializeResponse,
-                    context.Action);
+                    context.Action.Name);
             }
 
             TryHandleBoltServerError(context);
@@ -104,7 +104,7 @@ namespace Bolt.Client.Pipeline
                     throw new BoltClientException(
                         $"Parameter validation failed for action '{context.Action.Name}'.",
                         ClientErrorCode.SerializeParameters,
-                        context.Action,
+                        context.Action.Name,
                         e);
                 }
             }
@@ -158,7 +158,7 @@ namespace Bolt.Client.Pipeline
                 throw new BoltClientException(
                     $"Failed to deserialize response for action '{context.Action.Name}'.",
                     ClientErrorCode.DeserializeResponse,
-                    context.Action,
+                    context.Action.Name,
                     e);
             }
         }
@@ -186,7 +186,7 @@ namespace Bolt.Client.Pipeline
                 throw new BoltClientException(
                     $"Failed to deserialize exception response for action '{context.Action.Name}'.",
                     ClientErrorCode.DeserializeExceptionResponse,
-                    context.Action,
+                    context.Action.Name,
                     e);
             }
         }
@@ -227,7 +227,7 @@ namespace Bolt.Client.Pipeline
                     throw new BoltClientException(
                         $"Failed to serialize parameters for action '{_clientContext.Action.Name}'.",
                         ClientErrorCode.SerializeParameters,
-                        _clientContext.Action,
+                        _clientContext.Action.Name,
                         e);
                 }
             }

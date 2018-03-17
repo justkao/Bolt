@@ -43,7 +43,7 @@ namespace Bolt.Client.Test
                 SessionErrorHandling.Setup(r => r.Handle(It.IsAny<ClientActionContext>(), It.IsAny<Exception>())).Returns(ErrorHandlingResult.Recover);
 
                 var proxy = CreateProxy(pipeline);
-                await Assert.ThrowsAsync<BoltServerException>(() => proxy.OpenSession("test"));
+                await Assert.ThrowsAsync<BoltClientException>(() => proxy.OpenSession("test"));
 
                 SessionHandler.Verify();
             }

@@ -3,9 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Bolt.Test.Common
 {
-#if NET451
     [Serializable]
-#endif
     public class CustomException : Exception
     {
         public CustomException(int customData)
@@ -27,7 +25,6 @@ namespace Bolt.Test.Common
         {
         }
 
-#if NET451
         public CustomException(SerializationInfo info, StreamingContext context)
             : base(info, context)
         {
@@ -39,7 +36,7 @@ namespace Bolt.Test.Common
             info.AddValue("CustomData", CustomData);
             base.GetObjectData(info, context);
         }
-#endif
+
         public int CustomData { get; private set; }
     }
 }

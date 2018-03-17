@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client;
 using Bolt.Server;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,22 +15,20 @@ namespace Bolt.Sample.SimpleProxy
     {
         public static void Main(string[] args)
         {
-            var host = new WebHostBuilder()
-                    .UseKestrel()
-                    .UseStartup<Startup>()
-                    .Build();
+            var host = WebHost.CreateDefaultBuilder(args)
+                .UseStartup<Startup>()
+                .Build();
 
-            host.Start();
-            
+            CancellationTokenSource cancellation = new CancellationTokenSource();
+
             var serverLifetime = host.Services.GetService<IApplicationLifetime>();
-            serverLifetime.ApplicationStarted.Register(() =>
+            serverLifetime.ApplicationStarted.Register(async () =>
             {
-                TestBolt(host.Services.GetRequiredService<ILogger<Program>>(), serverLifetime.ApplicationStopping);
+                await TestBolt(host.Services.GetRequiredService<ILogger<Program>>(), serverLifetime.ApplicationStopping);
+                cancellation.Cancel();
             });
 
-            Console.WriteLine("Server running ... ");
-            Console.ReadLine();
-            host.Dispose();
+            host.RunAsync(cancellation.Token).GetAwaiter().GetResult();
         }
 
         public class Startup
@@ -53,11 +52,8 @@ namespace Bolt.Sample.SimpleProxy
             }
         }
 
-
-        private static async void TestBolt(ILogger<Program> logger, CancellationToken cancellationToken)
+        private static async Task TestBolt(ILogger<Program> logger, CancellationToken cancellationToken)
         {
-            await Task.Delay(2500, cancellationToken);
-
             // create Bolt proxy
             ClientConfiguration configuration = new ClientConfiguration();
             IDummyContract proxy = configuration.CreateProxy<IDummyContract>("http://localhost:5000");
@@ -89,15 +85,13 @@ namespace Bolt.Sample.SimpleProxy
 
                 try
                 {
-                    await Task.Delay(1000, cancellationToken);
+                    await Task.Delay(10, cancellationToken);
                 }
                 catch (OperationCanceledException)
                 {
                     return;
                 }
             }
-
-            Console.WriteLine("Test finished. Press any key to exit the application ... ");
         }
     }
 }

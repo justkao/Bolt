@@ -1,70 +1,91 @@
 ﻿using System;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace Bolt
 {
     /// <summary>
     /// Exception indicating that special Bolt error occurred on server.
     /// </summary>
+    [Serializable]
     public class BoltServerException : BoltException
     {
         public BoltServerException(string message, ServerErrorCode errorCode)
             : base(message)
         {
-            Error = errorCode;
+            ServerError = errorCode;
         }
 
         public BoltServerException(string message, ServerErrorCode errorCode, Exception innerException)
             : base(message, innerException)
         {
-            Error = errorCode;
+            ServerError = errorCode;
         }
 
-        public BoltServerException(int errorCode, MethodInfo action, string url)
-            : base($"Execution of action '{action.Name}' failed on server with error code '{errorCode}'. Url - '{url}'")
+        public BoltServerException(int errorCode, string action, string url)
+            : base($"Execution of action '{action}' failed on server with error code '{errorCode}'. Url - '{url}'")
         {
             ErrorCode = errorCode;
             Action = action;
         }
 
-        public BoltServerException(ServerErrorCode error, MethodInfo action, string url, Exception innerException)
-            : base($"Execution of action '{action.Name}' failed on server with error '{error}'. Url - '{url}'", innerException)
+        public BoltServerException(ServerErrorCode error, string action, string url, Exception innerException)
+            : base($"Execution of action '{action}' failed on server with error '{error}'. Url - '{url}'", innerException)
         {
-            Error = error;
+            ServerError = error;
             Action = action;
             Url = url;
         }
 
-        public BoltServerException(string message, ServerErrorCode error, MethodInfo action, string url, Exception innerException)
+        public BoltServerException(string message, ServerErrorCode error, string action, string url, Exception innerException)
             : base(message, innerException)
         {
-            Error = error;
+            ServerError = error;
             Action = action;
             Url = url;
         }
 
-        public BoltServerException(string message, ServerErrorCode error, MethodInfo action, string url)
+        public BoltServerException(string message, ServerErrorCode error, string action, string url)
             : base(message)
         {
-            Error = error;
+            ServerError = error;
             Action = action;
             Url = url;
         }
 
-        public BoltServerException(ServerErrorCode error, MethodInfo action, string url)
-            : base($"Execution of action '{action.Name}' failed on server with error '{error}'. Url - '{url}'")
+        public BoltServerException(ServerErrorCode error, string action, string url)
+            : base($"Execution of action '{action}' failed on server with error '{error}'. Url - '{url}'")
         {
-            Error = error;
+            ServerError = error;
             Action = action;
             Url = url;
         }
 
-        public ServerErrorCode? Error { get; }
+        public BoltServerException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+            var serverError = info.GetInt32(nameof(ServerError));
+            ServerError = serverError != -1 ? (ServerErrorCode)serverError : (ServerErrorCode?)null;
+            ErrorCode = info.GetInt32(nameof(ErrorCode));
+            Action = info.GetString(nameof(Action));
+            Url = info.GetString(nameof(Url));
+        }
 
-        public int? ErrorCode { get; set; }
+        public ServerErrorCode? ServerError { get; }
 
-        public MethodInfo Action { get; }
+        public int? ErrorCode { get; }
 
-        public string Url { get; set; }
+        public string Action { get; }
+
+        public string Url { get; }
+
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            info.AddValue(nameof(ServerError), ServerError != null ? (int)ServerError : -1);
+            info.AddValue(nameof(ErrorCode), ErrorCode);
+            info.AddValue(nameof(Action), Action);
+            info.AddValue(nameof(Url), Url);
+
+            base.GetObjectData(info, context);
+        }
     }
 }

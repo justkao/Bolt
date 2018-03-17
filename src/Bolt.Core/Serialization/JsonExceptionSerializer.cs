@@ -9,12 +9,12 @@ namespace Bolt.Serialization
         public JsonExceptionSerializer()
         {
             ExceptionSerializerSettings = new JsonSerializerSettings
-                                              {
-                                                  TypeNameAssemblyFormat = FormatterAssemblyStyle.Full,
-                                                  TypeNameHandling = TypeNameHandling.All,
-                                                  Formatting = Formatting.None,
-                                                  ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-                                              };
+            {
+                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Full,
+                TypeNameHandling = TypeNameHandling.All,
+                Formatting = Formatting.None,
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            };
         }
 
         public JsonSerializerSettings ExceptionSerializerSettings { get; }

@@ -55,7 +55,7 @@ namespace Bolt.Server.Pipeline
                     throw new BoltServerException(
                         $"Failed to deserialize parameters for action '{context.Action.Name}'.",
                         ServerErrorCode.DeserializeParameters,
-                        context.Action,
+                        context.Action.Name,
                         context.RequestUrl,
                         e);
                 }
@@ -110,7 +110,7 @@ namespace Bolt.Server.Pipeline
                     throw new BoltServerException(
                         $"Failed to serialize response for action '{context.Action.Name}'.",
                         ServerErrorCode.SerializeResponse,
-                        context.Action,
+                        context.Action.Name,
                         context.RequestUrl,
                         e);
                 }

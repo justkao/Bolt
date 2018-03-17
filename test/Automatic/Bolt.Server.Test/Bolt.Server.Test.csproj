@@ -1,9 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   
-  <Import Project="..\..\..\build\test.app.props" />
-  
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http" Version="1.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.0.2" />
   </ItemGroup>
   
   <ItemGroup>

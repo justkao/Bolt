@@ -21,25 +21,8 @@ namespace Bolt.Performance.Console
 
         public static int Main(params string[] args)
         {
-#if NET451
             ServicePointManager.DefaultConnectionLimit = 1000;		
             ServicePointManager.MaxServicePoints = 1000;
-#endif
-            List<(string name, IPerformanceContract proxy)> proxies = null;
-
-            int tries = 0;
-            while (!(proxies = CreateClients().ToList()).Any())
-            {
-                if (tries > 15)
-                {
-                    Console.WriteLine("No Bolt servers running ...".Red());
-                    return 1;
-                }
-
-                Console.WriteLine("No Bolt servers detected, waiting ...".Red());
-                tries++;
-                Thread.Sleep(1000);
-            }
  
             var app = new CommandLineApplication();
             app.Name = "bolt";
@@ -51,13 +34,37 @@ namespace Bolt.Performance.Console
 
             app.Command("quick", c =>
             {
+                var path = c.Option("-serverPath <command>", "Path to the server csproj that will be started before the execution starts.", CommandOptionType.SingleValue);
                 c.Description = "Quick tests Bolt performance.";
 
                 c.OnExecute(() =>
                 {
-                    ExecuteConcurrencyTest(proxies, 10, 10, false);
+                    Process process = null;
+                    if (path.HasValue())
+                    {
+                        Console.WriteLine("Running the server in the background ... ");
 
-                    Console.WriteLine("Test finished. ");
+                        ProcessStartInfo start = new ProcessStartInfo()
+                        {
+                            FileName = "dotnet",
+                            Arguments = $@"run -p ""{path.Value()}"" 15",
+                            RedirectStandardInput = true,
+                        };
+
+                        process = Process.Start(start);
+                        Thread.Sleep(5000);
+                    }
+
+                    ExecuteConcurrencyTest(EnsureServersRunning(), 10, 10, false);
+
+                    if (process != null)
+                    {
+                        process.StandardInput.Close();
+                        process.WaitForExit(2500);
+                        Console.WriteLine("Background server stopped");
+                    }
+
+                    Console.WriteLine("Test finished.");
                     return 0;
                 });
             });
@@ -68,7 +75,7 @@ namespace Bolt.Performance.Console
 
                 c.OnExecute(() =>
                 {
-                    ExecuteConcurrencyTest(proxies, 1, 50000, true, "Dev", filterArgument.Value);
+                    ExecuteConcurrencyTest(EnsureServersRunning(), 1, 50000, true, "Dev", filterArgument.Value);
 
                     Console.WriteLine("Test finished. ");
                     return 0;
@@ -82,6 +89,7 @@ namespace Bolt.Performance.Console
 
                 c.OnExecute(() =>
                 {
+                    var proxies = EnsureServersRunning();
 
                     if (argConcurrency.HasValue())
                     {
@@ -127,7 +135,7 @@ namespace Bolt.Performance.Console
 
                     PerformanceResult result = CreateEmptyReport(degree, cnt);
                
-                    ExecuteActions(proxies, cnt, degree, result, null, null);
+                    ExecuteActions(EnsureServersRunning(), cnt, degree, result, null, null);
 
                     if (output.HasValue())
                     {
@@ -191,9 +199,9 @@ namespace Bolt.Performance.Console
             {
                 threads = 25;
             }
-#if NET451
+
             ThreadPool.SetMinThreads(threads, threads);
-#endif
+
             Person person = Person.Create(10);
             List<Person> large = Enumerable.Repeat(person, 100).ToList();
             DateTime dateArg = DateTime.UtcNow;
@@ -430,6 +438,27 @@ namespace Bolt.Performance.Console
             result.Environment.Update();
             result.UpdateVersion();
             return result;
+        }
+
+        private static List<(string name, IPerformanceContract proxy)> EnsureServersRunning()
+        {
+            List<(string name, IPerformanceContract proxy)> proxies = null;
+
+            int tries = 0;
+            while (!(proxies = CreateClients().ToList()).Any())
+            {
+                if (tries > 15)
+                {
+                    Console.WriteLine("No Bolt servers running ...".Red());
+                    Environment.Exit(1);
+                }
+
+                Console.WriteLine("No Bolt servers detected, waiting ...".Red());
+                tries++;
+                Thread.Sleep(1000);
+            }
+
+            return proxies;
         }
     }
 }

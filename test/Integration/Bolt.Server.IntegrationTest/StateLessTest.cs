@@ -262,7 +262,7 @@ namespace Bolt.Server.IntegrationTest
             }
             catch (BoltServerException e)
             {
-                if (e.Error != ServerErrorCode.SerializeResponse)
+                if (e.ServerError != ServerErrorCode.SerializeResponse)
                 {
                     throw;
                 }
@@ -284,7 +284,7 @@ namespace Bolt.Server.IntegrationTest
             }
             catch (BoltServerException e)
             {
-                if (e.Error != ServerErrorCode.SerializeResponse)
+                if (e.ServerError != ServerErrorCode.SerializeResponse)
                 {
                     throw;
                 }
@@ -408,7 +408,7 @@ namespace Bolt.Server.IntegrationTest
         {
             ITestContract client = CreateChannel();
             Mock<ITestContract> server = Server();
-            server.Setup(v => v.ComplexFunction()).Returns<CompositeType>(null);
+            server.Setup(v => v.ComplexFunction()).Returns((CompositeType)null);
             Assert.Null(client.ComplexFunction());
         }
 

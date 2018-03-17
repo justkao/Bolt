@@ -38,9 +38,9 @@ namespace Bolt.Server
             {
                 response.Headers[actionContext.Configuration.Options.ServerErrorHeader] = error.ErrorCode.Value.ToString(CultureInfo.InvariantCulture);
             }
-            else if (error.Error != null)
+            else if (error.ServerError != null)
             {
-                response.Headers[actionContext.Configuration.Options.ServerErrorHeader] = error.Error.Value.ToString();
+                response.Headers[actionContext.Configuration.Options.ServerErrorHeader] = error.ServerError.Value.ToString();
             }
 
             LogBoltServerError(actionContext, error);
@@ -48,13 +48,13 @@ namespace Bolt.Server
 
         private void LogBoltServerError(ServerActionContext context, BoltServerException error)
         {
-            if (error.Error != null)
+            if (error.ServerError != null)
             {
                 Logger.LogError(
                     BoltLogId.RequestExecutionError,
                     "Execution of '{0}' failed with Bolt error '{1}'",
                     context.Action.Name,
-                    error.Error);
+                    error.ServerError);
             }
 
             if (error.ErrorCode != null)

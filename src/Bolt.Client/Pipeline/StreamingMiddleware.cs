@@ -56,7 +56,7 @@ namespace Bolt.Client.Pipeline
                 context.Request.Content = content ?? throw new BoltClientException(
                         $"Action '{context.Action.Name}' requires not null HttpContent parameter.",
                         ClientErrorCode.SerializeParameters,
-                        context.Action);
+                        context.Action.Name);
             }
         }
     }

@@ -9,7 +9,8 @@
   },
   "profiles": {
     "Bolt.Performance.Server": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "1000"
     }
   }
 }

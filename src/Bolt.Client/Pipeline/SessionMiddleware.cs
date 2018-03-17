@@ -88,7 +88,7 @@ namespace Bolt.Client.Pipeline
                     throw new BoltClientException(
                         $"Destroing session requires parameters that were not provided for action '{context.Action.Name}'.",
                         ClientErrorCode.InvalidDestroySessionParameters,
-                        context.Action,
+                        context.Action.Name,
                         null);
                 }
 
@@ -216,7 +216,7 @@ namespace Bolt.Client.Pipeline
                             throw new BoltClientException(
                                 "Proxy need to be initialized before it can be used.",
                                 ClientErrorCode.ProxyNotInitialized,
-                                context.Action,
+                                context.Action.Name,
                                 null);
                         }
                     }
@@ -241,7 +241,7 @@ namespace Bolt.Client.Pipeline
                         throw new BoltClientException(
                             $"Proxy is beeing initialized with invalid parameters. If session initialization has non empty parameters you should initialize it first by calling '{initSessionContext.Action.Name}' with proper parameters.",
                             ClientErrorCode.InvalidInitSessionParameters,
-                            context.Action,
+                            context.Action.Name,
                             e);
                     }
                 }
@@ -255,14 +255,14 @@ namespace Bolt.Client.Pipeline
                     string sessionId = ClientSessionHandler.GetSessionIdentifier(initSessionContext.Response);
                     if (initSessionContext.ServerConnection == null)
                     {
-                        throw new BoltClientException(ClientErrorCode.ConnectionUnavailable, initSessionContext.Action);
+                        throw new BoltClientException(ClientErrorCode.ConnectionUnavailable, initSessionContext.Action.Name);
                     }
 
                     sessionMetadata.InitSessionResult = initSessionContext.ActionResult;
                     sessionMetadata.InitSessionParameters = initSessionContext.Parameters;
                     sessionMetadata.SessionId = sessionId ?? throw new BoltServerException(
                             ServerErrorCode.SessionIdNotReceived,
-                            sessionMetadata.Contract.InitSession.Action,
+                            sessionMetadata.Contract.InitSession.Action.Name,
                             initSessionContext.Request?.RequestUri?.ToString());
                     sessionMetadata.ServerConnection = initSessionContext.ServerConnection;
                     sessionMetadata.ChangeState(context.Proxy, ProxyState.Open);

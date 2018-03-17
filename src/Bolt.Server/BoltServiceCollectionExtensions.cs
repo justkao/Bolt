@@ -7,6 +7,7 @@ using Bolt.Server;
 using Bolt.Server.Metadata;
 using Bolt.Server.Pipeline;
 using Bolt.Server.Session;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
@@ -43,6 +44,8 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddSingleton<IServerPipelineBuilder, ServerPipelineBuilder>();
             services.TryAddSingleton<IServerErrorHandler, ServerErrorHandler>();
             services.TryAddSingleton<ISerializer, JsonSerializer>();
+
+            services.AddRouting();
 
             return services;
         }

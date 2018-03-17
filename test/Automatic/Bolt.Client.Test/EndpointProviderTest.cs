@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using Xunit;
 
@@ -11,9 +12,9 @@ namespace Bolt.Client.Test
         [Theory]
         public void ValidateEndpoint(string server, string expectedResult)
         {
-            EndpointProvider endpointProvider = new EndpointProvider(new BoltOptions {Prefix = "test"});
+            EndpointProvider endpointProvider = new EndpointProvider(new BoltOptions { Prefix = "test" });
 
-            Assert.Equal<string>(expectedResult, endpointProvider.GetEndpoint(new Uri(server), GetType(), MethodInfo).ToString());
+            Assert.Equal(expectedResult, endpointProvider.GetEndpoint(new Uri(server), GetType(), MethodInfo).ToString());
         }
 
         [InlineData("http://localhost/", "http://localhost/test/EndpointProviderTest/Method")]
@@ -23,19 +24,19 @@ namespace Bolt.Client.Test
         {
             EndpointProvider endpointProvider = new EndpointProvider(new BoltOptions { Prefix = "test" });
 
-            Assert.Equal<string>(expectedResult, endpointProvider.GetEndpoint(new Uri(server), GetType(), MethodAsyncInfo).ToString());
+            Assert.Equal(expectedResult, endpointProvider.GetEndpoint(new Uri(server), GetType(), MethodAsyncInfo).ToString());
         }
 
-        public void Method()
+        protected void Method()
         {
         }
 
-        public void MethodAsync()
+        protected void MethodAsync()
         {
         }
 
-        private static readonly MethodInfo MethodInfo = typeof (EndpointProviderTest).GetRuntimeMethod("Method", new Type[0]);
+        private static readonly MethodInfo MethodInfo = typeof(EndpointProviderTest).GetRuntimeMethods().First(m => m.Name == nameof(Method));
 
-        private static readonly MethodInfo MethodAsyncInfo = typeof(EndpointProviderTest).GetRuntimeMethod("Method", new Type[0]);
+        private static readonly MethodInfo MethodAsyncInfo = typeof(EndpointProviderTest).GetRuntimeMethods().First(m => m.Name == nameof(MethodAsync));
     }
 }

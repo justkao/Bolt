@@ -1,27 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <Import Project="..\..\build\common.props" />
-  
   <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
     <Description>Bolt Tools used to generate client-side code.</Description>
-    <TargetFramework>netcoreapp1.0</TargetFramework>
-    <TargetFrameworks>netcoreapp1.0</TargetFrameworks>
     <AssemblyName>dotnet-bolt</AssemblyName>
+    <PackageType>DotnetTool</PackageType>
     <OutputType>Exe</OutputType>
     <PackageTags>bolt;tool;console</PackageTags>
+    <StartupObject>Bolt.Tools.Program</StartupObject>
   </PropertyGroup>
-  
+
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.0.1" />
-    <PackageReference Include="Newtonsoft.Json" Version="9.0.1" />
+    <PackageReference Include="Microsoft.Extensions.CommandLineUtils" Version="1.1.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="11.0.1" />
   </ItemGroup>
-  
-  <PropertyGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
-    <DefineConstants>$(DefineConstants);FEATURE_ASSEMBLY_LOAD_CONTEXT</DefineConstants>
-  </PropertyGroup>
-  
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">
-    <PackageReference Include="System.Runtime.Loader" Version="4.0.0" />
-  </ItemGroup>
-  
+
 </Project>

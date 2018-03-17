@@ -86,7 +86,7 @@ namespace Bolt.Client.Test
 
                 var result = await Proxy.CloseSession("temp");
 
-                Assert.Equal(result, "test");
+                Assert.Equal("test", result);
                 Callback.Verify();
             }
 

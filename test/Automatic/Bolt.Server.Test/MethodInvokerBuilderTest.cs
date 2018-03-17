@@ -56,7 +56,7 @@ namespace Bolt.Server.Test
 
             Moq.Mock<IDummyInterface> target = new Moq.Mock<IDummyInterface>();
             target.Setup(v => v.VoidMethod_Arguments(10, "val"));
-            Assert.Equal(null, lambda(target.Object, new object[] { 10, "val" }));
+            Assert.Null(lambda(target.Object, new object[] { 10, "val" }));
         }
 
         [Fact]

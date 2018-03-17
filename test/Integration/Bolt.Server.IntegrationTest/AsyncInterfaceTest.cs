@@ -45,7 +45,7 @@ namespace Bolt.Server.IntegrationTest
         {
             var proxy = CreateProxy();
             var error = await Assert.ThrowsAsync<BoltServerException>(() => proxy.DoSomethingAsyncInvalid(99, CancellationToken.None));
-            Assert.Equal(ServerErrorCode.ActionNotFound, error.Error);
+            Assert.Equal(ServerErrorCode.ActionNotFound, error.ServerError);
         }
 
         protected override void Configure(IApplicationBuilder appBuilder)

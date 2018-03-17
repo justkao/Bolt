@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client;
 using Microsoft.AspNetCore.Builder;
@@ -21,7 +22,7 @@ namespace Bolt.Server.IntegrationTest
         {
             Callback = new Mock<IDummyContract>();
 
-            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>())).Returns(Task.FromResult(true)).Verifiable();
+            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true)).Verifiable();
 
             Callback.Setup(c => c.OnExecute(It.IsAny<object>())).Callback<object>(
                 v =>
@@ -43,7 +44,7 @@ namespace Bolt.Server.IntegrationTest
 
             string sessionId = null;
 
-            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>())).Returns(Task.FromResult(true)).Verifiable();
+            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true)).Verifiable();
             Callback.Setup(c => c.OnExecute(It.IsAny<object>())).Callback<object>(
                 v =>
                 {
@@ -71,7 +72,7 @@ namespace Bolt.Server.IntegrationTest
             Callback = new Mock<IDummyContract>();
             List<string> sessions = new List<string>();
 
-            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>())).Returns(Task.FromResult(true)).Verifiable();
+            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true)).Verifiable();
             Callback.Setup(c => c.OnExecute(It.IsAny<object>())).Callback<object>(
                 v =>
                 {
@@ -91,7 +92,7 @@ namespace Bolt.Server.IntegrationTest
         {
             Callback = new Mock<IDummyContract>();
 
-            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>())).Returns(Task.FromResult(true)).Verifiable();
+            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true)).Verifiable();
 
             Callback.Setup(c => c.OnExecute(It.IsAny<object>())).Callback<object>(
                 v =>
@@ -108,8 +109,8 @@ namespace Bolt.Server.IntegrationTest
         {
             Callback = new Mock<IDummyContract>();
 
-            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>())).Returns(Task.FromResult(true)).Verifiable();
-            DistributedCache.Setup(c => c.GetAsync(It.IsAny<string>())).Returns(Task.FromResult((byte[])null)).Verifiable();
+            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true)).Verifiable();
+            DistributedCache.Setup(c => c.GetAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult((byte[])null)).Verifiable();
 
             Callback.Setup(c => c.OnExecute(It.IsAny<object>())).Callback<object>(
                 v =>
@@ -126,7 +127,7 @@ namespace Bolt.Server.IntegrationTest
         {
             Callback = new Mock<IDummyContract>();
 
-            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>())).Returns(Task.FromResult(true)).Verifiable();
+            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true)).Verifiable();
             DistributedCache.Setup(c => c.Get(It.IsAny<string>())).Returns(((byte[])null)).Verifiable();
 
             Callback.Setup(c => c.OnExecute(It.IsAny<object>())).Callback<object>(
@@ -143,10 +144,9 @@ namespace Bolt.Server.IntegrationTest
         public void LoadSession_SetValue_Ok()
         {
             Callback = new Mock<IDummyContract>();
-            DistributedCache.Setup(c => c.SetAsync(It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>()))
+            DistributedCache.Setup(c => c.SetAsync(It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(true))
                 .Verifiable();
-            DistributedCache.Setup(c => c.GetAsync(It.IsAny<string>())).Returns(Task.FromResult((byte[])null)).Verifiable();
             DistributedCache.Setup(c => c.Get(It.IsAny<string>())).Returns(((byte[])null)).Verifiable();
 
             Callback.Setup(c => c.OnExecute(It.IsAny<object>())).Callback<object>(
@@ -166,9 +166,10 @@ namespace Bolt.Server.IntegrationTest
         {
             List<string> sessions = new List<string>();
                  
-            Callback = new Mock<IDummyContract>();
-            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>())).Returns(Task.FromResult(true)).Callback<string>(
-                v =>
+            Callback = new Mock<IDummyContract>(MockBehavior.Strict);
+
+            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true)).Callback<string, CancellationToken>(
+                (v, t) =>
                     {
                         sessions.Add(v);
                     }).Verifiable();

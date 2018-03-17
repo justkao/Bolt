@@ -17,12 +17,12 @@ namespace Bolt.Client
                 return ErrorHandlingResult.Recover;
             }
 
-            if ((e as BoltServerException)?.Error == ServerErrorCode.ContractNotFound)
+            if ((e as BoltServerException)?.ServerError == ServerErrorCode.ContractNotFound)
             {
                 return ErrorHandlingResult.Close;
             }
 
-            if ((e as BoltServerException)?.Error == ServerErrorCode.SessionNotFound)
+            if ((e as BoltServerException)?.ServerError == ServerErrorCode.SessionNotFound)
             {
                 return ErrorHandlingResult.Recover; 
             }
