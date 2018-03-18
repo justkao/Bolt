@@ -1,6 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-  <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="$(NewtonsoftVersion)" />
-    <PackageReference Include="System.ServiceModel.Primitives" Version="4.4.1" />
-  </ItemGroup>
-</Project>

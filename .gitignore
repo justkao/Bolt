@@ -3,6 +3,7 @@
 [Oo]bj/
 [Bb]in/
 TestResults/
+benchmark/BenchmarkDotNet.Artifacts/
 .nuget/
 _ReSharper.*/
 packages/
