@@ -187,7 +187,7 @@ namespace Bolt.Client.Pipeline
             {
                 try
                 {
-                    await _serializer.WriteAsync(stream, _clientContext.Action.Parameters, _clientContext.Parameters).ConfigureAwait(false);
+                    await _serializer.WriteParametersAsync(stream, _clientContext.Action.Parameters, _clientContext.Parameters).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {

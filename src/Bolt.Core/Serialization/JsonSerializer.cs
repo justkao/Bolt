@@ -50,7 +50,7 @@ namespace Bolt.Serialization
             }
         }
 
-        public async Task WriteAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, IReadOnlyList<object> parameterValues)
+        public async Task WriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, IReadOnlyList<object> parameterValues)
         {
             if (stream == null)
             {
@@ -97,7 +97,7 @@ namespace Bolt.Serialization
             }
         }
 
-        public Task ReadAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] outputValues)
+        public Task ReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] outputValues)
         {
             if (stream == null)
             {

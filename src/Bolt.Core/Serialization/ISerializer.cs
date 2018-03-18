@@ -16,8 +16,8 @@ namespace Bolt.Serialization
 
         Task<object> ReadAsync(Stream stream, Type valueType);
 
-        Task WriteAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, IReadOnlyList<object> values);
+        Task WriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, IReadOnlyList<object> values);
 
-        Task ReadAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] outputValues);
+        Task ReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] outputValues);
     }
 }

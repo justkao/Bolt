@@ -64,7 +64,7 @@ namespace Bolt.Server.Pipeline
                 try
                 {
                     // TODO: copy body to another stream to prevent blocking in json deserialization
-                    await serializer.ReadAsync(context.HttpContext.Request.Body, metadata.SerializableParameters, parameterValues);
+                    await serializer.ReadParametersAsync(context.HttpContext.Request.Body, metadata.SerializableParameters, parameterValues);
                 }
                 catch (OperationCanceledException)
                 {

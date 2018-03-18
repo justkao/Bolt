@@ -43,24 +43,24 @@ namespace Bolt.Sample.ContentProtection
             return await _serializer.ReadAsync(new MemoryStream(data), valueType);
         }
 
-        public async Task WriteAsync(Stream stream, IReadOnlyList<ParameterMetadata> paramters, IReadOnlyList<object> values)
+        public async Task WriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> paramters, IReadOnlyList<object> values)
         {
             MemoryStream tempStream = new MemoryStream();
-            await _serializer.WriteAsync(tempStream, paramters, values);
+            await _serializer.WriteParametersAsync(tempStream, paramters, values);
             byte[] data = _protector.Protect(tempStream.ToArray());
             _logger.LogInformation("Parameters: Sending {0}B of protected data, Original: {1}B", data.Length, tempStream.ToArray().Length);
 
             await stream.WriteAsync(data, 0, data.Length);
         }
 
-        public async Task ReadAsync(Stream stream, IReadOnlyList<ParameterMetadata> metadata, object[] parameterValues)
+        public async Task ReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> metadata, object[] parameterValues)
         {
             MemoryStream tempStream = new MemoryStream();
             await stream.CopyToAsync(tempStream);
             byte[] data = _protector.Unprotect(tempStream.ToArray());
             _logger.LogInformation("Parameters: Received {0}B of protected data, Original: {1}B", tempStream.ToArray().Length, data.Length);
 
-            await _serializer.ReadAsync(new MemoryStream(data), metadata, parameterValues);
+            await _serializer.ReadParametersAsync(new MemoryStream(data), metadata, parameterValues);
         }
     }
 }
