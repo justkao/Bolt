@@ -20,7 +20,7 @@ namespace Bolt.Core.Test
         [Fact]
         public Task Write_NullStream_ThrowsArgumentNullException()
         {
-            return Assert.ThrowsAsync<ArgumentNullException>(() => Serializer.WriteAsync(new WriteValueContext(null, null, null)));
+            return Assert.ThrowsAsync<ArgumentNullException>(() => Serializer.WriteAsync(null, null));
         }
 
         [Fact]
@@ -28,14 +28,13 @@ namespace Bolt.Core.Test
         {
             // arrange
             MemoryStream stream = new MemoryStream();
-            await Serializer.WriteAsync(new WriteValueContext(stream, new TestActionContext(), null));
-            var readContext = new ReadValueContext(new MemoryStream(stream.ToArray()), new TestActionContext(), typeof(CompositeType));
+            await Serializer.WriteAsync(stream, null);
 
             // act 
-            await Serializer.ReadAsync(readContext);
+            var result = await Serializer.ReadAsync(new MemoryStream(stream.ToArray()), typeof(CompositeType));
 
             // assert
-            Assert.Null(readContext.GetValue<CompositeType>());
+            Assert.Null(result);
         }
 
         [Fact]
@@ -44,14 +43,13 @@ namespace Bolt.Core.Test
             // arrange
             CompositeType obj = CompositeType.CreateRandom();
             MemoryStream stream = new MemoryStream();
-            await Serializer.WriteAsync(new WriteValueContext(stream, new TestActionContext(), obj));
-            var readContext = new ReadValueContext(new MemoryStream(stream.ToArray()), new TestActionContext(), typeof(CompositeType));
+            await Serializer.WriteAsync(stream, obj);
 
             // act 
-            await Serializer.ReadAsync(readContext);
+            var result = await Serializer.ReadAsync(new MemoryStream(stream.ToArray()), typeof(CompositeType));
 
             // assert
-            Assert.Equal(obj, readContext.GetValue<CompositeType>());
+            Assert.Equal(obj, result);
         }
 
         [Fact]
@@ -60,14 +58,13 @@ namespace Bolt.Core.Test
             // arrange
             SimpleCustomType obj = new SimpleCustomType { BoolProperty = false };
             MemoryStream stream = new MemoryStream();
-            await Serializer.WriteAsync(new WriteValueContext(stream, new TestActionContext(), obj));
-            var readContext = new ReadValueContext(new MemoryStream(stream.ToArray()),  new TestActionContext(), typeof (SimpleCustomType));
+            await Serializer.WriteAsync(stream, obj);
 
             // act
-            await Serializer.ReadAsync(readContext);
+            var result = await Serializer.ReadAsync(new MemoryStream(stream.ToArray()), typeof(SimpleCustomType));
 
             // assert
-            Assert.Equal(obj, readContext.GetValue<SimpleCustomType>());
+            Assert.Equal(obj, result);
         }
 
         [Fact]
@@ -76,15 +73,14 @@ namespace Bolt.Core.Test
             // arrange
             CompositeType obj = CompositeType.CreateRandom();
             MemoryStream stream = new MemoryStream();
-            await Serializer.WriteAsync(new WriteValueContext(stream, new TestActionContext(), obj));
+            await Serializer.WriteAsync(stream, obj);
             stream.Seek(0, SeekOrigin.Begin);
-            var readContext = new ReadValueContext(stream, new TestActionContext(), typeof(CompositeType));
 
             // act 
-            await Serializer.ReadAsync(readContext);
+            var result = await Serializer.ReadAsync(stream, typeof(CompositeType));
 
             // assert
-            Assert.Equal(obj, readContext.GetValue<CompositeType>());
+            Assert.Equal(obj, result);
         }
 
         [Fact]
@@ -95,12 +91,11 @@ namespace Bolt.Core.Test
             MemoryStream stream = new MemoryStream();
 
             // act
-            await Serializer.WriteAsync(new WriteValueContext(stream, new TestActionContext(), obj));
-            var readContext = new ReadValueContext(new MemoryStream(stream.ToArray()),  new TestActionContext(), typeof (int));
-            await Serializer.ReadAsync(readContext);
+            await Serializer.WriteAsync(stream, obj);
+            var result = await Serializer.ReadAsync(new MemoryStream(stream.ToArray()), typeof(int));
 
             // assert
-            Assert.Equal(obj, readContext.GetValue<int>());
+            Assert.Equal(obj, result);
         }
 
         [Fact]
@@ -111,12 +106,11 @@ namespace Bolt.Core.Test
             MemoryStream stream = new MemoryStream();
 
             // act
-            await Serializer.WriteAsync(new WriteValueContext(stream, new TestActionContext(), obj));
-            var readContext = new ReadValueContext(new MemoryStream(stream.ToArray()), new TestActionContext(), typeof (List<int>));
-            await Serializer.ReadAsync(readContext);
+            await Serializer.WriteAsync(stream, obj);
+            var result = await Serializer.ReadAsync(new MemoryStream(stream.ToArray()), typeof(List<int>));
 
             // assert
-            Assert.Equal(obj, readContext.GetValue<List<int>>());
+            Assert.Equal(obj, result);
         }
     }
 }

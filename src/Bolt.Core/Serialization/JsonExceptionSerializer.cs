@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.Serialization.Formatters;
 using Newtonsoft.Json;
 
 namespace Bolt.Serialization
@@ -19,12 +18,13 @@ namespace Bolt.Serialization
 
         public JsonSerializerSettings ExceptionSerializerSettings { get; }
 
-        protected override Exception UnwrapCore(string wrappedException, ReadExceptionContext actionContext)
+
+        protected override Exception UnwrapCore(string serializedException)
         {
-            return JsonConvert.DeserializeObject<Exception>(wrappedException, ExceptionSerializerSettings);
+            return JsonConvert.DeserializeObject<Exception>(serializedException, ExceptionSerializerSettings);
         }
 
-        protected override string WrapCore(Exception exception, WriteExceptionContext actionContext)
+        protected override string WrapCore(Exception exception)
         {
             return JsonConvert.SerializeObject(exception, ExceptionSerializerSettings);
         }

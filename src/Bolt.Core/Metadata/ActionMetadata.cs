@@ -73,9 +73,11 @@ namespace Bolt.Metadata
                 int index = -1;
                 for (int i = 0; i < Parameters.Count; i++)
                 {
-                    if (typeof(CancellationToken).CanAssign(Parameters[i].Type) || typeof(CancellationToken?).CanAssign(Parameters[i].Type))
+
+                    if (Parameters[i].IsCancellationToken)
                     {
                         index = i;
+                        break;
                     }
                 }
 

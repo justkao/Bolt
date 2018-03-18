@@ -32,79 +32,64 @@ namespace Bolt.Serialization
 
         public Newtonsoft.Json.JsonSerializer Serializer { get; }
 
-        public async Task WriteAsync(WriteValueContext context)
+        public async Task WriteAsync(Stream stream, object value)
         {
-            if (context == null)
+            using (StreamWriter writer = CreateStreamWriter(stream))
             {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            if (context.Stream == null)
-            {
-                throw new ArgumentNullException(nameof(context.Stream));
-            }
-
-            using (StreamWriter writer = CreateStreamWriter(context.Stream))
-            {
-                Serializer.Serialize(writer, context.Value);
+                Serializer.Serialize(writer, value);
 
                 await writer.FlushAsync().ConfigureAwait(false);
             }
         }
 
-        public Task ReadAsync(ReadValueContext context)
+        public Task<object> ReadAsync(Stream stream, Type valueType)
         {
-            if (context == null)
+            using (TextReader reader = CreateStreamReader(stream))
             {
-                throw new ArgumentNullException(nameof(context));
+                return Task.FromResult(Serializer.Deserialize(reader, valueType));
             }
-
-            if (context.Stream == null)
-            {
-                throw new ArgumentNullException(nameof(context.Stream));
-            }
-
-            using (TextReader reader = CreateStreamReader(context.Stream))
-            {
-                context.Value = Serializer.Deserialize(reader, context.ValueType);
-            }
-
-            return Done;
         }
 
-        public async Task WriteAsync(WriteParametersContext context)
+        public async Task WriteAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, IReadOnlyList<object> parameterValues)
         {
-            if (context == null)
+            if (stream == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw new ArgumentNullException(nameof(stream));
             }
 
-            if (context.Stream == null)
-            {
-                throw new ArgumentNullException(nameof(context.Stream));
-            }
-
-            if (context.ParameterValues == null || context.ParameterValues.Count == 0)
+            if (parameters == null || parameters.Count == 0)
             {
                 return;
             }
 
-            using (StreamWriter streamWriter = CreateStreamWriter(context.Stream))
+            if (parameterValues?.Count != parameters.Count)
+            {
+                throw new ArgumentException(nameof(parameters), "The size of the parameter values must be the same as number of parameters");
+            }
+
+            using (StreamWriter streamWriter = CreateStreamWriter(stream))
             {
                 using (JsonTextWriter jsonWriter = new JsonTextWriter(streamWriter))
                 {
                     jsonWriter.CloseOutput = false;
                     jsonWriter.WriteStartObject();
 
-                    foreach (var parameterValue in context.ParameterValues)
+                    for (int i = 0; i < parameters.Count; i++)
                     {
-                        if (Equals(parameterValue.Value, null))
+                        var value = parameterValues[i];
+                        if (Equals(value, null))
                         {
                             continue;
                         }
 
-                        jsonWriter.WritePropertyName(parameterValue.Parameter.Name);
-                        Serializer.Serialize(jsonWriter, parameterValue.Value);
+                        var metadata = parameters[i];
+                        if (!metadata.IsSerializable)
+                        {
+                            continue;
+                        }
+
+                        jsonWriter.WritePropertyName(metadata.Name);
+                        Serializer.Serialize(jsonWriter, value);
                     }
                 }
 
@@ -112,26 +97,24 @@ namespace Bolt.Serialization
             }
         }
 
-        public Task ReadAsync(ReadParametersContext context)
+        public Task ReadAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] outputValues)
         {
-            if (context == null)
+            if (stream == null)
             {
-                throw new ArgumentNullException(nameof(context));
+                throw new ArgumentNullException(nameof(stream));
             }
 
-            if (context.Stream == null)
+            if (parameters == null || parameters.Count == 0)
             {
-                throw new ArgumentNullException(nameof(context.Stream));
+                throw new ArgumentNullException(nameof(parameters));
             }
 
-            if (context.Parameters == null || context.Parameters.Count == 0)
+            if (outputValues?.Length < parameters.Count)
             {
-                throw new ArgumentNullException(nameof(context.Parameters));
+                throw new ArgumentException(nameof(parameters), "The size of the output values must be the same as number of parameters");
             }
 
-            List<ParameterValue> result = new List<ParameterValue>();
-
-            using (StreamReader streamReader = CreateStreamReader(context.Stream))
+            using (StreamReader streamReader = CreateStreamReader(stream))
             {
                 using (JsonTextReader reader = new JsonTextReader(streamReader))
                 {
@@ -152,8 +135,8 @@ namespace Bolt.Serialization
                         }
 
                         string name = reader.Value as string;
-                        ParameterMetadata expectedParameter = FindParameterByName(context, name);
-                        if (expectedParameter == null)
+                        int index = FindParameterByName(parameters, name);
+                        if (index == -1)
                         {
                             // we will skip this value, no type definition available
                             reader.ReadAsString();
@@ -163,31 +146,30 @@ namespace Bolt.Serialization
                         reader.Read();
                         try
                         {
-                            result.Add(new ParameterValue(expectedParameter, Serializer.Deserialize(reader, expectedParameter.Type)));
+                            outputValues[index] = Serializer.Deserialize(reader, parameters[index].Type);
                         }
                         catch (Exception e)
                         {
-                            throw new InvalidOperationException($"Invalid json structure. Failed to deserialize '{name}' property of type '{expectedParameter.Type}'.", e);
+                            throw new InvalidOperationException($"Invalid json structure. Failed to deserialize '{name}' property of type '{parameters[index].Type}'.", e);
                         }
                     }
                 }
             }
 
-            context.ParameterValues = result;
-            return Done;
+            return Task.CompletedTask;
         }
 
-        private static ParameterMetadata FindParameterByName(ReadParametersContext parametersContext, string name)
+        private static int FindParameterByName(IReadOnlyList<ParameterMetadata> parameters, string name)
         {
-            for (int i = 0; i < parametersContext.Parameters.Count; i++)
+            for (int i = 0; i < parameters.Count; i++)
             {
-                if (string.Equals(parametersContext.Parameters[i].Name, name, StringComparison.OrdinalIgnoreCase))
+                if (string.Equals(parameters[i].Name, name, StringComparison.OrdinalIgnoreCase))
                 {
-                    return parametersContext.Parameters[i];
+                    return i;
                 }
             }
 
-            return null;
+            return -1;
         }
 
         private static StreamReader CreateStreamReader(Stream stream)

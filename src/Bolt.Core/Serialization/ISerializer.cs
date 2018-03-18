@@ -1,4 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Bolt.Serialization
 {
@@ -9,12 +12,12 @@ namespace Bolt.Serialization
         /// </summary>
         string MediaType { get; }
 
-        Task WriteAsync(WriteValueContext context);
+        Task WriteAsync(Stream stream, object value);
 
-        Task ReadAsync(ReadValueContext context);
+        Task<object> ReadAsync(Stream stream, Type valueType);
 
-        Task WriteAsync(WriteParametersContext context);
+        Task WriteAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, IReadOnlyList<object> values);
 
-        Task ReadAsync(ReadParametersContext context);
+        Task ReadAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] outputValues);
     }
 }
