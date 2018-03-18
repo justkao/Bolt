@@ -58,13 +58,13 @@ namespace Bolt.Server.Pipeline
 
         protected virtual async Task DeserializeParameters(ServerActionContext context, ActionMetadata metadata, object[] parameterValues)
         {
-            if (metadata.SerializableParameters?.Count > 0)
+            if (metadata.HasSerializableParameters)
             {
                 ISerializer serializer = context.GetSerializerOrThrow();
                 try
                 {
                     // TODO: copy body to another stream to prevent blocking in json deserialization
-                    await serializer.ReadParametersAsync(context.HttpContext.Request.Body, metadata.SerializableParameters, parameterValues);
+                    await serializer.ReadParametersAsync(context.HttpContext.Request.Body, metadata.Parameters, parameterValues);
                 }
                 catch (OperationCanceledException)
                 {
@@ -78,11 +78,6 @@ namespace Bolt.Server.Pipeline
                         context.Action.Name,
                         context.RequestUrl,
                         e);
-                }
-
-                if (metadata.CancellationTokenIndex >= 0)
-                {
-                    parameterValues[metadata.CancellationTokenIndex] = context.RequestAborted;
                 }
             }
 

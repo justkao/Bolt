@@ -83,6 +83,22 @@ namespace Bolt.Server.IntegrationTest
         }
 
         [Fact]
+        public void CancelationAsFirstParameter_OK()
+        {
+            var pipeline = CreatePipeline();
+
+            var client1 = CreateChannel(pipeline);
+
+            Mock<ITestContract> server = Server();
+            server.Setup(s => s.SimpleWithCancellationAsFirstArgument(It.IsAny<CancellationToken>(), 55)).Verifiable();
+            client1.SimpleWithCancellationAsFirstArgument(CancellationToken.None, 55);
+            (client1 as IDisposable)?.Dispose();
+
+            server.Verify();
+        }
+
+
+        [Fact]
         public void ValidateGeneratedSyncFunction()
         {
             var pipeline = CreatePipeline();

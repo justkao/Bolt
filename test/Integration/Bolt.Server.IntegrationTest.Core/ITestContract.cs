@@ -51,6 +51,8 @@ namespace Bolt.Server.IntegrationTest.Core
 
         void SimpleMethodWithCancellation(CancellationToken cancellation);
 
+        void SimpleWithCancellationAsFirstArgument(CancellationToken cancellation, int value);
+
         [AsyncOperation]
         CompositeType ComplexFunction();
     }

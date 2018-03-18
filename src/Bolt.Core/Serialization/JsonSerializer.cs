@@ -165,6 +165,11 @@ namespace Bolt.Serialization
             {
                 if (string.Equals(parameters[i].Name, name, StringComparison.OrdinalIgnoreCase))
                 {
+                    if (!parameters[i].IsSerializable)
+                    {
+                        return -1;
+                    }
+
                     return i;
                 }
             }

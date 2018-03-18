@@ -10,17 +10,16 @@ namespace Bolt.Metadata
 {
     public sealed class ActionMetadata
     {
-        private ReadOnlyCollection<ParameterMetadata> _serializableParameters;
-        private int? _cancellationTokenIndex;
-
         public ActionMetadata(MethodInfo action, ParameterMetadata[] parameters, Type resultType)
         {
             Action = action;
             Parameters = new ReadOnlyCollection<ParameterMetadata>(parameters);
             ResultType = resultType;
             Timeout = TimeSpan.Zero;
-            IsAsync = typeof (Task).GetTypeInfo().IsAssignableFrom(action.ReturnType.GetTypeInfo());
+            IsAsync = typeof(Task).GetTypeInfo().IsAssignableFrom(action.ReturnType.GetTypeInfo());
             NormalizedName = BoltFramework.NormalizeActionName(Name.AsReadOnlySpan()).ConvertToString();
+            HasSerializableParameters = Parameters.Any(p => p.IsSerializable);
+            CancellationTokenIndex = GetCancellationTokenIndex();
         }
 
         public string Name => Action.Name;
@@ -48,49 +47,13 @@ namespace Bolt.Metadata
 
         public IReadOnlyList<ParameterMetadata> Parameters { get; }
 
-        public IReadOnlyList<ParameterMetadata> SerializableParameters
-        {
-            get
-            {
-                if (_serializableParameters == null)
-                {
-                    _serializableParameters = new ReadOnlyCollection<ParameterMetadata>(GetSerializableParameters().ToArray());
-                }
-
-                return _serializableParameters;
-            }
-        }
-
-        public int CancellationTokenIndex
-        {
-            get
-            {
-                if (_cancellationTokenIndex.HasValue)
-                {
-                    return _cancellationTokenIndex.Value;
-                }
-
-                int index = -1;
-                for (int i = 0; i < Parameters.Count; i++)
-                {
-
-                    if (Parameters[i].IsCancellationToken)
-                    {
-                        index = i;
-                        break;
-                    }
-                }
-
-                _cancellationTokenIndex = index;
-                return index;
-            }
-        }
-
         public Type ResultType { get; }
 
         public bool HasResult => ResultType != typeof(void);
 
-        public bool HasSerializableParameters => SerializableParameters.Count > 0;
+        public bool HasSerializableParameters { get; }
+
+        public int CancellationTokenIndex { get; }
 
         public bool HasCancellationToken => CancellationTokenIndex >= 0;
 
@@ -132,18 +95,17 @@ namespace Bolt.Metadata
             }
         }
 
-        private IEnumerable<ParameterMetadata> GetSerializableParameters()
+        private int GetCancellationTokenIndex()
         {
             for (int i = 0; i < Parameters.Count; i++)
             {
-                if (i == CancellationTokenIndex)
+                if (Parameters[i].IsCancellationToken)
                 {
-                    continue;
+                    return i;
                 }
-
-                yield return Parameters[i];
             }
-        }
 
+            return -1;
+        }
     }
 }

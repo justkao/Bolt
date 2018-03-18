@@ -70,7 +70,7 @@ namespace Bolt.Server.Metadata
 
                     if (context.Action.HasSerializableParameters)
                     {
-                        actionMetadata.Parameters = context.Action.SerializableParameters.Select(p=>p.Name).ToArray();
+                        actionMetadata.Parameters = context.Action.Parameters.Where(p => p.IsSerializable).Select(p => p.Name).ToArray();
                     }
 
                     if (context.Action.HasResult)
