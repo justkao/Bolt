@@ -1,10 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <DotNetCliToolReference Include="Bolt.Tools" Version="0.50.0-alpha1" />
-  </ItemGroup>
-  
-  <ItemGroup>
     <ProjectReference Include="..\..\..\src\Bolt.Core\Bolt.Core.csproj" />
     <ProjectReference Include="..\..\Common\Bolt.Test.Common\Bolt.Test.Common.csproj" />
   </ItemGroup>
