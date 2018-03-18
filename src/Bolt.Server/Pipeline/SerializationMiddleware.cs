@@ -81,9 +81,9 @@ namespace Bolt.Server.Pipeline
                 }
             }
 
-            if (metadata.CancellationTokenIndex == 0)
+            if (metadata.CancellationTokenIndex >= 0)
             {
-                parameterValues[0] = context.RequestAborted;
+                parameterValues[metadata.CancellationTokenIndex] = context.RequestAborted;
             }
         }
 
