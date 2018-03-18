@@ -1,3 +1,4 @@
+using Bolt.Metadata;
 using System;
 
 namespace Bolt.Pipeline
@@ -8,6 +9,6 @@ namespace Bolt.Pipeline
 
         TMiddleware Find<TMiddleware>() where TMiddleware : IMiddleware<T>;
 
-        void Validate(Type contract);
+        void Validate(ContractMetadata contract);
     }
 }

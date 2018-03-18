@@ -61,7 +61,7 @@ namespace Bolt.Client.Test
 
         private MethodInfo GetMethod(string name, params Type[] paramters)
         {
-            return Contract.GetTypeInfo().GetMethod(name, paramters);
+            return Contract.Contract.GetTypeInfo().GetMethod(name, paramters);
         }
     }
 }

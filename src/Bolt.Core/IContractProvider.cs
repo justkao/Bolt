@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt.Metadata;
+using System;
 
 namespace Bolt
 {
@@ -10,6 +11,6 @@ namespace Bolt
         /// <summary>
         /// Gets the contract type assigned to object.
         /// </summary>
-        Type Contract { get; }
+        ContractMetadata Contract { get; }
     }
 }

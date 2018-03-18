@@ -90,7 +90,7 @@ namespace Bolt.Client.Test
 
         private class TimeoutProvider : IRequestTimeoutProvider
         {
-            public TimeSpan GetActionTimeout(Type contract, ActionMetadata actionMetadata)
+            public TimeSpan GetActionTimeout(ContractMetadata contract, ActionMetadata actionMetadata)
             {
                 throw new NotImplementedException();
             }

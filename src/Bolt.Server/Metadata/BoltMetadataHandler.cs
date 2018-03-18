@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Bolt.Metadata;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -32,7 +33,7 @@ namespace Bolt.Server.Metadata
             try
             {
                 string result = JsonConvert.SerializeObject(
-                    contracts.Select(c => BoltFramework.GetContractName(c.Contract)).ToList(),
+                    contracts.Select(c => c.Contract.NormalizedName).ToList(),
                     Formatting.Indented,
                     new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
 
@@ -51,10 +52,10 @@ namespace Bolt.Server.Metadata
                 string result;
                 string actionName = (context.HttpContext.Request.Query["action"]);
 
-                MethodInfo action = null;
+                Bolt.Metadata.ActionMetadata action = null;
                 if (!string.IsNullOrEmpty(actionName))
                 {
-                    action = _actionResolver.Resolve(context.Contract, actionName);
+                    action = _actionResolver.Resolve(context.Contract, actionName.AsReadOnlySpan());
                 }
 
                 if (action == null)
@@ -67,14 +68,14 @@ namespace Bolt.Server.Metadata
                     context.Action = action;
                     ActionMetadata actionMetadata = new ActionMetadata();
 
-                    if (context.ActionMetadata.HasSerializableParameters)
+                    if (context.Action.HasSerializableParameters)
                     {
-                        actionMetadata.Parameters = context.ActionMetadata.SerializableParameters.Select(p=>p.Name).ToArray();
+                        actionMetadata.Parameters = context.Action.SerializableParameters.Select(p=>p.Name).ToArray();
                     }
 
-                    if (context.ActionMetadata.HasResult)
+                    if (context.Action.HasResult)
                     {
-                        actionMetadata.Response = context.ActionMetadata.ResultType.Name;
+                        actionMetadata.Response = context.Action.ResultType.Name;
                     }
 
                     result = JsonConvert.SerializeObject(actionMetadata, Formatting.Indented, CreateSettings());
@@ -94,12 +95,12 @@ namespace Bolt.Server.Metadata
             }
         }
 
-        private ContractMetadata CrateContractMetadata(ServerActionContext context)
+        private RawContractMetadata CrateContractMetadata(ServerActionContext context)
         {
             var feature = context.HttpContext.Features.Get<IBoltFeature>();
-            var m = new ContractMetadata
+            var m = new RawContractMetadata
                         {
-                            Actions = BoltFramework.GetContractActions(context.Contract).Select(a => a.Name).ToList(),
+                            Actions = context.Contract.Actions.ToArray().Select(a => a.Name).ToList(),
                             ErrorHeader = feature.ActionContext.Configuration.Options.ServerErrorHeader,
                             ContentTypes = feature.ActionContext.Configuration.AvailableSerializers.Select(s => s.MediaType).ToArray()
                         };
@@ -118,7 +119,7 @@ namespace Bolt.Server.Metadata
             public string Response { get; set; }
         }
 
-        protected class ContractMetadata
+        protected class RawContractMetadata
         {
             public string[] ContentTypes { get; set; }
 

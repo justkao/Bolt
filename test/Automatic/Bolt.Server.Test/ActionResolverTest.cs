@@ -15,9 +15,12 @@ namespace Bolt.Server.Test
         [Theory]
         public void Resolve_Ok(string actionName)
         {
+            var contract= BoltFramework.GetContract(typeof(IContract1));
+
+
             ActionResolver resolver = new ActionResolver();
 
-            Assert.NotNull(resolver.Resolve(typeof (IContract1), actionName));
+            Assert.NotNull(resolver.Resolve(typeof(IContract1), actionName));
         }
 
         [InlineData("Method")]
@@ -31,7 +34,7 @@ namespace Bolt.Server.Test
             ActionResolver resolver = new ActionResolver();
 
             Assert.NotNull(resolver.Resolve(typeof(IContract2), actionName));
-            Assert.Equal(nameof(IContract2.MethodAsync), resolver.Resolve(typeof (IContract2), actionName).Name);
+            Assert.Equal(nameof(IContract2.MethodAsync), resolver.Resolve(typeof(IContract2), actionName).Name);
         }
 
         [InlineData("initboltsession")]
@@ -52,17 +55,17 @@ namespace Bolt.Server.Test
             Assert.Equal(BoltFramework.SessionMetadata.Resolve(typeof(IContract1)).DestroySession.Action, resolver.Resolve(typeof(IContract1), actionName));
         }
 
-        private  interface IContract1 : IContractInner
+        public interface IContract1 : IContractInner
         {
             void Method();
         }
 
-        private interface IContractInner
+        public interface IContractInner
         {
             void InnerMethod();
         }
 
-        private interface IContract2 : IContractInner
+        public interface IContract2 : IContractInner
         {
             void Method();
 

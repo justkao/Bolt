@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -8,6 +9,8 @@ namespace Bolt
 {
     public static class BoltFramework
     {
+        private static readonly ConcurrentDictionary<Type, ContractMetadata> _contracts = new ConcurrentDictionary<Type, ContractMetadata>();
+
         public const string AsyncPostFix = "Async";
 
         public const int DefaultBufferSize = 80 * 1024;
@@ -16,17 +19,22 @@ namespace Bolt
 
         public static readonly IActionMetadataProvider ActionMetadata = new ActionMetadataProvider();
 
-        public static IEnumerable<MethodInfo> GetContractActions(Type contract)
+        public static ContractMetadata GetContract(Type contract)
         {
             if (contract == null)
             {
                 throw new ArgumentNullException(nameof(contract));
             }
 
-            return contract.GetRuntimeMethods();
+            return _contracts.GetOrAdd(
+                contract, 
+                key => 
+                {
+                    return new ContractMetadata(contract);
+                });
         }
 
-        public static void ValidateContract(Type contract)
+        public static IEnumerable<MethodInfo> ValidateContract(Type contract)
         {
             if (contract == null)
             {
@@ -39,60 +47,77 @@ namespace Bolt
                     $"Unable to use class '{contract.FullName}' as contract because only interface contracts are supported.");
             }
 
-            if (contract.GetRuntimeProperties().Any())
+            if (GetContractProperties(contract).Any())
             {
                 throw new InvalidOperationException(
                     $"Unable to use interface '{contract.FullName}' as contract because it contains properties.");
             }
 
-            IEnumerable<MethodInfo> methods = contract.GetRuntimeMethods().ToList();
+            IEnumerable<MethodInfo> methods = GetContractMethods(contract).ToArray();
             if (methods.Count() != methods.Select(m => m.Name).Distinct().Count())
             {
-                throw new InvalidOperationException(
-                    $"Unable to use interface '{contract.FullName}' as contract because it contains methods with the same name.");
+                throw new InvalidOperationException($"Unable to use interface '{contract.FullName}' as contract because it contains methods with the same name.");
             }
+
+            return methods;
         }
 
-        public static string GetContractName(Type contract)
+        public static ReadOnlySpan<char> GetNormalizedContractName(Type contract)
         {
             if (contract == null)
             {
                 throw new ArgumentNullException(nameof(contract));
             }
 
-            string name = contract.Name;
-            if (name.StartsWith("I"))
+            return NormalizeContractName(contract.Name.AsReadOnlySpan());
+        }
+
+        public static ReadOnlySpan<char> NormalizeContractName(ReadOnlySpan<char> contractName)
+        {
+            if (contractName.IsEmpty)
             {
-                name = name.Substring(1);
+                throw new ArgumentNullException(nameof(contractName));
             }
 
-            string coerced;
-            if (TrimAsyncPostfix(name, out coerced))
+            if (contractName[0] == 'I')
             {
-                return coerced;
+                contractName = contractName.Slice(1);
+            }
+
+            return TrimAsyncPostfix(contractName);
+        }
+
+
+        public static ReadOnlySpan<char> NormalizeActionName(ReadOnlySpan<char> action)
+        {
+            if (action.Length == AsyncPostFix.Length)
+            {
+                return action;
+            }
+
+            return TrimAsyncPostfix(action);
+        }
+
+        private static IEnumerable<MethodInfo> GetContractMethods(Type contract)
+        {
+            return contract.GetTypeInfo().ImplementedInterfaces.SelectMany(i => i.GetRuntimeMethods()).Concat(contract.GetRuntimeMethods()).Distinct();
+        }
+
+        private static IEnumerable<PropertyInfo> GetContractProperties(Type contract)
+        {
+            return contract.GetTypeInfo().ImplementedInterfaces.SelectMany(i => i.GetRuntimeProperties()).Concat(contract.GetRuntimeProperties()).Distinct();
+        }
+
+        private static ReadOnlySpan<char> TrimAsyncPostfix(ReadOnlySpan<char> name)
+        {
+            if (name.EndsWithInvariant(AsyncPostFix.AsReadOnlySpan()))
+            {
+                return name.Slice(0, name.Length - AsyncPostFix.Length);
             }
 
             return name;
         }
 
-        public static bool TrimAsyncPostfix(string name, out string coercedName)
-        {
-            int index = name.IndexOf(AsyncPostFix, StringComparison.OrdinalIgnoreCase);
-            if (index <= 0)
-            {
-                coercedName = name;
-                return false;
-            }
-
-            if (index + AsyncPostFix.Length < name.Length)
-            {
-                coercedName = name;
-                return false;
-            }
-
-            coercedName = name.Substring(0, index);
-            return true;
-        }
         internal static bool CanAssign(this Type type, Type other)
         {
             return type.GetTypeInfo().IsAssignableFrom(other.GetTypeInfo());

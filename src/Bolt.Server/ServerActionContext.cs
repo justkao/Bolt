@@ -42,7 +42,7 @@ namespace Bolt.Server
         {
             get
             {
-                if (HttpContext == null || ActionMetadata == null || ActionMetadata.CancellationTokenIndex < 0)
+                if (HttpContext == null || Action == null || Action.CancellationTokenIndex < 0)
                 {
                     return CancellationToken.None;
                 }

@@ -42,7 +42,7 @@ namespace Bolt.Client.Pipeline
             // access or create session assigned to current proxy
             SessionMetadata session = _sessions.GetOrAdd(
                 context.Proxy,
-                proxy => new SessionMetadata(BoltFramework.SessionMetadata.Resolve(proxy.Contract)));
+                proxy => new SessionMetadata(proxy.Contract.Session));
 
             if (session.State != ProxyState.Open)
             {
@@ -56,7 +56,7 @@ namespace Bolt.Client.Pipeline
                 context.ServerConnection = session.ServerConnection;
             }
 
-            if (context.Action == session.Contract.InitSession.Action)
+            if (context.Action.Action == session.Contract.InitSession.Action)
             {
                 // at this point session is opened, assign initialization result just in case
                 if (context.ActionResult == null)
@@ -64,7 +64,7 @@ namespace Bolt.Client.Pipeline
                     context.ActionResult = session.InitSessionResult;
                 }
             }
-            else if (context.Action == session.Contract.DestroySession.Action)
+            else if (context.Action.Action == session.Contract.DestroySession.Action)
             {
                 if (context.Proxy.State == ProxyState.Closed)
                 {
@@ -205,7 +205,7 @@ namespace Bolt.Client.Pipeline
                 }
 
                 ClientActionContext initSessionContext = context;
-                if (context.Action != sessionMetadata.Contract.InitSession.Action)
+                if (context.Action.Action != sessionMetadata.Contract.InitSession.Action)
                 {
                     // we are not initializaing proxy explicitely, so we need to check whether proxy has been initalized before
                     if (sessionMetadata.Contract.InitSession.HasParameters)
@@ -226,7 +226,7 @@ namespace Bolt.Client.Pipeline
                     initSessionContext.Init(
                         context.Proxy,
                         context.Contract,
-                        sessionMetadata.Contract.InitSession.Action,
+                        sessionMetadata.Contract.InitSession,
                         sessionMetadata.InitSessionParameters);
                 }
                 else if (sessionMetadata.Contract.InitSession.HasParameters)
@@ -285,7 +285,7 @@ namespace Bolt.Client.Pipeline
                 finally
                 {
                     // we should not dispose original context
-                    if (context.Action != sessionMetadata.Contract.InitSession.Action)
+                    if (context.Action.Action != sessionMetadata.Contract.InitSession.Action)
                     {
                         initSessionContext.Reset();
                     }

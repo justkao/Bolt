@@ -1,3 +1,4 @@
+using Bolt.Metadata;
 using System;
 using System.Threading.Tasks;
 
@@ -9,6 +10,6 @@ namespace Bolt.Pipeline
 
         void Init(ActionDelegate<T> next);
 
-        void Validate(Type contract);
+        void Validate(ContractMetadata contract);
     }
 }

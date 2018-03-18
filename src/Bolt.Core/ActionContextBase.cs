@@ -12,29 +12,10 @@ namespace Bolt
     public abstract class ActionContextBase : IContractProvider
     {
         private IDictionary<object, object> _items;
-        private ActionMetadata _actionMetadata;
 
-        public Type Contract { get; set; }
+        public ContractMetadata Contract { get; set; }
 
-        public MethodInfo Action { get; set; }
-
-        public ActionMetadata ActionMetadata
-        {
-            get
-            {
-                if (Action == null)
-                {
-                    return null;
-                }
-
-                if ( _actionMetadata == null)
-                {
-                    _actionMetadata = BoltFramework.ActionMetadata.Resolve(Action);
-                }
-
-                return _actionMetadata;
-            }
-        }
+        public ActionMetadata Action { get; set; }
 
         public object ActionResult { get; set; }
 
@@ -42,16 +23,14 @@ namespace Bolt
 
         public virtual CancellationToken RequestAborted { get; set; }
 
-        public string ContractName => this.GetContractName();
-
-        public ActionMetadata GetActionMetadataOrThrow()
+        public ActionMetadata GetActionOrThrow()
         {
-            if (ActionMetadata == null)
+            if (Action == null)
             {
                 throw new InvalidOperationException("Required ActionMetadata instance is not assigned to current action.");
             }
 
-            return ActionMetadata;
+            return Action;
         }
 
         public IDictionary<object, object> Items
@@ -68,7 +47,6 @@ namespace Bolt
             Parameters = null;
             RequestAborted = CancellationToken.None;
             _items = null;
-            _actionMetadata = null;
         }
     }
 }

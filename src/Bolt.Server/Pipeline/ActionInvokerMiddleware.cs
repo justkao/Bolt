@@ -12,15 +12,15 @@ namespace Bolt.Server.Pipeline
 {
     public class ActionInvokerMiddleware : MiddlewareBase<ServerActionContext>
     {
-        private readonly ConcurrentDictionary<MethodInfo, ActionDescriptor> _actions = new ConcurrentDictionary<MethodInfo, ActionDescriptor>();
+        private readonly ConcurrentDictionary<ActionMetadata, ActionDescriptor> _actions = new ConcurrentDictionary<ActionMetadata, ActionDescriptor>();
 
         public override async Task InvokeAsync(ServerActionContext context)
         {
-            if (context.GetActionMetadataOrThrow().HasParameters)
+            if (context.GetActionOrThrow().HasParameters)
             {
                 try
                 {
-                    context.GetActionMetadataOrThrow().ValidateParameters(context.Parameters);
+                    context.GetActionOrThrow().ValidateParameters(context.Parameters);
                 }
                 catch (Exception e)
                 {
@@ -48,15 +48,14 @@ namespace Bolt.Server.Pipeline
             }
             */
 
-            if (context.Action == BoltFramework.SessionMetadata.InitSessionDefault ||
-                context.Action == BoltFramework.SessionMetadata.DestroySessionDefault)
+            if (context.Action.Action == BoltFramework.SessionMetadata.InitSessionDefault ||
+                context.Action.Action == BoltFramework.SessionMetadata.DestroySessionDefault)
             {
                 await Next(context);
             }
             else
             {
-                ActionDescriptor result = _actions.GetOrAdd(context.Action,
-                    a => new ActionDescriptor(BoltFramework.ActionMetadata.Resolve(a)));
+                ActionDescriptor result = _actions.GetOrAdd(context.Action, a => new ActionDescriptor(a));
                 await result.Execute(context);
                 await Next(context);
             }

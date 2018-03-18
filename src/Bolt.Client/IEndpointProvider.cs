@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt.Metadata;
+using System;
 using System.Reflection;
 
 namespace Bolt.Client
@@ -15,6 +16,6 @@ namespace Bolt.Client
         /// <param name="contract">Contract that contains the action.</param>
         /// <param name="action">The descriptor of action. This parameter might be null.</param>
         /// <returns>The result url of action.</returns>
-        Uri GetEndpoint(Uri server, Type contract, MethodInfo action);
+        Uri GetEndpoint(Uri server, ContractMetadata contract, ActionMetadata action);
     }
 }

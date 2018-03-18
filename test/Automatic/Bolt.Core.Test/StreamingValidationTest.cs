@@ -12,7 +12,7 @@ namespace Bolt.Core.Test
         [Fact]
         public void Validate_Ok()
         {
-            new TestStreamingMiddleware().Validate(typeof(IValid));
+            new TestStreamingMiddleware().Validate(BoltFramework.GetContract(typeof(IValid)));
         }
 
         [Fact]
@@ -20,7 +20,7 @@ namespace Bolt.Core.Test
         {
             TestStreamingMiddleware middleware = new TestStreamingMiddleware();
 
-            Assert.Throws<ContractViolationException>(() => middleware.Validate(typeof (IInvalid1)));
+            Assert.Throws<ContractViolationException>(() => middleware.Validate(BoltFramework.GetContract(typeof(IInvalid1))));
         }
 
         [Fact]
@@ -28,7 +28,7 @@ namespace Bolt.Core.Test
         {
             TestStreamingMiddleware middleware = new TestStreamingMiddleware();
 
-            Assert.Throws<ContractViolationException>(() => middleware.Validate(typeof(IInvalid2)));
+            Assert.Throws<ContractViolationException>(() => middleware.Validate(BoltFramework.GetContract(typeof(IInvalid2))));
         }
 
         [Fact]
@@ -36,7 +36,7 @@ namespace Bolt.Core.Test
         {
             TestStreamingMiddleware middleware = new TestStreamingMiddleware();
 
-            Assert.Throws<ContractViolationException>(() => middleware.Validate(typeof(IInvalid3)));
+            Assert.Throws<ContractViolationException>(() => middleware.Validate(BoltFramework.GetContract(typeof(IInvalid3))));
         }
 
         public class TestStreamingMiddleware : StreamingMiddlewareBase<ActionContextBase>

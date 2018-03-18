@@ -1,3 +1,4 @@
+using Bolt.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +20,9 @@ namespace Bolt.Pipeline
             return (TMiddleware)Middlewares.FirstOrDefault(m => m is TMiddleware);
         }
 
-        public void Validate(Type contract)
+        public void Validate(ContractMetadata contract)
         {
             if (contract == null) throw new ArgumentNullException(nameof(contract));
-            BoltFramework.ValidateContract(contract);
 
             foreach (IMiddleware<T> middleware in Middlewares)
             {

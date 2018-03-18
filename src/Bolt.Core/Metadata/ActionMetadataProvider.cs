@@ -18,12 +18,8 @@ namespace Bolt.Metadata
         {
             ParameterInfo[] parameters = method.GetParameters();
 
-            ActionMetadata descriptor = new ActionMetadata();
-            descriptor.Action = method;
-            descriptor.Parameters = parameters.Select(p => new ParameterMetadata(p.ParameterType, p.Name)).ToArray();
-            descriptor.ResultType = GetResultType(method);
+            ActionMetadata descriptor = new ActionMetadata(method, parameters.Select(p => new ParameterMetadata(p.ParameterType, p.Name)).ToArray(), GetResultType(method));
             descriptor.Timeout = GetTimeout(method);
-            descriptor.IsAsync = typeof(Task).GetTypeInfo().IsAssignableFrom(method.ReturnType.GetTypeInfo());
             return descriptor;
         }
 

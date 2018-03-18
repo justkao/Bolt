@@ -19,7 +19,7 @@ namespace Bolt.Server.Pipeline
                 context.Configuration.DefaultSerializer = PickSerializer(context);
             }
 
-            var actionMetadata = context.GetActionMetadataOrThrow();
+            var actionMetadata = context.GetActionOrThrow();
             if (actionMetadata.HasParameters && context.Parameters == null)
             {
                 context.Parameters = await DeserializeParameters(context, actionMetadata);
@@ -98,7 +98,7 @@ namespace Bolt.Server.Pipeline
             context.RequestAborted.ThrowIfCancellationRequested();
             context.HttpContext.Response.StatusCode = 200;
 
-            if (context.GetActionMetadataOrThrow().HasResult && context.ActionResult != null)
+            if (context.GetActionOrThrow().HasResult && context.ActionResult != null)
             {
                 context.HttpContext.Response.ContentType = context.Configuration.DefaultSerializer.MediaType;
                 try

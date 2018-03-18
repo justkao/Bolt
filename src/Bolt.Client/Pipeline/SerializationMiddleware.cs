@@ -75,7 +75,7 @@ namespace Bolt.Client.Pipeline
             }
             else
             {
-                if (context.GetActionMetadataOrThrow().HasResult && context.ActionResult == null)
+                if (context.GetActionOrThrow().HasResult && context.ActionResult == null)
                 {
                     using (Stream stream = await GetResponseStreamAsync(context.Response).ConfigureAwait(false))
                     {
@@ -92,7 +92,7 @@ namespace Bolt.Client.Pipeline
 
         protected virtual HttpContent BuildRequestContent(ClientActionContext context)
         {
-            ActionMetadata metadata = context.GetActionMetadataOrThrow();
+            ActionMetadata metadata = context.GetActionOrThrow();
             if (metadata.HasSerializableParameters)
             {
                 try
@@ -122,7 +122,7 @@ namespace Bolt.Client.Pipeline
         {
             List<ParameterValue> parameterValues = null;
 
-            for (int i = 0; i < context.ActionMetadata.Parameters.Count; i++)
+            for (int i = 0; i < context.Action.Parameters.Count; i++)
             {
                 if (context.Parameters[i] == null)
                 {
@@ -139,7 +139,7 @@ namespace Bolt.Client.Pipeline
                     parameterValues = new List<ParameterValue>();
                 }
 
-                parameterValues.Add(new ParameterValue(context.ActionMetadata.Parameters[i], context.Parameters[i]));
+                parameterValues.Add(new ParameterValue(context.Action.Parameters[i], context.Parameters[i]));
             }
 
             return parameterValues;
@@ -149,7 +149,7 @@ namespace Bolt.Client.Pipeline
         {
             try
             {
-                var readContext = new ReadValueContext(stream, context, context.ActionMetadata.ResultType);
+                var readContext = new ReadValueContext(stream, context, context.Action.ResultType);
                 await Serializer.ReadAsync(readContext).ConfigureAwait(false);
                 return readContext.Value;
             }

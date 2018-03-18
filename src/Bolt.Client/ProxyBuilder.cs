@@ -174,13 +174,11 @@ namespace Bolt.Client
             TContract proxy = _configuration.ProxyFactory.CreateProxy<TContract>(pipeline);
             if (proxy is IContractProvider)
             {
-                BoltFramework.ValidateContract((proxy as IContractProvider).Contract);
                 pipeline.Validate((proxy as IContractProvider).Contract);
             }
             else
             {
-                BoltFramework.ValidateContract(typeof(TContract));
-                pipeline.Validate(typeof(TContract));
+                pipeline.Validate(BoltFramework.GetContract(typeof(TContract)));
             }
 
 

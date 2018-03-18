@@ -11,7 +11,7 @@ namespace Bolt.Server.Pipeline
     {
         public override async Task InvokeAsync(ServerActionContext context)
         {
-            Metadata metadata = TryGetMetadata(context.Action);
+            Metadata metadata = TryGetMetadata(context.Action.Action);
             if (metadata == null)
             {
                 await Next(context);
@@ -19,15 +19,15 @@ namespace Bolt.Server.Pipeline
             }
 
             // handle action parameters
-            context.Parameters = new object[context.GetActionMetadataOrThrow().Parameters.Count];
+            context.Parameters = new object[context.GetActionOrThrow().Parameters.Count];
             if (metadata.HttpContentIndex >= 0)
             {
                 context.Parameters[metadata.HttpContentIndex] = CreateHttpContent(context, metadata);
             }
 
-            if (context.ActionMetadata.CancellationTokenIndex >= 0)
+            if (context.Action.CancellationTokenIndex >= 0)
             {
-                context.Parameters[context.ActionMetadata.CancellationTokenIndex] = context.RequestAborted;
+                context.Parameters[context.Action.CancellationTokenIndex] = context.RequestAborted;
             }
 
             // this middleware will also handle the result
