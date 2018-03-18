@@ -1,3 +1,4 @@
+using Bolt.Metadata;
 using System;
 using System.Threading.Tasks;
 
@@ -10,7 +11,7 @@ namespace Bolt.Pipeline
             Next = next ?? throw new ArgumentNullException(nameof(next));
         }
 
-        public virtual void Validate(Type contract)
+        public virtual void Validate(ContractMetadata contract)
         {
         }
 

@@ -6,30 +6,18 @@ namespace Bolt.Serialization
     {
         public Type Type => typeof(TExceptionDescriptor);
 
-        public Exception Read(ReadExceptionContext context)
+        public Exception Read(object serializedException)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            context.Exception = UnwrapCore((TExceptionDescriptor) context.SerializedException, context);
-            return context.Exception;
+            return UnwrapCore((TExceptionDescriptor)serializedException);
         }
 
-        public object Write(WriteExceptionContext context)
+        public object Write(Exception exception)
         {
-            if (context == null)
-            {
-                throw new ArgumentNullException(nameof(context));
-            }
-
-            context.SerializedException = WrapCore(context.Exception, context);
-            return context.SerializedException;
+            return WrapCore(exception);
         }
 
-        protected abstract Exception UnwrapCore(TExceptionDescriptor wrappedException, ReadExceptionContext actionContext);
+        protected abstract Exception UnwrapCore(TExceptionDescriptor serializedException);
 
-        protected abstract TExceptionDescriptor WrapCore(Exception exception, WriteExceptionContext actionContext);
+        protected abstract TExceptionDescriptor WrapCore(Exception exception);
     }
 }

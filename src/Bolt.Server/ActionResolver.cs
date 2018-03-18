@@ -1,80 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
+﻿using Bolt.Metadata;
+using System;
 
 namespace Bolt.Server
 {
     public class ActionResolver : IActionResolver
     {
-        public MethodInfo Resolve(Type contract, string actionName)
+        public ActionMetadata Resolve(ContractMetadata contract, ReadOnlySpan<char> actionName)
         {
-            var initSession = BoltFramework.SessionMetadata.Resolve(contract).InitSession;
-            if (actionName.ToLowerInvariant() == initSession.Name.ToLowerInvariant())
+            if (contract.Session.InitSession.IsMatch(actionName))
             {
-                return initSession.Action;
+                return contract.Session.InitSession;
             }
 
-            var destroySession = BoltFramework.SessionMetadata.Resolve(contract).DestroySession;
-            if (actionName.ToLowerInvariant() == destroySession.Name.ToLowerInvariant())
+            if (contract.Session.DestroySession.IsMatch(actionName))
             {
-                return destroySession.Action;
+                return contract.Session.DestroySession;
             }
 
-            List<MethodInfo> candidates = contract.GetRuntimeMethods().ToList();
-            MethodInfo found = Resolve(candidates, actionName, false) ?? Resolve(candidates, actionName, true);
-            if (found != null)
+            foreach (ActionMetadata action in contract.Actions)
             {
-                return found;
-            }
-
-            foreach (Type iface in contract.GetTypeInfo().ImplementedInterfaces)
-            {
-                candidates = iface.GetRuntimeMethods().ToList();
-                found = Resolve(candidates, actionName, false) ?? Resolve(candidates, actionName, true);
-                if (found != null)
+                if (action.IsAsync && action.IsMatch(actionName))
                 {
-                    return found;
+                    return action;
+                }
+            }
+
+            foreach (ActionMetadata action in contract.Actions)
+            {
+                if (!action.IsAsync && action.IsMatch(actionName))
+                {
+                    return action;
                 }
             }
 
             return null;
-        }
-
-        private MethodInfo Resolve(IReadOnlyCollection<MethodInfo> candidates, string actionName, bool lowerCase)
-        {
-            if (lowerCase)
-            {
-                actionName = actionName.ToLowerInvariant();
-            }
-            BoltFramework.TrimAsyncPostfix(actionName, out actionName);
-
-            return SelectByPriority(candidates.Where(m => CoerceMethodName(m.Name, lowerCase) == actionName));
-        }
-
-        private string CoerceMethodName(string name, bool lowerCase)
-        {
-            BoltFramework.TrimAsyncPostfix(name, out name);
-            if (lowerCase)
-            {
-                return name.ToLowerInvariant();
-            }
-
-            return name;
-        }
-
-        private MethodInfo SelectByPriority(IEnumerable<MethodInfo> candidates)
-        {
-            return candidates.OrderBy(m =>
-            {
-                if (typeof(Task).GetTypeInfo().IsAssignableFrom(m.ReturnType.GetTypeInfo()))
-                {
-                    return 0;
-                }
-
-                return 1;
-            }).FirstOrDefault();
         }
     }
 }

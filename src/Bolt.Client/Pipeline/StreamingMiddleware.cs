@@ -10,7 +10,7 @@ namespace Bolt.Client.Pipeline
     {
         public override async Task InvokeAsync(ClientActionContext context)
         {
-            Metadata metadata = TryGetMetadata(context.Action);
+            Metadata metadata = TryGetMetadata(context.Action.Action);
             if (metadata == null)
             {
                 await Next(context).ConfigureAwait(false);
@@ -42,7 +42,7 @@ namespace Bolt.Client.Pipeline
 
         private static void PrepareStreamingContent(ClientActionContext context, Metadata metadata)
         {
-            context.ActionMetadata.ValidateParameters(context.Parameters);
+            context.Action.ValidateParameters(context.Parameters);
 
             if (metadata.ContentResultType != null)
             {

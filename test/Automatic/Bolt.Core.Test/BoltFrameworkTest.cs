@@ -25,11 +25,9 @@ namespace Bolt.Core.Test
         [InlineData("AbcASYNC", "Abc")]
         [InlineData("AbcASYNCSomething", "AbcASYNCSomething")]
         [Theory]
-        public void TrimAsyncPostFix(string input, string expected)
+        public void NormalizeActionName(string input, string expected)
         {
-            string coerced;
-            BoltFramework.TrimAsyncPostfix(input, out coerced);
-            Assert.Equal(expected, coerced);
+            Assert.Equal(expected, BoltFramework.NormalizeActionName(input.AsReadOnlySpan()).ConvertToString());
         }
 
 

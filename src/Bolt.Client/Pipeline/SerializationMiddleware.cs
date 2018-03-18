@@ -75,7 +75,7 @@ namespace Bolt.Client.Pipeline
             }
             else
             {
-                if (context.GetActionMetadataOrThrow().HasResult && context.ActionResult == null)
+                if (context.GetActionOrThrow().HasResult && context.ActionResult == null)
                 {
                     using (Stream stream = await GetResponseStreamAsync(context.Response).ConfigureAwait(false))
                     {
@@ -92,7 +92,7 @@ namespace Bolt.Client.Pipeline
 
         protected virtual HttpContent BuildRequestContent(ClientActionContext context)
         {
-            ActionMetadata metadata = context.GetActionMetadataOrThrow();
+            ActionMetadata metadata = context.GetActionOrThrow();
             if (metadata.HasSerializableParameters)
             {
                 try
@@ -109,49 +109,19 @@ namespace Bolt.Client.Pipeline
                 }
             }
 
-            var parameterValues = CreateParameterValues(context);
-            if (parameterValues != null)
+            if (context.Action.HasSerializableParameters)
             {
-                return new SerializeParametersContent(parameterValues, Serializer, context);
+                return new SerializeParametersContent(Serializer, context);
             }
 
             return null;
-        }
-
-        private List<ParameterValue> CreateParameterValues(ClientActionContext context)
-        {
-            List<ParameterValue> parameterValues = null;
-
-            for (int i = 0; i < context.ActionMetadata.Parameters.Count; i++)
-            {
-                if (context.Parameters[i] == null)
-                {
-                    continue;
-                }
-
-                if (context.Parameters[i] is CancellationToken)
-                {
-                    continue;
-                }
-
-                if (parameterValues == null)
-                {
-                    parameterValues = new List<ParameterValue>();
-                }
-
-                parameterValues.Add(new ParameterValue(context.ActionMetadata.Parameters[i], context.Parameters[i]));
-            }
-
-            return parameterValues;
         }
 
         protected virtual async Task<object> DeserializeResponseAsync(ClientActionContext context, Stream stream)
         {
             try
             {
-                var readContext = new ReadValueContext(stream, context, context.ActionMetadata.ResultType);
-                await Serializer.ReadAsync(readContext).ConfigureAwait(false);
-                return readContext.Value;
+                return await Serializer.ReadAsync(stream, context.Action.ResultType).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -172,14 +142,13 @@ namespace Bolt.Client.Pipeline
 
             try
             {
-                var readContext = new ReadValueContext(stream, context, ExceptionSerializer.Type);
-                await Serializer.ReadAsync(readContext).ConfigureAwait(false);
-                if (readContext.Value == null)
+                var value = await Serializer.ReadAsync(stream, ExceptionSerializer.Type).ConfigureAwait(false);
+                if (value == null)
                 {
                     return null;
                 }
 
-                return ExceptionSerializer.Read(new ReadExceptionContext(context, readContext.Value));
+                return ExceptionSerializer.Read(value);
             }
             catch (Exception e)
             {
@@ -206,12 +175,10 @@ namespace Bolt.Client.Pipeline
         private class SerializeParametersContent : HttpContent
         {
             private readonly ClientActionContext _clientContext;
-            private readonly List<ParameterValue> _parameters;
             private readonly ISerializer _serializer;
 
-            public SerializeParametersContent(List<ParameterValue> parameters, ISerializer serializer, ClientActionContext clientContext)
+            public SerializeParametersContent(ISerializer serializer, ClientActionContext clientContext)
             {
-                _parameters = parameters;
                 _serializer = serializer;
                 _clientContext = clientContext;
             }
@@ -220,7 +187,7 @@ namespace Bolt.Client.Pipeline
             {
                 try
                 {
-                    await _serializer.WriteAsync(new WriteParametersContext(stream, _clientContext, _parameters)).ConfigureAwait(false);
+                    await _serializer.WriteParametersAsync(stream, _clientContext.Action.Parameters, _clientContext.Parameters).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {

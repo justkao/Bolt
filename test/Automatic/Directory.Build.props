@@ -3,7 +3,7 @@
 
   <PropertyGroup>
     <IsTestProject>true</IsTestProject>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>$(NetCoreAppVersion)</TargetFramework>
   </PropertyGroup>
   
 </Project>

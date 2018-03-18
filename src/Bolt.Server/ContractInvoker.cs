@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Bolt.Metadata;
 using Bolt.Pipeline;
 
 namespace Bolt.Server
@@ -13,7 +14,7 @@ namespace Bolt.Server
 
         public IPipeline<ServerActionContext> Pipeline { get; set; }
 
-        public Type Contract { get; set; }
+        public ContractMetadata Contract { get; set; }
 
         public IInstanceProvider InstanceProvider { get; set; }
 

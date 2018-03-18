@@ -52,7 +52,7 @@ namespace Bolt.Client.Test
                 Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
                     c =>
                         {
-                            Assert.Equal(ContractDescriptor.DestroySession.Action, c.Action);
+                            Assert.Equal(ContractDescriptor.DestroySession.Action, c.Action.Action);
                         }).Verifiable();
 
                 await Proxy.CloseSession("Test");

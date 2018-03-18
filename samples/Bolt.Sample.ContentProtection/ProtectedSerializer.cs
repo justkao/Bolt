@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 using Bolt.Serialization;
 using Microsoft.AspNetCore.DataProtection;
@@ -22,47 +24,43 @@ namespace Bolt.Sample.ContentProtection
             _serializer = new JsonSerializer();
         }
 
-        public async Task WriteAsync(WriteValueContext context)
+        public async Task WriteAsync(Stream stream, object value)
         {
             MemoryStream tempStream = new MemoryStream();
-            await _serializer.WriteAsync(new WriteValueContext(tempStream, context.ActionContext, context.Value));
+            await _serializer.WriteAsync(tempStream, value);
             byte[] data = _protector.Protect(tempStream.ToArray());
             _logger.LogInformation("Result: Sending {0}B of protected data, Original: {1}B.", data.Length, tempStream.ToArray().Length);
-            await context.Stream.WriteAsync(data, 0, data.Length);
+            await stream.WriteAsync(data, 0, data.Length);
         }
 
-        public async Task ReadAsync(ReadValueContext context)
+        public async Task<object> ReadAsync(Stream stream, Type valueType)
         {
             MemoryStream tempStream = new MemoryStream();
-            await context.Stream.CopyToAsync(tempStream);
+            await stream.CopyToAsync(tempStream);
             byte[] data = _protector.Unprotect(tempStream.ToArray());
             _logger.LogInformation("Result: Received {0}B of protected data, Original: {1}B", tempStream.ToArray().Length, data.Length);
 
-            ReadValueContext readContext = new ReadValueContext(new MemoryStream(data), context.ActionContext, context.ValueType);
-            await _serializer.ReadAsync(readContext);
-            context.Value = readContext.Value;
+            return await _serializer.ReadAsync(new MemoryStream(data), valueType);
         }
 
-        public async Task WriteAsync(WriteParametersContext context)
+        public async Task WriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> paramters, IReadOnlyList<object> values)
         {
             MemoryStream tempStream = new MemoryStream();
-            await _serializer.WriteAsync(new WriteParametersContext(tempStream, context.ActionContext, context.ParameterValues));
+            await _serializer.WriteParametersAsync(tempStream, paramters, values);
             byte[] data = _protector.Protect(tempStream.ToArray());
             _logger.LogInformation("Parameters: Sending {0}B of protected data, Original: {1}B", data.Length, tempStream.ToArray().Length);
 
-            await context.Stream.WriteAsync(data, 0, data.Length);
+            await stream.WriteAsync(data, 0, data.Length);
         }
 
-        public async Task ReadAsync(ReadParametersContext context)
+        public async Task ReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> metadata, object[] parameterValues)
         {
             MemoryStream tempStream = new MemoryStream();
-            await context.Stream.CopyToAsync(tempStream);
+            await stream.CopyToAsync(tempStream);
             byte[] data = _protector.Unprotect(tempStream.ToArray());
             _logger.LogInformation("Parameters: Received {0}B of protected data, Original: {1}B", tempStream.ToArray().Length, data.Length);
 
-            ReadParametersContext ctxt = new ReadParametersContext(new MemoryStream(data), context.ActionContext, context.Parameters);
-            await _serializer.ReadAsync(ctxt);
-            context.ParameterValues = ctxt.ParameterValues;
+            await _serializer.ReadParametersAsync(new MemoryStream(data), metadata, parameterValues);
         }
     }
 }

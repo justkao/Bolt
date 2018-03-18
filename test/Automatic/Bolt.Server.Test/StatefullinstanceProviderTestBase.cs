@@ -99,8 +99,8 @@ namespace Bolt.Server.Test
         {
             return new ServerActionContext {
                 HttpContext = new DefaultHttpContext(),
-                Action = action,
-                Contract = typeof(TContract)
+                Action = BoltFramework.GetContract(typeof(TContract)).GetAction(action),
+                Contract = BoltFramework.GetContract(typeof(TContract))
             };
         }
 

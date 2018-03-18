@@ -40,14 +40,7 @@ namespace Bolt.Client
 
         public T CreateProxy<T>(IClientPipeline pipeline) where T : class
         {
-            Type contract = typeof(T);
-            if (!contract.GetTypeInfo().IsInterface)
-            {
-                throw new ArgumentException("Proxy can obly be created from interfaces.");
-            }
-
-            BoltFramework.ValidateContract(contract);
-
+            ContractMetadata contract = BoltFramework.GetContract(typeof(T));
             var interceptor = new ChannelInterceptor();
             var options = new ProxyGenerationOptions
             {

@@ -13,11 +13,6 @@ namespace Bolt.Metadata
         private ReadOnlyCollection<ParameterMetadata> _serializableParameters;
         private int? _cancellationTokenIndex;
 
-        internal ActionMetadata()
-        {
-            Timeout = TimeSpan.Zero;
-        }
-
         public ActionMetadata(MethodInfo action, ParameterMetadata[] parameters, Type resultType)
         {
             Action = action;
@@ -25,15 +20,33 @@ namespace Bolt.Metadata
             ResultType = resultType;
             Timeout = TimeSpan.Zero;
             IsAsync = typeof (Task).GetTypeInfo().IsAssignableFrom(action.ReturnType.GetTypeInfo());
+            NormalizedName = BoltFramework.NormalizeActionName(Name.AsReadOnlySpan()).ConvertToString();
         }
 
         public string Name => Action.Name;
 
-        public MethodInfo Action { get; internal set; }
+        public string NormalizedName { get; }
 
-        public bool IsAsync { get; internal set; }
+        public bool IsMatch(ReadOnlySpan<char> name)
+        {
+            if (NormalizedName.AsReadOnlySpan().AreEqualInvariant(name))
+            {
+                return true;
+            }
 
-        public IReadOnlyList<ParameterMetadata> Parameters { get; internal set; }
+            if (NormalizedName.AsReadOnlySpan().AreEqualInvariant(BoltFramework.NormalizeActionName(name)))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public MethodInfo Action { get; }
+
+        public bool IsAsync { get; }
+
+        public IReadOnlyList<ParameterMetadata> Parameters { get; }
 
         public IReadOnlyList<ParameterMetadata> SerializableParameters
         {
@@ -60,9 +73,11 @@ namespace Bolt.Metadata
                 int index = -1;
                 for (int i = 0; i < Parameters.Count; i++)
                 {
-                    if (typeof(CancellationToken).CanAssign(Parameters[i].Type) || typeof(CancellationToken?).CanAssign(Parameters[i].Type))
+
+                    if (Parameters[i].IsCancellationToken)
                     {
                         index = i;
+                        break;
                     }
                 }
 
@@ -71,7 +86,7 @@ namespace Bolt.Metadata
             }
         }
 
-        public Type ResultType { get; internal set; }
+        public Type ResultType { get; }
 
         public bool HasResult => ResultType != typeof(void);
 

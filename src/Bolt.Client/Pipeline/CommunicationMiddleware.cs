@@ -50,7 +50,7 @@ namespace Bolt.Client.Pipeline
             }
 
             TimeSpan timeout = defaultTimeout;
-            ActionMetadata metadata = context.GetActionMetadataOrThrow();
+            ActionMetadata metadata = context.GetActionOrThrow();
             if (metadata.Timeout > TimeSpan.Zero)
             {
                 timeout = metadata.Timeout;
@@ -59,7 +59,7 @@ namespace Bolt.Client.Pipeline
             var timeoutProvider = TimeoutProvider;
             if (timeoutProvider != null)
             {
-                var timeoutOverride = timeoutProvider.GetActionTimeout(context.Contract, context.ActionMetadata);
+                var timeoutOverride = timeoutProvider.GetActionTimeout(context.Contract, context.Action);
                 if (timeoutOverride > TimeSpan.Zero)
                 {
                     timeout = timeoutOverride;

@@ -7,7 +7,6 @@ using Bolt.Server;
 using Bolt.Server.Metadata;
 using Bolt.Server.Pipeline;
 using Bolt.Server.Session;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 
@@ -36,7 +35,7 @@ namespace Microsoft.Extensions.DependencyInjection
             services.TryAddTransient<IBoltMetadataHandler, BoltMetadataHandler>();
             services.TryAddTransient<IContractInvoker, ContractInvoker>();
             services.TryAddSingleton<IActionResolver, ActionResolver>();
-            services.TryAddSingleton<IContractResolver, ContractResolver>();
+            services.TryAddSingleton<IContractInvokerSelector, ContractInvokerSelector>();
             services.TryAddTransient<IServerSessionHandler, ServerSessionHandler>();
             services.TryAddTransient<ISessionProvider, HttpContextSessionProvider>();
             services.TryAddTransient<IHttpSessionProvider, HttpContextSessionProvider>();

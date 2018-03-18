@@ -18,14 +18,14 @@ namespace Bolt.Pipeline
             return result;
         }
 
-        public override void Validate(Type contract)
+        public override void Validate(ContractMetadata contract)
         {
-            foreach (MethodInfo method in contract.GetRuntimeMethods())
+            foreach (ActionMetadata action in contract.Actions)
             {
-                Metadata metadata = Validate(contract, method);
+                Metadata metadata = Validate(contract.Contract, action.Action);
                 if (metadata != null)
                 {
-                    _streamingMethods.TryAdd(method, metadata);
+                    _streamingMethods.TryAdd(action.Action, metadata);
                 }
             }
         }

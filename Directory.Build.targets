@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup Condition=" $(IsTestProject) ">
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFramework>$(NetCoreAppVersion)</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup Condition=" $(IsTestProject) ">

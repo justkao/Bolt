@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt.Metadata;
+using System;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
@@ -46,16 +47,16 @@ namespace Bolt.Client
             return Response;
         }
 
-        public void Init(IProxy proxy, Type contract, MethodInfo action, object[] parameters)
+        public void Init(IProxy proxy, ContractMetadata contract, ActionMetadata action, object[] parameters)
         {
             Contract = contract;
             Action = action;
             Parameters = parameters;
             Proxy = proxy;
             Request = new HttpRequestMessage();
-            if (ActionMetadata.CancellationTokenIndex >= 0 && parameters != null)
+            if (Action.CancellationTokenIndex >= 0 && parameters != null)
             {
-                var cancellation = parameters[ActionMetadata.CancellationTokenIndex];
+                var cancellation = parameters[Action.CancellationTokenIndex];
                 if (cancellation is CancellationToken)
                 {
                     RequestAborted = (CancellationToken)cancellation;

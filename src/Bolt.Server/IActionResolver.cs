@@ -1,10 +1,10 @@
-﻿using System;
-using System.Reflection;
+﻿using Bolt.Metadata;
+using System;
 
 namespace Bolt.Server
 {
     public interface IActionResolver
     {
-        MethodInfo Resolve(Type contract, string actionName);
+        ActionMetadata Resolve(ContractMetadata contract, ReadOnlySpan<char> actionName);
     }
 }

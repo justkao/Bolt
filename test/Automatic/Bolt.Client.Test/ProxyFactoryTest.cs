@@ -48,7 +48,7 @@ namespace Bolt.Client.Proxy.Test
             pipeline.Setup(p => p.Instance).Returns(ctxt =>
             {
                 ctxt.ActionResult = "some value";
-                Assert.Equal(MethodWithParameters, ctxt.Action);
+                Assert.Equal(MethodWithParameters, ctxt.Action.Action);
                 Assert.Equal("val", ctxt.Parameters[0]);
                 Assert.Equal(10, ctxt.Parameters[1]);
                 Assert.Equal(CancellationToken.None, ctxt.Parameters[2]);
@@ -70,7 +70,7 @@ namespace Bolt.Client.Proxy.Test
             pipeline.Setup(p => p.Instance).Returns(ctxt =>
             {
                 ctxt.ActionResult = "some value";
-                Assert.Equal(AsyncMethod, ctxt.Action);
+                Assert.Equal(AsyncMethod, ctxt.Action.Action);
                 return Task.FromResult(0);
             });
 
@@ -88,7 +88,7 @@ namespace Bolt.Client.Proxy.Test
             pipeline.Setup(p => p.Instance).Returns(ctxt =>
             {
                 ctxt.ActionResult = "some value";
-                Assert.Equal(Function, ctxt.Action);
+                Assert.Equal(Function, ctxt.Action.Action);
                 return Task.FromResult(0);
             });
 
@@ -108,7 +108,7 @@ namespace Bolt.Client.Proxy.Test
             pipeline.Setup(p => p.Instance).Returns(ctxt =>
             {
                 ctxt.ActionResult = 10;
-                Assert.Equal(AsyncFunction, ctxt.Action);
+                Assert.Equal(AsyncFunction, ctxt.Action.Action);
                 return Task.FromResult(0);
             });
 

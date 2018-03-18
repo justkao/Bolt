@@ -11,7 +11,7 @@ namespace Bolt.Server.Pipeline
             bool instanceCreated = false;
             if (context.ContractInstance == null)
             {
-                context.ContractInstance = await context.ContractInvoker.InstanceProvider.GetInstanceAsync(context, context.ContractInvoker.Contract);
+                context.ContractInstance = await context.ContractInvoker.InstanceProvider.GetInstanceAsync(context, context.ContractInvoker.Contract.Contract);
                 instanceCreated = true;
             }
 

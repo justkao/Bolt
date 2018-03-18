@@ -50,14 +50,14 @@ namespace Bolt.Server.Pipeline
 
             try
             {
-                object wrappedException = context.Configuration.ExceptionSerializer.Write(new WriteExceptionContext(context, error));
+                object wrappedException = context.Configuration.ExceptionSerializer.Write(error);
                 if (wrappedException == null)
                 {
                     httpContext.Response.Body.Dispose();
                     return;
                 }
 
-                await context.GetSerializerOrThrow().WriteAsync(new WriteValueContext(httpContext.Response.Body, context, wrappedException));
+                await context.GetSerializerOrThrow().WriteAsync(httpContext.Response.Body, wrappedException);
                 serializedException.Seek(0, SeekOrigin.Begin);
             }
             catch (OperationCanceledException)

@@ -18,7 +18,7 @@ namespace Bolt.Server.InstanceProviders
         {
             IContractSession contractSession;
             
-            if (context.Action == BoltFramework.SessionMetadata.Resolve(context.Contract).InitSession.Action)
+            if (context.Action == context.Contract.Session.InitSession)
             {
                 contractSession = await _sessionFactory.CreateAsync(context.HttpContext, await base.GetInstanceAsync(context, type));
                 context.ContractInstance = contractSession.Instance;
@@ -41,7 +41,7 @@ namespace Bolt.Server.InstanceProviders
                 return;
             }
 
-            if (context.Action == BoltFramework.SessionMetadata.Resolve(context.Contract).InitSession.Action)
+            if (context.Action == context.Contract.Session.InitSession)
             {
                 if (error != null)
                 {
@@ -59,7 +59,7 @@ namespace Bolt.Server.InstanceProviders
                     }
                 }
             }
-            else if (context.Action == BoltFramework.SessionMetadata.Resolve(context.Contract).DestroySession.Action)
+            else if (context.Action == context.Contract.Session.DestroySession)
             {
                 await session.DestroyAsync();
                 await OnInstanceReleasedAsync(context, session.SessionId);

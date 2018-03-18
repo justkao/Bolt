@@ -1,9 +1,10 @@
+using Bolt.Metadata;
 using System;
 
 namespace Bolt.Server
 {
     public interface IContractInvokerFactory
     {
-        IContractInvoker Create(Type contract, IInstanceProvider instanceProvider, ServerRuntimeConfiguration configuration);
+        IContractInvoker Create(ContractMetadata contract, IInstanceProvider instanceProvider, ServerRuntimeConfiguration configuration);
     }
 }

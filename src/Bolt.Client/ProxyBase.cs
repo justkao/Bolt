@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Client.Pipeline;
 using System.Collections.Concurrent;
+using Bolt.Metadata;
 
 namespace Bolt.Client
 {
@@ -11,7 +12,7 @@ namespace Bolt.Client
         private IClientPipeline _pipeline;
         private readonly ConcurrentQueue<ClientActionContext> _contexts = new ConcurrentQueue<ClientActionContext>();
         private readonly int _poolSize = 128;
-        private Type _contract;
+        private ContractMetadata _contract;
 
         public ProxyBase()
         {
@@ -21,7 +22,7 @@ namespace Bolt.Client
         public ProxyBase(Type contract, IClientPipeline pipeline)
         {
             State = ProxyState.Ready;
-            _contract = contract ?? throw new ArgumentNullException(nameof(contract));
+            _contract = BoltFramework.GetContract(contract);
             _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
         }
 
@@ -37,7 +38,7 @@ namespace Bolt.Client
             _pipeline = proxy.Pipeline;
         }
 
-        public Type Contract
+        public ContractMetadata Contract
         {
             get { return _contract; }
             set
@@ -70,7 +71,7 @@ namespace Bolt.Client
 
         public async Task OpenAsync()
         {
-            ClientActionContext ctxt = CreateContext(BoltFramework.SessionMetadata.Resolve(Contract).InitSession.Action, null);
+            ClientActionContext ctxt = CreateContext(Contract.Session.InitSession, null);
             try
             {
                 await Pipeline.Instance(ctxt).ConfigureAwait(false);
@@ -86,7 +87,7 @@ namespace Bolt.Client
         {
             if (State == ProxyState.Open)
             {
-                ClientActionContext ctxt =  CreateContext(BoltFramework.SessionMetadata.Resolve(Contract).DestroySession.Action, null);
+                ClientActionContext ctxt =  CreateContext(Contract.Session.DestroySession, null);
                 try
                 {
                     await Pipeline.Instance(ctxt).ConfigureAwait(false);
@@ -107,7 +108,7 @@ namespace Bolt.Client
 
         public async Task<object> SendAsync(MethodInfo action, params object[] parameters)
         {
-            ClientActionContext ctxt = CreateContext(action, parameters);
+            ClientActionContext ctxt = CreateContext(Contract.GetAction(action), parameters);
             try
             {
                 await Pipeline.Instance(ctxt).ConfigureAwait(false);
@@ -134,7 +135,7 @@ namespace Bolt.Client
             State = newState;
         }
 
-        private ClientActionContext CreateContext(MethodInfo action, params object[] parameters)
+        private ClientActionContext CreateContext(ActionMetadata action, params object[] parameters)
         {
             ClientActionContext context;
 

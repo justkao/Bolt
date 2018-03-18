@@ -18,10 +18,8 @@ namespace Bolt.Core.Test
         public void UnwrapException_Ok()
         {
             Exception ex = new Exception("test message");
-            var writeContext = new WriteExceptionContext(new TestActionContext(), ex);
-            var serializedException = Subject.Write(writeContext);
-            var readContext = new ReadExceptionContext(new TestActionContext(), serializedException);
-            var deserializedException = Subject.Read(readContext);
+            var serializedException = Subject.Write(ex);
+            var deserializedException = Subject.Read(serializedException);
 
             Assert.NotNull(deserializedException);
         }
@@ -30,10 +28,8 @@ namespace Bolt.Core.Test
         public void Unwrap_MessageOk()
         {
             Exception ex = new Exception("test message");
-            var writeContext = new WriteExceptionContext(new TestActionContext(), ex);
-            var serializedException = Subject.Write(writeContext);
-            var readContext = new ReadExceptionContext(new TestActionContext(), serializedException);
-            var deserializedException = Subject.Read(readContext);
+            var serializedException = Subject.Write(ex);
+            var deserializedException = Subject.Read(serializedException);
 
             Assert.Equal(ex.Message, deserializedException.Message);
         }
@@ -42,10 +38,8 @@ namespace Bolt.Core.Test
         public void Unwrap_TypeOk()
         {
             Exception ex = new InvalidOperationException("test message");
-            var writeContext = new WriteExceptionContext(new TestActionContext(), ex);
-            var serializedException = Subject.Write(writeContext);
-            var readContext = new ReadExceptionContext(new TestActionContext(), serializedException);
-            var deserializedException = Subject.Read(readContext);
+            var serializedException = Subject.Write(ex);
+            var deserializedException = Subject.Read(serializedException);
 
             Assert.IsType<InvalidOperationException>(deserializedException);
         }
@@ -54,10 +48,8 @@ namespace Bolt.Core.Test
         public void Unwrap_CustomDataOk()
         {
             Exception ex = new CustomException(55);
-            var writeContext = new WriteExceptionContext(new TestActionContext(), ex);
-            var serializedException = Subject.Write(writeContext);
-            var readContext = new ReadExceptionContext(new TestActionContext(), serializedException);
-            var deserializedException = Subject.Read(readContext);
+            var serializedException = Subject.Write(ex);
+            var deserializedException = Subject.Read(serializedException);
 
             Assert.Equal(55, ((CustomException) deserializedException).CustomData);
         }
@@ -66,10 +58,8 @@ namespace Bolt.Core.Test
         public void Unwrap_InnerExceptionNotNull()
         {
             Exception ex = new Exception("test", new Exception("test 2"));
-            var writeContext = new WriteExceptionContext(new TestActionContext(), ex);
-            var serializedException = Subject.Write(writeContext);
-            var readContext = new ReadExceptionContext(new TestActionContext(), serializedException);
-            var deserializedException = Subject.Read(readContext);
+            var serializedException = Subject.Write(ex);
+            var deserializedException = Subject.Read(serializedException);
 
             Assert.NotNull(deserializedException.InnerException);
         }
@@ -78,10 +68,8 @@ namespace Bolt.Core.Test
         public void Unwrap_InnerExceptionMessagePreserved()
         {
             Exception ex = new Exception("test", new Exception("test 2"));
-            var writeContext = new WriteExceptionContext(new TestActionContext(), ex);
-            var serializedException = Subject.Write(writeContext);
-            var readContext = new ReadExceptionContext(new TestActionContext(), serializedException);
-            var deserializedException = Subject.Read(readContext);
+            var serializedException = Subject.Write(ex);
+            var deserializedException = Subject.Read(serializedException);
 
             Assert.Equal(ex.InnerException.Message, deserializedException.InnerException.Message);
         }

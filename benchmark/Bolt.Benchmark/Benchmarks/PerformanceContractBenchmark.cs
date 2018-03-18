@@ -1,0 +1,164 @@
+﻿using Bolt.Client;
+using Bolt.Server;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Net.Http;
+using BenchmarkDotNet.Attributes.Columns;
+using BenchmarkDotNet.Attributes;
+using System.Threading.Tasks;
+using System.Linq;
+using System.Collections.Generic;
+using Microsoft.Extensions.Logging;
+using Bolt.Benchmark.Contracts;
+
+namespace Bolt.Benchmark.Benchmarks
+{
+    [RankColumn]
+    public class PerformanceContractBenchmark
+    {
+        private TestServer _runningServer;
+        private Person _person;
+        private List<Person> _large;
+        private DateTime _dateTime;
+
+        public ClientConfiguration ClientConfiguration { get; private set; }
+
+        public IPerformanceContract Proxy { get; private set; }
+
+        [GlobalSetup]
+        public void GlobalSetup()
+        {
+            _person = Person.Create(10);
+            _large = Enumerable.Repeat(_person, 100).ToList();
+            _dateTime = DateTime.UtcNow;
+
+            _runningServer = new TestServer(new WebHostBuilder().ConfigureLogging(ConfigureLog).Configure(Configure).ConfigureServices(ConfigureServices));
+
+            ClientConfiguration = new ClientConfiguration();
+            HttpMessageHandler handler = _runningServer.CreateHandler();
+            ClientConfiguration.HttpMessageHandler = handler;
+            Proxy = ClientConfiguration.CreateProxy<IPerformanceContract>(new Uri("http://localhost"));
+        }
+
+        [GlobalCleanup]
+        public void GlobalCleanup()
+        {
+            _runningServer.Dispose();
+        }
+
+        [Benchmark]
+        public Task Method_Async()
+        {
+            return Proxy.Method_Async();
+        }
+
+        [Benchmark]
+        public Task Method_Int_Async()
+        {
+            return Proxy.Method_Int_Async(55);
+        }
+
+        [Benchmark]
+        public Task Method_Large_Async()
+        {
+            return Proxy.Method_Large_Async(_large);
+        }
+
+        [Benchmark]
+        public Task Method_Many_Async()
+        {
+            return Proxy.Method_Many_Async(10, "Xxxx", _dateTime, _person);
+        }
+
+        [Benchmark]
+        public Task Method_Object_Async()
+        {
+            return Proxy.Method_Object_Async(_person);
+        }
+
+        [Benchmark]
+        public Task Method_String_Async()
+        {
+            return Proxy.Method_String_Async("xxxx");
+        }
+
+        [Benchmark]
+        public Task Return_Ints_Async()
+        {
+            return Proxy.Return_Ints_Async();
+        }
+
+        [Benchmark]
+        public Task Return_Int_Async()
+        {
+            return Proxy.Return_Int_Async();
+        }
+
+        [Benchmark]
+        public Task Return_Large_Async()
+        {
+            return Proxy.Return_Large_Async();
+        }
+
+        [Benchmark]
+        public Task Return_Objects_Async()
+        {
+            return Proxy.Return_Objects_Async();
+        }
+
+        [Benchmark]
+        public Task Return_Object_Async()
+        {
+            return Proxy.Return_Object_Async();
+        }
+
+        [Benchmark]
+        public Task Return_Strings_Async()
+        {
+            return Proxy.Return_Strings_Async();
+        }
+
+        [Benchmark]
+        public Task Return_String_Async()
+        {
+            return Proxy.Return_String_Async();
+        }
+
+        [Benchmark]
+        public async Task Method_ThrowsErrorAsync()
+        {
+            try
+            {
+                await Proxy.Method_ThrowsErrorAsync();
+            }
+            catch (InvalidOperationException)
+            {
+            }    
+        }
+
+        private void ConfigureServices(IServiceCollection services)
+        {
+            services.AddRouting();
+            services.AddLogging();
+            services.AddOptions();
+            services.AddBolt();
+        }
+
+        private void Configure(IApplicationBuilder app)
+        {
+            app.UseBolt(
+                b =>
+                {
+                    b.Use<IPerformanceContract, PerformanceContractImplementation>();
+                });
+        }
+
+        private void ConfigureLog(ILoggingBuilder builder)
+        {
+            builder.SetMinimumLevel(LogLevel.Error);
+        }
+    }
+}

@@ -1,8 +1,9 @@
-﻿using Xunit;
+﻿using System;
+using Xunit;
 
 namespace Bolt.Server.Test
 {
-    public class ContractResolverTest
+    public class ContractInvokerSelectorTest
     {
         [InlineData("contract")]
         [InlineData("Contract")]
@@ -13,11 +14,15 @@ namespace Bolt.Server.Test
         [Theory]
         public void Resolve_Ok(string contractName)
         {
-            ContractResolver resolver = new ContractResolver();
-            Assert.NotNull(resolver.Resolve(new[] {typeof (Contract)}, contractName));
+            IContractInvokerSelector resolver = new ContractInvokerSelector();
+
+            ContractInvoker invoker = new ContractInvoker(new ServerRuntimeConfiguration());
+            invoker.Contract = BoltFramework.GetContract(typeof(IContract));
+
+            Assert.NotNull(resolver.Resolve(new[] { invoker }, contractName.AsReadOnlySpan()));
         }
 
-        private class Contract
+        private interface IContract
         {
         }
     }

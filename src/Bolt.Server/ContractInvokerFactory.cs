@@ -1,4 +1,5 @@
 using System;
+using Bolt.Metadata;
 using Bolt.Server.Pipeline;
 
 namespace Bolt.Server
@@ -10,7 +11,7 @@ namespace Bolt.Server
             if (pipelineBuilder == null) throw new ArgumentNullException(nameof(pipelineBuilder));
         }
 
-        public IContractInvoker Create(Type contract, IInstanceProvider instanceProvider, ServerRuntimeConfiguration configuration)
+        public IContractInvoker Create(ContractMetadata contract, IInstanceProvider instanceProvider, ServerRuntimeConfiguration configuration)
         {
             if (contract == null)
             {

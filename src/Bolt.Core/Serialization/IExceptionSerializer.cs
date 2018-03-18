@@ -12,8 +12,8 @@ namespace Bolt.Serialization
         /// </summary>
         Type Type { get; }
 
-        object Write(WriteExceptionContext context);
+        object Write(Exception exception);
 
-        Exception Read(ReadExceptionContext context);
+        Exception Read(object serializedException);
     }
 }

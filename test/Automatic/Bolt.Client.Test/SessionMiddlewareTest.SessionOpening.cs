@@ -55,7 +55,7 @@ namespace Bolt.Client.Test
                 var pipeline = CreatePipeline(
                     (next, ctxt) =>
                         {
-                            Assert.Equal(SessionContract.InitSession.Action, ctxt.Action);
+                            Assert.Equal(SessionContract.InitSession.Action, ctxt.Action.Action);
                             Assert.Equal("test", ctxt.Parameters[0]);
                             ctxt.ActionResult = "result";
                             ctxt.ServerConnection = ConnectionDescriptor;
@@ -201,7 +201,7 @@ namespace Bolt.Client.Test
                       {
                           ctxt.ServerConnection = ConnectionDescriptor;
 
-                          if (ctxt.Action != ContractDescriptor.InitSession.Action)
+                          if (ctxt.Action != ContractDescriptor.InitSession)
                           {
                               throw new InvalidOperationException();
                           }

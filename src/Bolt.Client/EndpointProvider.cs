@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bolt.Metadata;
+using System;
 using System.Reflection;
 using System.Text;
 
@@ -13,7 +14,7 @@ namespace Bolt.Client
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        public virtual Uri GetEndpoint(Uri server, Type contract, MethodInfo action)
+        public virtual Uri GetEndpoint(Uri server, ContractMetadata contract, ActionMetadata action)
         {
             StringBuilder sb = new StringBuilder();
             if (server != null)
@@ -30,7 +31,7 @@ namespace Bolt.Client
                         sb.Append(_options.Prefix + "/");
                     }
 
-                    sb.Append(CoerceContractName(contract));
+                    sb.Append(contract.NormalizedName);
                 }
                 else
                 {
@@ -39,26 +40,13 @@ namespace Bolt.Client
                         sb.Append("/" + _options.Prefix);
                     }
 
-                    sb.Append("/" + CoerceContractName(contract));
+                    sb.Append("/" + contract.NormalizedName);
                 }
 
-                string coerced;
-                if (BoltFramework.TrimAsyncPostfix(action.Name, out coerced))
-                {
-                    sb.Append("/" + coerced);
-                }
-                else
-                {
-                    sb.Append("/" + action.Name);
-                }
+                sb.Append("/" + action.NormalizedName);
             }
 
             return new Uri(sb.ToString(), server != null ? UriKind.Absolute : UriKind.Relative);
-        }
-
-        private string CoerceContractName(Type contract)
-        {
-            return BoltFramework.GetContractName(contract);
         }
     }
 }
