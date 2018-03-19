@@ -28,10 +28,11 @@ namespace Bolt.Benchmark
             {
                 var output = c.Option("--output <PATH>", "Output directory where performance report will be stored.", CommandOptionType.SingleValue);
                 var quick = c.Option("--quick", "Generates asynchronous version of methods.", CommandOptionType.NoValue);
+                var silent = c.Option("--silent", "Generates asynchronous version of methods.", CommandOptionType.NoValue);
 
                 c.OnExecute(() =>
                 {
-                    var summary = BenchmarkRunner.Run<PerformanceContractBenchmark>(new PerformanceContractBenchmarkConfig(quick.HasValue(), output.Value()));
+                    var summary = BenchmarkRunner.Run<PerformanceContractBenchmark>(new PerformanceContractBenchmarkConfig(quick.HasValue(), silent.HasValue(), output.Value()));
 
                     if (summary.HasCriticalValidationErrors)
                     {

@@ -58,7 +58,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Benchmark", "Benchmark", "{
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bolt.Benchmark", "benchmark\Bolt.Benchmark\Bolt.Benchmark.csproj", "{9F3421ED-617D-49C5-995B-6857A9FA691B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bolt.Serialization.MessagePack", "src\Bolt.Serialization.MessagePack\Bolt.Serialization.MessagePack.csproj", "{75AF60A0-74B0-402E-8115-DDA5679B6D16}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bolt.Serialization.MessagePack", "src\Bolt.Serialization.MessagePack\Bolt.Serialization.MessagePack.csproj", "{75AF60A0-74B0-402E-8115-DDA5679B6D16}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

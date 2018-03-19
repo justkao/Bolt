@@ -47,6 +47,21 @@ namespace Bolt.Core.Test
         }
 
         [Fact]
+        public async Task WriteRead_Derived_EnsureDeserializedProperly()
+        {
+            // arrange
+            A obj = new C(3);
+            MemoryStream stream = new MemoryStream();
+            await Serializer.WriteAsync(stream, obj);
+
+            // act 
+            var result = await Serializer.ReadAsync(new MemoryStream(stream.ToArray()), typeof(A));
+
+            // assert
+            Assert.Equal(obj, result);
+        }
+
+        [Fact]
         public async Task WriteRead_ComplexType_EnsureDeserializedProperly()
         {
             // arrange
@@ -111,7 +126,7 @@ namespace Bolt.Core.Test
         public async Task ReadWrite_SimpleList_EnsureValidResult()
         {
             // arrange
-            List<int> obj = new List<int>() {1, 2, 3};
+            List<int> obj = new List<int>() { 1, 2, 3 };
             MemoryStream stream = new MemoryStream();
 
             // act
@@ -157,6 +172,85 @@ namespace Bolt.Core.Test
         public Task WriteCancellationTokenParameter_ShouldBeNull()
         {
             return WriteSimpleParameterHelper(CancellationToken.None, null);
+        }
+
+        [Fact]
+        public Task WriteParamterAsIntArray()
+        {
+            return WriteSimpleParameterHelper(new int[] { 1, 2, 3 }, new int[] { 1, 2, 3 });
+        }
+
+        [Fact]
+        public Task WriteParamterAsShortArray()
+        {
+            return WriteSimpleParameterHelper(new short[] { 1, 2, 3 }, new short[] { 1, 2, 3 });
+        }
+
+        [Fact]
+        public Task WriteParamterAsDoubleArray()
+        {
+            return WriteSimpleParameterHelper(new double[] { 1, 2, 3 }, new double[] { 1, 2, 3 });
+        }
+
+        [Fact]
+        public Task ComplexParameters_OK()
+        {
+            return WriteReadParameters(CompositeType.CreateRandom(), DateTime.UtcNow, 10, false, 11.1, new string[] { "a", "b" }, new int[] { 2, 3, 3 });
+        }
+
+        [Fact]
+        public Task DerivedParameter_EnsureTypePreserved()
+        {
+            return WriteReadParameters(new A(1), new B(2), new C(3), new C(1));
+        }
+
+#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
+        public class A
+#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
+        {
+            public A(int id)
+            {
+                Id = id;
+            }
+
+            public int Id { get; }
+
+            public override bool Equals(object obj)
+            {
+                return GetType() == obj?.GetType() && (obj as A).Id == Id;
+            }
+        }
+
+        public class B : A
+        {
+            public B(int id) : base(id)
+            {
+            }
+        }
+
+        public class C : B
+        {
+            public C(int id) : base(id)
+            {
+            }
+        }
+
+        private async Task WriteReadParameters(params object[] parameters)
+        {
+            MemoryStream output = new MemoryStream();
+
+            var metadata = parameters.Select(v => new ParameterMetadata(v.GetType(), v.GetType().Name)).ToArray();
+            await Serializer.WriteParametersAsync(output, metadata, parameters);
+
+            output.Seek(0, SeekOrigin.Begin);
+            var outputValues = await Serializer.ReadParametersAsync(output, metadata);
+
+            var json = global::MessagePack.MessagePackSerializer.ToJson(output.ToArray());
+
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                Assert.Equal(parameters[i], outputValues[i]);
+            }
         }
 
         private async Task WriteSimpleParameterHelper(object parameter, object expected)

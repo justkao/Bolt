@@ -14,13 +14,12 @@ namespace Bolt.Serialization.MessagePack
 
         protected override Task DoWriteAsync(Stream stream, object value, Action<long> onContentLength)
         {
-            global::MessagePack.MessagePackSerializer.NonGeneric.Serialize(value.GetType(), stream, value);
-            return Task.CompletedTask;
+            return global::MessagePack.MessagePackSerializer.Typeless.SerializeAsync(stream, value);
         }
 
         protected override Task<object> DoReadAsync(Stream stream, Type valueType, long contentLength)
         {
-            return Task.FromResult(global::MessagePack.MessagePackSerializer.NonGeneric.Deserialize(valueType, stream));
+            return global::MessagePack.MessagePackSerializer.Typeless.DeserializeAsync(stream);
         }
 
         protected override Task DoWriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] values, Action<long> onContentLength)

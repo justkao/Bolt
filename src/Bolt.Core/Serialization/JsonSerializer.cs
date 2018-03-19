@@ -20,7 +20,7 @@ namespace Bolt.Serialization
             Serializer = new Newtonsoft.Json.JsonSerializer
             {
                 NullValueHandling = NullValueHandling.Ignore,
-                TypeNameHandling = TypeNameHandling.Auto,
+                TypeNameHandling = TypeNameHandling.All,
                 Formatting = Formatting.None,
                 ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
             };
