@@ -25,7 +25,7 @@
         /// <summary>
         /// Error during parameters serialization.
         /// </summary>
-        SerializeParameters  = 4,
+        SerializeParameters = 4,
 
         /// <summary>
         /// Error during response deserialization.

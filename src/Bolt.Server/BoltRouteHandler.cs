@@ -28,10 +28,10 @@ namespace Bolt.Server
 
         private readonly int _poolSize = Environment.ProcessorCount * 10;
 
-        public BoltRouteHandler(ILoggerFactory factory, 
-                                ServerRuntimeConfiguration defaultConfiguration, 
+        public BoltRouteHandler(ILoggerFactory factory,
+                                ServerRuntimeConfiguration defaultConfiguration,
                                 IBoltMetadataHandler metadataHandler,
-                                IServiceProvider applicationServices, 
+                                IServiceProvider applicationServices,
                                 IActionResolver actionResolver,
                                 IContractInvokerSelector contractResolver)
         {
@@ -112,7 +112,7 @@ namespace Bolt.Server
             action = actionSegment.Buffer.AsReadOnlySpan().Slice(actionSegment.Offset, actionSegment.Length);
 
             var boltFeature = AssignBoltFeature(CreateContext(routeContext));
-            
+
             // we have accessed Bolt root
             if (contract.IsEmpty && action.IsEmpty)
             {
@@ -130,7 +130,7 @@ namespace Bolt.Server
                 if (!string.IsNullOrEmpty(Options.Prefix))
                 {
                     string rawContractName = contract.ConvertToString();
-                    routeContext.Handler = (ctxt) => ReportContractNotFound(ctxt, rawContractName); 
+                    routeContext.Handler = (ctxt) => ReportContractNotFound(ctxt, rawContractName);
                 }
 
                 // just pass to next middleware in chain
@@ -155,12 +155,12 @@ namespace Bolt.Server
             boltFeature.ActionContext.Action = _actionResolver.Resolve(found.Contract, action);
             if (boltFeature.ActionContext.Action == null)
             {
-                Logger.LogWarning(BoltLogId.ContractNotFound, 
-                        "Action with name '{0}' not found on contract '{1}'", 
-                        action.ConvertToString(), 
-                        boltFeature.ActionContext.Contract.Name);    
+                Logger.LogWarning(BoltLogId.ContractNotFound,
+                        "Action with name '{0}' not found on contract '{1}'",
+                        action.ConvertToString(),
+                        boltFeature.ActionContext.Contract.Name);
             }
-            
+
             routeContext.Handler = HandleRequest;
             return CompletedTask.Done;
         }
@@ -168,11 +168,11 @@ namespace Bolt.Server
         private async Task HandleRequest(HttpContext context)
         {
             var boltFeature = context.Features.Get<IBoltFeature>();
-            
+
             try
             {
                 if (boltFeature.ActionContext.Action == null)
-                {                                      
+                {
                     context.Response.StatusCode = (int)HttpStatusCode.NotFound;
                     context.Response.Headers[Options.ServerErrorHeader] = ServerErrorCode.ActionNotFound.ToString();
                 }
@@ -190,10 +190,10 @@ namespace Bolt.Server
         private Task ReportContractNotFound(HttpContext context, string contract)
         {
             Logger.LogWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", contract, context.Request.Path);
-            
+
             context.Response.StatusCode = (int)HttpStatusCode.NotFound;
             context.Response.Headers[Options.ServerErrorHeader] = ServerErrorCode.ContractNotFound.ToString();
-            
+
             return CompletedTask.Done;
         }
 
@@ -215,7 +215,7 @@ namespace Bolt.Server
                 {
                     if (!ctxt.HttpContext.Response.HasStarted)
                     {
-                        ctxt.HttpContext.Response.StatusCode = (int) HttpStatusCode.RequestTimeout;
+                        ctxt.HttpContext.Response.StatusCode = (int)HttpStatusCode.RequestTimeout;
                     }
 
                     Logger.LogWarning(BoltLogId.RequestCancelled, "Execution of '{0}' has been aborted by client.", ctxt.Action.Name);
@@ -308,12 +308,14 @@ namespace Bolt.Server
                 {
                     return false;
                 }
+
                 contract = enumerator.Current;
 
                 if (!enumerator.MoveNext())
                 {
                     return false;
                 }
+
                 action = enumerator.Current;
             }
 

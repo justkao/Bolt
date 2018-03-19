@@ -29,7 +29,7 @@ namespace Bolt.Server.IntegrationTest
             var client = CreateChannel();
             Mock<ITestContract> server = Server();
 
-            await ((IProxy) client).OpenAsync();
+            await ((IProxy)client).OpenAsync();
             Assert.Equal(ProxyState.Open, ((IProxy)client).State);
         }
 
@@ -134,7 +134,7 @@ namespace Bolt.Server.IntegrationTest
             await ((IProxy)client).OpenAsync();
             await ((IProxy)client).CloseAsync();
 
-            await Assert.ThrowsAsync<ProxyClosedException>(()=>client.ComplexFunctionAsync());
+            await Assert.ThrowsAsync<ProxyClosedException>(() => client.ComplexFunctionAsync());
         }
 
         [Fact]
@@ -260,7 +260,7 @@ namespace Bolt.Server.IntegrationTest
             Mock<ITestContract> server = Server();
 
             server.Setup(v => v.SimpleMethod()).Throws<CustomException>();
-            Assert.Throws<CustomException>(()=> { client.SimpleMethod(); });
+            Assert.Throws<CustomException>(() => { client.SimpleMethod(); });
         }
 
         [Fact]

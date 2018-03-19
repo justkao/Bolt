@@ -48,9 +48,13 @@ namespace Bolt.Server.Test
                 Mock<IInstanceProviderActions> actions)
                 : this(
                     contract, actions,
-                    new MemorySessionFactory(new BoltServerOptions {SessionHeader = SessionHeader},
+                    new MemorySessionFactory(
+                        new BoltServerOptions { SessionHeader = SessionHeader },
                         new ServerSessionHandlerInternal(actions,
-                            new BoltServerOptions {SessionHeader = SessionHeader})))
+                            new BoltServerOptions
+                            {
+                                SessionHeader = SessionHeader
+                            })))
             {
             }
 
@@ -83,7 +87,8 @@ namespace Bolt.Server.Test
             {
                 private readonly Mock<IInstanceProviderActions> _actions;
 
-                public ServerSessionHandlerInternal(Mock<IInstanceProviderActions> actions, BoltServerOptions options) : base(options)
+                public ServerSessionHandlerInternal(Mock<IInstanceProviderActions> actions, BoltServerOptions options) 
+                    : base(options)
                 {
                     _actions = actions;
                 }

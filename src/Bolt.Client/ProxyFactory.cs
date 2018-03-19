@@ -15,10 +15,10 @@ namespace Bolt.Client
         public static readonly ProxyFactory Default = new ProxyFactory();
 
         private readonly ProxyGenerator _generator = new ProxyGenerator();
-        private readonly ConcurrentDictionary<Type, ProxyMetadata> _metadatas= new ConcurrentDictionary<Type, ProxyMetadata>();
+        private readonly ConcurrentDictionary<Type, ProxyMetadata> _metadatas = new ConcurrentDictionary<Type, ProxyMetadata>();
         private readonly Type _baseProxy;
 
-        public ProxyFactory() : this(typeof (ProxyBase))
+        public ProxyFactory() : this(typeof(ProxyBase))
         {
         }
 
@@ -32,7 +32,7 @@ namespace Bolt.Client
             if (!typeof(ProxyBase).GetTypeInfo().IsAssignableFrom(baseProxy.GetTypeInfo()))
             {
                 throw new ArgumentException(
-                    $"Invalid base proxy type. The base class must derive from {typeof (ProxyBase).FullName}.");
+                    $"Invalid base proxy type. The base class must derive from {typeof(ProxyBase).FullName}.");
             }
 
             _baseProxy = baseProxy;
@@ -47,12 +47,12 @@ namespace Bolt.Client
                 BaseTypeForInterfaceProxy = _baseProxy
             };
 
-            ProxyMetadata metadata = _metadatas.GetOrAdd(typeof (T), v => new ProxyMetadata(_baseProxy));
+            ProxyMetadata metadata = _metadatas.GetOrAdd(typeof(T), v => new ProxyMetadata(_baseProxy));
             var proxy = _generator.CreateInterfaceProxyWithoutTarget<T>(
                 options,
                 interceptor);
 
-            ProxyBase proxyBase = ((ProxyBase) (object) proxy);
+            ProxyBase proxyBase = ((ProxyBase)(object)proxy);
             proxyBase.Contract = contract;
             proxyBase.Pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
 
@@ -98,7 +98,7 @@ namespace Bolt.Client
                     {
                         Task<object> result = Proxy.SendAsync(invocation.Method, invocation.Arguments);
 
-                        if (metadata.ActionMetadata.ResultType == typeof (object))
+                        if (metadata.ActionMetadata.ResultType == typeof(object))
                         {
                             invocation.ReturnValue = result;
                         }
@@ -178,7 +178,8 @@ namespace Bolt.Client
 
             private static Task<T> ConvertTask<T>(Task<object> task)
             {
-                return task.ContinueWith(t =>
+                return task.ContinueWith(
+                t =>
                 {
                     if (t.Exception != null)
                     {
@@ -186,7 +187,7 @@ namespace Bolt.Client
                         t.GetAwaiter().GetResult();
                     }
 
-                    return (T) t.Result;
+                    return (T)t.Result;
                 }, TaskContinuationOptions.ExecuteSynchronously);
             }
         }

@@ -13,7 +13,7 @@ namespace Bolt.Benchmark
 
         public static int Main(params string[] args)
         {
-            ServicePointManager.DefaultConnectionLimit = 1000;		
+            ServicePointManager.DefaultConnectionLimit = 1000;
             ServicePointManager.MaxServicePoints = 1000;
  
             var app = new CommandLineApplication();

@@ -1,8 +1,8 @@
-﻿using Bolt.Metadata;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Bolt.Metadata;
 
 namespace Bolt.Serialization
 {
@@ -34,7 +34,6 @@ namespace Bolt.Serialization
 
             return DoWriteAsync(stream, value, onContentLength);
         }
-
 
         public Task<object> ReadAsync(Stream stream, Type valueType, long contentLength)
         {
@@ -68,7 +67,7 @@ namespace Bolt.Serialization
             for (int i = 0; i < parameters.Count; i++)
             {
                 var parameterMetadata = parameters[i];
-                if (! parameterMetadata.IsSerializable)
+                if (!parameterMetadata.IsSerializable)
                 {
                     values[i] = null;
                 }
@@ -90,7 +89,6 @@ namespace Bolt.Serialization
             }
 
             object[] values = await DoReadParametersAsync(stream, parameters, contentLength);
-
 
             for (int i = 0; i < values.Length; i++)
             {

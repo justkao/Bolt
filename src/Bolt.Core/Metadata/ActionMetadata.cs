@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Reflection;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,21 +26,6 @@ namespace Bolt.Metadata
 
         public string NormalizedName { get; }
 
-        public bool IsMatch(ReadOnlySpan<char> name)
-        {
-            if (NormalizedName.AsReadOnlySpan().AreEqualInvariant(name))
-            {
-                return true;
-            }
-
-            if (NormalizedName.AsReadOnlySpan().AreEqualInvariant(BoltFramework.NormalizeActionName(name)))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
         public MethodInfo Action { get; }
 
         public bool IsAsync { get; }
@@ -60,8 +45,6 @@ namespace Bolt.Metadata
         public bool HasParameters => Parameters.Count > 0;
 
         public TimeSpan Timeout { get; internal set; }
-
-        public void ValidateParameters(IReadOnlyList<object> values) => ValidateParameters(Parameters, values);
 
         public static void ValidateParameters(IReadOnlyList<ParameterMetadata> parameters, IReadOnlyList<object> values)
         {
@@ -101,6 +84,23 @@ namespace Bolt.Metadata
                 }
             }
         }
+
+        public bool IsMatch(ReadOnlySpan<char> name)
+        {
+            if (NormalizedName.AsReadOnlySpan().AreEqualInvariant(name))
+            {
+                return true;
+            }
+
+            if (NormalizedName.AsReadOnlySpan().AreEqualInvariant(BoltFramework.NormalizeActionName(name)))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public void ValidateParameters(IReadOnlyList<object> values) => ValidateParameters(Parameters, values);
 
         private int GetCancellationTokenIndex()
         {

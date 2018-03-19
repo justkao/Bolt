@@ -1,19 +1,16 @@
-﻿using BenchmarkDotNet.Attributes;
+﻿using System;
+using System.IO;
 using BenchmarkDotNet.Columns;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
-using BenchmarkDotNet.Exporters.Json;
-using BenchmarkDotNet.Horology;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
-using System;
-using System.IO;
 
 namespace Bolt.Performance.Core.Benchmark
 {
@@ -31,6 +28,7 @@ namespace Bolt.Performance.Core.Benchmark
                 {
                     Directory.CreateDirectory(ArtifactsPath);
                 }
+
                 Add(MarkdownExporter.GitHub);
             }
             else

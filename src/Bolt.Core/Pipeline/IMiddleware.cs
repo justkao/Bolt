@@ -1,6 +1,6 @@
-using Bolt.Metadata;
 using System;
 using System.Threading.Tasks;
+using Bolt.Metadata;
 
 namespace Bolt.Pipeline
 {
