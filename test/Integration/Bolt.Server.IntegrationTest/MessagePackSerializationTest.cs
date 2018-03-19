@@ -5,6 +5,6 @@ namespace Bolt.Server.IntegrationTest
 {
     public class MessagePackSerializationTest : SerializationTest
     {
-        protected override ISerializer CreateSerializer() => new MessagePackBoltSerializer();
+        protected override ISerializer CreateSerializer() => new MessagePackSerializer();
     }
 }

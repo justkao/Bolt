@@ -45,7 +45,7 @@ namespace Bolt.Benchmark.Benchmarks
             ClientConfiguration = new ClientConfiguration();
             if (UseMessagePack)
             {
-                ClientConfiguration.Serializer = new MessagePackBoltSerializer();
+                ClientConfiguration.Serializer = new MessagePackSerializer();
             }
             HttpMessageHandler handler = _runningServer.CreateHandler();
             ClientConfiguration.HttpMessageHandler = handler;
@@ -163,7 +163,7 @@ namespace Bolt.Benchmark.Benchmarks
                 {
                     if (UseMessagePack)
                     {
-                        b.Configuration.DefaultSerializer = new MessagePackBoltSerializer();
+                        b.Configuration.DefaultSerializer = new MessagePackSerializer();
                         b.Configuration.AvailableSerializers = new[] { b.Configuration.DefaultSerializer };
                     };
                     b.Use<IPerformanceContract, PerformanceContractImplementation>();

@@ -1,19 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Serialization;
+using Bolt.Serialization.MessagePack;
 using Bolt.Test.Common;
 using Xunit;
 
 namespace Bolt.Core.Test
 {
-    public class JsonSerializerTest
+    public abstract class SerializerTestBase
     {
-        public JsonSerializerTest()
+        public class JsonSerializerTest : SerializerTestBase
         {
-            Serializer =  new BufferedSerializer(new JsonSerializer());
+            protected override ISerializer CreateSerializer() => new JsonSerializer();
         }
+
+        public class MessagePackSerializerTest : SerializerTestBase
+        {
+            protected override ISerializer CreateSerializer() => new MessagePackSerializer();
+        }
+
+        protected SerializerTestBase()
+        {
+            Serializer = CreateSerializer();
+        }
+
+        protected abstract ISerializer CreateSerializer();
 
         public ISerializer Serializer { get; }
 
@@ -24,17 +39,11 @@ namespace Bolt.Core.Test
         }
 
         [Fact]
-        public async Task Read_NullObject_DoesNotThrow()
+        public async Task Write_NullObject_Throws()
         {
             // arrange
             MemoryStream stream = new MemoryStream();
-            await Serializer.WriteAsync(stream, null);
-
-            // act 
-            var result = await Serializer.ReadAsync(new MemoryStream(stream.ToArray()), typeof(CompositeType));
-
-            // assert
-            Assert.Null(result);
+            await Assert.ThrowsAsync<ArgumentNullException>(() => Serializer.WriteAsync(stream, null));
         }
 
         [Fact]
@@ -111,6 +120,65 @@ namespace Bolt.Core.Test
 
             // assert
             Assert.Equal(obj, result);
+        }
+
+        [InlineData(11.1)]
+        [InlineData("value")]
+        [InlineData(10)]
+        [InlineData(true)]
+        [Theory]
+        public Task WriteSimpleParameter_EnsureDeserializedProperly(object parameter)
+        {
+            return WriteSimpleParameterHelper(parameter, parameter);
+        }
+
+        [MemberData(nameof(GetManyProperties), 1)]
+        [MemberData(nameof(GetManyProperties), 2)]
+        [MemberData(nameof(GetManyProperties), 10)]
+        [Theory]
+        public async Task WriteSimpleParameters_EnsureDeserializedProperly((ParameterMetadata metadata, object value)[] parameters)
+        {
+            MemoryStream output = new MemoryStream();
+            var values = parameters.Select(p => p.value).ToArray();
+            var metadata = parameters.Select(p => p.metadata).ToArray();
+
+            await Serializer.WriteParametersAsync(output, metadata, values);
+
+            output.Seek(0, SeekOrigin.Begin);
+            var outputValues = await Serializer.ReadParametersAsync(output, metadata);
+
+            for (int i = 0; i < parameters.Length; i++)
+            {
+                Assert.Equal(parameters[i].value, outputValues[i]);
+            }
+        }
+
+        [Fact]
+        public Task WriteCancellationTokenParameter_ShouldBeNull()
+        {
+            return WriteSimpleParameterHelper(CancellationToken.None, null);
+        }
+
+        private async Task WriteSimpleParameterHelper(object parameter, object expected)
+        {
+            MemoryStream output = new MemoryStream();
+            var parameters = new[] { new ParameterMetadata(parameter.GetType(), "name") };
+            var values = new object[] { parameter };
+
+            await Serializer.WriteParametersAsync(output, parameters, values);
+
+            output.Seek(0, SeekOrigin.Begin);
+            var outputValues = await Serializer.ReadParametersAsync(output, parameters);
+
+            Assert.Equal(expected, outputValues[0]);
+        }
+
+
+        public static IEnumerable<object[]> GetManyProperties(int parameters)
+        {
+            yield return new object[] { Enumerable.Range(0, parameters).Select(index => (new ParameterMetadata(typeof(int), $"name_{index}"), (object)index)).Cast<object>().ToArray() };
+
+            yield return new object[] { Enumerable.Range(0, parameters).Select(index => (new ParameterMetadata(typeof(CompositeType), $"name_{index}"), (object)CompositeType.CreateRandom())).Cast<object>().ToArray() };
         }
     }
 }

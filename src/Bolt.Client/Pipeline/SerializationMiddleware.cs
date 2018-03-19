@@ -185,6 +185,15 @@ namespace Bolt.Client.Pipeline
 
             protected override async Task SerializeToStreamAsync(Stream stream, TransportContext context)
             {
+                // cleanup non serializable parameters
+                for (int i = 0; i < _clientContext.Parameters.Length; i++)
+                {
+                    if (!_clientContext.Action.Parameters[i].IsSerializable)
+                    {
+                        _clientContext.Parameters[i] = null;
+                    }
+                }
+
                 try
                 {
                     await _serializer.WriteParametersAsync(stream, _clientContext.Action.Parameters, _clientContext.Parameters, OnContentLength).ConfigureAwait(false);

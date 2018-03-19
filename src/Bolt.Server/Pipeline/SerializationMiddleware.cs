@@ -22,49 +22,32 @@ namespace Bolt.Server.Pipeline
             }
 
             var actionMetadata = context.GetActionOrThrow();
-            object[] rentedParameters = null;
 
             if (actionMetadata.HasParameters && context.Parameters == null)
             {
-                rentedParameters = ArrayPool<object>.Shared.Rent(actionMetadata.Parameters.Count);
-                for (int i = 0; i < actionMetadata.Parameters.Count; i++)
-                {
-                    // clear array just in case
-                    rentedParameters[i] = null;
-                }
-
-                await DeserializeParameters(context, actionMetadata, rentedParameters);
-                context.Parameters = rentedParameters;
+                context.Parameters = await DeserializeParameters(context, actionMetadata);
             }
 
-            try
-            {
-                await Next(context);
+            await Next(context);
 
-                if (!context.ResponseHandled)
-                {
-                    await HandleResponse(context);
-                    context.ResponseHandled = true;
-                }
-            }
-            finally
+            if (!context.ResponseHandled)
             {
-                if (rentedParameters != null)
-                {
-                    ArrayPool<object>.Shared.Return(rentedParameters);
-                }
+                await HandleResponse(context);
+                context.ResponseHandled = true;
             }
         }
 
-        protected virtual async Task DeserializeParameters(ServerActionContext context, ActionMetadata metadata, object[] parameterValues)
+        protected virtual async Task<object[]> DeserializeParameters(ServerActionContext context, ActionMetadata metadata)
         {
+            object[] parameters = null;
+
             if (metadata.HasSerializableParameters)
             {
                 ISerializer serializer = context.GetSerializerOrThrow();
                 try
                 {
                     // TODO: copy body to another stream to prevent blocking in json deserialization
-                    await serializer.ReadParametersAsync(context.HttpContext.Request.Body, metadata.Parameters, parameterValues, context.HttpContext.Request.ContentLength ?? -1);
+                    parameters = await serializer.ReadParametersAsync(context.HttpContext.Request.Body, metadata.Parameters, context.HttpContext.Request.ContentLength ?? -1);
                 }
                 catch (OperationCanceledException)
                 {
@@ -80,11 +63,17 @@ namespace Bolt.Server.Pipeline
                         e);
                 }
             }
+            else if (context.Action.Parameters.Count > 0)
+            {
+                parameters = new object[context.Action.Parameters.Count];
+            }
 
             if (metadata.CancellationTokenIndex >= 0)
             {
-                parameterValues[metadata.CancellationTokenIndex] = context.RequestAborted;
+                parameters[metadata.CancellationTokenIndex] = context.RequestAborted;
             }
+
+            return parameters;
         }
 
         protected virtual async Task HandleResponse(ServerActionContext context)

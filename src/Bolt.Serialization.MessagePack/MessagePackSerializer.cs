@@ -2,33 +2,35 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using MessagePack;
+using Bolt.Metadata;
 
 namespace Bolt.Serialization.MessagePack
 {
-    public class MessagePackBoltSerializer : ISerializer
+    public class MessagePackSerializer : SerializerBase
     {
-        public string MediaType => "application/x-msgpack";
-
-        public Task<object> ReadAsync(Stream stream, Type type, long contentLength = -1)
+        public MessagePackSerializer() : base("application/x-msgpack")
         {
-            return Task.FromResult(MessagePackSerializer.NonGeneric.Deserialize(type, stream));
         }
 
-        public Task ReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] outputValues, long contentLength = -1)
+        protected override Task DoWriteAsync(Stream stream, object value, Action<long> onContentLength)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task WriteAsync(Stream stream, object value, Action<long> onContentLength = null)
-        {
-            MessagePackSerializer.NonGeneric.Serialize(value.GetType(), stream, value);
+            global::MessagePack.MessagePackSerializer.NonGeneric.Serialize(value.GetType(), stream, value);
             return Task.CompletedTask;
         }
 
-        public Task WriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, IReadOnlyList<object> values, Action<long> onContentLength = null)
+        protected override Task<object> DoReadAsync(Stream stream, Type valueType, long contentLength)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(global::MessagePack.MessagePackSerializer.NonGeneric.Deserialize(valueType, stream));
+        }
+
+        protected override Task DoWriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] values, Action<long> onContentLength)
+        {
+            return global::MessagePack.MessagePackSerializer.Typeless.SerializeAsync(stream, values);
+        }
+
+        protected override async Task<object[]> DoReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, long contentLength)
+        {
+            return  (object[])(await global::MessagePack.MessagePackSerializer.Typeless.DeserializeAsync(stream));
         }
     }
 }

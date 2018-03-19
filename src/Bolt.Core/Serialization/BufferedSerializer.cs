@@ -7,21 +7,18 @@ using System.Threading.Tasks;
 
 namespace Bolt.Serialization
 {
-    public sealed class BufferedSerializer : ISerializer
+    public sealed class BufferedSerializer : SerializerBase
     {
         private const int BufferSize = 64 * 1024;
         private static readonly ArrayPool<byte> BufferPool = ArrayPool<byte>.Create(64 * 1024, 50);
         private readonly ISerializer _serializer;
 
-        public BufferedSerializer(ISerializer innerSerializer)
+        public BufferedSerializer(ISerializer innerSerializer) : base(innerSerializer.MediaType)
         {
             _serializer = innerSerializer ?? throw new ArgumentNullException(nameof(innerSerializer));
         }
 
-
-        public string MediaType => _serializer.MediaType;
-
-        public async Task WriteAsync(Stream stream, object value, Action<long> onContentLength)
+        protected override async Task DoWriteAsync(Stream stream, object value, Action<long> onContentLength)
         {
             byte[] buffer = BufferPool.Rent(BufferSize);
 
@@ -41,7 +38,7 @@ namespace Bolt.Serialization
             }
         }
 
-        public async Task<object> ReadAsync(Stream stream, Type valueType, long contentLength)
+        protected override async Task<object> DoReadAsync(Stream stream, Type valueType, long contentLength)
         {
             if (contentLength <= 0 || contentLength > BufferSize)
             {
@@ -64,7 +61,7 @@ namespace Bolt.Serialization
             }
         }
 
-        public async Task WriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, IReadOnlyList<object> parameterValues, Action<long> onContentLength)
+        protected override async Task DoWriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] values, Action<long> onContentLength)
         {
             byte[] buffer = BufferPool.Rent(BufferSize);
 
@@ -72,7 +69,7 @@ namespace Bolt.Serialization
             {
                 using (MemoryStream memoryStream = new MemoryStream(buffer))
                 {
-                    await _serializer.WriteParametersAsync(memoryStream, parameters, parameterValues);
+                    await _serializer.WriteParametersAsync(memoryStream, parameters, values);
                     var bytesWritten = memoryStream.Position;
                     onContentLength?.Invoke(bytesWritten);
                     await stream.WriteAsync(buffer, 0, (int)bytesWritten, CancellationToken.None);
@@ -84,12 +81,11 @@ namespace Bolt.Serialization
             }
         }
 
-        public async Task ReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] outputValues, long contentLength)
+        protected override async Task<object[]> DoReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, long contentLength)
         {
             if (contentLength <= 0 || contentLength > BufferSize)
             {
-                await _serializer.ReadParametersAsync(stream, parameters, outputValues, contentLength);
-                return;
+                return await _serializer.ReadParametersAsync(stream, parameters, contentLength);
             }
 
             byte[] buffer = BufferPool.Rent(BufferSize);
@@ -99,31 +95,13 @@ namespace Bolt.Serialization
                 await stream.ReadAsync(buffer, 0, (int)contentLength);
                 using (MemoryStream memoryStream = new MemoryStream(buffer, 0, (int)contentLength))
                 {
-                    await _serializer.ReadParametersAsync(stream, parameters, outputValues, contentLength);
+                    return await _serializer.ReadParametersAsync(stream, parameters, contentLength);
                 }
             }
             finally
             {
                 BufferPool.Return(buffer);
             }
-        }
-
-        private static int FindParameterByName(IReadOnlyList<ParameterMetadata> parameters, string name)
-        {
-            for (int i = 0; i < parameters.Count; i++)
-            {
-                if (string.Equals(parameters[i].Name, name, StringComparison.OrdinalIgnoreCase))
-                {
-                    if (!parameters[i].IsSerializable)
-                    {
-                        return -1;
-                    }
-
-                    return i;
-                }
-            }
-
-            return -1;
         }
     }
 }

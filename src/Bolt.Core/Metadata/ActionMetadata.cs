@@ -61,22 +61,29 @@ namespace Bolt.Metadata
 
         public TimeSpan Timeout { get; internal set; }
 
-        public void ValidateParameters(object[] parameters)
+        public void ValidateParameters(IReadOnlyList<object> values) => ValidateParameters(Parameters, values);
+
+        public static void ValidateParameters(IReadOnlyList<ParameterMetadata> parameters, IReadOnlyList<object> values)
         {
-            if (Parameters.Count == 0)
+            if (parameters.Count == 0)
             {
-                if (parameters != null && parameters.Length > 0)
+                if (values?.Count > 0)
                 {
-                    throw new BoltException($"Action '{Name}' does not require any parameters.");
+                    throw new BoltException($"No parameter values should be specified for current action.");
                 }
 
                 return;
             }
 
-            for (int i = 0; i < Parameters.Count; i++)
+            if (values?.Count < parameters.Count)
             {
-                var parameterMetadata = Parameters[i];
-                object parameter = parameters[i];
+                throw new BoltException($"Not enough parameters specified.");
+            }
+
+            for (int i = 0; i < parameters.Count; i++)
+            {
+                var parameterMetadata = parameters[i];
+                object parameter = values[i];
 
                 if (parameter == null)
                 {
