@@ -32,7 +32,7 @@ namespace Bolt.Serialization
 
         public Newtonsoft.Json.JsonSerializer Serializer { get; }
 
-        public async Task WriteAsync(Stream stream, object value)
+        public async Task WriteAsync(Stream stream, object value, Action<long> onContentLength)
         {
             using (StreamWriter writer = CreateStreamWriter(stream))
             {
@@ -42,7 +42,7 @@ namespace Bolt.Serialization
             }
         }
 
-        public Task<object> ReadAsync(Stream stream, Type valueType)
+        public Task<object> ReadAsync(Stream stream, Type valueType, long contentLength)
         {
             using (TextReader reader = CreateStreamReader(stream))
             {
@@ -50,7 +50,7 @@ namespace Bolt.Serialization
             }
         }
 
-        public async Task WriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, IReadOnlyList<object> parameterValues)
+        public async Task WriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, IReadOnlyList<object> parameterValues, Action<long> onContentLength)
         {
             if (stream == null)
             {
@@ -97,7 +97,7 @@ namespace Bolt.Serialization
             }
         }
 
-        public Task ReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] outputValues)
+        public Task ReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] outputValues, long contentLength)
         {
             if (stream == null)
             {

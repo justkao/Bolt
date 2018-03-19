@@ -13,6 +13,8 @@ using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Bolt.Benchmark.Contracts;
+using Bolt.Serialization;
+using Bolt.Serialization.MessagePack;
 
 namespace Bolt.Benchmark.Benchmarks
 {
@@ -28,6 +30,9 @@ namespace Bolt.Benchmark.Benchmarks
 
         public IPerformanceContract Proxy { get; private set; }
 
+        [Params(true, false)]
+        public bool UseMessagePack { get; set; }
+
         [GlobalSetup]
         public void GlobalSetup()
         {
@@ -38,6 +43,10 @@ namespace Bolt.Benchmark.Benchmarks
             _runningServer = new TestServer(new WebHostBuilder().ConfigureLogging(ConfigureLog).Configure(Configure).ConfigureServices(ConfigureServices));
 
             ClientConfiguration = new ClientConfiguration();
+            if (UseMessagePack)
+            {
+                ClientConfiguration.Serializer = new MessagePackBoltSerializer();
+            }
             HttpMessageHandler handler = _runningServer.CreateHandler();
             ClientConfiguration.HttpMessageHandler = handler;
             Proxy = ClientConfiguration.CreateProxy<IPerformanceContract>(new Uri("http://localhost"));
@@ -152,6 +161,11 @@ namespace Bolt.Benchmark.Benchmarks
             app.UseBolt(
                 b =>
                 {
+                    if (UseMessagePack)
+                    {
+                        b.Configuration.DefaultSerializer = new MessagePackBoltSerializer();
+                        b.Configuration.AvailableSerializers = new[] { b.Configuration.DefaultSerializer };
+                    };
                     b.Use<IPerformanceContract, PerformanceContractImplementation>();
                 });
         }

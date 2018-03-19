@@ -46,7 +46,8 @@ namespace Bolt.Performance.Core.Benchmark
 
             if (quick)
             {
-                Add(new DummyLogger());
+                // Add(new DummyLogger());
+                Add(ConsoleLogger.Default);
 
                 Add(Job.Core
                 .WithLaunchCount(1)

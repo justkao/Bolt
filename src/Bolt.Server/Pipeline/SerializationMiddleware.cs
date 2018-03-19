@@ -64,7 +64,7 @@ namespace Bolt.Server.Pipeline
                 try
                 {
                     // TODO: copy body to another stream to prevent blocking in json deserialization
-                    await serializer.ReadParametersAsync(context.HttpContext.Request.Body, metadata.Parameters, parameterValues);
+                    await serializer.ReadParametersAsync(context.HttpContext.Request.Body, metadata.Parameters, parameterValues, context.HttpContext.Request.ContentLength ?? -1);
                 }
                 catch (OperationCanceledException)
                 {
@@ -97,7 +97,7 @@ namespace Bolt.Server.Pipeline
                 context.HttpContext.Response.ContentType = context.Configuration.DefaultSerializer.MediaType;
                 try
                 {
-                    await context.GetSerializerOrThrow().WriteAsync(context.HttpContext.Response.Body, context.ActionResult);
+                    await context.GetSerializerOrThrow().WriteAsync(context.HttpContext.Response.Body, context.ActionResult, l => OnHandleContentLength(context, l));
                 }
                 catch (Exception e)
                 {
@@ -116,6 +116,14 @@ namespace Bolt.Server.Pipeline
 
             await context.HttpContext.Response.Body.FlushAsync();
             context.HttpContext.Response.Body.Dispose();
+        }
+
+        private void OnHandleContentLength(ServerActionContext context, long contentLength)
+        {
+            if ( contentLength > 0)
+            {
+                context.HttpContext.Response.ContentLength = contentLength;
+            }
         }
 
         protected virtual ISerializer PickSerializer(ServerActionContext context)

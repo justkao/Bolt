@@ -12,12 +12,12 @@ namespace Bolt.Serialization
         /// </summary>
         string MediaType { get; }
 
-        Task WriteAsync(Stream stream, object value);
+        Task WriteAsync(Stream stream, object value, Action<long> onContentLength = null);
 
-        Task<object> ReadAsync(Stream stream, Type valueType);
+        Task<object> ReadAsync(Stream stream, Type type, long contentLength = -1);
 
-        Task WriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, IReadOnlyList<object> values);
+        Task WriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, IReadOnlyList<object> values, Action<long> onContentLength = null);
 
-        Task ReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] outputValues);
+        Task ReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] outputValues, long contentLength = -1);
     }
 }

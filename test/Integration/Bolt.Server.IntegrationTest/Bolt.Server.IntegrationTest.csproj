@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Bolt.Client\Bolt.Client.csproj" />
+    <ProjectReference Include="..\..\..\src\Bolt.Serialization.MessagePack\Bolt.Serialization.MessagePack.csproj" />
     <ProjectReference Include="..\..\..\src\Bolt.Server\Bolt.Server.csproj" />
     <ProjectReference Include="..\Bolt.Server.IntegrationTest.Core\Bolt.Server.IntegrationTest.Core.csproj" />
   </ItemGroup>

@@ -12,7 +12,7 @@ namespace Bolt.Core.Test
     {
         public JsonSerializerTest()
         {
-            Serializer = new JsonSerializer();
+            Serializer =  new BufferedSerializer(new JsonSerializer());
         }
 
         public ISerializer Serializer { get; }
