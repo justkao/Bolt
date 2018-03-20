@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Bolt.Client;
@@ -274,13 +275,13 @@ namespace Bolt.Server.IntegrationTest
             for (int index = 0; index < proxies.Count; index++)
             {
                 var proxy = proxies[index];
-                proxy.SetState(index.ToString());
+                proxy.SetState(index.ToString(CultureInfo.InvariantCulture));
             }
 
             for (int index = 0; index < proxies.Count; index++)
             {
                 var proxy = proxies[index];
-                Assert.Equal(index.ToString(), proxy.GetState());
+                Assert.Equal(index.ToString(CultureInfo.InvariantCulture), proxy.GetState());
             }
 
             foreach (IDisposable proxy in proxies)

@@ -162,8 +162,8 @@ namespace Bolt.Tools.Configuration
                 Parent = this,
                 Contract = type.FullName,
                 Modifier = internalVisibility ? "internal" : "public",
-                ForceAsync = true,
-                ForceSync = true,
+                ForceAsyncMethod = true,
+                ForceSyncMethod = true,
                 Namespace = type.Namespace
             };
 

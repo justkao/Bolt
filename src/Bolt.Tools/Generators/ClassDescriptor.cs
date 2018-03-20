@@ -8,7 +8,7 @@ namespace Bolt.Tools.Generators
     {
         public ClassDescriptor()
         {
-            BaseClasses = new string[0];
+            BaseClasses = Array.Empty<string>();
         }
 
         public ClassDescriptor(Type type)
@@ -17,7 +17,7 @@ namespace Bolt.Tools.Generators
         }
 
         public ClassDescriptor(string name, string @namespace)
-            : this(name, @namespace, new string[0])
+            : this(name, @namespace, Array.Empty<string>())
         {
         }
 

@@ -24,19 +24,19 @@ namespace Bolt.Server.Pipeline
 
             if (actionMetadata.HasParameters && context.Parameters == null)
             {
-                context.Parameters = await DeserializeParameters(context, actionMetadata);
+                context.Parameters = await DeserializeParametersAsync(context, actionMetadata);
             }
 
             await Next(context);
 
             if (!context.ResponseHandled)
             {
-                await HandleResponse(context);
+                await HandleResponseAsync(context);
                 context.ResponseHandled = true;
             }
         }
 
-        protected virtual async Task<object[]> DeserializeParameters(ServerActionContext context, ActionMetadata metadata)
+        protected virtual async Task<object[]> DeserializeParametersAsync(ServerActionContext context, ActionMetadata metadata)
         {
             object[] parameters = null;
 
@@ -75,7 +75,7 @@ namespace Bolt.Server.Pipeline
             return parameters;
         }
 
-        protected virtual async Task HandleResponse(ServerActionContext context)
+        protected virtual async Task HandleResponseAsync(ServerActionContext context)
         {
             context.RequestAborted.ThrowIfCancellationRequested();
             context.HttpContext.Response.StatusCode = 200;

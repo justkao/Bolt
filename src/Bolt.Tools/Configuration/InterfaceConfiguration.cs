@@ -14,9 +14,11 @@ namespace Bolt.Tools.Configuration
         [JsonProperty(Required = Required.Always)]
         public string Contract { get; set; }
 
-        public bool ForceAsync { get; set; }
+        [JsonProperty("ForceAsync")]
+        public bool ForceAsyncMethod { get; set; }
 
-        public bool ForceSync { get; set; }
+        [JsonProperty("ForceAsync")]
+        public bool ForceSyncMethod { get; set; }
 
         public List<string> ExcludedInterfaces { get; set; }
 
@@ -71,8 +73,8 @@ namespace Bolt.Tools.Configuration
             InterfaceGenerator interfaceGenerator = new InterfaceGenerator
             {
                 ContractDefinition = definition,
-                ForceAsync = ForceAsync,
-                ForceSync = ForceSync,
+                ForceAsynchronous = ForceAsyncMethod,
+                ForceSynchronous = ForceSyncMethod,
                 InterfaceSuffix = Suffix,
                 ExcludedInterfaces = ExcludedInterfaces,
                 Name = Name,

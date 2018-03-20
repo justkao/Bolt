@@ -3,6 +3,7 @@
   <PropertyGroup>
     <Description>Bolt portable client library used to access Bolt based services.</Description>
     <PackageTags>bolt;client</PackageTags>
+    <UseAsyncAnalyzer>true</UseAsyncAnalyzer>
   </PropertyGroup>
   
   <ItemGroup>

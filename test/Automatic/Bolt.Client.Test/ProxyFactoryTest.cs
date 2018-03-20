@@ -10,10 +10,10 @@ namespace Bolt.Client.Proxy.Test
 {
     public class ProxyFactoryTest
     {
-        private static readonly MethodInfo Action = typeof(ITestContract).GetRuntimeMethod(nameof(ITestContract.Action), new Type[0]);
-        private static readonly MethodInfo Function = typeof(ITestContract).GetRuntimeMethod(nameof(ITestContract.Function), new Type[0]);
-        private static readonly MethodInfo AsyncMethod = typeof(ITestContract).GetRuntimeMethod(nameof(ITestContract.AsyncMethod), new Type[0]);
-        private static readonly MethodInfo AsyncFunction = typeof(ITestContract).GetRuntimeMethod(nameof(ITestContract.AsyncFunction), new Type[0]);
+        private static readonly MethodInfo Action = typeof(ITestContract).GetRuntimeMethod(nameof(ITestContract.Action), Array.Empty<Type>());
+        private static readonly MethodInfo Function = typeof(ITestContract).GetRuntimeMethod(nameof(ITestContract.Function), Array.Empty<Type>());
+        private static readonly MethodInfo AsyncMethod = typeof(ITestContract).GetRuntimeMethod(nameof(ITestContract.AsyncMethod), Array.Empty<Type>());
+        private static readonly MethodInfo AsyncFunction = typeof(ITestContract).GetRuntimeMethod(nameof(ITestContract.AsyncFunction), Array.Empty<Type>());
 
         private static readonly MethodInfo MethodWithParameters = typeof(ITestContract).GetRuntimeMethod(nameof(ITestContract.MethodWithParameters), new[] { typeof(string), typeof(int), typeof(CancellationToken) });
 

@@ -126,6 +126,8 @@ namespace Bolt.Client
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
+
             if (State == ProxyState.Open)
             {
                 this.Close();

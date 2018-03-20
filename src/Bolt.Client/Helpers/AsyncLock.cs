@@ -56,6 +56,7 @@ namespace Bolt.Client.Helpers
         {
             _semaphore?.Dispose();
             _semaphore = null;
+            _releaser?.Dispose();
         }
 
         private sealed class Releaser : IDisposable

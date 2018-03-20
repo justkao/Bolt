@@ -48,7 +48,7 @@ namespace Bolt.Client.Pipeline
                             (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Open);
                             throw;
                         default:
-                            throw new ArgumentOutOfRangeException();
+                            throw new ArgumentOutOfRangeException($"The value of '{errorHandlingResult}' is not supported.", nameof(errorHandlingResult));
                     }
                 }
 

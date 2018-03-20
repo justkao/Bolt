@@ -36,6 +36,8 @@ namespace Bolt.Client
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
+
             Current = null;
         }
     }

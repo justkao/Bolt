@@ -233,8 +233,8 @@ namespace Bolt.Tools
                     foreach (InterfaceConfiguration contract in rootConfiguration.AddAllContracts(internalVisibility))
                     {
                         contract.Suffix = suffix;
-                        contract.ForceSync = forceSync;
-                        contract.ForceAsync = forceAsync;
+                        contract.ForceSyncMethod = forceSync;
+                        contract.ForceAsyncMethod = forceAsync;
                         contract.AddExcluded(excludedContracts);
                     }
                 }
@@ -256,8 +256,8 @@ namespace Bolt.Tools
                         foreach (var config in rootConfiguration.AddContractsFromNamespace(ns, internalVisibility))
                         {
                             config.Suffix = suffix;
-                            config.ForceSync = forceSync;
-                            config.ForceAsync = forceAsync;
+                            config.ForceSyncMethod = forceSync;
+                            config.ForceAsyncMethod = forceAsync;
                             config.AddExcluded(excludedContracts);
                         }
                     }
@@ -271,8 +271,8 @@ namespace Bolt.Tools
                     try
                     {
                         var config = rootConfiguration.AddContract(contract, internalVisibility);
-                        config.ForceSync = forceSync;
-                        config.ForceAsync = forceAsync;
+                        config.ForceSyncMethod = forceSync;
+                        config.ForceAsyncMethod = forceAsync;
                         config.Suffix = suffix;
                         config.AddExcluded(excludedContracts);
                     }
@@ -298,8 +298,8 @@ namespace Bolt.Tools
                     Contract = "<Type>",
                     Modifier = "<public|internal>",
                     Excluded = new List<string> { "<FullTypeName>", "<FullTypeName>" },
-                    ForceAsync = true,
-                    ForceSync = true,
+                    ForceAsyncMethod = true,
+                    ForceSyncMethod = true,
                     Output = "<Path>",
                     Suffix = $"<Suffix> // suffix for generated interface, defaults to '{GeneratorBase.AsyncSuffix}'",
                     Namespace = "<Namespace> // namespace of generated interface, defaults to contract namespace if null",

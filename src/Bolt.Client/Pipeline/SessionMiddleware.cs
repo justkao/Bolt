@@ -151,7 +151,7 @@ namespace Bolt.Client.Pipeline
                 case ErrorHandlingResult.Rethrow:
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException($"The value of '{handlingResult}' is not supported", nameof(handlingResult));
             }
 
             return error;
@@ -171,7 +171,7 @@ namespace Bolt.Client.Pipeline
                     session.ChangeState(context.Proxy, ProxyState.Ready);
                     break;
                 default:
-                    throw new ArgumentOutOfRangeException();
+                    throw new ArgumentOutOfRangeException($"The value of '{handlingResult}' is not supported", nameof(handlingResult));
             }
 
             return error;

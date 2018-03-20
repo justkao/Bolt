@@ -19,7 +19,7 @@ namespace Bolt.Server
 
             foreach (ActionMetadata action in contract.Actions)
             {
-                if (action.IsAsync && action.IsMatch(actionName))
+                if (action.IsAsynchronous && action.IsMatch(actionName))
                 {
                     return action;
                 }
@@ -27,7 +27,7 @@ namespace Bolt.Server
 
             foreach (ActionMetadata action in contract.Actions)
             {
-                if (!action.IsAsync && action.IsMatch(actionName))
+                if (!action.IsAsynchronous && action.IsMatch(actionName))
                 {
                     return action;
                 }

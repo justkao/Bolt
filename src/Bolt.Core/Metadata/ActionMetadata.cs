@@ -16,7 +16,7 @@ namespace Bolt.Metadata
             Parameters = new ReadOnlyCollection<ParameterMetadata>(parameters);
             ResultType = resultType;
             Timeout = TimeSpan.Zero;
-            IsAsync = typeof(Task).GetTypeInfo().IsAssignableFrom(action.ReturnType.GetTypeInfo());
+            IsAsynchronous = typeof(Task).GetTypeInfo().IsAssignableFrom(action.ReturnType.GetTypeInfo());
             NormalizedName = BoltFramework.NormalizeActionName(Name.AsReadOnlySpan()).ConvertToString();
             HasSerializableParameters = Parameters.Any(p => p.IsSerializable);
             CancellationTokenIndex = GetCancellationTokenIndex();
@@ -28,7 +28,7 @@ namespace Bolt.Metadata
 
         public MethodInfo Action { get; }
 
-        public bool IsAsync { get; }
+        public bool IsAsynchronous { get; }
 
         public IReadOnlyList<ParameterMetadata> Parameters { get; }
 

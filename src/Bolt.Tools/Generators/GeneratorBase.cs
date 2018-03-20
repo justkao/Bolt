@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -109,9 +110,9 @@ namespace Bolt.Tools.Generators
             return method.ReturnType;
         }
 
-        public virtual bool IsAsync(MethodInfo method)
+        public virtual bool IsAsynchronous(MethodInfo method)
         {
-            return method.IsAsync();
+            return method.IsAsyncMethod();
         }
 
         public virtual string FormatPublicProperty(Type type, string name)
@@ -127,11 +128,11 @@ namespace Bolt.Tools.Generators
             {
                 if (includeTypes)
                 {
-                    builder.AppendFormat("{0} {1}, ", Formatter.FormatType(pair.Value), pair.Key);
+                    builder.AppendFormat(CultureInfo.InvariantCulture, "{0} {1}, ", Formatter.FormatType(pair.Value), pair.Key);
                 }
                 else
                 {
-                    builder.AppendFormat("{0}, ", pair.Key);
+                    builder.AppendFormat(CultureInfo.InvariantCulture, "{0}, ", pair.Key);
                 }
             }
 
@@ -199,7 +200,7 @@ namespace Bolt.Tools.Generators
                 return FormatMethodDeclaration(info);
             }
 
-            if (info.IsAsync())
+            if (info.IsAsyncMethod())
             {
                 if (formatting == MethodDeclarationFormatting.ChangeToSync)
                 {

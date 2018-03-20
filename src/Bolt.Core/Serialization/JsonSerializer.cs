@@ -11,8 +11,6 @@ namespace Bolt.Serialization
     {
         private const int BufferSize = 4 * 1024;
 
-        private static readonly Task Done = Task.FromResult(true);
-
         private static readonly Encoding Encoding = Encoding.UTF8;
 
         public JsonSerializer() : base("application/json")

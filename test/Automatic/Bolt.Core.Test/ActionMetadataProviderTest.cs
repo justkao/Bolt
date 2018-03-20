@@ -12,7 +12,7 @@ namespace Bolt.Core.Test
         {
             ActionMetadataProvider provider = new ActionMetadataProvider();
 
-            var metadata = provider.Resolve(typeof(ITestContract).GetRuntimeMethod(nameof(ITestContract.Method1), new Type[0]));
+            var metadata = provider.Resolve(typeof(ITestContract).GetRuntimeMethod(nameof(ITestContract.Method1), Array.Empty<Type>()));
             Assert.Equal(TimeSpan.FromMilliseconds(9999), metadata.Timeout);
         }
 

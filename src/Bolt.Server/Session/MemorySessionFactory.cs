@@ -107,6 +107,8 @@ namespace Bolt.Server.Session
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
+
             _timer?.Dispose();
         }
 

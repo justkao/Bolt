@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 
@@ -22,7 +23,7 @@ namespace Bolt.Test.Common
 
             for (int i = 0; i < rnd.Next(0, 20); i++)
             {
-                type.List.Add(rnd.Next().ToString());
+                type.List.Add(rnd.Next().ToString(CultureInfo.InvariantCulture));
             }
 
             if (createInner)

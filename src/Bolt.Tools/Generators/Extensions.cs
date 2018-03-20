@@ -1,4 +1,5 @@
 using System;
+using System.Globalization;
 using System.Reflection;
 using System.Threading.Tasks;
 
@@ -13,7 +14,7 @@ namespace Bolt.Tools.Generators
                 return text;
             }
 
-            if (!text.EndsWith(suffix))
+            if (!text.EndsWith(suffix, StringComparison.OrdinalIgnoreCase))
             {
                 return text;
             }
@@ -29,22 +30,24 @@ namespace Bolt.Tools.Generators
 
         public static string LowerCaseFirstLetter(this string name)
         {
-            return name.Substring(0, 1).ToLower() + name.Substring(1);
+#pragma warning disable CA1308 // Normalize strings to uppercase
+            return name.Substring(0, 1).ToLower(CultureInfo.InvariantCulture) + name.Substring(1);
+#pragma warning restore CA1308 // Normalize strings to uppercase
         }
 
         public static string CapitalizeFirstLetter(this string name)
         {
-            return name.Substring(0, 1).ToUpper() + name.Substring(1);
+            return name.Substring(0, 1).ToUpper(CultureInfo.InvariantCulture) + name.Substring(1);
         }
 
-        public static bool IsAsync(this MethodInfo method)
+        public static bool IsAsyncMethod(this MethodInfo method)
         {
             return typeof(Task).GetTypeInfo().IsAssignableFrom(method.ReturnType.GetTypeInfo());
         }
 
         public static Type GetTargetRawType(this MethodInfo method)
         {
-            if (method.IsAsync())
+            if (method.IsAsyncMethod())
             {
                 if (typeof(Task) == method.ReturnType)
                 {
@@ -64,7 +67,7 @@ namespace Bolt.Tools.Generators
 
         public static string GetAsyncName(this MethodInfo method)
         {
-            if (method.Name.EndsWith(GeneratorBase.AsyncSuffix))
+            if (method.Name.EndsWith(GeneratorBase.AsyncSuffix, StringComparison.OrdinalIgnoreCase))
             {
                 return method.Name;
             }

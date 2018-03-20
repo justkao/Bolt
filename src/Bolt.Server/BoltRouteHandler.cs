@@ -130,7 +130,7 @@ namespace Bolt.Server
                 if (!string.IsNullOrEmpty(Options.Prefix))
                 {
                     string rawContractName = contract.ConvertToString();
-                    routeContext.Handler = (ctxt) => ReportContractNotFound(ctxt, rawContractName);
+                    routeContext.Handler = (ctxt) => ReportContractNotFoundAsync(ctxt, rawContractName);
                 }
 
                 // just pass to next middleware in chain
@@ -162,7 +162,7 @@ namespace Bolt.Server
                         boltFeature.ActionContext.Contract.Name);
             }
 
-            routeContext.Handler = HandleRequest;
+            routeContext.Handler = HandleRequestAsync;
             return CompletedTask.Done;
         }
 
@@ -171,7 +171,7 @@ namespace Bolt.Server
             return null;
         }
 
-        protected virtual async Task Execute(ServerActionContext ctxt)
+        protected virtual async Task ExecuteAsync(ServerActionContext ctxt)
         {
             using (Logger.BeginScope("Execute"))
             {
@@ -248,7 +248,7 @@ namespace Bolt.Server
             }
         }
 
-        private async Task HandleRequest(HttpContext context)
+        private async Task HandleRequestAsync(HttpContext context)
         {
             var boltFeature = context.Features.Get<IBoltFeature>();
 
@@ -261,7 +261,7 @@ namespace Bolt.Server
                 }
                 else
                 {
-                    await Execute(boltFeature.ActionContext);
+                    await ExecuteAsync(boltFeature.ActionContext);
                 }
             }
             finally
@@ -270,7 +270,7 @@ namespace Bolt.Server
             }
         }
 
-        private Task ReportContractNotFound(HttpContext context, string contract)
+        private Task ReportContractNotFoundAsync(HttpContext context, string contract)
         {
             Logger.LogWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", contract, context.Request.Path);
 

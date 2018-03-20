@@ -79,7 +79,7 @@ namespace Bolt.Client
             {
                 ActionMetadata metadata = BoltFramework.ActionMetadata.Resolve(key);
                 Func<Task<object>, Task> provider = null;
-                if (metadata.IsAsync && metadata.HasResult)
+                if (metadata.IsAsynchronous && metadata.HasResult)
                 {
                     provider = MethodInvokerBuilder.Build(metadata.ResultType);
                 }
@@ -112,14 +112,14 @@ namespace Bolt.Client
                 // lambda parameters
                 ParameterExpression taskParam = Expression.Parameter(typeof(Task<object>), "task");
 
-                MethodInfo convertTaskMethod = typeof(MethodInvokerBuilder).GetTypeInfo().DeclaredMethods.First(m => m.Name == nameof(ConvertTask));
+                MethodInfo convertTaskMethod = typeof(MethodInvokerBuilder).GetTypeInfo().DeclaredMethods.First(m => m.Name == nameof(ConvertTaskAsync));
                 convertTaskMethod = convertTaskMethod.MakeGenericMethod(resultType);
 
                 // compile lambda
                 return Expression.Lambda<Func<Task<object>, Task>>(Expression.Call(convertTaskMethod, taskParam), taskParam).Compile();
             }
 
-            private static Task<T> ConvertTask<T>(Task<object> task)
+            private static Task<T> ConvertTaskAsync<T>(Task<object> task)
             {
                 return task.ContinueWith(
                 t =>
@@ -160,7 +160,7 @@ namespace Bolt.Client
                     return;
                 }
 
-                if (metadata.ActionMetadata.IsAsync)
+                if (metadata.ActionMetadata.IsAsynchronous)
                 {
                     if (!metadata.ActionMetadata.HasResult)
                     {

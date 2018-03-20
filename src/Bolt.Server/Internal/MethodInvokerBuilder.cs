@@ -62,7 +62,7 @@ namespace Bolt.Server.Internal
         {
             if (parameters.Length == 0)
             {
-                return new Expression[0];
+                return Array.Empty<Expression>();
             }
 
             Expression[] result = new Expression[parameters.Length];

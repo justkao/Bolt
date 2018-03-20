@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using Bolt.Metadata;
@@ -12,7 +13,7 @@ namespace Bolt.Serialization
         {
             if (string.IsNullOrEmpty(mediaType))
             {
-                throw new ArgumentException(nameof(mediaType));
+                throw new ArgumentException("The serializer media type needs to be specified", nameof(mediaType));
             }
 
             MediaType = mediaType;
@@ -97,7 +98,7 @@ namespace Bolt.Serialization
                 {
                     if (Convert.GetTypeCode(rawValue) != TypeCode.Object)
                     {
-                        rawValue = Convert.ChangeType(rawValue, parameters[i].Type);
+                        rawValue = Convert.ChangeType(rawValue, parameters[i].Type, CultureInfo.InvariantCulture);
                     }
                 }
 

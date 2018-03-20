@@ -53,7 +53,7 @@ namespace Bolt.Tools.Generators
 
         public virtual bool ShouldBeSync(MethodInfo method, bool force)
         {
-            if (!method.IsAsync())
+            if (!method.IsAsyncMethod())
             {
                 return false;
             }
@@ -81,9 +81,9 @@ namespace Bolt.Tools.Generators
             return methods.All(m => m.Name != methodName);
         }
 
-        public virtual bool ShouldBeAsync(MethodInfo method, bool force)
+        public virtual bool ShouldBeAsynchronous(MethodInfo method, bool force)
         {
-            if (method.IsAsync())
+            if (method.IsAsyncMethod())
             {
                 return false;
             }

@@ -87,8 +87,7 @@ namespace Bolt.Tools
 
             if (!string.IsNullOrEmpty(extension))
             {
-                hasExtension =
-                    new[] { ".exe", ".dll" }.Any(ext => string.CompareOrdinal(extension.ToLowerInvariant(), ext) == 0);
+                hasExtension = new[] { ".EXE", ".DLL" }.Any(ext => string.CompareOrdinal(extension.ToUpperInvariant(), ext) == 0);
             }
 
             foreach (var dir in _dirs)

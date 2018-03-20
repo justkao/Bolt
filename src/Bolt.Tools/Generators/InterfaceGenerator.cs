@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 
 namespace Bolt.Tools.Generators
 {
@@ -12,9 +13,11 @@ namespace Bolt.Tools.Generators
 
         public IEnumerable<string> GeneratedAsyncInterfaces => _generatedAsyncInterfaces;
 
-        public bool ForceAsync { get; set; }
+        [JsonProperty("ForceAsync")]
+        public bool ForceAsynchronous { get; set; }
 
-        public bool ForceSync { get; set; }
+        [JsonProperty("ForceSync")]
+        public bool ForceSynchronous { get; set; }
 
         public List<string> ExcludedInterfaces { get; set; }
 
@@ -95,8 +98,8 @@ namespace Bolt.Tools.Generators
             {
                 var methods =
                     (from method in ContractDefinition.GetEffectiveMethods(contract)
-                     let async = ShouldBeAsync(method, ForceAsync)
-                     let sync = ShouldBeSync(method, ForceSync)
+                     let async = ShouldBeAsynchronous(method, ForceAsynchronous)
+                     let sync = ShouldBeSync(method, ForceSynchronous)
                      where async || sync
                      select new { method, async, sync }).ToList();
 
@@ -128,22 +131,22 @@ namespace Bolt.Tools.Generators
 
         private bool ShouldHaveSyncMethods(Type contract)
         {
-            if (ForceSync)
+            if (ForceSynchronous)
             {
                 return true;
             }
 
-            return ContractDefinition.GetEffectiveMethods(contract).Any(m => ShouldBeSync(m, ForceSync));
+            return ContractDefinition.GetEffectiveMethods(contract).Any(m => ShouldBeSync(m, ForceSynchronous));
         }
 
         private bool ShouldHaveAsyncMethods(Type contract)
         {
-            if (ForceAsync)
+            if (ForceAsynchronous)
             {
                 return true;
             }
 
-            return ContractDefinition.GetEffectiveMethods(contract).Any(m => ShouldBeAsync(m, ForceAsync));
+            return ContractDefinition.GetEffectiveMethods(contract).Any(m => ShouldBeAsynchronous(m, ForceAsynchronous));
         }
     }
 }

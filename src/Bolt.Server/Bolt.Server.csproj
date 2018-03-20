@@ -5,6 +5,7 @@
     <WarningsAsErrors>true</WarningsAsErrors>
     <PackageTags>bolt;server</PackageTags>
     <TargetFramework>$(TargetFramework)</TargetFramework>
+    <UseAsyncAnalyzer>true</UseAsyncAnalyzer>
   </PropertyGroup>
   
   <ItemGroup>

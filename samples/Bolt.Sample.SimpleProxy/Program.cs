@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client;
@@ -46,7 +47,7 @@ namespace Bolt.Sample.SimpleProxy
                 {
                     try
                     {
-                        await proxy.ExecuteAsync(i.ToString());
+                        await proxy.ExecuteAsync(i.ToString(CultureInfo.InvariantCulture));
                     }
                     catch (OperationCanceledException)
                     {

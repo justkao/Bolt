@@ -35,6 +35,8 @@ namespace Bolt.Server.IntegrationTest
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
+
             _runningServer.Dispose();
         }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -85,7 +86,7 @@ namespace Bolt.Tools.Generators
                     StringBuilder sb = new StringBuilder();
                     foreach (string s in Descriptor.BaseClasses)
                     {
-                        sb.AppendFormat("{0}, ", s);
+                        sb.AppendFormat(CultureInfo.InvariantCulture, "{0}, ", s);
                     }
 
                     if (sb.Length > 0)

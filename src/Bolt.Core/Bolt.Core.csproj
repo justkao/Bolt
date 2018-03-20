@@ -3,6 +3,7 @@
   <PropertyGroup> 
     <Description>Bolt Core library containing common classes shared by client and server.</Description>
     <PackageTags>bolt;core</PackageTags>
+    <UseAsyncAnalyzer>true</UseAsyncAnalyzer>
   </PropertyGroup>
   
   <ItemGroup>

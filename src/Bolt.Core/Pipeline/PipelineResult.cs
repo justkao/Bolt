@@ -37,6 +37,8 @@ namespace Bolt.Pipeline
 
         public void Dispose()
         {
+            GC.SuppressFinalize(this);
+
             foreach (IDisposable disposable in Middlewares.OfType<IDisposable>())
             {
                 disposable.Dispose();

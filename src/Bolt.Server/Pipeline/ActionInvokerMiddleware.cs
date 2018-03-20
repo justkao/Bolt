@@ -56,7 +56,7 @@ namespace Bolt.Server.Pipeline
             else
             {
                 ActionDescriptor result = _actions.GetOrAdd(context.Action, a => new ActionDescriptor(a));
-                await result.Execute(context);
+                await result.ExecuteAsync(context);
                 await Next(context);
             }
         }
@@ -83,7 +83,7 @@ namespace Bolt.Server.Pipeline
 
             private Type[] ParametersTypes { get; }
 
-            public async Task Execute(ServerActionContext context)
+            public async Task ExecuteAsync(ServerActionContext context)
             {
                 var result = _compiledLambda(context.ContractInstance, context.Parameters);
                 if (_isTaskResult)
