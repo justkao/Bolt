@@ -1,11 +1,11 @@
-##Bolt
+## Bolt
 
 [![Build status](https://ci.appveyor.com/api/projects/status/b97hsk15u6cw000m/branch/master?svg=true)](https://ci.appveyor.com/project/justkao/bolt)
 
 Lean and lightweight http communication library based on ASP.Net Core. The main focus of project 
 was to create multiplatform, simple and powerfull replacement for WCF library.
 
-####Service Contract
+#### Service Contract
 Bolt requires interface describing your service that will be used for communication.
 
 ```c#
@@ -19,7 +19,7 @@ public interface IFooService
 }
 ```
 
-####Client
+#### Client
 * Add *Bolt.Client* package to project (`Install-Package Bolt.Client -pre`)
 * Create proxy to your service and call remote method
 ```c#
@@ -28,7 +28,7 @@ IFooService proxy = configuration.CreateProxy<IFooService>(<service url>);
 proxy.DoYourThing();
 ```
 
-####Server
+#### Server
 * Add *Bolt.Server* package to project (`Install-Package Bolt.Server -pre`)
 * In you startup class use Bolt extensions to register Bolt into the pipeline
 
@@ -67,7 +67,7 @@ Bolt also supports:
 * **[Bolt.Core](https://www.nuget.org/packages/Bolt.Core/)** - contains common interfaces and helpers shared by both client and server.
 * **[Bolt.Client](https://www.nuget.org/packages/Bolt.Client/)** - contains client side code required to communicate with Bolt service.
 * **[Bolt.Server](https://www.nuget.org/packages/Bolt.Server/)** - server side code required to integrate Bolt into ASP.NET Core
-* **[Bolt.Console](https://www.nuget.org/packages/Bolt.Tool/)** - tool used to generate syncronous and asynchronous interfaces.
+* **[dotnet-bolt](https://www.nuget.org/packages/dotnet-bolt/)** - tool used to generate synchronous and asynchronous interfaces.
 
 To find out more just take a look at Bolt code or check out the [Bolt.Samples](https://github.com/justkao/Bolt.Samples)
 repository.
