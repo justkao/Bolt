@@ -10,7 +10,9 @@ namespace Bolt.Client
 {
     public class ProxyBuilder
     {
+        private readonly List<IMiddleware<ClientActionContext>> _beforeSend = new List<IMiddleware<ClientActionContext>>();
         private readonly ClientConfiguration _configuration;
+
         private RetryRequestMiddleware _retryRequest;
         private SessionMiddleware _sessionMiddleware;
         private IServerProvider _serverProvider;
@@ -18,8 +20,6 @@ namespace Bolt.Client
         private StreamingMiddleware _streamingMiddleware;
         private TimeSpan? _timeout;
         private IRequestTimeoutProvider _timeoutProvider;
-
-        private readonly List<IMiddleware<ClientActionContext>> _beforeSend = new List<IMiddleware<ClientActionContext>>();
 
         public ProxyBuilder(ClientConfiguration configuration)
         {
@@ -101,7 +101,10 @@ namespace Bolt.Client
 
         public virtual ProxyBuilder OnSending(Func<ActionDelegate<ClientActionContext>, ClientActionContext, Task> handler)
         {
-            if (handler == null) throw new ArgumentNullException(nameof(handler));
+            if (handler == null)
+            {
+                throw new ArgumentNullException(nameof(handler));
+            }
 
             _beforeSend.Add(new DelegatedMiddleware<ClientActionContext>(handler));
             return this;
@@ -109,7 +112,10 @@ namespace Bolt.Client
 
         public virtual ProxyBuilder OnSending(IMiddleware<ClientActionContext> middleware)
         {
-            if (middleware == null) throw new ArgumentNullException(nameof(middleware));
+            if (middleware == null)
+            {
+                throw new ArgumentNullException(nameof(middleware));
+            }
 
             _beforeSend.Add(middleware);
             return this;
@@ -180,7 +186,6 @@ namespace Bolt.Client
             {
                 pipeline.Validate(BoltFramework.GetContract(typeof(TContract)));
             }
-
 
             return proxy;
         }

@@ -15,8 +15,7 @@ namespace Bolt.Server.Test
         [Theory]
         public void Resolve_Ok(string actionName)
         {
-            var contract= BoltFramework.GetContract(typeof(IContract1));
-
+            var contract = BoltFramework.GetContract(typeof(IContract1));
 
             ActionResolver resolver = new ActionResolver();
 

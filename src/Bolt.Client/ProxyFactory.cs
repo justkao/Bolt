@@ -15,10 +15,10 @@ namespace Bolt.Client
         public static readonly ProxyFactory Default = new ProxyFactory();
 
         private readonly ProxyGenerator _generator = new ProxyGenerator();
-        private readonly ConcurrentDictionary<Type, ProxyMetadata> _metadatas= new ConcurrentDictionary<Type, ProxyMetadata>();
+        private readonly ConcurrentDictionary<Type, ProxyMetadata> _metadatas = new ConcurrentDictionary<Type, ProxyMetadata>();
         private readonly Type _baseProxy;
 
-        public ProxyFactory() : this(typeof (ProxyBase))
+        public ProxyFactory() : this(typeof(ProxyBase))
         {
         }
 
@@ -32,7 +32,7 @@ namespace Bolt.Client
             if (!typeof(ProxyBase).GetTypeInfo().IsAssignableFrom(baseProxy.GetTypeInfo()))
             {
                 throw new ArgumentException(
-                    $"Invalid base proxy type. The base class must derive from {typeof (ProxyBase).FullName}.");
+                    $"Invalid base proxy type. The base class must derive from {typeof(ProxyBase).FullName}.");
             }
 
             _baseProxy = baseProxy;
@@ -47,73 +47,18 @@ namespace Bolt.Client
                 BaseTypeForInterfaceProxy = _baseProxy
             };
 
-            ProxyMetadata metadata = _metadatas.GetOrAdd(typeof (T), v => new ProxyMetadata(_baseProxy));
+            ProxyMetadata metadata = _metadatas.GetOrAdd(typeof(T), v => new ProxyMetadata(_baseProxy));
             var proxy = _generator.CreateInterfaceProxyWithoutTarget<T>(
                 options,
                 interceptor);
 
-            ProxyBase proxyBase = ((ProxyBase) (object) proxy);
+            ProxyBase proxyBase = (ProxyBase)(object)proxy;
             proxyBase.Contract = contract;
             proxyBase.Pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
 
             interceptor.Proxy = proxyBase;
             interceptor.Metadata = metadata;
             return proxy;
-        }
-
-        private class ChannelInterceptor : IInterceptor
-        {
-            public ProxyBase Proxy { get; set; }
-
-            public ProxyMetadata Metadata { get; set; }
-
-            public void Intercept(IInvocation invocation)
-            {
-                MethodMetadata metadata = Metadata.Get(invocation.Method);
-
-                if (metadata.InvocationTarget != null)
-                {
-                    try
-                    {
-                        // currently invoked using reflection, if required we might switch to invocation using expressions
-                        invocation.ReturnValue = metadata.InvocationTarget.Invoke(invocation.Proxy,
-                            invocation.Arguments);
-                    }
-                    catch (TargetInvocationException e)
-                    {
-                        throw e.InnerException;
-                    }
-
-                    return;
-                }
-
-                if (metadata.ActionMetadata.IsAsync)
-                {
-                    if (!metadata.ActionMetadata.HasResult)
-                    {
-                        // async method
-                        invocation.ReturnValue = Proxy.SendAsync(invocation.Method, invocation.Arguments);
-                    }
-                    else
-                    {
-                        Task<object> result = Proxy.SendAsync(invocation.Method, invocation.Arguments);
-
-                        if (metadata.ActionMetadata.ResultType == typeof (object))
-                        {
-                            invocation.ReturnValue = result;
-                        }
-                        else
-                        {
-                            invocation.ReturnValue = metadata.AsyncValueProvider(result);
-                        }
-                    }
-                }
-                else
-                {
-                    // not async method
-                    invocation.ReturnValue = Proxy.Send(invocation.Method, invocation.Arguments);
-                }
-            }
         }
 
         internal class ProxyMetadata : ValueCache<MethodInfo, MethodMetadata>
@@ -139,9 +84,7 @@ namespace Bolt.Client
                     provider = MethodInvokerBuilder.Build(metadata.ResultType);
                 }
 
-                MethodInfo method = _proxyBase.GetRuntimeMethod(key.Name,
-                    key.GetParameters().Select(p => p.ParameterType).ToArray());
-
+                MethodInfo method = _proxyBase.GetRuntimeMethod(key.Name, key.GetParameters().Select(p => p.ParameterType).ToArray());
                 return new MethodMetadata(metadata, provider, method);
             }
         }
@@ -178,7 +121,8 @@ namespace Bolt.Client
 
             private static Task<T> ConvertTask<T>(Task<object> task)
             {
-                return task.ContinueWith(t =>
+                return task.ContinueWith(
+                t =>
                 {
                     if (t.Exception != null)
                     {
@@ -186,8 +130,62 @@ namespace Bolt.Client
                         t.GetAwaiter().GetResult();
                     }
 
-                    return (T) t.Result;
+                    return (T)t.Result;
                 }, TaskContinuationOptions.ExecuteSynchronously);
+            }
+        }
+
+        private class ChannelInterceptor : IInterceptor
+        {
+            public ProxyBase Proxy { get; set; }
+
+            public ProxyMetadata Metadata { get; set; }
+
+            public void Intercept(IInvocation invocation)
+            {
+                MethodMetadata metadata = Metadata.Get(invocation.Method);
+
+                if (metadata.InvocationTarget != null)
+                {
+                    try
+                    {
+                        // currently invoked using reflection, if required we might switch to invocation using expressions
+                        invocation.ReturnValue = metadata.InvocationTarget.Invoke(invocation.Proxy, invocation.Arguments);
+                    }
+                    catch (TargetInvocationException e)
+                    {
+                        throw e.InnerException;
+                    }
+
+                    return;
+                }
+
+                if (metadata.ActionMetadata.IsAsync)
+                {
+                    if (!metadata.ActionMetadata.HasResult)
+                    {
+                        // async method
+                        invocation.ReturnValue = Proxy.SendAsync(invocation.Method, invocation.Arguments);
+                    }
+                    else
+                    {
+                        Task<object> result = Proxy.SendAsync(invocation.Method, invocation.Arguments);
+
+                        if (metadata.ActionMetadata.ResultType == typeof(object))
+                        {
+                            invocation.ReturnValue = result;
+                        }
+                        else
+                        {
+                            invocation.ReturnValue = metadata.AsyncValueProvider(result);
+                        }
+                    }
+                }
+                else
+                {
+                    // not async method
+                    invocation.ReturnValue = Proxy.Send(invocation.Method, invocation.Arguments);
+                }
             }
         }
     }

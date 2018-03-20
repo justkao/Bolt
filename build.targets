@@ -58,7 +58,7 @@
 
   <Target Name="RunBenchmark">
     <Message Importance="high" Text="Running validation benchmark test "/>
-    <Exec Command="dotnet run -c Release -p benchmark\Bolt.Benchmark\Bolt.Benchmark.csproj benchmark --quick" StandardOutputImportance="low" StandardErrorImportance="low"  />
+    <Exec Command="dotnet run -c Release -p benchmark\Bolt.Benchmark\Bolt.Benchmark.csproj benchmark --quick --silent" StandardOutputImportance="low" StandardErrorImportance="low"  />
   </Target>
 
   <Target Name="PackPackages">

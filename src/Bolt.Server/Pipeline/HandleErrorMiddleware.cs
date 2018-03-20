@@ -15,7 +15,7 @@ namespace Bolt.Server.Pipeline
             {
                 await Next(context);
             }
-            catch(OperationCanceledException)
+            catch (OperationCanceledException)
             {
                 throw;
             }

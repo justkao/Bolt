@@ -20,26 +20,8 @@ namespace Bolt.Tools.Configuration
 
         public List<string> ExcludedInterfaces { get; set; }
 
-        protected internal override void DoPrepare(DocumentGenerator generator, ContractDefinition definition)
-        {
-            InterfaceGenerator interfaceGenerator = new InterfaceGenerator
-            {
-                ContractDefinition = definition,
-                ForceAsync = ForceAsync,
-                ForceSync = ForceSync,
-                InterfaceSuffix = Suffix,
-                ExcludedInterfaces = ExcludedInterfaces,
-                Name = Name,
-                Modifier = Modifier
-            };
-
-            if (!string.IsNullOrEmpty(Suffix))
-            {
-                interfaceGenerator.InterfaceSuffix = Suffix;
-            }
-
-            generator.Add(interfaceGenerator);
-        }
+        [JsonIgnore]
+        public ContractDefinition ContractDefinition => _contractDefinition ?? (_contractDefinition = GetContractDefinition());
 
         public override string GetFileName(ContractDefinition definition)
         {
@@ -78,13 +60,31 @@ namespace Bolt.Tools.Configuration
             return this;
         }
 
-        [JsonIgnore]
-        public ContractDefinition ContractDefinition => _contractDefinition ?? (_contractDefinition = GetContractDefinition());
-
         public void Generate()
         {
             ExecutionContext executionContext = new ExecutionContext(ContractDefinition);
             Prepare(executionContext).Generate(null);
+        }
+
+        protected internal override void DoPrepare(DocumentGenerator generator, ContractDefinition definition)
+        {
+            InterfaceGenerator interfaceGenerator = new InterfaceGenerator
+            {
+                ContractDefinition = definition,
+                ForceAsync = ForceAsync,
+                ForceSync = ForceSync,
+                InterfaceSuffix = Suffix,
+                ExcludedInterfaces = ExcludedInterfaces,
+                Name = Name,
+                Modifier = Modifier
+            };
+
+            if (!string.IsNullOrEmpty(Suffix))
+            {
+                interfaceGenerator.InterfaceSuffix = Suffix;
+            }
+
+            generator.Add(interfaceGenerator);
         }
 
         private ContractDefinition GetContractDefinition()

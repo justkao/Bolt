@@ -78,15 +78,15 @@ namespace Bolt.Tools.Generators
             return GetEffectiveContracts().SelectMany(effectiveContract => effectiveContract.GetTypeInfo().DeclaredMethods).Distinct();
         }
 
-        protected virtual IEnumerable<Type> GetInterfaces(Type contract)
-        {
-            return GetInterfacesInternal(contract.GetTypeInfo().ImplementedInterfaces).Distinct();
-        }
-
         public bool IsValid()
         {
             List<MethodInfo> methods = GetEffectiveMethods().ToList();
             return methods.Select(m => m.Name).Distinct().Count() == methods.Count();
+        }
+
+        protected virtual IEnumerable<Type> GetInterfaces(Type contract)
+        {
+            return GetInterfacesInternal(contract.GetTypeInfo().ImplementedInterfaces).Distinct();
         }
 
         private IEnumerable<Type> GetInterfacesInternal(IEnumerable<Type> interfaces)

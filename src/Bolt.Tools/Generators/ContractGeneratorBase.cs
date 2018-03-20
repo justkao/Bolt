@@ -51,11 +51,6 @@ namespace Bolt.Tools.Generators
             }
         }
 
-        protected virtual ClassDescriptor CreateDefaultClassDescriptor()
-        {
-            return new ClassDescriptor(ContractDefinition.Name, ContractDefinition.Namespace);
-        }
-
         public virtual bool ShouldBeSync(MethodInfo method, bool force)
         {
             if (!method.IsAsync())
@@ -85,7 +80,6 @@ namespace Bolt.Tools.Generators
 
             return methods.All(m => m.Name != methodName);
         }
-
 
         public virtual bool ShouldBeAsync(MethodInfo method, bool force)
         {
@@ -129,6 +123,11 @@ namespace Bolt.Tools.Generators
                 IntendProvider = IntendProvider,
                 ContractDefinition = ContractDefinition
             };
+        }
+
+        protected virtual ClassDescriptor CreateDefaultClassDescriptor()
+        {
+            return new ClassDescriptor(ContractDefinition.Name, ContractDefinition.Namespace);
         }
     }
 }

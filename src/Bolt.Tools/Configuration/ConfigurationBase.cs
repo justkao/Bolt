@@ -51,9 +51,9 @@ namespace Bolt.Tools.Configuration
             return document;
         }
 
-        protected internal abstract void DoPrepare(DocumentGenerator generator, ContractDefinition definition);
-
         public abstract string GetFileName(ContractDefinition definition);
+
+        protected internal abstract void DoPrepare(DocumentGenerator generator, ContractDefinition definition);
 
         private ContractDefinition CoerceContractDefinition(ContractDefinition definition)
         {

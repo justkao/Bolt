@@ -17,6 +17,12 @@
     <NetCoreAppVersion>netcoreapp2.0</NetCoreAppVersion>
     <NewtonsoftVersion>11.0.1</NewtonsoftVersion>
     <CommandLineVersion>1.1.1</CommandLineVersion>
+    <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodeRules.ruleset</CodeAnalysisRuleSet>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-  
+
+  <ItemGroup>
+    <PackageReference Include="StyleCop.Analyzers" Version="1.1.0-beta006" />
+  </ItemGroup>
+
 </Project>

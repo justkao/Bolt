@@ -56,21 +56,6 @@ namespace Bolt.Test.Common
         [DataMember(Order = 6)]
         public List<CompositeType> Inner { get; set; }
 
-        protected bool Equals(CompositeType other)
-        {
-            if (!List.EmptyIfNull().SequenceEqual(other.List.EmptyIfNull()))
-            {
-                return false;
-            }
-
-            if (!Inner.EmptyIfNull().SequenceEqual(other.Inner.EmptyIfNull()))
-            {
-                return false;
-            }
-
-            return Int == other.Int && Double == other.Double && DateTime.Equals(other.DateTime) && Bool.Equals(other.Bool);
-        }
-
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj))
@@ -87,6 +72,21 @@ namespace Bolt.Test.Common
             }
 
             return Equals((CompositeType)obj);
+        }
+
+        protected bool Equals(CompositeType other)
+        {
+            if (!List.EmptyIfNull().SequenceEqual(other.List.EmptyIfNull()))
+            {
+                return false;
+            }
+
+            if (!Inner.EmptyIfNull().SequenceEqual(other.Inner.EmptyIfNull()))
+            {
+                return false;
+            }
+
+            return Int == other.Int && Double == other.Double && DateTime.Equals(other.DateTime) && Bool.Equals(other.Bool);
         }
     }
 }

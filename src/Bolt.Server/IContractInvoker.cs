@@ -7,10 +7,10 @@ namespace Bolt.Server
     {
         IInstanceProvider InstanceProvider { get; set; }
 
-        IPipeline<ServerActionContext> Pipeline{ get; set; }
-
-        Task ExecuteAsync(ServerActionContext context);
+        IPipeline<ServerActionContext> Pipeline { get; set; }
 
         ServerRuntimeConfiguration Configuration { get; }
+
+        Task ExecuteAsync(ServerActionContext context);
     }
 }

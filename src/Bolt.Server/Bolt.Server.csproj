@@ -4,7 +4,7 @@
     <Description>Bolt Server side libraries based on ASP.NET 5. The Bolt is portable and lightweight alternative to WCF library.</Description>
     <WarningsAsErrors>true</WarningsAsErrors>
     <PackageTags>bolt;server</PackageTags>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>$(TargetFramework)</TargetFramework>
   </PropertyGroup>
   
   <ItemGroup>

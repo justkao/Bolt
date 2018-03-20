@@ -18,7 +18,6 @@ namespace Bolt.Serialization
 
         public JsonSerializerSettings ExceptionSerializerSettings { get; }
 
-
         protected override Exception UnwrapCore(string serializedException)
         {
             return JsonConvert.DeserializeObject<Exception>(serializedException, ExceptionSerializerSettings);

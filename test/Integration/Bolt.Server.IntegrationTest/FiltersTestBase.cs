@@ -7,6 +7,10 @@ namespace Bolt.Server.IntegrationTest
 {
     public class FiltersTestBase : IntegrationTestBase, ITestContext
     {
+        public object Instance => this;
+
+        protected internal Mock<IFiltersContract> Callback { get; set; }
+
         protected override void ConfigureServices(IServiceCollection services)
         {
             services.AddSingleton<ITestContext>(c => this);
@@ -20,8 +24,6 @@ namespace Bolt.Server.IntegrationTest
                 h.Use<IFiltersContract, FiltersContract>();
             });
         }
-
-        protected internal Mock<IFiltersContract> Callback { get; set; }
 
         protected virtual IFiltersContract CreateChannel()
         {
@@ -47,7 +49,5 @@ namespace Bolt.Server.IntegrationTest
                 ((FiltersTestBase)_context.Instance).Callback?.Object.OnExecute();
             }
         }
-
-        public object Instance => this;
     }
 }

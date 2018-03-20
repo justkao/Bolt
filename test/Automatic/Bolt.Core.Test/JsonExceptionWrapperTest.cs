@@ -51,7 +51,7 @@ namespace Bolt.Core.Test
             var serializedException = Subject.Write(ex);
             var deserializedException = Subject.Read(serializedException);
 
-            Assert.Equal(55, ((CustomException) deserializedException).CustomData);
+            Assert.Equal(55, ((CustomException)deserializedException).CustomData);
         }
 
         [Fact]

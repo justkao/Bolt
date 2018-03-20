@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Reflection;
 using System.Threading.Tasks;
-using Xunit;
 using Bolt.Server.Internal;
+using Xunit;
 
 namespace Bolt.Server.Test
 {
@@ -13,7 +13,7 @@ namespace Bolt.Server.Test
         {
             MethodInfo method = GetMethod(nameof(IDummyInterface.VoidMethod_NoArguments));
 
-            var lambda = MethodInvokerBuilder.Build(typeof (IDummyInterface), method);
+            var lambda = MethodInvokerBuilder.Build(typeof(IDummyInterface), method);
 
             Moq.Mock<IDummyInterface> target = new Moq.Mock<IDummyInterface>();
             target.Setup(v => v.VoidMethod_NoArguments()).Verifiable();
@@ -38,19 +38,19 @@ namespace Bolt.Server.Test
         [Fact]
         public void BuildFunc_Arguments()
         {
-            MethodInfo method = GetMethod(nameof(IDummyInterface.Func_Arguments), typeof (int), typeof (string));
+            MethodInfo method = GetMethod(nameof(IDummyInterface.Func_Arguments), typeof(int), typeof(string));
 
             var lambda = MethodInvokerBuilder.Build(typeof(IDummyInterface), method);
 
             Moq.Mock<IDummyInterface> target = new Moq.Mock<IDummyInterface>();
             target.Setup(v => v.Func_Arguments(10, "val")).Returns(10);
-            Assert.Equal(10, lambda(target.Object, new object[] {10, "val"}));
+            Assert.Equal(10, lambda(target.Object, new object[] { 10, "val" }));
         }
 
         [Fact]
         public void BuildVoidMethod_Arguments()
         {
-            MethodInfo method = GetMethod(nameof(IDummyInterface.VoidMethod_Arguments), typeof (int), typeof (string));
+            MethodInfo method = GetMethod(nameof(IDummyInterface.VoidMethod_Arguments), typeof(int), typeof(string));
 
             var lambda = MethodInvokerBuilder.Build(typeof(IDummyInterface), method);
 
@@ -62,7 +62,7 @@ namespace Bolt.Server.Test
         [Fact]
         public void BuildTaskResultProvider()
         {
-            var provider = MethodInvokerBuilder.BuildTaskResultProvider(typeof (int));
+            var provider = MethodInvokerBuilder.BuildTaskResultProvider(typeof(int));
 
             Assert.Equal(10, provider(Task.FromResult(10)));
             Assert.Equal(11, provider(Task.FromResult(11)));

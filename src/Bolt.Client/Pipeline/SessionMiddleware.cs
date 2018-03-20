@@ -15,7 +15,7 @@ namespace Bolt.Client.Pipeline
             Recoverable = true;
         }
 
-        public IClientSessionHandler ClientSessionHandler { get;  }
+        public IClientSessionHandler ClientSessionHandler { get; }
 
         public IErrorHandling ErrorHandling { get; set; }
 
@@ -212,7 +212,7 @@ namespace Bolt.Client.Pipeline
                     {
                         if (sessionMetadata.InitSessionParameters == null)
                         {
-                            // we can not reuse initialization parameters, so throw 
+                            // we can not reuse initialization parameters, so throw
                             throw new BoltClientException(
                                 "Proxy need to be initialized before it can be used.",
                                 ClientErrorCode.ProxyNotInitialized,
@@ -237,7 +237,7 @@ namespace Bolt.Client.Pipeline
                     }
                     catch (Exception e)
                     {
-                        // we can not reuse initialization parameters, so throw 
+                        // we can not reuse initialization parameters, so throw
                         throw new BoltClientException(
                             $"Proxy is beeing initialized with invalid parameters. If session initialization has non empty parameters you should initialize it first by calling '{initSessionContext.Action.Name}' with proper parameters.",
                             ClientErrorCode.InvalidInitSessionParameters,

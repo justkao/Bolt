@@ -19,7 +19,6 @@ namespace Bolt.Client.Test
                     .UseSession(false)
                     .Url("http://dummy.tmp")
                     .UseHttpMessageHandler(this).Build<ITestContract>();
-
         }
 
         public ClientConfiguration Configuration { get; set; }
@@ -39,8 +38,8 @@ namespace Bolt.Client.Test
             };
 
             Proxy.OpenSession();
-            Assert.Equal(ProxyState.Open, ((ProxyBase) Proxy).State);
-            Assert.NotNull(((ProxyBase) Proxy).Pipeline.Find<SessionMiddleware>().GetSession(Proxy));
+            Assert.Equal(ProxyState.Open, ((ProxyBase)Proxy).State);
+            Assert.NotNull(((ProxyBase)Proxy).Pipeline.Find<SessionMiddleware>().GetSession(Proxy));
         }
 
         [Fact]
@@ -57,11 +56,11 @@ namespace Bolt.Client.Test
 
             SendAction = () =>
             {
-               throw new HttpRequestException("Dummy");
+                throw new HttpRequestException("Dummy");
             };
 
-            Assert.Throws<HttpRequestException>(() => ((IDisposable) Proxy).Dispose());
-            Assert.Equal(ProxyState.Closed, ((IProxy) Proxy).State);
+            Assert.Throws<HttpRequestException>(() => ((IDisposable)Proxy).Dispose());
+            Assert.Equal(ProxyState.Closed, ((IProxy)Proxy).State);
         }
 
         protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)

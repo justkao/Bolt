@@ -17,11 +17,17 @@ namespace Bolt.Client
         {
         }
 
-        public RequestScope(TimeSpan timeout = default (TimeSpan), CancellationToken cancellation = default (CancellationToken))
+        public RequestScope(TimeSpan timeout = default(TimeSpan), CancellationToken cancellation = default(CancellationToken))
         {
             Timeout = timeout;
             Cancellation = cancellation;
             Current = this;
+        }
+
+        public static RequestScope Current
+        {
+            get { return RequestScopeCurrent.Value; }
+            set { RequestScopeCurrent.Value = value; }
         }
 
         public TimeSpan Timeout { get; }
@@ -31,12 +37,6 @@ namespace Bolt.Client
         public void Dispose()
         {
             Current = null;
-        }
-
-        public static RequestScope Current
-        {
-            get { return RequestScopeCurrent.Value; }
-            set { RequestScopeCurrent.Value = value; }
         }
     }
 }

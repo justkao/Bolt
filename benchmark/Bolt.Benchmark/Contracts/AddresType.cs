@@ -7,6 +7,7 @@ namespace Bolt.Benchmark.Contracts
     {
         [EnumMember]
         Local,
+
         [EnumMember]
         Remote
     }

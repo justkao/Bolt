@@ -14,7 +14,6 @@ namespace Bolt.Client.Test
             using (RequestScope scope = new RequestScope(TimeSpan.FromSeconds(1)))
             {
                 Assert.Equal(TimeSpan.FromSeconds(1), scope.Timeout);
-
             }
         }
 
@@ -26,7 +25,6 @@ namespace Bolt.Client.Test
             using (RequestScope scope = new RequestScope(cancellation: source.Token))
             {
                 Assert.Equal(source.Token, scope.Cancellation);
-
             }
         }
 
@@ -63,7 +61,6 @@ namespace Bolt.Client.Test
                 scope.Dispose();
             }
         }
-
 
         [Fact]
         public void Dispose_EnsureDisposed()

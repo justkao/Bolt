@@ -13,11 +13,6 @@ namespace Bolt.Tools
             Loader = new DirectoryLookupAssemblyLoader();
         }
 
-        private void OnLoadAssembly(object sender, AssemblyLoadEventArgs args)
-        {
-            throw new NotImplementedException();
-        }
-
         public DirectoryLookupAssemblyLoader Loader { get; }
 
         public IEnumerable<Type> GetTypes(Assembly assembly)
@@ -55,6 +50,17 @@ namespace Bolt.Tools
             }
 
             return type;
+        }
+
+        private static Type FindType(Assembly assembly, string fullName)
+        {
+            var found = assembly.ExportedTypes.FirstOrDefault(t => t.FullName == fullName);
+            return found ?? assembly.ExportedTypes.FirstOrDefault(t => t.Name == fullName);
+        }
+
+        private void OnLoadAssembly(object sender, AssemblyLoadEventArgs args)
+        {
+            throw new NotImplementedException();
         }
 
         private IEnumerable<Type> CoerceTypes(IReadOnlyCollection<Type> initial)
@@ -128,17 +134,10 @@ namespace Bolt.Tools
                 }
                 catch (Exception)
                 {
-
                 }
             }
 
             return null;
-        }
-
-        private static Type FindType(Assembly assembly, string fullName)
-        {
-            var found = assembly.ExportedTypes.FirstOrDefault(t => t.FullName == fullName);
-            return found ?? assembly.ExportedTypes.FirstOrDefault(t => t.Name == fullName);
         }
 
         private IEnumerable<Assembly> GetSearchableAssemblies()
@@ -146,7 +145,6 @@ namespace Bolt.Tools
             // first return explicitely loaded assemblies
             return Loader;
         }
-
 
         private Assembly OnResolveAssembly(object sender, ResolveEventArgs args)
         {

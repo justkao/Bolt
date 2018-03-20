@@ -2,16 +2,14 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client;
-using Bolt.Server;
 using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 namespace Bolt.Sample.SimpleProxy
 {
-    public class Program
+    public partial class Program
     {
         public static void Main(string[] args)
         {
@@ -31,27 +29,6 @@ namespace Bolt.Sample.SimpleProxy
             host.RunAsync(cancellation.Token).GetAwaiter().GetResult();
         }
 
-        public class Startup
-        {
-            public void ConfigureServices(IServiceCollection serviceCollection)
-            {
-                serviceCollection.AddRouting();
-                serviceCollection.AddBolt();
-                serviceCollection.AddOptions();
-                serviceCollection.AddLogging();
-            }
-
-            public void Configure(IApplicationBuilder builder)
-            {
-                
-                ILoggerFactory factory = builder.ApplicationServices.GetRequiredService<ILoggerFactory>();
-                factory.AddConsole(LogLevel.Debug);
-
-                // we will add IDummyContract endpoint to Bolt
-                builder.UseBolt(r => r.Use<IDummyContract, DummyContract>());
-            }
-        }
-
         private static async Task TestBolt(ILogger<Program> logger, CancellationToken cancellationToken)
         {
             // create Bolt proxy
@@ -63,6 +40,7 @@ namespace Bolt.Sample.SimpleProxy
             for (int i = 0; i < 10; i++)
             {
                 logger.LogInformation("Client: Sending {0}", i);
+
                 // we can add timeout and CancellationToken to each Bolt call
                 using (new RequestScope(TimeSpan.FromSeconds(5), cancellationToken))
                 {

@@ -52,6 +52,12 @@ namespace Bolt.Client.Helpers
                 TaskScheduler.Default);
         }
 
+        public void Dispose()
+        {
+            _semaphore?.Dispose();
+            _semaphore = null;
+        }
+
         private sealed class Releaser : IDisposable
         {
             private readonly AsyncLock _release;
@@ -65,12 +71,6 @@ namespace Bolt.Client.Helpers
             {
                 _release._semaphore.Release();
             }
-        }
-
-        public void Dispose()
-        {
-            _semaphore?.Dispose();
-            _semaphore = null;
         }
     }
 }

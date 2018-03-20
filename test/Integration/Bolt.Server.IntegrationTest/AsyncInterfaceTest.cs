@@ -8,7 +8,7 @@ namespace Bolt.Server.IntegrationTest
 {
     public class AsyncInterfaceTest : IntegrationTestBase
     {
-        public Mock<IDummy> Contract = new Mock<IDummy>();
+        public Mock<IDummy> Contract { get; } = new Mock<IDummy>();
 
         [Fact]
         public void CreateProxy_DoesNotThrow()

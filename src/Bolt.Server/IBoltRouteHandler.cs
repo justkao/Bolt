@@ -7,10 +7,10 @@ namespace Bolt.Server
     {
         ServerRuntimeConfiguration Configuration { get; set; }
 
+        IServiceProvider ApplicationServices { get; }
+
         void Add(IContractInvoker contractInvoker);
 
         IContractInvoker Get(Type contract);
-
-        IServiceProvider ApplicationServices { get; }
     }
 }

@@ -34,7 +34,6 @@ namespace Bolt
                 return false;
             }
 
-
             return true;
         }
 

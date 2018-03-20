@@ -9,13 +9,13 @@ namespace Bolt.Benchmark
 {
     public static class Program
     {
-        private static AnsiConsole Console = AnsiConsole.GetOutput(true);
+        private static readonly AnsiConsole Console = AnsiConsole.GetOutput(true);
 
         public static int Main(params string[] args)
         {
-            ServicePointManager.DefaultConnectionLimit = 1000;		
+            ServicePointManager.DefaultConnectionLimit = 1000;
             ServicePointManager.MaxServicePoints = 1000;
- 
+
             var app = new CommandLineApplication();
             app.Name = "bolt";
             app.OnExecute(() =>
@@ -28,10 +28,11 @@ namespace Bolt.Benchmark
             {
                 var output = c.Option("--output <PATH>", "Output directory where performance report will be stored.", CommandOptionType.SingleValue);
                 var quick = c.Option("--quick", "Generates asynchronous version of methods.", CommandOptionType.NoValue);
+                var silent = c.Option("--silent", "Generates asynchronous version of methods.", CommandOptionType.NoValue);
 
                 c.OnExecute(() =>
                 {
-                    var summary = BenchmarkRunner.Run<PerformanceContractBenchmark>(new PerformanceContractBenchmarkConfig(quick.HasValue(), output.Value()));
+                    var summary = BenchmarkRunner.Run<PerformanceContractBenchmark>(new PerformanceContractBenchmarkConfig(quick.HasValue(), silent.HasValue(), output.Value()));
 
                     if (summary.HasCriticalValidationErrors)
                     {

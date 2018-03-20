@@ -50,7 +50,7 @@ namespace Bolt.Tools
                             Console.WriteLine($"Example created: {outputFile.White().Bold()}".Green());
                         }
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         return HandleError("Failed to generate example configuration file.", e);
                     }
@@ -117,7 +117,6 @@ namespace Bolt.Tools
                 var forceAsync = c.Option("--force-async", "Generates asynchronous version of methods.", CommandOptionType.NoValue);
                 var forceSync = c.Option("--force-sync", "Generates synchronous version of methods.", CommandOptionType.NoValue);
                 var suffix = c.Option("--suffix", "Suffix for generated interfaces. Default value is 'Async'.", CommandOptionType.SingleValue);
-
 
                 c.HelpOption("-?|-h|--help");
 
@@ -213,6 +212,16 @@ namespace Bolt.Tools
             return app.Execute(args);
         }
 
+        internal static int HandleError(string message, Exception e)
+        {
+            Console.WriteLine(Environment.NewLine);
+            ErrorConsole.WriteLine(message.Red().Bold());
+            Console.WriteLine(e.ToString());
+            Console.WriteLine(Environment.NewLine);
+
+            return 1;
+        }
+
         private static int AddContracts(RootConfiguration rootConfiguration, List<string> contracts, List<string> excludedContracts, bool internalVisibility, bool forceAsync, bool forceSync, string suffix)
         {
             if (!contracts.Any() || contracts.Any(c => c.EndsWith(".*", StringComparison.OrdinalIgnoreCase)))
@@ -277,16 +286,6 @@ namespace Bolt.Tools
             return 0;
         }
 
-        internal static int HandleError(string message, Exception e)
-        {
-            Console.WriteLine(Environment.NewLine);
-            ErrorConsole.WriteLine(message.Red().Bold());
-            Console.WriteLine(e.ToString());
-            Console.WriteLine(Environment.NewLine);
-
-            return 1;
-        }
-
         private static RootConfiguration CreateSampleConfiguration(AssemblyCache cache)
         {
             RootConfiguration rootConfiguration = new RootConfiguration(cache);
@@ -298,14 +297,14 @@ namespace Bolt.Tools
                 {
                     Contract = "<Type>",
                     Modifier = "<public|internal>",
-                    Excluded = new List<string> {"<FullTypeName>", "<FullTypeName>"},
+                    Excluded = new List<string> { "<FullTypeName>", "<FullTypeName>" },
                     ForceAsync = true,
                     ForceSync = true,
                     Output = "<Path>",
                     Suffix = $"<Suffix> // suffix for generated interface, defaults to '{GeneratorBase.AsyncSuffix}'",
                     Namespace = "<Namespace> // namespace of generated interface, defaults to contract namespace if null",
                     Name = "<InterfaceName> // name of generated interface, defaults to '<ContractName><Suffix>' if null",
-                    ExcludedInterfaces = new List<string> {"<FullTypeName>", "<FullTypeName>"}
+                    ExcludedInterfaces = new List<string> { "<FullTypeName>", "<FullTypeName>" }
                 });
 
             return rootConfiguration;

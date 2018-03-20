@@ -59,7 +59,7 @@ namespace Bolt.Tools.Generators
 
             if (
                 !ContractDefinition.GetEffectiveContracts(contract)
-                    .Concat(new[] {contract})
+                    .Concat(new[] { contract })
                     .Any(ShouldGenerateInterface))
             {
                 return;
@@ -95,11 +95,10 @@ namespace Bolt.Tools.Generators
             {
                 var methods =
                     (from method in ContractDefinition.GetEffectiveMethods(contract)
-                        let async = ShouldBeAsync(method, ForceAsync)
-                        let sync = ShouldBeSync(method, ForceSync)
-
-                        where async || sync
-                        select new {method, async, sync}).ToList();
+                     let async = ShouldBeAsync(method, ForceAsync)
+                     let sync = ShouldBeSync(method, ForceSync)
+                     where async || sync
+                     select new { method, async, sync }).ToList();
 
                 foreach (var method in methods)
                 {
@@ -126,7 +125,6 @@ namespace Bolt.Tools.Generators
         {
             return ShouldHaveAsyncMethods(contract) || ShouldHaveSyncMethods(contract);
         }
-
 
         private bool ShouldHaveSyncMethods(Type contract)
         {

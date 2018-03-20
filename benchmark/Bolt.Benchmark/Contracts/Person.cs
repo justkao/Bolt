@@ -29,7 +29,7 @@ namespace Bolt.Benchmark.Contracts
                 Address = new Address { City = "Address" + id },
                 BornDate = DateTime.UtcNow,
                 Id = id,
-                Surname = "Surname" + id
+                Surname = "Surname" + id,
             };
         }
     }

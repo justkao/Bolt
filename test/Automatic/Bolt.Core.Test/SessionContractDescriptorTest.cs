@@ -6,7 +6,7 @@ namespace Bolt.Core.Test
 {
     public class SessionContractDescriptorTest
     {
-        public ISessionContractMetadataProvider Provider = new SessionContractMetadataProvider();
+        public ISessionContractMetadataProvider Provider { get; } = new SessionContractMetadataProvider();
 
         [Fact]
         public void Resolve_Ok()
@@ -28,7 +28,7 @@ namespace Bolt.Core.Test
             Assert.NotNull(Provider.Resolve<IWithAttributes>().InitSession);
             Assert.NotNull(Provider.Resolve<IWithAttributes>().DestroySession);
 
-            Assert.Equal(nameof(IWithAttributes.InitMySession),Provider.Resolve<IWithAttributes>().InitSession.Name);
+            Assert.Equal(nameof(IWithAttributes.InitMySession), Provider.Resolve<IWithAttributes>().InitSession.Name);
             Assert.Equal(nameof(IWithAttributes.DestroyMySession), Provider.Resolve<IWithAttributes>().DestroySession.Name);
         }
 
@@ -57,12 +57,10 @@ namespace Bolt.Core.Test
 
         private class InitSessionAttribute : Attribute
         {
-            
         }
 
         private class DestroySessionAttribute : Attribute
         {
-
         }
 
         private interface IWithCustomAttributes

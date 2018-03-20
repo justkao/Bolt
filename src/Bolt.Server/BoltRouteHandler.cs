@@ -22,18 +22,18 @@ namespace Bolt.Server
 
         private readonly IActionResolver _actionResolver;
         private readonly IContractInvokerSelector _contractResolver;
-        private IContractInvoker[] _invokers = Array.Empty<IContractInvoker>();
-
         private readonly ConcurrentQueue<ServerActionContext> _contexts = new ConcurrentQueue<ServerActionContext>();
-
         private readonly int _poolSize = Environment.ProcessorCount * 10;
 
-        public BoltRouteHandler(ILoggerFactory factory, 
-                                ServerRuntimeConfiguration defaultConfiguration, 
-                                IBoltMetadataHandler metadataHandler,
-                                IServiceProvider applicationServices, 
-                                IActionResolver actionResolver,
-                                IContractInvokerSelector contractResolver)
+        private IContractInvoker[] _invokers = Array.Empty<IContractInvoker>();
+
+        public BoltRouteHandler(
+            ILoggerFactory factory,
+            ServerRuntimeConfiguration defaultConfiguration,
+            IBoltMetadataHandler metadataHandler,
+            IServiceProvider applicationServices,
+            IActionResolver actionResolver,
+            IContractInvokerSelector contractResolver)
         {
             if (factory == null)
             {
@@ -56,6 +56,8 @@ namespace Bolt.Server
 
         public IBoltMetadataHandler MetadataHandler { get; set; }
 
+        public ReadOnlySpan<IContractInvoker> ContractInvokers => _invokers.AsReadOnlySpan();
+
         private BoltServerOptions Options => Configuration.Options;
 
         public virtual void Add(IContractInvoker contractInvoker)
@@ -72,7 +74,6 @@ namespace Bolt.Server
 
             contractInvoker.Pipeline.Validate(contractInvoker.Contract);
             Logger.LogInformation(BoltLogId.ContractAdded, "Adding contract: {0}", contractInvoker.Contract.Name);
-
 
             _invokers = new List<IContractInvoker>(_invokers) { contractInvoker }.ToArray();
 
@@ -95,8 +96,6 @@ namespace Bolt.Server
             return null;
         }
 
-        public ReadOnlySpan<IContractInvoker> ContractInvokers => _invokers.AsReadOnlySpan();
-
         public virtual Task RouteAsync(RouteContext routeContext)
         {
             StringSegment contractSegment;
@@ -107,12 +106,13 @@ namespace Bolt.Server
             {
                 return CompletedTask.Done;
             }
+
             // TODO: use span API on the string segment
             contract = contractSegment.Buffer.AsReadOnlySpan().Slice(contractSegment.Offset, contractSegment.Length);
             action = actionSegment.Buffer.AsReadOnlySpan().Slice(actionSegment.Offset, actionSegment.Length);
 
             var boltFeature = AssignBoltFeature(CreateContext(routeContext));
-            
+
             // we have accessed Bolt root
             if (contract.IsEmpty && action.IsEmpty)
             {
@@ -130,7 +130,7 @@ namespace Bolt.Server
                 if (!string.IsNullOrEmpty(Options.Prefix))
                 {
                     string rawContractName = contract.ConvertToString();
-                    routeContext.Handler = (ctxt) => ReportContractNotFound(ctxt, rawContractName); 
+                    routeContext.Handler = (ctxt) => ReportContractNotFound(ctxt, rawContractName);
                 }
 
                 // just pass to next middleware in chain
@@ -155,46 +155,20 @@ namespace Bolt.Server
             boltFeature.ActionContext.Action = _actionResolver.Resolve(found.Contract, action);
             if (boltFeature.ActionContext.Action == null)
             {
-                Logger.LogWarning(BoltLogId.ContractNotFound, 
-                        "Action with name '{0}' not found on contract '{1}'", 
-                        action.ConvertToString(), 
-                        boltFeature.ActionContext.Contract.Name);    
+                Logger.LogWarning(
+                        BoltLogId.ContractNotFound,
+                        "Action with name '{0}' not found on contract '{1}'",
+                        action.ConvertToString(),
+                        boltFeature.ActionContext.Contract.Name);
             }
-            
+
             routeContext.Handler = HandleRequest;
             return CompletedTask.Done;
         }
 
-        private async Task HandleRequest(HttpContext context)
+        public virtual VirtualPathData GetVirtualPath(VirtualPathContext context)
         {
-            var boltFeature = context.Features.Get<IBoltFeature>();
-            
-            try
-            {
-                if (boltFeature.ActionContext.Action == null)
-                {                                      
-                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-                    context.Response.Headers[Options.ServerErrorHeader] = ServerErrorCode.ActionNotFound.ToString();
-                }
-                else
-                {
-                    await Execute(boltFeature.ActionContext);
-                }
-            }
-            finally
-            {
-                ReleaseContext(boltFeature.ActionContext);
-            }
-        }
-
-        private Task ReportContractNotFound(HttpContext context, string contract)
-        {
-            Logger.LogWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", contract, context.Request.Path);
-            
-            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-            context.Response.Headers[Options.ServerErrorHeader] = ServerErrorCode.ContractNotFound.ToString();
-            
-            return CompletedTask.Done;
+            return null;
         }
 
         protected virtual async Task Execute(ServerActionContext ctxt)
@@ -215,7 +189,7 @@ namespace Bolt.Server
                 {
                     if (!ctxt.HttpContext.Response.HasStarted)
                     {
-                        ctxt.HttpContext.Response.StatusCode = (int) HttpStatusCode.RequestTimeout;
+                        ctxt.HttpContext.Response.StatusCode = (int)HttpStatusCode.RequestTimeout;
                     }
 
                     Logger.LogWarning(BoltLogId.RequestCancelled, "Execution of '{0}' has been aborted by client.", ctxt.Action.Name);
@@ -274,9 +248,36 @@ namespace Bolt.Server
             }
         }
 
-        public virtual VirtualPathData GetVirtualPath(VirtualPathContext context)
+        private async Task HandleRequest(HttpContext context)
         {
-            return null;
+            var boltFeature = context.Features.Get<IBoltFeature>();
+
+            try
+            {
+                if (boltFeature.ActionContext.Action == null)
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+                    context.Response.Headers[Options.ServerErrorHeader] = ServerErrorCode.ActionNotFound.ToString();
+                }
+                else
+                {
+                    await Execute(boltFeature.ActionContext);
+                }
+            }
+            finally
+            {
+                ReleaseContext(boltFeature.ActionContext);
+            }
+        }
+
+        private Task ReportContractNotFound(HttpContext context, string contract)
+        {
+            Logger.LogWarning(BoltLogId.ContractNotFound, "Contract with name '{0}' not found in registered contracts at '{1}'", contract, context.Request.Path);
+
+            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
+            context.Response.Headers[Options.ServerErrorHeader] = ServerErrorCode.ContractNotFound.ToString();
+
+            return CompletedTask.Done;
         }
 
         private bool Parse(PathString path, out StringSegment contract, out StringSegment action)
@@ -308,12 +309,14 @@ namespace Bolt.Server
                 {
                     return false;
                 }
+
                 contract = enumerator.Current;
 
                 if (!enumerator.MoveNext())
                 {
                     return false;
                 }
+
                 action = enumerator.Current;
             }
 

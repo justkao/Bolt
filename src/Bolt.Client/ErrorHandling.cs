@@ -24,12 +24,12 @@ namespace Bolt.Client
 
             if ((e as BoltServerException)?.ServerError == ServerErrorCode.SessionNotFound)
             {
-                return ErrorHandlingResult.Recover; 
+                return ErrorHandlingResult.Recover;
             }
 
             if (e is HttpRequestException)
             {
-                return ErrorHandlingResult.Recover; 
+                return ErrorHandlingResult.Recover;
             }
 
             if (e is ProxyClosedException)

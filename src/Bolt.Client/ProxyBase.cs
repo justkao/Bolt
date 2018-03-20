@@ -1,18 +1,18 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Reflection;
 using System.Threading.Tasks;
 using Bolt.Client.Pipeline;
-using System.Collections.Concurrent;
 using Bolt.Metadata;
 
 namespace Bolt.Client
 {
     public class ProxyBase : IProxy, IPipelineCallback
     {
-        private IClientPipeline _pipeline;
         private readonly ConcurrentQueue<ClientActionContext> _contexts = new ConcurrentQueue<ClientActionContext>();
         private readonly int _poolSize = 128;
         private ContractMetadata _contract;
+        private IClientPipeline _pipeline;
 
         public ProxyBase()
         {
@@ -40,7 +40,11 @@ namespace Bolt.Client
 
         public ContractMetadata Contract
         {
-            get { return _contract; }
+            get
+            {
+                return _contract;
+            }
+
             set
             {
                 EnsureReady();
@@ -87,7 +91,7 @@ namespace Bolt.Client
         {
             if (State == ProxyState.Open)
             {
-                ClientActionContext ctxt =  CreateContext(Contract.Session.DestroySession, null);
+                ClientActionContext ctxt = CreateContext(Contract.Session.DestroySession, null);
                 try
                 {
                     await Pipeline.Instance(ctxt).ConfigureAwait(false);

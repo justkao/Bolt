@@ -5,7 +5,7 @@ using Bolt.Serialization;
 namespace Bolt.Client
 {
     /// <summary>
-    /// The Bolt configuration of the client. 
+    /// The Bolt configuration of the client.
     /// </summary>
     public class ClientConfiguration
     {
@@ -23,7 +23,7 @@ namespace Bolt.Client
         }
 
         /// <summary>
-        /// Gets or sets the Bolt options.
+        /// Gets the Bolt options.
         /// </summary>
         public BoltOptions Options { get; }
 
@@ -41,7 +41,7 @@ namespace Bolt.Client
 
         public IErrorHandling ErrorHandling { get; set; }
 
-        public IClientErrorProvider ErrorProvider{ get; set; }
+        public IClientErrorProvider ErrorProvider { get; set; }
 
         public IRequestTimeoutProvider TimeoutProvider { get; set; }
 

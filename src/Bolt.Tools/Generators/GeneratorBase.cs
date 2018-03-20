@@ -179,10 +179,7 @@ namespace Bolt.Tools.Generators
                     $"Task {info.GetAsyncName()}({FormatMethodParameters(info, true)})";
             }
 
-
-
-            return
-                $"Task<{FormatType(info.ReturnType)}> {info.GetAsyncName()}({FormatMethodParameters(info, true)})";
+            return $"Task<{FormatType(info.ReturnType)}> {info.GetAsyncName()}({FormatMethodParameters(info, true)})";
         }
 
         public virtual string FormatMethodDeclaration(MethodInfo info)
@@ -191,7 +188,7 @@ namespace Bolt.Tools.Generators
             {
                 return $"void {info.Name}({FormatMethodParameters(info, true)})";
             }
-            
+
             return $"{FormatType(info.ReturnType)} {info.Name}({FormatMethodParameters(info, true)})";
         }
 

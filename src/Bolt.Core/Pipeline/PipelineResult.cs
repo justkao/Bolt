@@ -1,7 +1,7 @@
-using Bolt.Metadata;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Bolt.Metadata;
 
 namespace Bolt.Pipeline
 {
@@ -15,6 +15,8 @@ namespace Bolt.Pipeline
 
         public ActionDelegate<T> Instance { get; }
 
+        public IReadOnlyCollection<IMiddleware<T>> Middlewares { get; }
+
         public TMiddleware Find<TMiddleware>() where TMiddleware : IMiddleware<T>
         {
             return (TMiddleware)Middlewares.FirstOrDefault(m => m is TMiddleware);
@@ -22,15 +24,16 @@ namespace Bolt.Pipeline
 
         public void Validate(ContractMetadata contract)
         {
-            if (contract == null) throw new ArgumentNullException(nameof(contract));
+            if (contract == null)
+            {
+                throw new ArgumentNullException(nameof(contract));
+            }
 
             foreach (IMiddleware<T> middleware in Middlewares)
             {
                 middleware.Validate(contract);
             }
         }
-
-        public IReadOnlyCollection<IMiddleware<T>> Middlewares { get; }
 
         public void Dispose()
         {

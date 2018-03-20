@@ -4,9 +4,9 @@ namespace Bolt.Server.Test
 {
     public class MockContractDescriptor
     {
-        public MockContractDescriptor() 
+        public MockContractDescriptor()
         {
-            Action = typeof (IMockContract).GetTypeInfo().GetDeclaredMethod(nameof(IMockContract.Action));
+            Action = typeof(IMockContract).GetTypeInfo().GetDeclaredMethod(nameof(IMockContract.Action));
         }
 
         public MethodInfo Action { get; }

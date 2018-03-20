@@ -1,29 +1,17 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
-using System;
+﻿using System;
 using System.Threading;
 using Bolt.Serialization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 
 namespace Bolt.Server
 {
     /// <summary>
-    /// Context of single contract action. By default all properties are filled by <see cref="BoltRouteHandler"/>. 
+    /// Context of single contract action. By default all properties are filled by <see cref="BoltRouteHandler"/>.
     /// Optionaly <see cref="IContractInvoker"/> might override some properties if special handling is required.
     /// </summary>
     public class ServerActionContext : ActionContextBase, IBoltFeature
     {
-        public void Init(HttpContext httpContext, ServerRuntimeConfiguration configuration)
-        {
-            HttpContext = httpContext;
-
-            if (Configuration == null)
-            {
-                Configuration = new ServerRuntimeConfiguration();
-            }
-
-            Configuration.Merge(configuration);
-        }
-
         public HttpContext HttpContext { get; set; }
 
         public bool ResponseHandled { get; set; }
@@ -57,6 +45,18 @@ namespace Bolt.Server
                     HttpContext.RequestAborted = value;
                 }
             }
+        }
+
+        public void Init(HttpContext httpContext, ServerRuntimeConfiguration configuration)
+        {
+            HttpContext = httpContext;
+
+            if (Configuration == null)
+            {
+                Configuration = new ServerRuntimeConfiguration();
+            }
+
+            Configuration.Merge(configuration);
         }
 
         public ISerializer GetSerializerOrThrow()

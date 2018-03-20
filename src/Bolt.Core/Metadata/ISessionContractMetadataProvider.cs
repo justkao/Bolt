@@ -5,11 +5,11 @@ namespace Bolt.Metadata
 {
     public interface ISessionContractMetadataProvider
     {
-        SessionContractMetadata Resolve(Type contract);
-
         MethodInfo InitSessionDefault { get; }
 
         MethodInfo DestroySessionDefault { get; }
+
+        SessionContractMetadata Resolve(Type contract);
     }
 
     public static class SessionContractMetadataProviderExtensions

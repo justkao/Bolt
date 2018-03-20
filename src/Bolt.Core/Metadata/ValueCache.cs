@@ -5,7 +5,7 @@ namespace Bolt.Metadata
     public abstract class ValueCache<TKey, TValue>
     {
         private readonly object _syncRoot = new object();
-        private Dictionary<TKey, TValue> _cache = new Dictionary<TKey,TValue>();
+        private Dictionary<TKey, TValue> _cache = new Dictionary<TKey, TValue>();
 
         protected TValue Get(TKey key, object context = null)
         {

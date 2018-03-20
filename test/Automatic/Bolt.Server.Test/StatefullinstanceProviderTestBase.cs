@@ -9,7 +9,7 @@ using Moq;
 
 namespace Bolt.Server.Test
 {
-    public abstract class StatefullinstanceProviderTestBase<TContract> where TContract:IMockContract
+    public abstract class StatefullinstanceProviderTestBase<TContract> where TContract : IMockContract
     {
         protected const string SessionHeader = "test-session-id";
 
@@ -44,13 +44,20 @@ namespace Bolt.Server.Test
             private readonly Mock<IInstanceProviderActions> _actions;
             private readonly MemorySessionFactory _factory;
 
-            public MockSessionInstanceProvider(MockContractDescriptor contract,
+            public MockSessionInstanceProvider(
+                MockContractDescriptor contract,
                 Mock<IInstanceProviderActions> actions)
                 : this(
-                    contract, actions,
-                    new MemorySessionFactory(new BoltServerOptions {SessionHeader = SessionHeader},
-                        new ServerSessionHandlerInternal(actions,
-                            new BoltServerOptions {SessionHeader = SessionHeader})))
+                    contract,
+                    actions,
+                    new MemorySessionFactory(
+                        new BoltServerOptions { SessionHeader = SessionHeader },
+                        new ServerSessionHandlerInternal(
+                            actions,
+                            new BoltServerOptions
+                            {
+                                SessionHeader = SessionHeader
+                            })))
             {
             }
 
@@ -83,7 +90,8 @@ namespace Bolt.Server.Test
             {
                 private readonly Mock<IInstanceProviderActions> _actions;
 
-                public ServerSessionHandlerInternal(Mock<IInstanceProviderActions> actions, BoltServerOptions options) : base(options)
+                public ServerSessionHandlerInternal(Mock<IInstanceProviderActions> actions, BoltServerOptions options)
+                    : base(options)
                 {
                     _actions = actions;
                 }
@@ -97,7 +105,8 @@ namespace Bolt.Server.Test
 
         protected virtual ServerActionContext CreateContext(MethodInfo action)
         {
-            return new ServerActionContext {
+            return new ServerActionContext
+            {
                 HttpContext = new DefaultHttpContext(),
                 Action = BoltFramework.GetContract(typeof(TContract)).GetAction(action),
                 Contract = BoltFramework.GetContract(typeof(TContract))

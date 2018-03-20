@@ -8,7 +8,7 @@ namespace Bolt.Metadata
     public class ActionMetadataProvider : ValueCache<MethodInfo, ActionMetadata>, IActionMetadataProvider
     {
         private static readonly Type TaskGenericType = typeof(Task<>);
-        
+
         public ActionMetadata Resolve(MethodInfo action)
         {
             return Get(action);
@@ -27,12 +27,12 @@ namespace Bolt.Metadata
         {
             TimeSpan? timeoutValue = (from attr in
                 method.GetCustomAttributes<Attribute>()
-                    .Where(a => a.GetType().Name == typeof (TimeoutAttribute).Name)
-                let timeoutProperty = attr.GetType().GetRuntimeProperty(nameof(TimeoutAttribute.Timeout))
-                where timeoutProperty != null
-                let timeout = CreateTimeout(timeoutProperty.GetValue(attr))
-                where timeout != null
-                select timeout).FirstOrDefault();
+                    .Where(a => a.GetType().Name == typeof(TimeoutAttribute).Name)
+                                      let timeoutProperty = attr.GetType().GetRuntimeProperty(nameof(TimeoutAttribute.Timeout))
+                                      where timeoutProperty != null
+                                      let timeout = CreateTimeout(timeoutProperty.GetValue(attr))
+                                      where timeout != null
+                                      select timeout).FirstOrDefault();
 
             if (timeoutValue != null)
             {
@@ -86,14 +86,14 @@ namespace Bolt.Metadata
 
             return method.ReturnType;
         }
-        
+
         private static Type GetTaskInnerTypeOrNull(Type type)
         {
             if (type.GetTypeInfo().IsGenericType && !type.GetTypeInfo().IsGenericTypeDefinition)
             {
                 var genericTypeDefinition = type.GetGenericTypeDefinition();
                 var genericArguments = type.GetTypeInfo().GenericTypeArguments;
-                if (genericArguments.Length == 1 && TaskGenericType == genericTypeDefinition)
+                if (genericTypeDefinition == TaskGenericType && genericArguments.Length == 1)
                 {
                     // Only Return if there is a single argument.
                     return genericArguments[0];

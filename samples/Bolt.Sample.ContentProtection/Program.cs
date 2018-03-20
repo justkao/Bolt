@@ -4,20 +4,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client;
 using Bolt.Serialization;
-using Bolt.Server;
 using Microsoft.AspNetCore;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Bolt.Sample.ContentProtection
 {
-    public class Program
+    public partial class Program
     {
-        private static int Result;
+        private static int _result;
 
         public static int Main(string[] args)
         {
@@ -31,46 +27,18 @@ namespace Bolt.Sample.ContentProtection
             var serverLifetime = server.Services.GetService<IApplicationLifetime>();
             serverLifetime.ApplicationStarted.Register(async () =>
             {
-                await TestBolt(server.Services.GetRequiredService<ILogger<Program>>(), server.Services.GetRequiredService<ISerializer>(), serverLifetime.ApplicationStopping);
+                await TestBoltAsync(server.Services.GetRequiredService<ILogger<Program>>(), server.Services.GetRequiredService<ISerializer>(), serverLifetime.ApplicationStopping);
                 cancellation.Cancel();
             });
 
             server.RunAsync(cancellation.Token).GetAwaiter().GetResult();
-            return Result;
+            return _result;
         }
 
-        public class Startup
-        {
-            public void ConfigureServices(IServiceCollection serviceCollection)
-            {
-                serviceCollection.AddRouting();
-                serviceCollection.AddBolt();
-                serviceCollection.Replace(new ServiceDescriptor(typeof (ISerializer), (p) =>
-                {
-                    IDataProtector protector = p.GetDataProtector("content protection");
-                    ILoggerFactory factory = p.GetService<ILoggerFactory>();
-                    return new ProtectedSerializer(protector, factory);
-                }, ServiceLifetime.Singleton));
-
-                serviceCollection.AddOptions();
-                serviceCollection.AddLogging();
-                serviceCollection.AddDataProtection();
-            }
-
-            public void Configure(IApplicationBuilder builder)
-            {
-                ILoggerFactory factory = builder.ApplicationServices.GetRequiredService<ILoggerFactory>();
-                factory.AddConsole(LogLevel.Debug);
-
-                // we will add IDummyContract endpoint to Bolt
-                builder.UseBolt(r => r.Use<IDummyContract, DummyContract>());
-            }
-        }
-
-        private static async Task TestBolt(ILogger<Program> logger, ISerializer serializer, CancellationToken cancellationToken)
+        private static async Task TestBoltAsync(ILogger<Program> logger, ISerializer serializer, CancellationToken cancellationToken)
         {
             // create Bolt proxy
-            ClientConfiguration configuration = new ClientConfiguration() {Serializer = serializer};
+            ClientConfiguration configuration = new ClientConfiguration() { Serializer = serializer };
             IDummyContract proxy = configuration.CreateProxy<IDummyContract>("http://localhost:5000");
 
             logger.LogInformation("Testing Bolt Proxy ... ");
@@ -89,7 +57,7 @@ namespace Bolt.Sample.ContentProtection
                 catch (Exception e)
                 {
                     logger.LogInformation("Client: Error {0}", e.Message);
-                    Result = 1;
+                    _result = 1;
                 }
 
                 logger.LogInformation("---------------------------------------------");

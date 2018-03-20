@@ -16,7 +16,8 @@ namespace Bolt.Client
             return clientConfiguration.CreateSessionProxy<TContract>(new SingleServerProvider(uri));
         }
 
-        public static TContract CreateSessionProxy<TContract>(this ClientConfiguration clientConfiguration,
+        public static TContract CreateSessionProxy<TContract>(
+            this ClientConfiguration clientConfiguration,
             IServerProvider serverProvider)
             where TContract : class
         {
@@ -35,7 +36,8 @@ namespace Bolt.Client
             return clientConfiguration.CreateProxy<TContract>(new SingleServerProvider(uri));
         }
 
-        public static TContract CreateProxy<TContract>(this ClientConfiguration clientConfiguration,
+        public static TContract CreateProxy<TContract>(
+            this ClientConfiguration clientConfiguration,
             IServerProvider serverProvider)
             where TContract : class
         {

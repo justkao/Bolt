@@ -9,8 +9,6 @@ namespace Bolt
 {
     public static class BoltFramework
     {
-        private static readonly ConcurrentDictionary<Type, ContractMetadata> _contracts = new ConcurrentDictionary<Type, ContractMetadata>();
-
         public const string AsyncPostFix = "Async";
 
         public const int DefaultBufferSize = 80 * 1024;
@@ -18,6 +16,8 @@ namespace Bolt
         public static readonly ISessionContractMetadataProvider SessionMetadata = new SessionContractMetadataProvider();
 
         public static readonly IActionMetadataProvider ActionMetadata = new ActionMetadataProvider();
+
+        private static readonly ConcurrentDictionary<Type, ContractMetadata> _contracts = new ConcurrentDictionary<Type, ContractMetadata>();
 
         public static ContractMetadata GetContract(Type contract)
         {
@@ -27,8 +27,8 @@ namespace Bolt
             }
 
             return _contracts.GetOrAdd(
-                contract, 
-                key => 
+                contract,
+                key =>
                 {
                     return new ContractMetadata(contract);
                 });
@@ -87,7 +87,6 @@ namespace Bolt
             return TrimAsyncPostfix(contractName);
         }
 
-
         public static ReadOnlySpan<char> NormalizeActionName(ReadOnlySpan<char> action)
         {
             if (action.Length == AsyncPostFix.Length)
@@ -96,6 +95,11 @@ namespace Bolt
             }
 
             return TrimAsyncPostfix(action);
+        }
+
+        internal static bool CanAssign(this Type type, Type other)
+        {
+            return type.GetTypeInfo().IsAssignableFrom(other.GetTypeInfo());
         }
 
         private static IEnumerable<MethodInfo> GetContractMethods(Type contract)
@@ -116,11 +120,6 @@ namespace Bolt
             }
 
             return name;
-        }
-
-        internal static bool CanAssign(this Type type, Type other)
-        {
-            return type.GetTypeInfo().IsAssignableFrom(other.GetTypeInfo());
         }
     }
 }

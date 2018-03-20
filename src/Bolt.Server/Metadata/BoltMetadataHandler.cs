@@ -50,7 +50,7 @@ namespace Bolt.Server.Metadata
             try
             {
                 string result;
-                string actionName = (context.HttpContext.Request.Query["action"]);
+                string actionName = context.HttpContext.Request.Query["action"];
 
                 Bolt.Metadata.ActionMetadata action = null;
                 if (!string.IsNullOrEmpty(actionName))
@@ -95,6 +95,11 @@ namespace Bolt.Server.Metadata
             }
         }
 
+        private static JsonSerializerSettings CreateSettings()
+        {
+            return new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, ContractResolver = new CamelCasePropertyNamesContractResolver() };
+        }
+
         private RawContractMetadata CrateContractMetadata(ServerActionContext context)
         {
             var feature = context.HttpContext.Features.Get<IBoltFeature>();
@@ -105,11 +110,6 @@ namespace Bolt.Server.Metadata
                             ContentTypes = feature.ActionContext.Configuration.AvailableSerializers.Select(s => s.MediaType).ToArray()
                         };
             return m;
-        }
-
-        private static JsonSerializerSettings CreateSettings()
-        {
-            return new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore, ContractResolver = new CamelCasePropertyNamesContractResolver() };
         }
 
         protected class ActionMetadata

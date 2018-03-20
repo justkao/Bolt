@@ -24,7 +24,7 @@ namespace Bolt.Sample.ContentProtection
             _serializer = new JsonSerializer();
         }
 
-        public async Task WriteAsync(Stream stream, object value)
+        public async Task WriteAsync(Stream stream, object value, Action<long> onContentLength)
         {
             MemoryStream tempStream = new MemoryStream();
             await _serializer.WriteAsync(tempStream, value);
@@ -33,7 +33,7 @@ namespace Bolt.Sample.ContentProtection
             await stream.WriteAsync(data, 0, data.Length);
         }
 
-        public async Task<object> ReadAsync(Stream stream, Type valueType)
+        public async Task<object> ReadAsync(Stream stream, Type valueType, long contentLength)
         {
             MemoryStream tempStream = new MemoryStream();
             await stream.CopyToAsync(tempStream);
@@ -43,7 +43,7 @@ namespace Bolt.Sample.ContentProtection
             return await _serializer.ReadAsync(new MemoryStream(data), valueType);
         }
 
-        public async Task WriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> paramters, IReadOnlyList<object> values)
+        public async Task WriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> paramters, object[] values, Action<long> onContentLength)
         {
             MemoryStream tempStream = new MemoryStream();
             await _serializer.WriteParametersAsync(tempStream, paramters, values);
@@ -53,14 +53,14 @@ namespace Bolt.Sample.ContentProtection
             await stream.WriteAsync(data, 0, data.Length);
         }
 
-        public async Task ReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> metadata, object[] parameterValues)
+        public async Task<object[]> ReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> metadata, long contentLength)
         {
             MemoryStream tempStream = new MemoryStream();
             await stream.CopyToAsync(tempStream);
             byte[] data = _protector.Unprotect(tempStream.ToArray());
             _logger.LogInformation("Parameters: Received {0}B of protected data, Original: {1}B", tempStream.ToArray().Length, data.Length);
 
-            await _serializer.ReadParametersAsync(new MemoryStream(data), metadata, parameterValues);
+            return await _serializer.ReadParametersAsync(new MemoryStream(data), metadata);
         }
     }
 }

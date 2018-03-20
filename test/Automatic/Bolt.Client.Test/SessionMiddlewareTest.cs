@@ -13,24 +13,15 @@ namespace Bolt.Client.Test
     {
         public BoltOptions Options { get; } = new BoltOptions();
 
-        public Mock<IClientSessionHandler> SessionHandler = new Mock<IClientSessionHandler>(MockBehavior.Strict);
+        public Mock<IClientSessionHandler> SessionHandler { get; } = new Mock<IClientSessionHandler>(MockBehavior.Strict);
 
-        public Mock<IErrorHandling> SessionErrorHandling = new Mock<IErrorHandling>(MockBehavior.Strict);
+        public Mock<IErrorHandling> SessionErrorHandling { get; } = new Mock<IErrorHandling>(MockBehavior.Strict);
 
-        public Mock<ISerializer> Serializer = new Mock<ISerializer>(MockBehavior.Strict);
+        public Mock<ISerializer> Serializer { get; } = new Mock<ISerializer>(MockBehavior.Strict);
 
-        public ConnectionDescriptor ConnectionDescriptor = new ConnectionDescriptor(new Uri("http://localhost"));
+        public ConnectionDescriptor ConnectionDescriptor { get; } = new ConnectionDescriptor(new Uri("http://localhost"));
 
         public SessionContractMetadata SessionContract => BoltFramework.SessionMetadata.Resolve(typeof(ITestContract));
-
-        protected void SetupSessionHandler(string sessionid, bool ensuresSession = false)
-        {
-            SessionHandler.Setup(s => s.GetSessionIdentifier(It.IsAny<HttpResponseMessage>())).Returns(sessionid);
-            if (ensuresSession)
-            {
-                SessionHandler.Setup(s => s.EnsureSession(It.IsAny<HttpRequestMessage>(), sessionid)).Verifiable();
-            }
-        }
 
         public TestContractProxy CreateProxy(IClientPipeline pipeline)
         {
@@ -49,7 +40,16 @@ namespace Bolt.Client.Test
             }
 
             return builder.BuildClient();
-        } 
+        }
+
+        protected void SetupSessionHandler(string sessionid, bool ensuresSession = false)
+        {
+            SessionHandler.Setup(s => s.GetSessionIdentifier(It.IsAny<HttpResponseMessage>())).Returns(sessionid);
+            if (ensuresSession)
+            {
+                SessionHandler.Setup(s => s.EnsureSession(It.IsAny<HttpRequestMessage>(), sessionid)).Verifiable();
+            }
+        }
 
         public interface IInvokeCallback
         {

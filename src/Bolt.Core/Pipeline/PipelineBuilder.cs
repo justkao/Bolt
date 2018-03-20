@@ -14,11 +14,15 @@ namespace Bolt.Pipeline
         public PipelineBuilder<T> Use(Func<ActionDelegate<T>, T, Task> action)
         {
             return Use(new DelegatedMiddleware<T>(action));
-        } 
+        }
 
         public PipelineBuilder<T> Use(IMiddleware<T> middleware)
         {
-            if (middleware == null) throw new ArgumentNullException(nameof(middleware));
+            if (middleware == null)
+            {
+                throw new ArgumentNullException(nameof(middleware));
+            }
+
             _middlewares.Add(middleware);
             return this;
         }

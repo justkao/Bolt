@@ -6,8 +6,6 @@ namespace Bolt.Server.Session
 {
     public class ServerSessionHandler : IServerSessionHandler
     {
-        public string SessionHeader => _options.SessionHeader;
-
         private readonly BoltServerOptions _options;
 
         public ServerSessionHandler(IOptions<BoltServerOptions> options)
@@ -19,6 +17,8 @@ namespace Bolt.Server.Session
 
             _options = options.Value;
         }
+
+        public string SessionHeader => _options.SessionHeader;
 
         public virtual string GetIdentifier(HttpContext context)
         {

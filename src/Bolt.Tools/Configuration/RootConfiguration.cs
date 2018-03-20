@@ -23,6 +23,24 @@ namespace Bolt.Tools.Configuration
             Assemblies = new List<string>();
         }
 
+        [JsonIgnore]
+        public AssemblyCache AssemblyCache { get; private set; }
+
+        public List<string> Assemblies { get; set; }
+
+        [JsonProperty(Required = Required.Always)]
+        public List<InterfaceConfiguration> Contracts { get; set; }
+
+        [JsonIgnore]
+        public bool IgnoreGeneratorErrors { get; set; }
+
+        public string Modifier { get; set; }
+
+        public bool FullTypeNames { get; set; }
+
+        [JsonIgnore]
+        public string OutputDirectory { get; set; }
+
         public static RootConfiguration CreateFromConfig(AssemblyCache cache, string file)
         {
             file = Path.GetFullPath(file);
@@ -65,29 +83,11 @@ namespace Bolt.Tools.Configuration
                 foreach (var type in root.AssemblyCache.GetTypes(loadedAssembly))
                 {
                     root.AddContract(type.GetTypeInfo(), internalVisibility);
-                };
+                }
             }
 
             return root;
         }
-
-        [JsonIgnore]
-        public AssemblyCache AssemblyCache { get; private set; }
-
-        public List<string> Assemblies { get; set; }
-
-        [JsonProperty(Required = Required.Always)]
-        public List<InterfaceConfiguration> Contracts { get; set; }
-
-        [JsonIgnore]
-        public bool IgnoreGeneratorErrors { get; set; }
-
-        public string Modifier { get; set; }
-
-        public bool FullTypeNames { get; set; }
-
-        [JsonIgnore]
-        public string OutputDirectory { get; set; }
 
         public string Serialize()
         {
@@ -132,10 +132,10 @@ namespace Bolt.Tools.Configuration
             {
                 Console.WriteLine($"Contract '{type.Name.Bold()}' added.");
             }
-			else
-			{
-				Console.WriteLine($"Contract '{type.Name.Bold()}' not found.");
-			}
+            else
+            {
+                Console.WriteLine($"Contract '{type.Name.Bold()}' not found.");
+            }
 
             return addedContract;
         }
@@ -214,7 +214,7 @@ namespace Bolt.Tools.Configuration
             Console.WriteLine(Environment.NewLine);
             Console.WriteLine("Generating files ... ");
 
-            foreach (var filesInDirectory in _documents.GroupBy(f=>Path.GetDirectoryName(f.Key)))
+            foreach (var filesInDirectory in _documents.GroupBy(f => Path.GetDirectoryName(f.Key)))
             {
                 Console.WriteLine(string.Join(string.Empty, Enumerable.Repeat("-", filesInDirectory.Key.Count() + 12).ToArray()));
                 Console.WriteLine($"Directory: {filesInDirectory.Key.Bold().White()}");

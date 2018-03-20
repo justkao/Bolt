@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <Description>Bolt MessagePack Serializator.</Description>
+    <TargetFramework>$(TargetFramework)</TargetFramework>
+    <PackageTags>bolt;core;messagepack;serializer</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MessagePack" Version="1.7.3.4" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Bolt.Core\Bolt.Core.csproj" />
+  </ItemGroup>
+</Project>

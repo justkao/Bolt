@@ -80,7 +80,6 @@ namespace Bolt.Server
                 throw new ArgumentNullException(nameof(bolt));
             }
 
-
             if (instanceProvider == null)
             {
                 throw new ArgumentNullException(nameof(instanceProvider));
@@ -89,7 +88,6 @@ namespace Bolt.Server
             var factory = bolt.ApplicationServices.GetRequiredService<IContractInvokerFactory>();
             configuration = configuration ?? new ServerRuntimeConfiguration(bolt.Configuration);
 
-           
             IContractInvoker invoker = factory.Create(BoltFramework.GetContract(typeof(TContract)), instanceProvider, configuration);
             IPipeline<ServerActionContext> pipeline = null;
             if (configure != null)

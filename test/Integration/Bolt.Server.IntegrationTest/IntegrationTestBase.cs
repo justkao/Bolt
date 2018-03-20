@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Net.Http;
 using Bolt.Client;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Hosting;
-using System.Net.Http;
 
 namespace Bolt.Server.IntegrationTest
 {
@@ -33,6 +33,11 @@ namespace Bolt.Server.IntegrationTest
 
         protected ClientConfiguration ClientConfiguration { get; }
 
+        public void Dispose()
+        {
+            _runningServer.Dispose();
+        }
+
         protected abstract void Configure(IApplicationBuilder appBuilder);
 
         protected virtual void ConfigureServices(IServiceCollection services)
@@ -42,11 +47,6 @@ namespace Bolt.Server.IntegrationTest
         }
 
         protected virtual void Destroy()
-        {
-            _runningServer.Dispose();
-        }
-
-        public void Dispose()
         {
             _runningServer.Dispose();
         }

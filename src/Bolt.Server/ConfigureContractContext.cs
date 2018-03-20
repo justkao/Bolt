@@ -19,9 +19,14 @@ namespace Bolt.Server
 
         public IContractInvoker ContractInvoker { get; }
 
-        public ConfigureContractContext Use(Func<ActionDelegate<ServerActionContext>, ServerActionContext, Task> handler) 
+        public IEnumerable<IMiddleware<ServerActionContext>> Middlewares => _middlewares;
+
+        public ConfigureContractContext Use(Func<ActionDelegate<ServerActionContext>, ServerActionContext, Task> handler)
         {
-            if (handler == null) throw new ArgumentNullException(nameof(handler));
+            if (handler == null)
+            {
+                throw new ArgumentNullException(nameof(handler));
+            }
 
             _middlewares.Add(new DelegatedMiddleware<ServerActionContext>(handler));
             return this;
@@ -32,7 +37,5 @@ namespace Bolt.Server
             _middlewares.Add(ActivatorUtilities.GetServiceOrCreateInstance<T>(_applicationServices));
             return this;
         }
-
-        public IEnumerable<IMiddleware<ServerActionContext>> Middlewares => _middlewares;
     }
 }

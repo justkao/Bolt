@@ -23,6 +23,12 @@ namespace Bolt
 
         public virtual CancellationToken RequestAborted { get; set; }
 
+        public IDictionary<object, object> Items
+        {
+            get { return _items ?? (_items = new Dictionary<object, object>()); }
+            set { _items = value; }
+        }
+
         public ActionMetadata GetActionOrThrow()
         {
             if (Action == null)
@@ -31,12 +37,6 @@ namespace Bolt
             }
 
             return Action;
-        }
-
-        public IDictionary<object, object> Items
-        {
-            get { return _items ?? (_items = new Dictionary<object, object>()); }
-            set { _items = value; }
         }
 
         public virtual void Reset()

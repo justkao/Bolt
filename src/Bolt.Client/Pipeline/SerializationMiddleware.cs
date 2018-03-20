@@ -121,7 +121,7 @@ namespace Bolt.Client.Pipeline
         {
             try
             {
-                return await Serializer.ReadAsync(stream, context.Action.ResultType).ConfigureAwait(false);
+                return await Serializer.ReadAsync(stream, context.Action.ResultType, context.Response.Content?.Headers.ContentLength ?? -1).ConfigureAwait(false);
             }
             catch (Exception e)
             {
@@ -142,7 +142,7 @@ namespace Bolt.Client.Pipeline
 
             try
             {
-                var value = await Serializer.ReadAsync(stream, ExceptionSerializer.Type).ConfigureAwait(false);
+                var value = await Serializer.ReadAsync(stream, ExceptionSerializer.Type, context.Response.Content?.Headers.ContentLength ?? -1).ConfigureAwait(false);
                 if (value == null)
                 {
                     return null;
@@ -185,9 +185,18 @@ namespace Bolt.Client.Pipeline
 
             protected override async Task SerializeToStreamAsync(Stream stream, TransportContext context)
             {
+                // cleanup non serializable parameters
+                for (int i = 0; i < _clientContext.Parameters.Length; i++)
+                {
+                    if (!_clientContext.Action.Parameters[i].IsSerializable)
+                    {
+                        _clientContext.Parameters[i] = null;
+                    }
+                }
+
                 try
                 {
-                    await _serializer.WriteParametersAsync(stream, _clientContext.Action.Parameters, _clientContext.Parameters).ConfigureAwait(false);
+                    await _serializer.WriteParametersAsync(stream, _clientContext.Action.Parameters, _clientContext.Parameters, OnContentLength).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
@@ -203,6 +212,14 @@ namespace Bolt.Client.Pipeline
             {
                 length = -1;
                 return false;
+            }
+
+            private void OnContentLength(long contentLength)
+            {
+                if (contentLength > 0)
+                {
+                    Headers.ContentLength = contentLength;
+                }
             }
         }
     }

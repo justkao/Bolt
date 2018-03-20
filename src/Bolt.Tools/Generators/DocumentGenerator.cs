@@ -31,6 +31,8 @@ namespace Bolt.Tools.Generators
             IntendProvider = intendProvider;
         }
 
+        public object Context { get; set; }
+
         public static DocumentGenerator Create(ContractDefinition contract = null)
         {
             return new DocumentGenerator
@@ -38,8 +40,6 @@ namespace Bolt.Tools.Generators
                 ContractDefinition = contract
             };
         }
-
-        public object Context { get; set; }
 
         public string GetResult()
         {
@@ -88,7 +88,7 @@ namespace Bolt.Tools.Generators
         }
 
         public InterfaceGenerator Interface(
-            ContractDefinition definition = null, 
+            ContractDefinition definition = null,
             ClassDescriptor contractDescriptor = null)
         {
             var interfaceGenerator = new InterfaceGenerator
@@ -99,12 +99,6 @@ namespace Bolt.Tools.Generators
 
             AddContractGenerator(interfaceGenerator);
             return interfaceGenerator;
-        }
-
-        private DocumentGenerator AddContractGenerator(ContractGeneratorBase generator)
-        {
-            Add(generator);
-            return this;
         }
 
         public void Add(GeneratorBase generator)
@@ -120,6 +114,12 @@ namespace Bolt.Tools.Generators
             generator.IntendProvider = IntendProvider;
 
             _contractGenerator.Add(generator);
+        }
+
+        private DocumentGenerator AddContractGenerator(ContractGeneratorBase generator)
+        {
+            Add(generator);
+            return this;
         }
     }
 }

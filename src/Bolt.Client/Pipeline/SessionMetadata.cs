@@ -26,12 +26,6 @@ namespace Bolt.Client.Pipeline
 
         public ProxyState State { get; private set; }
 
-        public void ChangeState(IProxy proxy, ProxyState state)
-        {
-            State = state;
-            (proxy as IPipelineCallback)?.ChangeState(state);
-        }
-
         public bool RequiresDestroyParameters => Contract.DestroySession.HasSerializableParameters;
 
         public bool HasInitResult => Contract.InitSession.HasResult;
@@ -39,6 +33,12 @@ namespace Bolt.Client.Pipeline
         public bool HasDestroyResult => Contract.DestroySession.HasResult;
 
         public string SessionId { get; set; }
+
+        public void ChangeState(IProxy proxy, ProxyState state)
+        {
+            State = state;
+            (proxy as IPipelineCallback)?.ChangeState(state);
+        }
 
         public void ClearSession()
         {

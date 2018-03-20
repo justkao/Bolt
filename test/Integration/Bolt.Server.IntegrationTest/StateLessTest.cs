@@ -16,6 +16,8 @@ namespace Bolt.Server.IntegrationTest
 {
     public class StateLessTest : IntegrationTestBase
     {
+        private MockInstanceProvider _instanceProvider = new MockInstanceProvider();
+
         [Fact]
         public void NewProxy_EnsureReady()
         {
@@ -29,7 +31,7 @@ namespace Bolt.Server.IntegrationTest
             var client = CreateChannel();
             Mock<ITestContract> server = Server();
 
-            await ((IProxy) client).OpenAsync();
+            await ((IProxy)client).OpenAsync();
             Assert.Equal(ProxyState.Open, ((IProxy)client).State);
         }
 
@@ -66,7 +68,6 @@ namespace Bolt.Server.IntegrationTest
             await client2.SimpleMethodAsync();
         }
 
-
         [Fact]
         public void ValidateGeneratedSyncMethod()
         {
@@ -96,7 +97,6 @@ namespace Bolt.Server.IntegrationTest
 
             server.Verify();
         }
-
 
         [Fact]
         public void ValidateGeneratedSyncFunction()
@@ -134,7 +134,7 @@ namespace Bolt.Server.IntegrationTest
             await ((IProxy)client).OpenAsync();
             await ((IProxy)client).CloseAsync();
 
-            await Assert.ThrowsAsync<ProxyClosedException>(()=>client.ComplexFunctionAsync());
+            await Assert.ThrowsAsync<ProxyClosedException>(() => client.ComplexFunctionAsync());
         }
 
         [Fact]
@@ -260,7 +260,7 @@ namespace Bolt.Server.IntegrationTest
             Mock<ITestContract> server = Server();
 
             server.Setup(v => v.SimpleMethod()).Throws<CustomException>();
-            Assert.Throws<CustomException>(()=> { client.SimpleMethod(); });
+            Assert.Throws<CustomException>(() => { client.SimpleMethod(); });
         }
 
         [Fact]
@@ -492,7 +492,7 @@ namespace Bolt.Server.IntegrationTest
         public Mock<ITestContract> Server()
         {
             Mock<ITestContract> mock = new Mock<ITestContract>(MockBehavior.Strict);
-            InstanceProvider.CurrentInstance = mock.Object;
+            _instanceProvider.CurrentInstance = mock.Object;
             return mock;
         }
 
@@ -512,13 +512,11 @@ namespace Bolt.Server.IntegrationTest
             return builder.BuildPipeline();
         }
 
-        public MockInstanceProvider InstanceProvider = new MockInstanceProvider();
-
         protected override void Configure(IApplicationBuilder appBuilder)
         {
             appBuilder.UseBolt(h =>
             {
-                h.Use<ITestContract>(InstanceProvider);
+                h.Use<ITestContract>(_instanceProvider);
             });
         }
     }

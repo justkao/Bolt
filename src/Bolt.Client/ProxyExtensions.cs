@@ -43,15 +43,18 @@ namespace Bolt.Client
                 throw new ArgumentNullException(nameof(proxy));
             }
 
-            return (T) proxy.Send(action, parameters);
+            return (T)proxy.Send(action, parameters);
         }
 
         public static async Task<T> SendAsync<T>(this IProxy proxy, MethodInfo action, params object[] parameters)
         {
-            if (proxy == null) throw new ArgumentNullException(nameof(proxy));
+            if (proxy == null)
+            {
+                throw new ArgumentNullException(nameof(proxy));
+            }
 
             var result = await proxy.SendAsync(action, parameters).ConfigureAwait(false);
-            return (T) result;
+            return (T)result;
         }
     }
 }

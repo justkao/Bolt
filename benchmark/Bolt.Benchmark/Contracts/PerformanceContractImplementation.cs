@@ -16,16 +16,16 @@ namespace Bolt.Benchmark.Contracts
         private static readonly Task<Person> CompletedPerson = Task.FromResult(Person.Create(10));
 
         private static readonly Task<IEnumerable<int>> CompletedInts =
-            Task.FromResult((IEnumerable<int>) Enumerable.Range(0, 5).ToList());
+            Task.FromResult((IEnumerable<int>)Enumerable.Range(0, 5).ToList());
 
         private static readonly Task<IEnumerable<string>> CompletedStrings =
-            Task.FromResult((IEnumerable<string>) Enumerable.Range(0, 5).Select(v => "dummy_" + v).ToList());
+            Task.FromResult((IEnumerable<string>)Enumerable.Range(0, 5).Select(v => "dummy_" + v).ToList());
 
         private static readonly Task<IEnumerable<Person>> CompletedObjects =
-            Task.FromResult((IEnumerable<Person>) Enumerable.Range(0, 5).Select(Person.Create).ToList());
+            Task.FromResult((IEnumerable<Person>)Enumerable.Range(0, 5).Select(Person.Create).ToList());
 
         private static readonly Task<IEnumerable<Person>> CompletedLarge =
-            Task.FromResult((IEnumerable<Person>) Enumerable.Range(0, 100).Select(Person.Create).ToList());
+            Task.FromResult((IEnumerable<Person>)Enumerable.Range(0, 100).Select(Person.Create).ToList());
 
         public Task Method_Async()
         {

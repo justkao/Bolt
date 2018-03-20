@@ -4,12 +4,14 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Bolt.Server.InstanceProviders
 {
+#pragma warning disable SA1649 // File name should match first type name
     public class SessionInstanceProvider<T> : SessionInstanceProvider
+#pragma warning restore SA1649 // File name should match first type name
     {
         private ObjectFactory _factory;
 
         public SessionInstanceProvider(BoltServerOptions options)
-            : base( new MemorySessionFactory(options))
+            : base(new MemorySessionFactory(options))
         {
         }
 

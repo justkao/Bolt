@@ -1,6 +1,6 @@
-﻿using Bolt.Metadata;
-using System;
+﻿using System;
 using System.Reflection;
+using Bolt.Metadata;
 
 namespace Bolt.Server.Test
 {

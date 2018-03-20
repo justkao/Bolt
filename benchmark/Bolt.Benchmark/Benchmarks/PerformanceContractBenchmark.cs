@@ -1,18 +1,20 @@
-﻿using Bolt.Client;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Attributes.Columns;
+using Bolt.Benchmark.Contracts;
+using Bolt.Client;
+using Bolt.Serialization;
+using Bolt.Serialization.MessagePack;
 using Bolt.Server;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Net.Http;
-using BenchmarkDotNet.Attributes.Columns;
-using BenchmarkDotNet.Attributes;
-using System.Threading.Tasks;
-using System.Linq;
-using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Bolt.Benchmark.Contracts;
 
 namespace Bolt.Benchmark.Benchmarks
 {
@@ -28,6 +30,9 @@ namespace Bolt.Benchmark.Benchmarks
 
         public IPerformanceContract Proxy { get; private set; }
 
+        [Params(true, false)]
+        public bool UseMessagePack { get; set; }
+
         [GlobalSetup]
         public void GlobalSetup()
         {
@@ -38,6 +43,11 @@ namespace Bolt.Benchmark.Benchmarks
             _runningServer = new TestServer(new WebHostBuilder().ConfigureLogging(ConfigureLog).Configure(Configure).ConfigureServices(ConfigureServices));
 
             ClientConfiguration = new ClientConfiguration();
+            if (UseMessagePack)
+            {
+                ClientConfiguration.Serializer = new MessagePackSerializer();
+            }
+
             HttpMessageHandler handler = _runningServer.CreateHandler();
             ClientConfiguration.HttpMessageHandler = handler;
             Proxy = ClientConfiguration.CreateProxy<IPerformanceContract>(new Uri("http://localhost"));
@@ -136,7 +146,7 @@ namespace Bolt.Benchmark.Benchmarks
             }
             catch (InvalidOperationException)
             {
-            }    
+            }
         }
 
         private void ConfigureServices(IServiceCollection services)
@@ -152,6 +162,12 @@ namespace Bolt.Benchmark.Benchmarks
             app.UseBolt(
                 b =>
                 {
+                    if (UseMessagePack)
+                    {
+                        b.Configuration.DefaultSerializer = new MessagePackSerializer();
+                        b.Configuration.AvailableSerializers = new[] { b.Configuration.DefaultSerializer };
+                    }
+
                     b.Use<IPerformanceContract, PerformanceContractImplementation>();
                 });
         }

@@ -17,6 +17,12 @@ namespace Bolt.Server.IntegrationTest
 {
     public class DistributedSessionTest : IntegrationTestBase, ITestContext
     {
+        public object Instance => this;
+
+        protected internal Mock<IDummyContract> Callback { get; set; }
+
+        protected internal Mock<IDistributedCache> DistributedCache { get; set; }
+
         [Fact]
         public void Execute_EnsureHasSession()
         {
@@ -128,7 +134,7 @@ namespace Bolt.Server.IntegrationTest
             Callback = new Mock<IDummyContract>();
 
             DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true)).Verifiable();
-            DistributedCache.Setup(c => c.Get(It.IsAny<string>())).Returns(((byte[])null)).Verifiable();
+            DistributedCache.Setup(c => c.Get(It.IsAny<string>())).Returns((byte[])null).Verifiable();
 
             Callback.Setup(c => c.OnExecute(It.IsAny<object>())).Callback<object>(
                 v =>
@@ -147,7 +153,7 @@ namespace Bolt.Server.IntegrationTest
             DistributedCache.Setup(c => c.SetAsync(It.IsAny<string>(), It.IsAny<byte[]>(), It.IsAny<DistributedCacheEntryOptions>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.FromResult(true))
                 .Verifiable();
-            DistributedCache.Setup(c => c.Get(It.IsAny<string>())).Returns(((byte[])null)).Verifiable();
+            DistributedCache.Setup(c => c.Get(It.IsAny<string>())).Returns((byte[])null).Verifiable();
 
             Callback.Setup(c => c.OnExecute(It.IsAny<object>())).Callback<object>(
                 v =>
@@ -165,14 +171,15 @@ namespace Bolt.Server.IntegrationTest
         public void GetSession_EnsureSameDistributedSession()
         {
             List<string> sessions = new List<string>();
-                 
             Callback = new Mock<IDummyContract>(MockBehavior.Strict);
 
-            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>(), It.IsAny<CancellationToken>())).Returns(Task.FromResult(true)).Callback<string, CancellationToken>(
+            DistributedCache.Setup(c => c.RefreshAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.FromResult(true))
+                .Callback<string, CancellationToken>(
                 (v, t) =>
-                    {
-                        sessions.Add(v);
-                    }).Verifiable();
+                {
+                    sessions.Add(v);
+                }).Verifiable();
 
             Callback.Setup(c => c.OnExecute(It.IsAny<object>())).Callback<object>(
                 v =>
@@ -185,7 +192,7 @@ namespace Bolt.Server.IntegrationTest
             channel.OnExecute(null);
             channel.OnExecute(null);
 
-            Assert.True(sessions.Distinct().Count()== 1, "Multiple sessions were created.");
+            Assert.True(sessions.Distinct().Count() == 1, "Multiple sessions were created.");
             DistributedCache.Verify();
         }
 
@@ -210,10 +217,6 @@ namespace Bolt.Server.IntegrationTest
                     });
         }
 
-        protected internal Mock<IDummyContract> Callback { get; set; }
-
-        protected internal Mock<IDistributedCache> DistributedCache { get; set; }
-
         protected virtual IDummyContract CreateChannel()
         {
             return ClientConfiguration.CreateSessionProxy<IDummyContract>(ServerUrl);
@@ -221,13 +224,13 @@ namespace Bolt.Server.IntegrationTest
 
         public class DummyContract : IDummyContract
         {
+            private readonly ITestContext _context;
+
             public DummyContract(ITestContext context, IHttpSessionProvider httpSessionProvider)
             {
                 HttpSessionProvider = httpSessionProvider;
                 _context = context;
             }
-
-            private readonly ITestContext _context;
 
             public IHttpSessionProvider HttpSessionProvider { get; }
 
@@ -236,7 +239,5 @@ namespace Bolt.Server.IntegrationTest
                 ((DistributedSessionTest)_context.Instance).Callback?.Object.OnExecute(this);
             }
         }
-
-        public object Instance => this;
     }
 }
