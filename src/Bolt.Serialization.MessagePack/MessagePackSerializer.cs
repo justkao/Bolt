@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
-using Bolt.Metadata;
 
 namespace Bolt.Serialization.MessagePack
 {
@@ -29,7 +28,7 @@ namespace Bolt.Serialization.MessagePack
 
         protected override async Task<object[]> DoReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, long contentLength)
         {
-            return  (object[])(await global::MessagePack.MessagePackSerializer.Typeless.DeserializeAsync(stream));
+            return (object[])(await global::MessagePack.MessagePackSerializer.Typeless.DeserializeAsync(stream));
         }
     }
 }

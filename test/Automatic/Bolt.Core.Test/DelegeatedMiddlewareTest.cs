@@ -19,7 +19,6 @@ namespace Bolt.Core.Test
                         target.Add("first");
                         await next(ctxt);
                         target.Add("third");
-
                     }).Use(
                         (next, ctxt) =>
                             {
@@ -47,13 +46,11 @@ namespace Bolt.Core.Test
                     {
                         await next(ctxt);
                         target.Add("third");
-
                     }).Use(async (next, ctxt) =>
                             {
                                 target.Add("first");
                                 await next(ctxt);
                                 target.Add("second");
-
                             }).Build();
 
             await pipeline.Instance(new TestActionContext());

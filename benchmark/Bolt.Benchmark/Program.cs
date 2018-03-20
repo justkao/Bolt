@@ -9,7 +9,7 @@ namespace Bolt.Benchmark
 {
     public static class Program
     {
-        private static AnsiConsole Console = AnsiConsole.GetOutput(true);
+        private static readonly AnsiConsole Console = AnsiConsole.GetOutput(true);
 
         public static int Main(params string[] args)
         {

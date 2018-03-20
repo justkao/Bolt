@@ -17,7 +17,7 @@ namespace Bolt.Server.InstanceProviders
         public sealed override async Task<object> GetInstanceAsync(ServerActionContext context, Type type)
         {
             IContractSession contractSession;
-            
+
             if (context.Action == context.Contract.Session.InitSession)
             {
                 contractSession = await _sessionFactory.CreateAsync(context.HttpContext, await base.GetInstanceAsync(context, type));
@@ -67,7 +67,7 @@ namespace Bolt.Server.InstanceProviders
             else
             {
                 await session.CommitAsync();
-            } 
+            }
         }
 
         protected virtual Task OnInstanceCreatedAsync(ServerActionContext context, string sessionId)

@@ -1,14 +1,13 @@
 ﻿using System;
-using System.Threading.Tasks;
-
-using Bolt.Metadata;
-using Bolt.Pipeline;
+using System.Buffers;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Threading.Tasks;
+using Bolt.Metadata;
+using Bolt.Pipeline;
 using Bolt.Serialization;
 using Microsoft.Extensions.Primitives;
-using System.Collections.Generic;
-using System.Buffers;
 
 namespace Bolt.Server.Pipeline
 {
@@ -107,14 +106,6 @@ namespace Bolt.Server.Pipeline
             context.HttpContext.Response.Body.Dispose();
         }
 
-        private void OnHandleContentLength(ServerActionContext context, long contentLength)
-        {
-            if ( contentLength > 0)
-            {
-                context.HttpContext.Response.ContentLength = contentLength;
-            }
-        }
-
         protected virtual ISerializer PickSerializer(ServerActionContext context)
         {
             if (context.Configuration.AvailableSerializers.Count == 1)
@@ -138,6 +129,14 @@ namespace Bolt.Server.Pipeline
             }
 
             return context.Configuration.AvailableSerializers[0];
+        }
+
+        private void OnHandleContentLength(ServerActionContext context, long contentLength)
+        {
+            if (contentLength > 0)
+            {
+                context.HttpContext.Response.ContentLength = contentLength;
+            }
         }
     }
 }

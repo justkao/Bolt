@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using Bolt.Client;
 using Bolt.Serialization;
 using Bolt.Server.IntegrationTest.Core;
@@ -18,7 +17,7 @@ namespace Bolt.Server.IntegrationTest
             ClientConfiguration.Serializer = CreateSerializer();
         }
 
-        protected abstract ISerializer CreateSerializer();
+        public MockInstanceProvider InstanceProvider { get; } = new MockInstanceProvider();
 
         [Fact]
         public void WriteResponseOnServer_ReadOnClient_OK()
@@ -39,7 +38,6 @@ namespace Bolt.Server.IntegrationTest
             {
                 Assert.Equal(returned[i], data[i]);
             }
-
         }
 
         [Fact]
@@ -50,8 +48,8 @@ namespace Bolt.Server.IntegrationTest
             var arg3 = DateTime.UtcNow;
 
             Server().Setup(v => v.MethodWithManyArguments(arg1, arg2, arg3)).Callback<CompositeType, CompositeType, DateTime>(
-                (a1, a2, a3) 
-                => 
+                (a1, a2, a3)
+                =>
                 {
                     Assert.Equal(arg1, a1);
                     Assert.Equal(arg2, a2);
@@ -59,6 +57,18 @@ namespace Bolt.Server.IntegrationTest
                 });
 
             CreateChannel().MethodWithManyArguments(arg1, arg2, arg3);
+        }
+
+        protected abstract ISerializer CreateSerializer();
+
+        protected override void Configure(IApplicationBuilder appBuilder)
+        {
+            appBuilder.UseBolt(h =>
+            {
+                h.Configuration.DefaultSerializer = CreateSerializer();
+                h.Configuration.AvailableSerializers = new[] { h.Configuration.DefaultSerializer };
+                h.Use<ITestContract>(InstanceProvider);
+            });
         }
 
         private Mock<ITestContract> Server()
@@ -71,18 +81,6 @@ namespace Bolt.Server.IntegrationTest
         private ITestContractAsync CreateChannel()
         {
             return ClientConfiguration.CreateProxy<ITestContractAsync>(ServerUrl);
-        }
-
-        public MockInstanceProvider InstanceProvider = new MockInstanceProvider();
-
-        protected override void Configure(IApplicationBuilder appBuilder)
-        {
-            appBuilder.UseBolt(h =>
-            {
-                h.Configuration.DefaultSerializer = CreateSerializer();
-                h.Configuration.AvailableSerializers = new[] { h.Configuration.DefaultSerializer };
-                h.Use<ITestContract>(InstanceProvider);
-            });
         }
     }
 }

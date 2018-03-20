@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Moq;
-using Xunit;
-using Bolt.Server;
 using Bolt.Server.Session;
 using Microsoft.AspNetCore.Http;
+using Moq;
+using Xunit;
 
 namespace Bolt.Server.Test
 {
@@ -104,7 +103,7 @@ namespace Bolt.Server.Test
             var instance = session.Instance;
             await session.DestroyAsync();
 
-            Assert.True(((InstanceInternal) instance).Disposed);
+            Assert.True(((InstanceInternal)instance).Disposed);
         }
 
         [Fact(Skip = "Unstable... investigate ")]

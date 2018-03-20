@@ -19,11 +19,11 @@ namespace Bolt.Server.IntegrationTest
             InstanceProvider.CurrentInstance = Callback.Object;
         }
 
+        public MockInstanceProvider InstanceProvider { get; } = new MockInstanceProvider();
+
+        public Mock<IStreamingService> Callback { get; } = new Mock<IStreamingService>();
+
         public object Instance => this;
-
-        public MockInstanceProvider InstanceProvider = new MockInstanceProvider();
-
-        public Mock<IStreamingService> Callback  = new Mock<IStreamingService>();
 
         [Fact]
         public async Task SendHeader_EnsureReceivedOnServer()
@@ -53,14 +53,12 @@ namespace Bolt.Server.IntegrationTest
             Callback.Setup(s => s.SendAsync(It.IsAny<HttpContent>())).Callback<HttpContent>(c =>
             {
                 Assert.Equal(rawContent, c.ReadAsStringAsync().GetAwaiter().GetResult());
-
             }).Returns(Task.FromResult(true));
 
             await proxy.SendAsync(content);
 
             Callback.Verify();
         }
-
 
         [InlineData(0)]
         [InlineData(10)]
@@ -74,7 +72,6 @@ namespace Bolt.Server.IntegrationTest
             Callback.Setup(s => s.SendAsync(It.IsAny<HttpContent>())).Callback<HttpContent>(c =>
             {
                 Assert.Equal(length, c.ReadAsByteArrayAsync().GetAwaiter().GetResult().Length);
-
             }).Returns(Task.FromResult(true));
 
             await proxy.SendAsync(content);
@@ -96,7 +93,6 @@ namespace Bolt.Server.IntegrationTest
                 MemoryStream stream = new MemoryStream();
                 c.ReadAsStreamAsync().GetAwaiter().GetResult().CopyTo(stream);
                 Assert.Equal(length, stream.ToArray().Length);
-
             }).Returns(Task.FromResult(true));
 
             await proxy.SendAsync(content);
@@ -136,7 +132,6 @@ namespace Bolt.Server.IntegrationTest
                 serverReached = true;
                 byte[] bytesRead = c.ReadAsByteArrayAsync().GetAwaiter().GetResult();
                 Assert.Equal(10, bytesRead.Length);
-
             }).Returns(Task.FromResult(true));
 
             HttpContent content = new StreamContent(new ValidatingStream(new byte[100], streamCallback.Object), 5);
@@ -166,26 +161,6 @@ namespace Bolt.Server.IntegrationTest
             Callback.Verify();
         }
 
-        private class ValidatingStream : MemoryStream
-        {
-            private readonly IStreamCallback _streamCallback;
-
-            public ValidatingStream(byte[] content, IStreamCallback streamCallback) : base(content)
-            {
-                _streamCallback = streamCallback;
-            }
-
-            public override int Read(byte[] buffer, int offset, int count)
-            {
-                return _streamCallback.OnRead();
-            }
-        }
-
-        public interface IStreamCallback
-        {
-            int OnRead();
-        }
-
         [Fact]
         public async Task SendNullContent_Throws()
         {
@@ -202,6 +177,11 @@ namespace Bolt.Server.IntegrationTest
             var content = await proxy.DuplicateAsync(new StringContent("test"));
         }
         */
+
+        public IStreamingService CreateProxy()
+        {
+            return ClientConfiguration.ProxyBuilder().UseStreaming().Url(ServerUrl).Build<IStreamingService>();
+        }
 
         protected override void ConfigureServices(IServiceCollection services)
         {
@@ -221,16 +201,31 @@ namespace Bolt.Server.IntegrationTest
             }));
         }
 
-        public IStreamingService CreateProxy()
-        {
-            return ClientConfiguration.ProxyBuilder().UseStreaming().Url(ServerUrl).Build<IStreamingService>();
-        }
-
         public interface IStreamingService
         {
             Task SendAsync(HttpContent content);
 
             Task<HttpContent> ReceiveAsync();
+        }
+
+        public interface IStreamCallback
+        {
+            int OnRead();
+        }
+
+        private class ValidatingStream : MemoryStream
+        {
+            private readonly IStreamCallback _streamCallback;
+
+            public ValidatingStream(byte[] content, IStreamCallback streamCallback) : base(content)
+            {
+                _streamCallback = streamCallback;
+            }
+
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                return _streamCallback.OnRead();
+            }
         }
     }
 }

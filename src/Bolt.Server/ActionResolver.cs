@@ -1,5 +1,5 @@
-﻿using Bolt.Metadata;
-using System;
+﻿using System;
+using Bolt.Metadata;
 
 namespace Bolt.Server
 {

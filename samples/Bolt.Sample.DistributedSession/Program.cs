@@ -74,7 +74,7 @@ namespace Bolt.Sample.DistributedSession
                 .Build<IDummyContract>();
         }
 
-        public static async Task TestProxy(IDummyContract proxy)
+        private static async Task TestProxy(IDummyContract proxy)
         {
             Console.WriteLine("Sending {0} requests to multiple servers with session", 10);
 

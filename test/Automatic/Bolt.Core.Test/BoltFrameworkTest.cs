@@ -30,10 +30,10 @@ namespace Bolt.Core.Test
             Assert.Equal(expected, BoltFramework.NormalizeActionName(input.AsReadOnlySpan()).ConvertToString());
         }
 
-
         public interface IInvalidInterface
         {
             void Method(string arg);
+
             void Method();
         }
     }

@@ -122,15 +122,14 @@ namespace Bolt.Server.Test
             {
                 Mock.Setup(o => o.CreateInstance(ctxt, typeof(IMockContract))).Returns(instance ?? new object()).Verifiable();
                 Mock.Setup(o => o.GenerateSessionid()).Returns(session ?? Guid.NewGuid().ToString()).Verifiable();
-
             }
         }
 
         public class GetInstanceWithExistingSession : StatefullinstanceProviderTestBase<IMockContract>
         {
-            private string _sessionHeaderValue = "session value";
-
             private readonly object _instance;
+
+            private string _sessionHeaderValue = "session value";
 
             public GetInstanceWithExistingSession()
             {
@@ -190,7 +189,7 @@ namespace Bolt.Server.Test
 
         public class ReleaseInstanceWithExistingSession : StatefullinstanceProviderTestBase<IMockContract>
         {
-            private string SessionHeaderValue = "session value";
+            private const string SessionHeaderValue = "session value";
 
             private readonly object _instance;
 
@@ -223,7 +222,7 @@ namespace Bolt.Server.Test
             }
 
             [Fact]
-            public async Task  Release_DestroyAction_InstanceDestroyed()
+            public async Task Release_DestroyAction_InstanceDestroyed()
             {
                 var ctxt = CreateContext(DestroySessionAction);
 
@@ -266,7 +265,7 @@ namespace Bolt.Server.Test
 
                 await Subject.ReleaseInstanceAsync(ctxt, _instance, null);
 
-                Assert.True(((InstanceObject) _instance).Disposed);
+                Assert.True(((InstanceObject)_instance).Disposed);
             }
 
             [Fact]
@@ -288,7 +287,7 @@ namespace Bolt.Server.Test
 
                 await Subject.ReleaseInstanceAsync(ctxt, _instance, new Exception());
 
-                Assert.True(((InstanceObject) _instance).Disposed);
+                Assert.True(((InstanceObject)_instance).Disposed);
             }
 
             [Fact]
@@ -299,7 +298,7 @@ namespace Bolt.Server.Test
 
                 await Subject.ReleaseInstanceAsync(ctxt, _instance, new Exception());
 
-                Assert.False(((InstanceObject) _instance).Disposed);
+                Assert.False(((InstanceObject)_instance).Disposed);
             }
 
             [Fact]
@@ -310,12 +309,7 @@ namespace Bolt.Server.Test
 
                 await Subject.ReleaseInstanceAsync(ctxt, _instance, new Exception());
 
-                Assert.True(((InstanceObject) _instance).Disposed);
-            }
-
-            private void SetupRelease(ServerActionContext ctxt = null)
-            {
-                Mock.Setup(o => o.OnInstanceReleased(ctxt ?? _context, SessionHeaderValue)).Verifiable();
+                Assert.True(((InstanceObject)_instance).Disposed);
             }
 
             protected override ServerActionContext CreateContext(MethodInfo action)
@@ -324,6 +318,11 @@ namespace Bolt.Server.Test
                 ctxt.HttpContext.Features.Set(_session);
                 ctxt.HttpContext.Request.Headers[SessionHeader] = SessionHeaderValue;
                 return ctxt;
+            }
+
+            private void SetupRelease(ServerActionContext ctxt = null)
+            {
+                Mock.Setup(o => o.OnInstanceReleased(ctxt ?? _context, SessionHeaderValue)).Verifiable();
             }
 
             private class InstanceObject : IDisposable

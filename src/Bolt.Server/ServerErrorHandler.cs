@@ -66,6 +66,5 @@ namespace Bolt.Server
                     error.ErrorCode);
             }
         }
-
     }
 }

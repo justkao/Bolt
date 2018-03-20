@@ -11,14 +11,14 @@ namespace Bolt.Client.Test
         {
             private const string SessionId = "test session";
 
-            private Mock<IInvokeCallback> Callback = new Mock<IInvokeCallback>();
+            private Mock<IInvokeCallback> _callback = new Mock<IInvokeCallback>();
 
             public OpenedSession()
             {
                 Pipeline = CreatePipeline(
                     (next, ctxt) =>
                     {
-                        Callback.Object.Handle(ctxt);
+                        _callback.Object.Handle(ctxt);
                         ctxt.ServerConnection = ConnectionDescriptor;
                         return next(ctxt);
                     });
@@ -49,7 +49,7 @@ namespace Bolt.Client.Test
             [Fact]
             public async Task Close_EnsureCalled()
             {
-                Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
+                _callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
                     c =>
                         {
                             Assert.Equal(ContractDescriptor.DestroySession.Action, c.Action.Action);
@@ -57,13 +57,13 @@ namespace Bolt.Client.Test
 
                 await Proxy.CloseSession("Test");
 
-                Callback.Verify();
+                _callback.Verify();
             }
 
             [Fact]
             public async Task Close_EnsureProperParameters()
             {
-                Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
+                _callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
                     c =>
                     {
                         Assert.Equal("temp", c.Parameters[0]);
@@ -71,14 +71,13 @@ namespace Bolt.Client.Test
 
                 await Proxy.CloseSession("temp");
 
-                Callback.Verify();
+                _callback.Verify();
             }
 
             [Fact]
             public async Task Close_EnsureProperResult()
             {
-
-                Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
+                _callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
                     c =>
                         {
                             c.ActionResult = "test";
@@ -87,7 +86,7 @@ namespace Bolt.Client.Test
                 var result = await Proxy.CloseSession("temp");
 
                 Assert.Equal("test", result);
-                Callback.Verify();
+                _callback.Verify();
             }
 
             [Fact]
@@ -97,7 +96,7 @@ namespace Bolt.Client.Test
 
                 Assert.NotNull(connection);
 
-                Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
+                _callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>())).Callback<ClientActionContext>(
                     c =>
                     {
                         Assert.Equal(connection.ServerConnection, c.ServerConnection);
@@ -105,7 +104,7 @@ namespace Bolt.Client.Test
 
                 await Proxy.CloseSession("Test");
 
-                Callback.Verify();
+                _callback.Verify();
             }
 
             [Fact]

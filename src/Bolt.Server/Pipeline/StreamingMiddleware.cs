@@ -40,19 +40,9 @@ namespace Bolt.Server.Pipeline
             {
                 if (typeof(HttpContent).GetTypeInfo().IsAssignableFrom(metadata.ContentResultType.GetTypeInfo()))
                 {
-                    await HandleContent(context, (HttpContent) context.ActionResult);
+                    await HandleContentAsync(context, (HttpContent)context.ActionResult);
                 }
             }
-        }
-
-        private static async Task HandleContent(ServerActionContext context, HttpContent content)
-        {
-            foreach (KeyValuePair<string, IEnumerable<string>> pair in content.Headers)
-            {
-                context.HttpContext.Response.Headers.Add(pair.Key, pair.Value.ToArray());
-            }
-
-            await content.CopyToAsync(context.HttpContext.Response.Body);
         }
 
         protected virtual HttpContent CreateHttpContent(ServerActionContext context, Metadata actionMetadata)
@@ -64,6 +54,16 @@ namespace Bolt.Server.Pipeline
             }
 
             return streamContent;
+        }
+
+        private static async Task HandleContentAsync(ServerActionContext context, HttpContent content)
+        {
+            foreach (KeyValuePair<string, IEnumerable<string>> pair in content.Headers)
+            {
+                context.HttpContext.Response.Headers.Add(pair.Key, pair.Value.ToArray());
+            }
+
+            await content.CopyToAsync(context.HttpContext.Response.Body);
         }
     }
 }

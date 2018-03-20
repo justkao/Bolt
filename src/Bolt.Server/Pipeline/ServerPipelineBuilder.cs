@@ -27,7 +27,10 @@ namespace Bolt.Server.Pipeline
 
         public IPipeline<ServerActionContext> Build(IEnumerable<IMiddleware<ServerActionContext>> middlewares)
         {
-            if (middlewares == null) throw new ArgumentNullException(nameof(middlewares));
+            if (middlewares == null)
+            {
+                throw new ArgumentNullException(nameof(middlewares));
+            }
 
             PipelineBuilder<ServerActionContext> builder = new PipelineBuilder<ServerActionContext>();
 

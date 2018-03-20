@@ -14,7 +14,6 @@ namespace Bolt.Client.Pipeline
 
         public override async Task InvokeAsync(ClientActionContext context)
         {
-
             try
             {
                 await Next(context).ConfigureAwait(false);

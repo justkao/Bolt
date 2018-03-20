@@ -1,8 +1,8 @@
-﻿using Bolt.Metadata;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Reflection;
 using System.Threading;
+using Bolt.Metadata;
 
 namespace Bolt.Client
 {
@@ -14,12 +14,12 @@ namespace Bolt.Client
         public ConnectionDescriptor ServerConnection { get; set; }
 
         /// <summary>
-        /// The raw <see cref="HttpRequestMessage"/>.
+        /// Gets or sets the raw <see cref="HttpRequestMessage"/>.
         /// </summary>
         public HttpRequestMessage Request { get; set; }
 
         /// <summary>
-        /// The server response or null if the request has not been send yet.
+        /// Gets or sets the server response or null if the request has not been send yet.
         /// </summary>
         public HttpResponseMessage Response { get; set; }
 

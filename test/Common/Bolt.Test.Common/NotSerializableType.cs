@@ -1,4 +1,3 @@
-
 namespace Bolt.Test.Common
 {
     public class NotSerializableType

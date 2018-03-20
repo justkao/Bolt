@@ -37,6 +37,5 @@ namespace Bolt.Server
             _middlewares.Add(ActivatorUtilities.GetServiceOrCreateInstance<T>(_applicationServices));
             return this;
         }
-
     }
 }

@@ -11,5 +11,7 @@
     <Rule Id="SA1127" Action="None" />
     <Rule Id="SA1128" Action="None" />
     <Rule Id="SA0001" Action="None" />
+    <Rule Id="SA1513" Action="None" />
+    <Rule Id="SA1201" Action="None" />
   </Rules>
 </RuleSet>

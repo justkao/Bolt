@@ -114,7 +114,6 @@ namespace Bolt.Tools.Generators
             WriteLine();
         }
 
-
         public virtual void GenerateConstructor(string parameters, string baseCall = null, string modifier = "public")
         {
             if (!string.IsNullOrEmpty(baseCall))

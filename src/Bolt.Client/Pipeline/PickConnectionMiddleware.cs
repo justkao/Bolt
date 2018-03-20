@@ -6,7 +6,8 @@ namespace Bolt.Client.Pipeline
 {
     public class PickConnectionMiddleware : ClientMiddlewareBase
     {
-        public PickConnectionMiddleware(IServerProvider serverProvider,
+        public PickConnectionMiddleware(
+            IServerProvider serverProvider,
             IEndpointProvider endpointProvider)
         {
             ServerProvider = serverProvider ?? throw new ArgumentNullException(nameof(serverProvider));

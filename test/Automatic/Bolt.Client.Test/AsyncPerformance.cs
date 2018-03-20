@@ -39,7 +39,8 @@ namespace Bolt.Client.Test
 
         private class DummyMessageHandler : HttpMessageHandler
         {
-            protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request,
+            protected override Task<HttpResponseMessage> SendAsync(
+                HttpRequestMessage request,
                 CancellationToken cancellationToken)
             {
                 return Task.FromResult(new HttpResponseMessage());

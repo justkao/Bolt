@@ -1,7 +1,7 @@
-﻿using Bolt.Metadata;
-using System;
+﻿using System;
 using System.Reflection;
 using System.Text;
+using Bolt.Metadata;
 
 namespace Bolt.Client
 {

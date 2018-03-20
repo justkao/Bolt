@@ -208,18 +208,18 @@ namespace Bolt.Client.Pipeline
                 }
             }
 
+            protected override bool TryComputeLength(out long length)
+            {
+                length = -1;
+                return false;
+            }
+
             private void OnContentLength(long contentLength)
             {
                 if (contentLength > 0)
                 {
                     Headers.ContentLength = contentLength;
                 }
-            }
-
-            protected override bool TryComputeLength(out long length)
-            {
-                length = -1;
-                return false;
             }
         }
     }

@@ -11,7 +11,7 @@ namespace Bolt.Client
     public interface IServerProvider
     {
         /// <summary>
-        /// Gets the Bolt server that will be used by <see cref="IProxy"/> to send the Bolt request. 
+        /// Gets the Bolt server that will be used by <see cref="IProxy"/> to send the Bolt request.
         /// </summary>
         /// <returns>Connection descriptor to Bolt server.</returns>
         /// <exception cref="NoServersAvailableException">Thrown if there are no more available servers.</exception>

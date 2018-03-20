@@ -13,7 +13,7 @@ namespace Bolt.Server.Session
         private readonly ISessionStore _sessionStore;
         private readonly IServerSessionHandler _sessionHandler;
 
-        public DistributedSessionFactory(IOptions<BoltServerOptions> options, ISessionStore  sessionStore, IServerSessionHandler sessionHandler = null)
+        public DistributedSessionFactory(IOptions<BoltServerOptions> options, ISessionStore sessionStore, IServerSessionHandler sessionHandler = null)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _sessionStore = sessionStore ?? throw new ArgumentNullException(nameof(sessionStore));
@@ -63,7 +63,7 @@ namespace Bolt.Server.Session
 
         private class DistributedContractSession : IDistributedContractSession
         {
-            public DistributedContractSession (string sessionId, object instance, ISession session)
+            public DistributedContractSession(string sessionId, object instance, ISession session)
             {
                 Instance = instance;
                 Session = session;

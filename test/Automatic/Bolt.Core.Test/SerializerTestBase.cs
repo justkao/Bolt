@@ -28,9 +28,14 @@ namespace Bolt.Core.Test
             Serializer = CreateSerializer();
         }
 
-        protected abstract ISerializer CreateSerializer();
-
         public ISerializer Serializer { get; }
+
+        public static IEnumerable<object[]> GetManyProperties(int parameters)
+        {
+            yield return new object[] { Enumerable.Range(0, parameters).Select(index => (new ParameterMetadata(typeof(int), $"name_{index}"), (object)index)).Cast<object>().ToArray() };
+
+            yield return new object[] { Enumerable.Range(0, parameters).Select(index => (new ParameterMetadata(typeof(CompositeType), $"name_{index}"), (object)CompositeType.CreateRandom())).Cast<object>().ToArray() };
+        }
 
         [Fact]
         public Task Write_NullStream_ThrowsArgumentNullException()
@@ -54,7 +59,7 @@ namespace Bolt.Core.Test
             MemoryStream stream = new MemoryStream();
             await Serializer.WriteAsync(stream, obj);
 
-            // act 
+            // act
             var result = await Serializer.ReadAsync(new MemoryStream(stream.ToArray()), typeof(A));
 
             // assert
@@ -69,7 +74,7 @@ namespace Bolt.Core.Test
             MemoryStream stream = new MemoryStream();
             await Serializer.WriteAsync(stream, obj);
 
-            // act 
+            // act
             var result = await Serializer.ReadAsync(new MemoryStream(stream.ToArray()), typeof(CompositeType));
 
             // assert
@@ -100,7 +105,7 @@ namespace Bolt.Core.Test
             await Serializer.WriteAsync(stream, obj);
             stream.Seek(0, SeekOrigin.Begin);
 
-            // act 
+            // act
             var result = await Serializer.ReadAsync(stream, typeof(CompositeType));
 
             // assert
@@ -204,36 +209,7 @@ namespace Bolt.Core.Test
             return WriteReadParameters(new A(1), new B(2), new C(3), new C(1));
         }
 
-#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
-        public class A
-#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
-        {
-            public A(int id)
-            {
-                Id = id;
-            }
-
-            public int Id { get; }
-
-            public override bool Equals(object obj)
-            {
-                return GetType() == obj?.GetType() && (obj as A).Id == Id;
-            }
-        }
-
-        public class B : A
-        {
-            public B(int id) : base(id)
-            {
-            }
-        }
-
-        public class C : B
-        {
-            public C(int id) : base(id)
-            {
-            }
-        }
+        protected abstract ISerializer CreateSerializer();
 
         private async Task WriteReadParameters(params object[] parameters)
         {
@@ -267,12 +243,35 @@ namespace Bolt.Core.Test
             Assert.Equal(expected, outputValues[0]);
         }
 
-
-        public static IEnumerable<object[]> GetManyProperties(int parameters)
+#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
+        public class A
+#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
         {
-            yield return new object[] { Enumerable.Range(0, parameters).Select(index => (new ParameterMetadata(typeof(int), $"name_{index}"), (object)index)).Cast<object>().ToArray() };
+            public A(int id)
+            {
+                Id = id;
+            }
 
-            yield return new object[] { Enumerable.Range(0, parameters).Select(index => (new ParameterMetadata(typeof(CompositeType), $"name_{index}"), (object)CompositeType.CreateRandom())).Cast<object>().ToArray() };
+            public int Id { get; }
+
+            public override bool Equals(object obj)
+            {
+                return GetType() == obj?.GetType() && (obj as A).Id == Id;
+            }
+        }
+
+        public class B : A
+        {
+            public B(int id) : base(id)
+            {
+            }
+        }
+
+        public class C : B
+        {
+            public C(int id) : base(id)
+            {
+            }
         }
     }
 }

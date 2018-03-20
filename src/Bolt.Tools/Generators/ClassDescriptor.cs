@@ -6,11 +6,6 @@ namespace Bolt.Tools.Generators
 {
     public class ClassDescriptor
     {
-        public static ClassDescriptor Create<T>()
-        {
-            return new ClassDescriptor(typeof(T));
-        }
-
         public ClassDescriptor()
         {
             BaseClasses = new string[0];
@@ -42,6 +37,11 @@ namespace Bolt.Tools.Generators
         public IEnumerable<string> BaseClasses { get; set; }
 
         public bool IsInterface { get; set; }
+
+        public static ClassDescriptor Create<T>()
+        {
+            return new ClassDescriptor(typeof(T));
+        }
 
         public override string ToString()
         {

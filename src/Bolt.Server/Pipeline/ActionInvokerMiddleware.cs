@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
-using Bolt.Pipeline;
 using Bolt.Metadata;
+using Bolt.Pipeline;
 using Bolt.Server.Internal;
 
 namespace Bolt.Server.Pipeline
@@ -72,7 +72,7 @@ namespace Bolt.Server.Pipeline
                 Parameters = metadata.Action.GetParameters().ToList();
                 ParametersTypes = Parameters.Select(p => p.ParameterType).ToArray();
                 _compiledLambda = MethodInvokerBuilder.Build(metadata.Action.DeclaringType, metadata.Action);
-                _isTaskResult = typeof (Task).IsAssignableFrom(metadata.Action.ReturnType);
+                _isTaskResult = typeof(Task).IsAssignableFrom(metadata.Action.ReturnType);
                 if (_isTaskResult && metadata.Action.ReturnType.GetTypeInfo().IsGenericType)
                 {
                     _taskResultProvider = MethodInvokerBuilder.BuildTaskResultProvider(metadata.ResultType);
@@ -88,10 +88,10 @@ namespace Bolt.Server.Pipeline
                 var result = _compiledLambda(context.ContractInstance, context.Parameters);
                 if (_isTaskResult)
                 {
-                    await (Task) result;
+                    await (Task)result;
                     if (_taskResultProvider != null)
                     {
-                        context.ActionResult = _taskResultProvider((Task) result);
+                        context.ActionResult = _taskResultProvider((Task)result);
                     }
                 }
                 else

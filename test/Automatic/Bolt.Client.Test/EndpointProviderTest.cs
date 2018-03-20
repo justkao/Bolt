@@ -1,7 +1,7 @@
-﻿using Bolt.Metadata;
-using System;
+﻿using System;
 using System.Linq;
 using System.Reflection;
+using Bolt.Metadata;
 using Xunit;
 
 namespace Bolt.Client.Test
@@ -9,7 +9,6 @@ namespace Bolt.Client.Test
     public class EndpointProviderTest
     {
         private ContractMetadata Contract => BoltFramework.GetContract(typeof(IContract));
-
 
         [InlineData(null, "/test/Contract/Method")]
         [InlineData("http://localhost/", "http://localhost/test/Contract/Method")]

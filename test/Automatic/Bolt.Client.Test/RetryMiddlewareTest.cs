@@ -18,7 +18,7 @@ namespace Bolt.Client.Test
             var pipeline = CreatePipeline(10);
             var proxy = CreateProxy(pipeline);
             Callback.Setup(c => c.Handle(It.IsAny<ClientActionContext>()));
-            proxy.Execute("");
+            proxy.Execute(string.Empty);
         }
 
         [InlineData(true, ErrorHandlingResult.Close)]
@@ -100,7 +100,7 @@ namespace Bolt.Client.Test
         public IClientPipeline CreatePipeline(int retries)
         {
             ClientPipelineBuilder builder = new ClientPipelineBuilder();
-            builder.Use(new RetryRequestMiddleware(ErrorHandling.Object) {Retries = retries});
+            builder.Use(new RetryRequestMiddleware(ErrorHandling.Object) { Retries = retries });
             builder.Use(
                 (next, ctxt) =>
                     {

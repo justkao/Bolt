@@ -49,7 +49,7 @@ namespace Bolt.Server.IntegrationTest
         {
             var client = GetProxy(null, false);
             await client.OpenSessionAsync("test");
-            await ((IProxy) client).CloseAsync();
+            await ((IProxy)client).CloseAsync();
 
             Assert.Equal(ProxyState.Closed, ((IProxy)client).State);
         }
@@ -296,7 +296,7 @@ namespace Bolt.Server.IntegrationTest
             Task.WaitAll(Enumerable.Repeat(0, 5).Select(_ => Task.Run(() => proxy.OpenSessionAsync("test").GetAwaiter().GetResult())).ToArray());
 
             Assert.Equal(1, Factory.Count);
-            ((IProxy) proxy).Dispose();
+            ((IProxy)proxy).Dispose();
             Assert.Equal(0, Factory.Count);
         }
 
@@ -340,7 +340,7 @@ namespace Bolt.Server.IntegrationTest
         public async Task Async_InitSession_Explicitely_EnsureInitialized()
         {
             ITestContractStateFullAsync channel = GetProxy();
-            await ((IProxy) channel).OpenAsync();
+            await ((IProxy)channel).OpenAsync();
             await channel.GetStateAsync();
             await (channel as IProxy).CloseAsync();
         }

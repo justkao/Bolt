@@ -10,10 +10,10 @@ namespace Bolt.Server.Session
     public class MemorySessionFactory : ISessionFactory, IDisposable
     {
         private readonly IOptions<BoltServerOptions> _options;
-        private Timer _timer;
         private readonly ConcurrentDictionary<string, ContractSession> _items = new ConcurrentDictionary<string, ContractSession>();
         private readonly IServerSessionHandler _sessionHandler;
         private TimeSpan _timeoutCheckInterval;
+        private Timer _timer;
 
         public MemorySessionFactory(IOptions<BoltServerOptions> options, IServerSessionHandler sessionHandler = null)
         {
@@ -27,7 +27,8 @@ namespace Bolt.Server.Session
 
         public TimeSpan TimeoutCheckInterval
         {
-            get { return _timeoutCheckInterval; }
+            get => _timeoutCheckInterval;
+
             set
             {
                 _timeoutCheckInterval = value;
@@ -37,7 +38,8 @@ namespace Bolt.Server.Session
 
         public TimeSpan SessionTimeout
         {
-            get { return _options.Value.SessionTimeout; }
+            get => _options.Value.SessionTimeout;
+
             set
             {
                 _options.Value.SessionTimeout = value;
@@ -101,6 +103,11 @@ namespace Bolt.Server.Session
             }
 
             return false;
+        }
+
+        public void Dispose()
+        {
+            _timer?.Dispose();
         }
 
         protected virtual bool ShouldTimeout(DateTime timestamp)
@@ -170,11 +177,6 @@ namespace Bolt.Server.Session
                 Destroy();
                 return CompletedTask.Done;
             }
-        }
-
-        public void Dispose()
-        {
-            _timer?.Dispose();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace Bolt.Server.Test
     {
         public SessionHandlerTest()
         {
-            Options = new BoltServerOptions {SessionHeader = "Test"};
+            Options = new BoltServerOptions { SessionHeader = "Test" };
             Subject = new ServerSessionHandler(Options);
         }
 

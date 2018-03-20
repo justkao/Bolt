@@ -24,11 +24,11 @@ namespace Bolt.Server.IntegrationTest
                 .Build<ITestContract>();
         }
 
-        private DummyMessageHandler MessageHandler { get; set; }
-
         public ITestContract Proxy { get; set; }
 
         public Mock<IErrorHandling> ErrorHandling { get; set; }
+
+        private DummyMessageHandler MessageHandler { get; set; }
 
         [Fact]
         public void Handle_EnsureCalled()
@@ -39,8 +39,7 @@ namespace Bolt.Server.IntegrationTest
 
             Assert.Throws<HttpRequestException>(() => Proxy.SimpleMethod());
             ErrorHandling.Verify();
-            ErrorHandling.Verify(h => h.Handle(It.IsAny<ClientActionContext>(), It.IsAny<HttpRequestException>()),
-                Times.Exactly(1));
+            ErrorHandling.Verify(h => h.Handle(It.IsAny<ClientActionContext>(), It.IsAny<HttpRequestException>()), Times.Exactly(1));
 
             Assert.Equal(1, MessageHandler.Called);
         }
@@ -53,8 +52,7 @@ namespace Bolt.Server.IntegrationTest
                 .Verifiable();
 
             Assert.Throws<HttpRequestException>(() => Proxy.SimpleMethod());
-            ErrorHandling.Verify(h => h.Handle(It.IsAny<ClientActionContext>(), It.IsAny<HttpRequestException>()),
-                Times.Exactly(3 + 1));
+            ErrorHandling.Verify(h => h.Handle(It.IsAny<ClientActionContext>(), It.IsAny<HttpRequestException>()), Times.Exactly(3 + 1));
 
             // 3 recoveries + final try
             Assert.Equal(3 + 1, MessageHandler.Called);
@@ -79,11 +77,10 @@ namespace Bolt.Server.IntegrationTest
                 .Verifiable();
 
             Assert.Throws<HttpRequestException>(() => Proxy.SimpleMethod());
-            Assert.Equal(ProxyState.Closed, ((IProxy) Proxy).State);
+            Assert.Equal(ProxyState.Closed, ((IProxy)Proxy).State);
             Assert.Throws<ProxyClosedException>(() => Proxy.SimpleMethod());
 
-            ErrorHandling.Verify(h => h.Handle(It.IsAny<ClientActionContext>(), It.IsAny<HttpRequestException>()),
-                Times.Exactly(1));
+            ErrorHandling.Verify(h => h.Handle(It.IsAny<ClientActionContext>(), It.IsAny<HttpRequestException>()), Times.Exactly(1));
 
             Assert.Equal(1, MessageHandler.Called);
         }

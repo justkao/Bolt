@@ -8,11 +8,6 @@ namespace Bolt.Test.Common
         [DataMember(Order = 1)]
         public bool BoolProperty { get; set; }
 
-        protected bool Equals(SimpleCustomType other)
-        {
-            return BoolProperty.Equals(other.BoolProperty);
-        }
-
         public override bool Equals(object obj)
         {
             if (ReferenceEquals(null, obj))
@@ -33,6 +28,11 @@ namespace Bolt.Test.Common
         public override int GetHashCode()
         {
             return BoolProperty.GetHashCode();
+        }
+
+        protected bool Equals(SimpleCustomType other)
+        {
+            return BoolProperty.Equals(other.BoolProperty);
         }
     }
 }

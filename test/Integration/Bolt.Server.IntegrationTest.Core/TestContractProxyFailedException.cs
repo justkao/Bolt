@@ -10,15 +10,15 @@ namespace Bolt.Server.IntegrationTest.Core
         {
         }
 
-        protected TestContractProxyFailedException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
-
         public TestContractProxyFailedException(string message) : base(message)
         {
         }
 
         public TestContractProxyFailedException(string message, Exception innerException) : base(message, innerException)
+        {
+        }
+
+        protected TestContractProxyFailedException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

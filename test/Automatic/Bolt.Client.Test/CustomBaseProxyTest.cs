@@ -11,13 +11,13 @@ namespace Bolt.Client.Proxy.Test
         [Fact]
         public void CreatWithCustomProxy_Ok()
         {
-            ProxyFactory factory = new ProxyFactory(typeof (CustomProxy));
+            ProxyFactory factory = new ProxyFactory(typeof(CustomProxy));
         }
 
         [Fact]
         public void CreatWithInvalidCustomProxy_Ok()
         {
-            Assert.Throws<ArgumentException>(()=>new ProxyFactory(typeof(string)));
+            Assert.Throws<ArgumentException>(() => new ProxyFactory(typeof(string)));
         }
 
         [Fact]
@@ -38,7 +38,7 @@ namespace Bolt.Client.Proxy.Test
 
             IDummyInterface proxy = factory.CreateProxy<IDummyInterface>(pipeline.Object);
             Assert.Equal(10, proxy.Execute(false));
-            Assert.True(((CustomProxy) proxy).Executed);
+            Assert.True(((CustomProxy)proxy).Executed);
         }
 
         [Fact]
@@ -74,6 +74,8 @@ namespace Bolt.Client.Proxy.Test
 
         public class CustomProxy : ProxyBase
         {
+            public bool Executed { get; set; }
+
             public virtual int Execute(bool throwError)
             {
                 if (throwError)
@@ -83,8 +85,6 @@ namespace Bolt.Client.Proxy.Test
                 Executed = true;
                 return 10;
             }
-
-            public bool Executed { get; set; }
-        } 
+        }
     }
 }

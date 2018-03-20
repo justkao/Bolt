@@ -38,6 +38,8 @@ namespace Bolt.Tools.Generators
 
         public bool ForceFullTypeNames { get; set; }
 
+        public List<Assembly> Assemblies { get; set; }
+
         public virtual string FormatType(ClassDescriptor descriptor)
         {
             if (_namespaces.Contains(descriptor.Namespace))
@@ -65,8 +67,6 @@ namespace Bolt.Tools.Generators
         {
             return _namespaces.Distinct().OrderBy(n => n).Distinct().ToList();
         }
-
-        public List<Assembly> Assemblies { get; set; }
 
         public Type GetType(string name)
         {

@@ -194,7 +194,7 @@ namespace Bolt.Client.Test
             [InlineData(false, ErrorHandlingResult.Rethrow)]
             [InlineData(false, ErrorHandlingResult.Recover)]
             [Theory]
-            public async Task Execute_ThrowsError_Handle(bool recoverableProxy, ErrorHandlingResult  handlingResult)
+            public async Task Execute_ThrowsError_Handle(bool recoverableProxy, ErrorHandlingResult handlingResult)
             {
                 var pipeline = CreatePipeline(
                       (next, ctxt) =>

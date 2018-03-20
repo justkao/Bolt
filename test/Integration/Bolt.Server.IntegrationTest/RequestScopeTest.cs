@@ -13,6 +13,10 @@ namespace Bolt.Server.IntegrationTest
 {
     public class RequestScopeTest : IntegrationTestBase, ITestContext
     {
+        public object Instance => this;
+
+        protected internal Mock<IDummyContract> Callback { get; set; }
+
         [Fact]
         public void Execute_WithTimeout_EnsureTimeoutException()
         {
@@ -43,14 +47,13 @@ namespace Bolt.Server.IntegrationTest
                     Task.Delay(TimeSpan.FromSeconds(4)).GetAwaiter().GetResult();
                 }).Verifiable();
 
-            using (new RequestScope(cancellation:source.Token))
+            using (new RequestScope(cancellation: source.Token))
             {
                 Assert.Throws<OperationCanceledException>(() => CreateChannel().OnExecute(null));
             }
 
             Callback.Verify();
         }
-
 
         protected override void ConfigureServices(IServiceCollection services)
         {
@@ -68,8 +71,6 @@ namespace Bolt.Server.IntegrationTest
                     });
         }
 
-        protected internal Mock<IDummyContract> Callback { get; set; }
-
         protected virtual IDummyContract CreateChannel()
         {
             return ClientConfiguration.CreateProxy<IDummyContract>(ServerUrl);
@@ -77,19 +78,17 @@ namespace Bolt.Server.IntegrationTest
 
         public class DummyContract : IDummyContract
         {
+            private readonly ITestContext _context;
+
             public DummyContract(ITestContext context)
             {
                 _context = context;
             }
-
-            private readonly ITestContext _context;
 
             public void OnExecute(object context)
             {
                 ((RequestScopeTest)_context.Instance).Callback.Object.OnExecute(this);
             }
         }
-
-        public object Instance => this;
     }
 }

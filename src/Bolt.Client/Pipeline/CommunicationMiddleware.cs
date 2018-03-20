@@ -27,12 +27,12 @@ namespace Bolt.Client.Pipeline
 
         public override async Task InvokeAsync(ClientActionContext context)
         {
+            var timeout = GetResponseTimeout(context, ResponseTimeout);
+            var cancellation = GetCancellationToken(context.RequestAborted);
+
             context.GetRequestOrThrow().Headers.Connection.Add("Keep-Alive");
             context.GetRequestOrThrow().Method = HttpMethod.Post;
-            context.Response =
-                await
-                    _handler.SendAsync(context.Request, GetCancellationToken(context.RequestAborted),
-                        GetResponseTimeout(context, ResponseTimeout)).ConfigureAwait(false);
+            context.Response = await _handler.SendAsync(context.Request, cancellation, timeout).ConfigureAwait(false);
             await Next(context).ConfigureAwait(false);
         }
 
