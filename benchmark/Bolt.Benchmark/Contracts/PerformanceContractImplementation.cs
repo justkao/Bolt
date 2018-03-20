@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -26,6 +27,8 @@ namespace Bolt.Benchmark.Contracts
 
         private static readonly Task<IEnumerable<Person>> CompletedLarge =
             Task.FromResult((IEnumerable<Person>)Enumerable.Range(0, 100).Select(Person.Create).ToList());
+
+        private static readonly ConcurrentDictionary<int, Task<IEnumerable<Person>>> CompletedCachedLarge = new ConcurrentDictionary<int, Task<IEnumerable<Person>>>();
 
         public Task Method_Async()
         {
@@ -102,6 +105,11 @@ namespace Bolt.Benchmark.Contracts
             {
                 throw new InvalidOperationException("Forced outer error", e);
             }
+        }
+
+        public Task<IEnumerable<Person>> Return_Large_Cached_Async(int count)
+        {
+            return CompletedCachedLarge.GetOrAdd(count, k => Task.FromResult<IEnumerable<Person>>(Enumerable.Range(0, k).Select(Person.Create).ToList()));
         }
     }
 }

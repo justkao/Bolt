@@ -36,11 +36,14 @@ namespace Bolt.Performance.Core.Benchmark
             else
             {
                 Add(new DummyEporter());
+                Add(JsonExporter.Brief);
             }
 
             Add(StatisticColumn.OperationsPerSecond);
             Add(DefaultColumnProviders.Instance);
             Add(new TagColumn("Version", name => version.ToString()));
+            Add(MemoryDiagnoser.Default);
+
             if (!silent)
             {
                 Add(ConsoleLogger.Default);
@@ -61,7 +64,6 @@ namespace Bolt.Performance.Core.Benchmark
             else
             {
                 Add(JitOptimizationsValidator.FailOnError);
-                Add(MemoryDiagnoser.Default);
 
                 Add(Job.Core
                     .With(CsProjCoreToolchain.From(NetCoreAppSettings.NetCoreApp20))

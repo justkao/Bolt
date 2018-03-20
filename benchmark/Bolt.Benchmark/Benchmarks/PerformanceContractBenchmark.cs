@@ -24,6 +24,7 @@ namespace Bolt.Benchmark.Benchmarks
         private TestServer _runningServer;
         private Person _person;
         private List<Person> _large;
+        private List<Person> _veryLarge;
         private DateTime _dateTime;
 
         public ClientConfiguration ClientConfiguration { get; private set; }
@@ -38,6 +39,8 @@ namespace Bolt.Benchmark.Benchmarks
         {
             _person = Person.Create(10);
             _large = Enumerable.Repeat(_person, 100).ToList();
+            _veryLarge = Enumerable.Repeat(_person, 10000).ToList();
+
             _dateTime = DateTime.UtcNow;
 
             _runningServer = new TestServer(new WebHostBuilder().ConfigureLogging(ConfigureLog).Configure(Configure).ConfigureServices(ConfigureServices));
@@ -147,6 +150,18 @@ namespace Bolt.Benchmark.Benchmarks
             catch (InvalidOperationException)
             {
             }
+        }
+
+        [Benchmark]
+        public Task Return_Very_Large_Async()
+        {
+            return Proxy.Return_Large_Cached_Async(50000);
+        }
+
+        [Benchmark]
+        public Task Method_Very_Large_Async()
+        {
+            return Proxy.Method_Large_Async(_veryLarge);
         }
 
         private void ConfigureServices(IServiceCollection services)

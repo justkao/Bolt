@@ -32,6 +32,8 @@ namespace Bolt.Benchmark.Contracts
 
         Task<IEnumerable<Person>> Return_Large_Async();
 
+        Task<IEnumerable<Person>> Return_Large_Cached_Async(int count);
+
         Task Method_ThrowsErrorAsync();
     }
 }
