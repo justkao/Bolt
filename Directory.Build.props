@@ -18,6 +18,7 @@
     <NewtonsoftVersion>11.0.1</NewtonsoftVersion>
     <CommandLineVersion>1.1.1</CommandLineVersion>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodeRules.ruleset</CodeAnalysisRuleSet>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

@@ -5,6 +5,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Exporters;
+using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
 using BenchmarkDotNet.Reports;
@@ -30,6 +31,7 @@ namespace Bolt.Performance.Core.Benchmark
                 }
 
                 Add(MarkdownExporter.GitHub);
+                Add(JsonExporter.Brief);
             }
             else
             {

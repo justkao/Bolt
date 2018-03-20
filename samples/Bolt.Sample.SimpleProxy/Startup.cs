@@ -21,6 +21,7 @@ namespace Bolt.Sample.SimpleProxy
             {
                 ILoggerFactory factory = builder.ApplicationServices.GetRequiredService<ILoggerFactory>();
                 factory.AddConsole(LogLevel.Debug);
+
                 // we will add IDummyContract endpoint to Bolt
                 builder.UseBolt(r => r.Use<IDummyContract, DummyContract>());
             }

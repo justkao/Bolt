@@ -40,6 +40,7 @@ namespace Bolt.Sample.SimpleProxy
             for (int i = 0; i < 10; i++)
             {
                 logger.LogInformation("Client: Sending {0}", i);
+
                 // we can add timeout and CancellationToken to each Bolt call
                 using (new RequestScope(TimeSpan.FromSeconds(5), cancellationToken))
                 {

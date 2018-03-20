@@ -13,7 +13,7 @@ namespace Bolt.Sample.ContentProtection
 {
     public partial class Program
     {
-        private static int Result;
+        private static int _result;
 
         public static int Main(string[] args)
         {
@@ -32,7 +32,7 @@ namespace Bolt.Sample.ContentProtection
             });
 
             server.RunAsync(cancellation.Token).GetAwaiter().GetResult();
-            return Result;
+            return _result;
         }
 
         private static async Task TestBoltAsync(ILogger<Program> logger, ISerializer serializer, CancellationToken cancellationToken)
@@ -57,7 +57,7 @@ namespace Bolt.Sample.ContentProtection
                 catch (Exception e)
                 {
                     logger.LogInformation("Client: Error {0}", e.Message);
-                    Result = 1;
+                    _result = 1;
                 }
 
                 logger.LogInformation("---------------------------------------------");
