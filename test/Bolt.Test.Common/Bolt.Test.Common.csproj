@@ -3,5 +3,10 @@
   <PropertyGroup>
     <TargetFramework>$(TargetFramework)</TargetFramework>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Bolt.Core\Bolt.Core.csproj" />
+  </ItemGroup>
   
 </Project>
+    

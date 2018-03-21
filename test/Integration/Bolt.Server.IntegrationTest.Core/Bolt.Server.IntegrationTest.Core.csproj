@@ -1,8 +1,0 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Bolt.Core\Bolt.Core.csproj" />
-    <ProjectReference Include="..\..\Common\Bolt.Test.Common\Bolt.Test.Common.csproj" />
-  </ItemGroup>
-  
-</Project>

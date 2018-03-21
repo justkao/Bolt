@@ -12,13 +12,14 @@
     <VersionSuffix Condition="'$(VersionSuffix)'!='' AND '$(BuildNumber)' != ''">$(VersionSuffix)-$(BuildNumber)</VersionSuffix>
     <Authors>Martin Tomka</Authors>
     <WarningsAsErrors>true</WarningsAsErrors>
-    <TargetFramework>netstandard2.0</TargetFramework>
     <AspNetCoreVersion>2.0.0</AspNetCoreVersion>
+    <NetStandardVersion>netstandard2.0</NetStandardVersion>
     <NetCoreAppVersion>netcoreapp2.0</NetCoreAppVersion>
     <NewtonsoftVersion>11.0.1</NewtonsoftVersion>
     <CommandLineVersion>1.1.1</CommandLineVersion>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodeRules.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <TargetFramework>$(NetStandardVersion)</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>

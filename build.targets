@@ -34,8 +34,7 @@
 
   <Target Name="RunTests">
     <ItemGroup>
-      <TestProjectPath Include="test/automatic/**/*.csproj"/>
-      <TestProjectPath Include="test/integration/Bolt.Server.IntegrationTest/*.csproj"/>
+      <TestProjectPath Include="test/**/*.csproj" Exclude="test/Bolt.Test.Common/*.csproj" />
     </ItemGroup>
 
     <Exec Command="dotnet test %(TestProjectPath.Identity)" />
@@ -49,11 +48,11 @@
 
   <Target Name="GenerateInterfaces">
     <ItemGroup>
-      <InterfaceAssemblies Include="$(MSBuildThisFileDirectory)test\Integration\Bolt.Server.IntegrationTest.Core\bin\**\Bolt.Server.IntegrationTest.Core.dll"/>
+      <InterfaceAssemblies Include="$(MSBuildThisFileDirectory)test\Bolt.Test.Common\bin\**\**\Bolt.Test.Common.dll"/>
     </ItemGroup>
-    <Message Importance="high" Text="Generating interfaces ... "/>
+    <Message Importance="high" Text="Generating interfaces from assembly '%(InterfaceAssemblies.Identity)' "/>
 
-    <Exec Command='dotnet run -p src\Bolt.Tools\Bolt.Tools.csproj code "%(InterfaceAssemblies.Identity)" --contract ITestContract --contract ITestContractStateFull --output "$(MSBuildThisFileDirectory)test\Integration\Bolt.Server.IntegrationTest\Generated" ' StandardOutputImportance="low" StandardErrorImportance="low" />
+    <Exec Command='dotnet run -p src\Bolt.Tools\Bolt.Tools.csproj code "%(InterfaceAssemblies.Identity)" --contract ITestContract --contract ITestContractStateFull --output "$(MSBuildThisFileDirectory)test\Bolt.Server.IntegrationTest\Generated" ' StandardOutputImportance="low" StandardErrorImportance="low" />
   </Target>
 
   <Target Name="RunBenchmark">

@@ -1,0 +1,13 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>$(NetCoreAppVersion)</TargetFramework>
+    <IsTestProject>true</IsTestProject>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Bolt.Client\Bolt.Client.csproj" />
+    <ProjectReference Include="..\Bolt.Test.Common\Bolt.Test.Common.csproj" />
+  </ItemGroup>
+  
+</Project>
