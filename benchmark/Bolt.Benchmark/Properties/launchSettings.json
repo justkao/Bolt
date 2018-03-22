@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Bolt.Benchmark": {
+      "commandName": "Project",
+      "commandLineArgs": "QuickPerformance"
+    }
+  }
+}

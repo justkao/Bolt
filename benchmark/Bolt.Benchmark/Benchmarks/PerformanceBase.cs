@@ -5,9 +5,9 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Attributes.Columns;
+using BenchmarkDotNet.Configs;
 using Bolt.Benchmark.Contracts;
 using Bolt.Client;
-using Bolt.Serialization;
 using Bolt.Serialization.MessagePack;
 using Bolt.Server;
 using Microsoft.AspNetCore.Builder;
@@ -19,7 +19,7 @@ using Microsoft.Extensions.Logging;
 namespace Bolt.Benchmark.Benchmarks
 {
     [RankColumn]
-    public class PerformanceContractBenchmark
+    public abstract class PerformanceBase
     {
         private TestServer _runningServer;
         private Person _person;
@@ -34,12 +34,16 @@ namespace Bolt.Benchmark.Benchmarks
         [Params(true, false)]
         public bool UseMessagePack { get; set; }
 
+        protected virtual int VeryLargeMethodParamters => 10000;
+
+        protected virtual int VeryLargeReturnCount => 50000;
+
         [GlobalSetup]
         public void GlobalSetup()
         {
             _person = Person.Create(10);
             _large = Enumerable.Repeat(_person, 100).ToList();
-            _veryLarge = Enumerable.Repeat(_person, 10000).ToList();
+            _veryLarge = Enumerable.Repeat(_person, VeryLargeMethodParamters).ToList();
 
             _dateTime = DateTime.UtcNow;
 
@@ -155,7 +159,7 @@ namespace Bolt.Benchmark.Benchmarks
         [Benchmark]
         public Task Return_Very_Large_Async()
         {
-            return Proxy.Return_Large_Cached_Async(50000);
+            return Proxy.Return_Large_Cached_Async(VeryLargeReturnCount);
         }
 
         [Benchmark]

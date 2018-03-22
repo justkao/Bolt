@@ -1,5 +1,7 @@
 ﻿using System.Linq;
 using System.Net;
+using System.Reflection;
+using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using Bolt.Benchmark.Benchmarks;
 using Bolt.Performance.Core.Benchmark;
@@ -13,56 +15,36 @@ namespace Bolt.Benchmark
 
         public static int Main(params string[] args)
         {
-            ServicePointManager.DefaultConnectionLimit = 1000;
-            ServicePointManager.MaxServicePoints = 1000;
-
-            var app = new CommandLineApplication();
-            app.Name = "bolt";
-            app.OnExecute(() =>
+            var summaries = BenchmarkSwitcher.FromAssembly(typeof(Program).GetTypeInfo().Assembly).Run(args, new ManualConfig());
+            foreach (var summary in summaries)
             {
-                app.ShowHelp();
-                return 2;
-            });
-
-            app.Command("benchmark", c =>
-            {
-                var output = c.Option("--output <PATH>", "Output directory where performance report will be stored.", CommandOptionType.SingleValue);
-                var quick = c.Option("--quick", "Generates asynchronous version of methods.", CommandOptionType.NoValue);
-                var silent = c.Option("--silent", "Generates asynchronous version of methods.", CommandOptionType.NoValue);
-
-                c.OnExecute(() =>
+                if (summary.HasCriticalValidationErrors)
                 {
-                    var summary = BenchmarkRunner.Run<PerformanceContractBenchmark>(new PerformanceContractBenchmarkConfig(quick.HasValue(), silent.HasValue(), output.Value()));
+                    return Fail(summary, nameof(summary.HasCriticalValidationErrors));
+                }
 
-                    if (summary.HasCriticalValidationErrors)
+                foreach (var report in summary.Reports)
+                {
+                    if (!report.BuildResult.IsGenerateSuccess)
                     {
-                        return Fail(summary, nameof(summary.HasCriticalValidationErrors));
+                        return Fail(report, nameof(report.BuildResult.IsGenerateSuccess));
                     }
 
-                    foreach (var report in summary.Reports)
+                    if (!report.BuildResult.IsBuildSuccess)
                     {
-                        if (!report.BuildResult.IsGenerateSuccess)
-                        {
-                            return Fail(report, nameof(report.BuildResult.IsGenerateSuccess));
-                        }
-
-                        if (!report.BuildResult.IsBuildSuccess)
-                        {
-                            return Fail(report, nameof(report.BuildResult.IsBuildSuccess));
-                        }
-
-                        if (!report.AllMeasurements.Any())
-                        {
-                            return Fail(report, nameof(report.AllMeasurements));
-                        }
+                        return Fail(report, nameof(report.BuildResult.IsBuildSuccess));
                     }
 
-                    Console.WriteLine(summary.ToString());
-                    return 0;
-                });
-            });
+                    if (!report.AllMeasurements.Any())
+                    {
+                        return Fail(report, nameof(report.AllMeasurements));
+                    }
+                }
 
-            return app.Execute(args);
+                Console.WriteLine(summary.ToString());
+            }
+
+            return 0;
         }
 
         private static int Fail(object o, string message)
