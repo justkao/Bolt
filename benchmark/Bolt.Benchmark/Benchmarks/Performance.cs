@@ -5,6 +5,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Json;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Loggers;
+using BenchmarkDotNet.Toolchains;
 using BenchmarkDotNet.Toolchains.CsProj;
 using BenchmarkDotNet.Toolchains.DotNetCli;
 using BenchmarkDotNet.Validators;
@@ -21,8 +22,14 @@ namespace Bolt.Performance.Core.Benchmark
             {
                 Add(JitOptimizationsValidator.FailOnError);
 
-                Add(Job.Core
-                    .With(CsProjCoreToolchain.From(NetCoreAppSettings.NetCoreApp20))
+                AddJob(Job.Core, CsProjCoreToolchain.NetCoreApp20);
+                AddJob(Job.Core, CsProjCoreToolchain.NetCoreApp21);
+                AddJob(Job.Clr, CsProjClassicNetToolchain.Net461);
+            }
+
+            private void AddJob(Job job, IToolchain toolchain)
+            {
+                Add(job.With(toolchain)
                     .WithRemoveOutliers(false)
                     .With(new GcMode { Server = true })
                     .With(RunStrategy.Throughput)

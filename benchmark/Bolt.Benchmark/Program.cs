@@ -1,18 +1,16 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Running;
 using Bolt.Benchmark.Benchmarks;
 using Bolt.Performance.Core.Benchmark;
-using Microsoft.Extensions.CommandLineUtils;
 
 namespace Bolt.Benchmark
 {
     public static class Program
     {
-        private static readonly AnsiConsole Console = AnsiConsole.GetOutput(true);
-
         public static int Main(params string[] args)
         {
             var summaries = BenchmarkSwitcher.FromAssembly(typeof(Program).GetTypeInfo().Assembly).Run(args, new ManualConfig());
