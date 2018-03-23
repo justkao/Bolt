@@ -54,7 +54,7 @@
     </ItemGroup>
     <Message Importance="high" Text="Generating interfaces from assembly '%(InterfaceAssemblies.Identity)' "/>
 
-    <Exec Command='dotnet run -p src\Bolt.Tools\Bolt.Tools.csproj code "%(InterfaceAssemblies.Identity)" --contract ITestContract --contract ITestContractStateFull --output "$(MSBuildThisFileDirectory)test\Bolt.Server.IntegrationTest\Generated" -f $(NetCoreAppVersion)' StandardOutputImportance="low" StandardErrorImportance="low" />
+    <Exec Command='dotnet run -p src\dotnet-bolt\dotnet-bolt.csproj code "%(InterfaceAssemblies.Identity)" --contract ITestContract --contract ITestContractStateFull --output "$(MSBuildThisFileDirectory)test\Bolt.Server.IntegrationTest\Generated" -f $(NetCoreAppVersion)' StandardOutputImportance="low" StandardErrorImportance="low" />
   </Target>
 
   <Target Name="RunBenchmark">

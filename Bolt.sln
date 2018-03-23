@@ -25,7 +25,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bolt.Sample.DistributedSess
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bolt.Sample.SimpleProxy", "samples\Bolt.Sample.SimpleProxy\Bolt.Sample.SimpleProxy.csproj", "{F8089028-54BE-40A0-8EFF-65AB546FF60A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bolt.Tools", "src\Bolt.Tools\Bolt.Tools.csproj", "{46F1FE6A-D6D8-4481-A9E5-4FF2AB03A85C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "dotnet-bolt", "src\dotnet-bolt\dotnet-bolt.csproj", "{46F1FE6A-D6D8-4481-A9E5-4FF2AB03A85C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C2298C3F-0DFD-4337-A1AC-DB6BB117B4A9}"
 	ProjectSection(SolutionItems) = preProject
