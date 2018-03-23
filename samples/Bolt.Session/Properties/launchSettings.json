@@ -1,0 +1,15 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:63778/",
+      "sslPort": 0
+    }
+  },
+  "profiles": {
+    "Bolt.Sample.SimpleProxy": {
+      "commandName": "Project"
+    }
+  }
+}

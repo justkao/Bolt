@@ -22,14 +22,12 @@ namespace Bolt.Sample.DistributedSession
                     o.TableName = "Entries";
                 });
 
-            services.AddLogging();
             services.AddBolt();
         }
 
         public void Configure(IApplicationBuilder app)
         {
             app.ApplicationServices.GetRequiredService<IDistributedCache>();
-            app.ApplicationServices.GetRequiredService<ILoggerFactory>().AddConsole(LogLevel.Debug);
             app.UseBolt(
                 b =>
                     {

@@ -1,0 +1,1 @@
+﻿This sample application demostrates session aware comunication between Bolt Client and Bolt Server that is running on AspNetCore.

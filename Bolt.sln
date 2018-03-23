@@ -52,6 +52,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bolt.Server.IntegrationTest
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bolt.Server.Test", "test\Bolt.Server.Test\Bolt.Server.Test.csproj", "{A6CF483E-5EE8-4E0C-A888-22DEF6522711}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bolt.Session", "samples\Bolt.Session\Bolt.Session.csproj", "{082E4A00-4B85-4E57-8A8D-CB22A4942263}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -218,6 +220,18 @@ Global
 		{A6CF483E-5EE8-4E0C-A888-22DEF6522711}.Release|x64.Build.0 = Release|Any CPU
 		{A6CF483E-5EE8-4E0C-A888-22DEF6522711}.Release|x86.ActiveCfg = Release|Any CPU
 		{A6CF483E-5EE8-4E0C-A888-22DEF6522711}.Release|x86.Build.0 = Release|Any CPU
+		{082E4A00-4B85-4E57-8A8D-CB22A4942263}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{082E4A00-4B85-4E57-8A8D-CB22A4942263}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{082E4A00-4B85-4E57-8A8D-CB22A4942263}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{082E4A00-4B85-4E57-8A8D-CB22A4942263}.Debug|x64.Build.0 = Debug|Any CPU
+		{082E4A00-4B85-4E57-8A8D-CB22A4942263}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{082E4A00-4B85-4E57-8A8D-CB22A4942263}.Debug|x86.Build.0 = Debug|Any CPU
+		{082E4A00-4B85-4E57-8A8D-CB22A4942263}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{082E4A00-4B85-4E57-8A8D-CB22A4942263}.Release|Any CPU.Build.0 = Release|Any CPU
+		{082E4A00-4B85-4E57-8A8D-CB22A4942263}.Release|x64.ActiveCfg = Release|Any CPU
+		{082E4A00-4B85-4E57-8A8D-CB22A4942263}.Release|x64.Build.0 = Release|Any CPU
+		{082E4A00-4B85-4E57-8A8D-CB22A4942263}.Release|x86.ActiveCfg = Release|Any CPU
+		{082E4A00-4B85-4E57-8A8D-CB22A4942263}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -232,6 +246,7 @@ Global
 		{CCC95CAF-B422-494F-BC62-253001AB8AC2} = {5D2CA858-5B91-4B30-BB27-274BB66F5C42}
 		{938DCD04-C42C-4A57-B603-2F10C9C4DAD0} = {5D2CA858-5B91-4B30-BB27-274BB66F5C42}
 		{A6CF483E-5EE8-4E0C-A888-22DEF6522711} = {5D2CA858-5B91-4B30-BB27-274BB66F5C42}
+		{082E4A00-4B85-4E57-8A8D-CB22A4942263} = {87264C94-6FE7-4CCC-B955-A99B3845C8F3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {873626A0-4799-44C5-8B95-1853F42476A4}
