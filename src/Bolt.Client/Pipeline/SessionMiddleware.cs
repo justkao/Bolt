@@ -214,10 +214,9 @@ namespace Bolt.Client.Pipeline
                         {
                             // we can not reuse initialization parameters, so throw
                             throw new BoltClientException(
-                                "Proxy need to be initialized before it can be used.",
-                                ClientErrorCode.ProxyNotInitialized,
-                                context.Action.Name,
-                                null);
+                                $"Action '{context.Action.Name}' on contract '{context.Contract.NormalizedName}' cannot be executed because proxy that is used for communication has not been initialized. Initialize the proxy first by explicitely calling '{initSessionContext.Action.Name}' action with proper parameters.",
+                                ClientErrorCode.InvalidInitSessionParameters,
+                                context.Action.Name);
                         }
                     }
 
@@ -239,7 +238,7 @@ namespace Bolt.Client.Pipeline
                     {
                         // we can not reuse initialization parameters, so throw
                         throw new BoltClientException(
-                            $"Proxy is beeing initialized with invalid parameters. If session initialization has non empty parameters you should initialize it first by calling '{initSessionContext.Action.Name}' with proper parameters.",
+                            $"Proxy initialization action '{context.Action.Name}' on contract '{context.Contract.NormalizedName}' cannot be executed because the provided parameters are invalid.",
                             ClientErrorCode.InvalidInitSessionParameters,
                             context.Action.Name,
                             e);
@@ -270,12 +269,7 @@ namespace Bolt.Client.Pipeline
                 catch (Exception e)
                 {
                     Exception handled = HandleOpenConnectionError(initSessionContext, e, sessionMetadata);
-                    if (handled == e)
-                    {
-                        throw;
-                    }
-
-                    if (handled != null)
+                    if (handled != null && handled != e)
                     {
                         throw handled;
                     }
