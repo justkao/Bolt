@@ -27,7 +27,8 @@ namespace Bolt.Server
             var config = new ServerRuntimeConfiguration(bolt.Configuration);
             var factory = new MemorySessionFactory(
                 config,
-                bolt.ApplicationServices.GetRequiredService<IServerSessionHandler>());
+                bolt.ApplicationServices.GetRequiredService<IServerSessionHandler>(),
+                bolt.ApplicationServices.GetRequiredService<ILogger<MemorySessionFactory>>());
 
             return bolt.Use<TContract>(new SessionInstanceProvider<TContractImplementation>(factory), configure, config);
         }

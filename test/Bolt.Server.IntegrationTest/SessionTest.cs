@@ -9,6 +9,8 @@ using Bolt.Server.InstanceProviders;
 using Bolt.Server.IntegrationTest.Core;
 using Bolt.Server.Session;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -114,7 +116,7 @@ namespace Bolt.Server.IntegrationTest
 
             await client.GetStateAsync();
             string sessionId1 = session.GetSession(client).SessionId;
-            Factory.Destroy(sessionId1);
+            await Factory.DestroyAsync(sessionId1);
 
             try
             {
@@ -141,7 +143,7 @@ namespace Bolt.Server.IntegrationTest
             string sessionId = session.GetSession(client).SessionId;
 
             SessionInstanceProvider instanceProvider = InstanceProvider;
-            Factory.Destroy(sessionId);
+            await Factory.DestroyAsync(sessionId);
 
             await client.GetStateAsync();
         }
@@ -178,7 +180,7 @@ namespace Bolt.Server.IntegrationTest
         }
 
         [Fact]
-        public void SessionNotFound_EnsureBoltServerExceptionIsThrown()
+        public async Task SessionNotFound_EnsureBoltServerExceptionIsThrown()
         {
             var pipeline = CreatePipeline();
             var session = pipeline.Find<SessionMiddleware>();
@@ -186,7 +188,7 @@ namespace Bolt.Server.IntegrationTest
 
             client.GetState();
             string sessionId1 = session.GetSession(client).SessionId;
-            Factory.Destroy(sessionId1);
+            await Factory.DestroyAsync(sessionId1);
 
             try
             {
@@ -199,7 +201,7 @@ namespace Bolt.Server.IntegrationTest
         }
 
         [Fact]
-        public void SessionNotFound_RetriesEnabled_EnsureNewSession()
+        public async Task SessionNotFound_RetriesEnabled_EnsureNewSession()
         {
             var pipeline = CreatePipeline(1);
             var session = pipeline.Find<SessionMiddleware>();
@@ -209,13 +211,13 @@ namespace Bolt.Server.IntegrationTest
             string sessionId = session.GetSession(client).SessionId;
 
             SessionInstanceProvider instanceProvider = InstanceProvider;
-            Factory.Destroy(sessionId);
+            await Factory.DestroyAsync(sessionId);
 
             client.GetState();
         }
 
         [Fact]
-        public void CloseSession_EnsureInstanceReleasedOnServer()
+        public async Task CloseSession_EnsureInstanceReleasedOnServer()
         {
             var pipeline = CreatePipeline();
             var session = pipeline.Find<SessionMiddleware>();
@@ -225,7 +227,7 @@ namespace Bolt.Server.IntegrationTest
             string sessionId = session.GetSession(client).SessionId;
             (client as IDisposable).Dispose();
             SessionInstanceProvider instanceProvider = InstanceProvider;
-            Assert.False(Factory.Destroy(sessionId));
+            Assert.False(await Factory.DestroyAsync(sessionId));
         }
 
         [Fact]
@@ -239,7 +241,7 @@ namespace Bolt.Server.IntegrationTest
             string sessionId = session.GetSession(client).SessionId;
             await (client as IProxy).CloseAsync();
             SessionInstanceProvider instanceProvider = InstanceProvider;
-            Assert.False(Factory.Destroy(sessionId));
+            Assert.False(await Factory.DestroyAsync(sessionId));
         }
 
         [Fact]

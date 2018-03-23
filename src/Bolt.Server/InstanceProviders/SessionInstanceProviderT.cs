@@ -10,12 +10,7 @@ namespace Bolt.Server.InstanceProviders
     {
         private ObjectFactory _factory;
 
-        public SessionInstanceProvider(BoltServerOptions options)
-            : base(new MemorySessionFactory(options))
-        {
-        }
-
-        public SessionInstanceProvider(ISessionFactory sessionFactory = null)
+        public SessionInstanceProvider(ISessionFactory sessionFactory)
             : base(sessionFactory)
         {
         }
