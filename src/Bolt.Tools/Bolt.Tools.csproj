@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <TargetFrameworks>$(NetCoreAppVersion);$(NetClrVersion)</TargetFrameworks>
+    <TargetFramework></TargetFramework>
     <Description>Bolt Tools used to generate client-side code.</Description>
     <AssemblyName>dotnet-bolt</AssemblyName>
     <PackageType>DotnetTool</PackageType>

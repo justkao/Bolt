@@ -16,6 +16,7 @@
     <NetStandardVersion>netstandard2.0</NetStandardVersion>
     <NetCoreAppVersion>netcoreapp2.0</NetCoreAppVersion>
     <NewtonsoftVersion>11.0.1</NewtonsoftVersion>
+    <NetClrVersion>net461</NetClrVersion>
     <CommandLineVersion>1.1.1</CommandLineVersion>
     <CodeAnalysisRuleSet>$(MSBuildThisFileDirectory)CodeRules.ruleset</CodeAnalysisRuleSet>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
