@@ -35,7 +35,7 @@ namespace Bolt.Server.Test
             SesionHandler.Setup(v => v.Initialize(ctxt)).Returns(sessionId).Verifiable();
             SesionHandler.Setup(v => v.GetIdentifier(ctxt)).Returns(sessionId).Verifiable();
 
-            var result = await Subject.CreateAsync(ctxt, Instance);
+            var result = await Subject.CreateAsync(ctxt, () => Instance);
             Assert.NotNull(result);
 
             SesionHandler.Verify();
@@ -50,7 +50,7 @@ namespace Bolt.Server.Test
             SesionHandler.Setup(v => v.Initialize(ctxt)).Returns(sessionId).Verifiable();
             SesionHandler.Setup(v => v.GetIdentifier(ctxt)).Returns(sessionId).Verifiable();
 
-            await Subject.CreateAsync(ctxt, Instance);
+            await Subject.CreateAsync(ctxt, () => Instance);
             Assert.Equal(1, Subject.Count);
         }
 
@@ -173,7 +173,7 @@ namespace Bolt.Server.Test
             SesionHandler.Setup(v => v.Initialize(ctxt)).Returns(sessionId);
             SesionHandler.Setup(v => v.GetIdentifier(ctxt)).Returns(sessionId);
 
-            return await Subject.CreateAsync(ctxt, Instance);
+            return await Subject.CreateAsync(ctxt, () => Instance);
         }
 
         private class InstanceInternal : IDisposable

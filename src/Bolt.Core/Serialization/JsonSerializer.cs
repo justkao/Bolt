@@ -26,13 +26,14 @@ namespace Bolt.Serialization
 
         public Newtonsoft.Json.JsonSerializer Serializer { get; }
 
-        protected override async Task DoWriteAsync(Stream stream, object value, Action<long> onContentLength)
+        protected override Task DoWriteAsync(Stream stream, object value, Action<long> onContentLength)
         {
             using (StreamWriter writer = CreateStreamWriter(stream))
             {
                 Serializer.Serialize(writer, value);
-                await writer.FlushAsync().ConfigureAwait(false);
             }
+
+            return Task.CompletedTask;
         }
 
         protected override Task<object> DoReadAsync(Stream stream, Type valueType, long contentLength)
@@ -43,14 +44,14 @@ namespace Bolt.Serialization
             }
         }
 
-        protected override async Task DoWriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] values, Action<long> onContentLength)
+        protected override Task DoWriteParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, object[] values, Action<long> onContentLength)
         {
             using (StreamWriter streamWriter = CreateStreamWriter(stream))
             {
                 Serializer.Serialize(streamWriter, values);
-
-                await streamWriter.FlushAsync().ConfigureAwait(false);
             }
+
+            return Task.CompletedTask;
         }
 
         protected override Task<object[]> DoReadParametersAsync(Stream stream, IReadOnlyList<ParameterMetadata> parameters, long contentLength)

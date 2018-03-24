@@ -26,7 +26,7 @@ namespace Bolt.Server.Session
 
         public TimeSpan SessionTimeout => _options.Value.SessionTimeout;
 
-        public Task<IContractSession> CreateAsync(HttpContext context, object instance)
+        public Task<IContractSession> CreateAsync(HttpContext context, Func<object> instanceFactory)
         {
             var sessionId = _sessionHandler.GetIdentifier(context);
             if (sessionId != null)
@@ -41,10 +41,10 @@ namespace Bolt.Server.Session
             context.Features.Set<ISessionFeature>(new SessionFeature());
             context.Session = session;
 
-            return Task.FromResult((IContractSession)new DistributedContractSession(sessionId, instance, session));
+            return Task.FromResult((IContractSession)new DistributedContractSession(sessionId, instanceFactory(), session));
         }
 
-        public async Task<IContractSession> GetExistingAsync(HttpContext context, Func<Task<object>> instanceFactory)
+        public Task<IContractSession> GetExistingAsync(HttpContext context, Func<object> instanceFactory)
         {
             var sessionId = _sessionHandler.GetIdentifier(context);
 
@@ -58,7 +58,7 @@ namespace Bolt.Server.Session
             context.Features.Set<ISessionFeature>(new SessionFeature());
             context.Session = session;
 
-            return new DistributedContractSession(sessionId, await instanceFactory(), session);
+            return Task.FromResult<IContractSession>(new DistributedContractSession(sessionId, instanceFactory(), session));
         }
 
         private class DistributedContractSession : IDistributedContractSession

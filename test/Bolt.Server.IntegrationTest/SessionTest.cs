@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Bolt.Client;
 using Bolt.Client.Pipeline;
@@ -271,8 +272,12 @@ namespace Bolt.Server.IntegrationTest
         [Fact]
         public void ManySessions_EnsureStateSaved()
         {
-            List<ITestContractStateFullAsync> proxies =
-                Enumerable.Repeat(100, 100).Select(c => GetProxy()).ToList();
+            List<ITestContractStateFullAsync> proxies = new List<ITestContractStateFullAsync>();
+            for (int i = 0; i < 100; i++)
+            {
+                proxies.Add(GetProxy());
+                Thread.Sleep(20);
+            }
 
             for (int index = 0; index < proxies.Count; index++)
             {

@@ -12,16 +12,20 @@ namespace Bolt.Server.Session
     {
         private readonly ILogger<MemorySessionFactory> _logger;
         private readonly IOptions<BoltServerOptions> _options;
-        private readonly ConcurrentDictionary<string, ContractSession> _items = new ConcurrentDictionary<string, ContractSession>();
+        private readonly ConcurrentDictionary<string, MemoryContractSession> _items = new ConcurrentDictionary<string, MemoryContractSession>();
         private readonly IServerSessionHandler _sessionHandler;
         private TimeSpan _timeoutCheckInterval;
         private Timer _timer;
 
-        public MemorySessionFactory(IOptions<BoltServerOptions> options, IServerSessionHandler sessionHandler = null, ILogger<MemorySessionFactory> logger = null)
+        public MemorySessionFactory(IOptions<BoltServerOptions> options, IServerSessionHandler sessionHandler = null, ILoggerFactory loggerFactory = null)
         {
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _sessionHandler = sessionHandler ?? new ServerSessionHandler(options);
-            _logger = logger;
+            if (loggerFactory != null)
+            {
+                _logger = loggerFactory.CreateLogger<MemorySessionFactory>();
+            }
+
             _timeoutCheckInterval = TimeSpan.FromMinutes(1);
             ResetTimer();
         }
@@ -50,13 +54,13 @@ namespace Bolt.Server.Session
             }
         }
 
-        public async Task<IContractSession> CreateAsync(HttpContext context, object instance)
+        public async Task<IContractSession> CreateAsync(HttpContext context, Func<object> instanceFactory)
         {
-            ContractSession contractSession;
-            var session = _sessionHandler.GetIdentifier(context);
-            if (session != null)
+            MemoryContractSession contractSession;
+            var sessionId = _sessionHandler.GetIdentifier(context);
+            if (sessionId != null)
             {
-                if (_items.TryGetValue(session, out contractSession))
+                if (_items.TryGetValue(sessionId, out contractSession))
                 {
                     contractSession.TimeStamp = DateTime.UtcNow;
                     return contractSession;
@@ -65,16 +69,14 @@ namespace Bolt.Server.Session
                 _sessionHandler.Destroy(context);
             }
 
-            session = _sessionHandler.Initialize(context);
-            contractSession = new ContractSession(this, session, instance);
-            await OnSessionCreatingAsync(contractSession);
-
-            _items.TryAdd(session, contractSession);
+            sessionId = _sessionHandler.Initialize(context);
+            contractSession = new MemoryContractSession(this, sessionId, await CreateInstanceAsync(sessionId, instanceFactory));
+            _items[sessionId] = contractSession;
 
             return contractSession;
         }
 
-        public Task<IContractSession> GetExistingAsync(HttpContext context, Func<Task<object>> instanceFactory)
+        public Task<IContractSession> GetExistingAsync(HttpContext context, Func<object> instanceFactory)
         {
             var session = _sessionHandler.GetIdentifier(context);
 
@@ -83,7 +85,7 @@ namespace Bolt.Server.Session
                 throw new SessionHeaderNotFoundException();
             }
 
-            ContractSession contractSession;
+            MemoryContractSession contractSession;
             if (_items.TryGetValue(session, out contractSession))
             {
                 contractSession.TimeStamp = DateTime.UtcNow;
@@ -100,24 +102,12 @@ namespace Bolt.Server.Session
                 return false;
             }
 
-            ContractSession instance;
+            MemoryContractSession instance;
             if (_items.TryRemove(sessionId, out instance))
             {
                 try
                 {
-                    (instance.Instance as IDisposable)?.Dispose();
-                }
-                catch (Exception e)
-                {
-                    if (_logger != null)
-                    {
-                        _logger.LogError(e, "Failed to dispose the contract - '{0}' for session - '{1}'. This error won't cause the failure of original request however the backend code that deals with the cleanup should be investigated.", instance.InstanceType.FullName, sessionId);
-                    }
-                }
-
-                try
-                {
-                    await OnSessionDestroyedAsync(sessionId);
+                    await DestroyInstanceAsync(instance.SessionId, instance.Instance);
                 }
                 catch (Exception e)
                 {
@@ -145,13 +135,15 @@ namespace Bolt.Server.Session
             return (DateTime.UtcNow - timestamp) > SessionTimeout;
         }
 
-        protected virtual Task OnSessionDestroyedAsync(string sessionId)
+        protected virtual Task<object> CreateInstanceAsync(string sessionId, Func<object> instanceFactory)
         {
-            return Task.CompletedTask;
+            return Task.FromResult(instanceFactory());
         }
 
-        protected virtual Task OnSessionCreatingAsync(IContractSession contractSession)
+        protected virtual Task DestroyInstanceAsync(string sessionId, object instance)
         {
+            (instance as IDisposable)?.Dispose();
+
             return Task.CompletedTask;
         }
 
@@ -184,11 +176,11 @@ namespace Bolt.Server.Session
             }
         }
 
-        private class ContractSession : IContractSession
+        private class MemoryContractSession : IContractSession
         {
-            private readonly MemorySessionFactory _parent;
+            private MemorySessionFactory _parent;
 
-            public ContractSession(MemorySessionFactory parent, string session, object instance)
+            public MemoryContractSession(MemorySessionFactory parent, string session, object instance)
             {
                 _parent = parent;
                 Instance = instance;
@@ -203,7 +195,7 @@ namespace Bolt.Server.Session
 
             public string SessionId { get; }
 
-            public DateTime TimeStamp { get; set; }
+            public DateTime TimeStamp { get; internal set; }
 
             public Task CommitAsync()
             {

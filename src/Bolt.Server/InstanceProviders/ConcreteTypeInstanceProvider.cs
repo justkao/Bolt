@@ -1,18 +1,16 @@
 ﻿using System;
-using Bolt.Server.Session;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Bolt.Server.InstanceProviders
 {
-#pragma warning disable SA1649 // File name should match first type name
-    public class SessionInstanceProvider<T> : SessionInstanceProvider
-#pragma warning restore SA1649 // File name should match first type name
+    public class ConcreteTypeInstanceProvider : InstanceProvider
     {
+        private readonly Type _type;
         private ObjectFactory _factory;
 
-        public SessionInstanceProvider(ISessionFactory sessionFactory)
-            : base(sessionFactory)
+        public ConcreteTypeInstanceProvider(Type type)
         {
+            _type = type ?? throw new ArgumentNullException(nameof(type));
         }
 
         protected override object CreateInstance(ServerActionContext context, Type type)
@@ -20,7 +18,7 @@ namespace Bolt.Server.InstanceProviders
             var factory = _factory;
             if (factory == null)
             {
-                factory = ActivatorUtilities.CreateFactory(typeof(T), Array.Empty<Type>());
+                factory = ActivatorUtilities.CreateFactory(_type, Array.Empty<Type>());
                 _factory = factory;
             }
 

@@ -101,9 +101,6 @@ namespace Bolt.Server.Pipeline
             {
                 context.HttpContext.Response.ContentLength = 0;
             }
-
-            await context.HttpContext.Response.Body.FlushAsync();
-            context.HttpContext.Response.Body.Dispose();
         }
 
         protected virtual ISerializer PickSerializer(ServerActionContext context)

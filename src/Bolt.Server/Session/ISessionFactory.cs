@@ -6,8 +6,8 @@ namespace Bolt.Server.Session
 {
     public interface ISessionFactory
     {
-        Task<IContractSession> GetExistingAsync(HttpContext context, Func<Task<object>> instanceFactory);
+        Task<IContractSession> GetExistingAsync(HttpContext context, Func<object> instanceFactory);
 
-        Task<IContractSession> CreateAsync(HttpContext context, object instance);
+        Task<IContractSession> CreateAsync(HttpContext context, Func<object> instanceFactory);
     }
 }
