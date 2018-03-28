@@ -21,11 +21,16 @@ namespace Bolt.Serialization
 
         public string MediaType { get; }
 
-        public Task WriteAsync(Stream stream, object value, Action<long> onContentLength)
+        public Task WriteAsync(Stream stream, Type type, object value, Action<long> onContentLength)
         {
             if (stream == null)
             {
                 throw new ArgumentNullException(nameof(stream));
+            }
+
+            if (type == null)
+            {
+                throw new ArgumentNullException(nameof(value));
             }
 
             if (value == null)
@@ -33,7 +38,7 @@ namespace Bolt.Serialization
                 throw new ArgumentNullException(nameof(value));
             }
 
-            return DoWriteAsync(stream, value, onContentLength);
+            return DoWriteAsync(stream, type, value, onContentLength);
         }
 
         public Task<object> ReadAsync(Stream stream, Type valueType, long contentLength)
@@ -109,7 +114,7 @@ namespace Bolt.Serialization
             return values;
         }
 
-        protected abstract Task DoWriteAsync(Stream stream, object value, Action<long> onContentLength);
+        protected abstract Task DoWriteAsync(Stream stream, Type type, object value, Action<long> onContentLength);
 
         protected abstract Task<object> DoReadAsync(Stream stream, Type valueType, long contentLength);
 

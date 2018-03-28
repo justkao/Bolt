@@ -57,7 +57,7 @@ namespace Bolt.Server.Pipeline
                     return;
                 }
 
-                await context.GetSerializerOrThrow().WriteAsync(httpContext.Response.Body, wrappedException);
+                await context.GetSerializerOrThrow().WriteAsync(httpContext.Response.Body, context.Configuration.ExceptionSerializer.Type, wrappedException);
                 serializedException.Seek(0, SeekOrigin.Begin);
             }
             catch (OperationCanceledException)

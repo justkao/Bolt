@@ -24,10 +24,10 @@ namespace Bolt.Sample.ContentProtection
             _serializer = new JsonSerializer();
         }
 
-        public async Task WriteAsync(Stream stream, object value, Action<long> onContentLength)
+        public async Task WriteAsync(Stream stream, Type type, object value, Action<long> onContentLength)
         {
             MemoryStream tempStream = new MemoryStream();
-            await _serializer.WriteAsync(tempStream, value);
+            await _serializer.WriteAsync(tempStream, type, value);
             byte[] data = _protector.Protect(tempStream.ToArray());
             _logger.LogInformation("Result: Sending {0}B of protected data, Original: {1}B.", data.Length, tempStream.ToArray().Length);
             await stream.WriteAsync(data, 0, data.Length);

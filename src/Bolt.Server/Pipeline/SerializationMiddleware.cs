@@ -85,7 +85,7 @@ namespace Bolt.Server.Pipeline
                 context.HttpContext.Response.ContentType = context.Configuration.DefaultSerializer.MediaType;
                 try
                 {
-                    await context.GetSerializerOrThrow().WriteAsync(context.HttpContext.Response.Body, context.ActionResult, l => OnHandleContentLength(context, l));
+                    await context.GetSerializerOrThrow().WriteAsync(context.HttpContext.Response.Body, context.Action.ResultType, context.ActionResult, l => OnHandleContentLength(context, l));
                 }
                 catch (Exception e)
                 {

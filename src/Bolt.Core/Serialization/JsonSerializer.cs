@@ -26,7 +26,7 @@ namespace Bolt.Serialization
 
         public Newtonsoft.Json.JsonSerializer Serializer { get; }
 
-        protected override Task DoWriteAsync(Stream stream, object value, Action<long> onContentLength)
+        protected override Task DoWriteAsync(Stream stream, Type type, object value, Action<long> onContentLength)
         {
             using (StreamWriter writer = CreateStreamWriter(stream))
             {

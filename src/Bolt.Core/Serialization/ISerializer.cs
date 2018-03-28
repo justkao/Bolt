@@ -8,11 +8,11 @@ namespace Bolt.Serialization
     public interface ISerializer
     {
         /// <summary>
-        /// Type of content serializer supports.
+        /// Gets the media type of serializer.
         /// </summary>
         string MediaType { get; }
 
-        Task WriteAsync(Stream stream, object value, Action<long> onContentLength = null);
+        Task WriteAsync(Stream stream, Type type, object value, Action<long> onContentLength = null);
 
         Task<object> ReadAsync(Stream stream, Type type, long contentLength = -1);
 

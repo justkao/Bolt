@@ -192,18 +192,18 @@ namespace Bolt.Server
                         ctxt.HttpContext.Response.StatusCode = (int)HttpStatusCode.RequestTimeout;
                     }
 
-                    Logger.LogWarning(BoltLogId.RequestCancelled, "Execution of '{0}' has been aborted by client.", ctxt.Action.Name);
+                    Logger.LogWarning(BoltLogId.RequestCancelled, "Execution of action '{0}' on contract '{1}' has been aborted by client.", ctxt.Action.Name, ctxt.Contract.Name);
                 }
                 catch (Exception e)
                 {
-                    Logger.LogError(BoltLogId.RequestExecutionError, "Execution of '{0}' failed with error '{1}'", ctxt.Action.Name, e);
+                    Logger.LogError(BoltLogId.RequestExecutionError, "Execution of action '{0}' on contract '{1}' failed with error '{2}'", ctxt.Action.Name, ctxt.Contract.Name, e);
                     throw;
                 }
                 finally
                 {
                     if (watch != null)
                     {
-                        Logger.LogDebug(BoltLogId.RequestExecutionTime, "Execution of '{0}' has taken '{1}ms'", ctxt.Action.Name, watch.ElapsedMilliseconds);
+                        Logger.LogDebug(BoltLogId.RequestExecutionTime, "Execution of action '{0}' on contract '{1}' has taken '{2}ms'", ctxt.Action.Name, ctxt.Contract.Name, watch.ElapsedMilliseconds);
                     }
                 }
             }

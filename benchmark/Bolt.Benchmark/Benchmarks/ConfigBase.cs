@@ -37,5 +37,7 @@ namespace Bolt.Performance.Core.Benchmark
                 Add(RPlotExporter.Default);
             }
         }
+
+        protected bool Quick => Environment.GetCommandLineArgs().Contains("--quick");
     }
 }

@@ -11,7 +11,7 @@ namespace Bolt.Serialization.MessagePack
         {
         }
 
-        protected override Task DoWriteAsync(Stream stream, object value, Action<long> onContentLength)
+        protected override Task DoWriteAsync(Stream stream, Type type, object value, Action<long> onContentLength)
         {
             return global::MessagePack.MessagePackSerializer.Typeless.SerializeAsync(stream, value);
         }
