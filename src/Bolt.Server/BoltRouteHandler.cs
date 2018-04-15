@@ -56,7 +56,7 @@ namespace Bolt.Server
 
         public IBoltMetadataHandler MetadataHandler { get; set; }
 
-        public ReadOnlySpan<IContractInvoker> ContractInvokers => _invokers.AsReadOnlySpan();
+        public ReadOnlySpan<IContractInvoker> ContractInvokers => _invokers.AsSpan();
 
         private BoltServerOptions Options => Configuration.Options;
 
@@ -108,8 +108,8 @@ namespace Bolt.Server
             }
 
             // TODO: use span API on the string segment
-            contract = contractSegment.Buffer.AsReadOnlySpan().Slice(contractSegment.Offset, contractSegment.Length);
-            action = actionSegment.Buffer.AsReadOnlySpan().Slice(actionSegment.Offset, actionSegment.Length);
+            contract = contractSegment.Buffer.AsSpan().Slice(contractSegment.Offset, contractSegment.Length);
+            action = actionSegment.Buffer.AsSpan().Slice(actionSegment.Offset, actionSegment.Length);
 
             var boltFeature = AssignBoltFeature(CreateContext(routeContext));
 
@@ -129,7 +129,7 @@ namespace Bolt.Server
             {
                 if (!string.IsNullOrEmpty(Options.Prefix))
                 {
-                    string rawContractName = contract.ConvertToString();
+                    string rawContractName = contract.ToString();
                     routeContext.Handler = (ctxt) => ReportContractNotFoundAsync(ctxt, rawContractName);
                 }
 
@@ -158,7 +158,7 @@ namespace Bolt.Server
                 Logger.LogWarning(
                         BoltLogId.ContractNotFound,
                         "Action with name '{0}' not found on contract '{1}'",
-                        action.ConvertToString(),
+                        action.ToString(),
                         boltFeature.ActionContext.Contract.Name);
             }
 

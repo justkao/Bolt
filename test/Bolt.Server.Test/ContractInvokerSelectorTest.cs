@@ -19,7 +19,7 @@ namespace Bolt.Server.Test
             ContractInvoker invoker = new ContractInvoker(new ServerRuntimeConfiguration());
             invoker.Contract = BoltFramework.GetContract(typeof(IContract));
 
-            Assert.NotNull(resolver.Resolve(new[] { invoker }, contractName.AsReadOnlySpan()));
+            Assert.NotNull(resolver.Resolve(new[] { invoker }, contractName.AsSpan()));
         }
 
         private interface IContract

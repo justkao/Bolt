@@ -12,7 +12,7 @@ namespace Bolt.Metadata
         {
             Contract = contract ?? throw new ArgumentNullException(nameof(contract));
             Session = BoltFramework.SessionMetadata.Resolve(contract);
-            NormalizedName = BoltFramework.GetNormalizedContractName(contract).ConvertToString();
+            NormalizedName = BoltFramework.GetNormalizedContractName(contract).ToString();
             _actions = BoltFramework.ValidateContract(contract).Select(a => BoltFramework.ActionMetadata.Resolve(a)).ToArray();
         }
 

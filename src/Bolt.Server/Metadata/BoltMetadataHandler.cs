@@ -55,7 +55,7 @@ namespace Bolt.Server.Metadata
                 Bolt.Metadata.ActionMetadata action = null;
                 if (!string.IsNullOrEmpty(actionName))
                 {
-                    action = _actionResolver.Resolve(context.Contract, actionName.AsReadOnlySpan());
+                    action = _actionResolver.Resolve(context.Contract, actionName.AsSpan());
                 }
 
                 if (action == null)

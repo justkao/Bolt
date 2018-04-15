@@ -8,7 +8,7 @@ namespace Bolt.Server.Test
     {
         public static MethodInfo Resolve(this IActionResolver resolver, Type type, string name)
         {
-            return resolver.Resolve(BoltFramework.GetContract(type), name.AsReadOnlySpan())?.Action;
+            return resolver.Resolve(BoltFramework.GetContract(type), name.AsSpan())?.Action;
         }
     }
 }

@@ -8,7 +8,7 @@ namespace Bolt.Server
         {
             foreach (IContractInvoker contract in contracts)
             {
-                if (contract.Contract.NormalizedName.AsReadOnlySpan().AreEqualInvariant(contractName))
+                if (contract.Contract.NormalizedName.AsSpan().Equals(contractName, StringComparison.OrdinalIgnoreCase))
                 {
                     return contract;
                 }
@@ -16,7 +16,7 @@ namespace Bolt.Server
 
             foreach (IContractInvoker contract in contracts)
             {
-                if (contract.Contract.NormalizedName.AsReadOnlySpan().AreEqualInvariant(BoltFramework.NormalizeContractName(contractName)))
+                if (contract.Contract.NormalizedName.AsSpan().Equals(BoltFramework.NormalizeContractName(contractName), StringComparison.OrdinalIgnoreCase))
                 {
                     return contract;
                 }

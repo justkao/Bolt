@@ -69,7 +69,7 @@ namespace Bolt
                 throw new ArgumentNullException(nameof(contract));
             }
 
-            return NormalizeContractName(contract.Name.AsReadOnlySpan());
+            return NormalizeContractName(contract.Name.AsSpan());
         }
 
         public static ReadOnlySpan<char> NormalizeContractName(ReadOnlySpan<char> contractName)
@@ -114,7 +114,7 @@ namespace Bolt
 
         private static ReadOnlySpan<char> TrimAsyncPostfix(ReadOnlySpan<char> name)
         {
-            if (name.EndsWithInvariant(AsyncPostFix.AsReadOnlySpan()))
+            if (name.EndsWith(AsyncPostFix.AsSpan(), StringComparison.OrdinalIgnoreCase))
             {
                 return name.Slice(0, name.Length - AsyncPostFix.Length);
             }

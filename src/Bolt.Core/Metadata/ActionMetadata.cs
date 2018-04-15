@@ -17,7 +17,7 @@ namespace Bolt.Metadata
             ResultType = resultType;
             Timeout = TimeSpan.Zero;
             IsAsynchronous = typeof(Task).GetTypeInfo().IsAssignableFrom(action.ReturnType.GetTypeInfo());
-            NormalizedName = BoltFramework.NormalizeActionName(Name.AsReadOnlySpan()).ConvertToString();
+            NormalizedName = BoltFramework.NormalizeActionName(Name.AsSpan()).ToString();
             HasSerializableParameters = Parameters.Any(p => p.IsSerializable);
             CancellationTokenIndex = GetCancellationTokenIndex();
         }
@@ -87,12 +87,12 @@ namespace Bolt.Metadata
 
         public bool IsMatch(ReadOnlySpan<char> name)
         {
-            if (NormalizedName.AsReadOnlySpan().AreEqualInvariant(name))
+            if (NormalizedName.AsSpan().Equals(name, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
 
-            if (NormalizedName.AsReadOnlySpan().AreEqualInvariant(BoltFramework.NormalizeActionName(name)))
+            if (NormalizedName.AsSpan().Equals(BoltFramework.NormalizeActionName(name), StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }

@@ -27,7 +27,7 @@ namespace Bolt.Core.Test
         [Theory]
         public void NormalizeActionName(string input, string expected)
         {
-            Assert.Equal(expected, BoltFramework.NormalizeActionName(input.AsReadOnlySpan()).ConvertToString());
+            Assert.Equal(expected, BoltFramework.NormalizeActionName(input.AsSpan()).ToString());
         }
 
         public interface IInvalidInterface
