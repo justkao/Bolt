@@ -94,7 +94,7 @@ namespace Bolt.Serialization
                 throw new ArgumentNullException(nameof(parameters));
             }
 
-            object[] values = await DoReadParametersAsync(stream, parameters, contentLength);
+            object[] values = await DoReadParametersAsync(stream, parameters, contentLength).ConfigureAwait(false);
 
             for (int i = 0; i < values.Length; i++)
             {
