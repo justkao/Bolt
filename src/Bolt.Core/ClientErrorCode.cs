@@ -33,7 +33,7 @@
         DeserializeResponse = 5,
 
         /// <summary>
-        /// Error durring deserialization of exception response send from server.
+        /// Error during deserialization of exception response send from server.
         /// </summary>
         DeserializeExceptionResponse = 6
     }

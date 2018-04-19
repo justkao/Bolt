@@ -22,7 +22,7 @@ namespace Bolt.Server.IntegrationTest
         public void NewProxy_EnsureReady()
         {
             var client = CreateChannel();
-            Assert.Equal(ProxyState.Ready, ((IProxy)client).State);
+            Assert.Equal(ProxyState.Default, ((IProxy)client).State);
         }
 
         [Fact]
@@ -429,7 +429,7 @@ namespace Bolt.Server.IntegrationTest
         }
 
         [Fact]
-        public void Server_ThrowsWithInner_EnsureInnerwithCorrectMessageReceivedOnClient()
+        public void Server_ThrowsWithInner_EnsureInnerWithCorrectMessageReceivedOnClient()
         {
             var client = CreateChannel();
             Mock<ITestContract> server = Server();

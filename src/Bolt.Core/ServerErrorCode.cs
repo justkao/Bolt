@@ -66,7 +66,7 @@
         InvalidContractInstance = 11,
 
         /// <summary>
-        /// Serilization of exception failed on server.
+        /// Serialization of exception failed on server.
         /// </summary>
         SerializeException = 12
     }

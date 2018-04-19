@@ -15,7 +15,7 @@ namespace Bolt
         }
 
         /// <summary>
-        /// Gets or sets timeout in miliseconds.
+        /// Gets or sets the timeout in milliseconds.
         /// </summary>
         public int Timeout { get; set; }
     }

@@ -12,7 +12,7 @@ namespace Bolt.Client
     public interface ICloseable : IDisposable
     {
         /// <summary>
-        /// Determines whether the objects was already closed.
+        /// Gets a value indicating whether the object was already closed.
         /// </summary>
         bool IsClosed { get; }
 

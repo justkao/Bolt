@@ -23,7 +23,7 @@ namespace Bolt.Server.Internal
 
             if (method.ReturnType == typeof(void))
             {
-                // void method, compile the lamda that returns no value
+                // void method, compile the lambda that returns no value
                 Action<object, object[]> lambda = Expression.Lambda<Action<object, object[]>>(body, instanceParam, parametersArrayParam).Compile();
 
                 return (p1, p2) =>

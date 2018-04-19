@@ -343,18 +343,5 @@ namespace Bolt.Server
                 _contexts.Enqueue(context);
             }
         }
-
-        private class StringSegmentComparer : IEqualityComparer<StringSegment>
-        {
-            public bool Equals(StringSegment x, StringSegment y)
-            {
-                return x == y;
-            }
-
-            public int GetHashCode(StringSegment obj)
-            {
-                return obj.GetHashCode();
-            }
-        }
     }
 }

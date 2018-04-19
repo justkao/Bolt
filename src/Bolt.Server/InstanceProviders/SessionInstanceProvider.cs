@@ -54,7 +54,7 @@ namespace Bolt.Server.InstanceProviders
                     {
                         Debug.Assert(
                             false,
-                            "Instance release failed after the session initialization error. This exception will be supressed and the session initialization error will be propagated to client.",
+                            "Instance release failed after the session initialization error. This exception will be suppressed and the session initialization error will be propagated to client.",
                             e.ToString());
                     }
                 }

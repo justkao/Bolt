@@ -21,7 +21,7 @@ namespace Bolt.Client.Pipeline
 
             await Next(context).ConfigureAwait(false);
 
-            if (proxyState == ProxyState.Ready)
+            if (proxyState == ProxyState.Default)
             {
                 (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Open);
             }

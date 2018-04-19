@@ -17,7 +17,7 @@ namespace Bolt.Client.Test
                 var pipeline = CreatePipeline();
                 var proxy = CreateProxy(pipeline);
 
-                Assert.Equal(ProxyState.Ready, proxy.State);
+                Assert.Equal(ProxyState.Default, proxy.State);
             }
 
             [Fact]
@@ -146,7 +146,7 @@ namespace Bolt.Client.Test
 
                 if (canRecover)
                 {
-                    Assert.Equal(ProxyState.Ready, proxy.State);
+                    Assert.Equal(ProxyState.Default, proxy.State);
                 }
                 else
                 {
@@ -230,7 +230,7 @@ namespace Bolt.Client.Test
                             Assert.Equal(ProxyState.Closed, proxy.State);
                             break;
                         case ErrorHandlingResult.Recover:
-                            Assert.Equal(ProxyState.Ready, proxy.State);
+                            Assert.Equal(ProxyState.Default, proxy.State);
                             break;
                         case ErrorHandlingResult.Rethrow:
                             Assert.Equal(ProxyState.Open, proxy.State);

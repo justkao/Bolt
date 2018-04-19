@@ -101,7 +101,7 @@ namespace Bolt.Pipeline
             if (metadata.HttpContentIndex >= 0 && parameters.Count > 1 && actionMetadata.CancellationTokenIndex < 0)
             {
                 throw new ContractViolationException(
-                    $"Action '{method.Name}' has invalid declaration. Only HttpContent parameter type witj optional cancellation token is supported.",
+                    $"Action '{method.Name}' has invalid declaration. Only HttpContent parameter type with optional cancellation token is supported.",
                     contract,
                     method);
             }

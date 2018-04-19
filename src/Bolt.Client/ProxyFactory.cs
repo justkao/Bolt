@@ -44,7 +44,7 @@ namespace Bolt.Client
             var interceptor = new ChannelInterceptor();
             var options = new ProxyGenerationOptions
             {
-                BaseTypeForInterfaceProxy = _baseProxy
+                BaseTypeForInterfaceProxy = _baseProxy,
             };
 
             ProxyMetadata metadata = _metadatas.GetOrAdd(typeof(T), v => new ProxyMetadata(_baseProxy));

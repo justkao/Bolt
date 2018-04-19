@@ -16,12 +16,12 @@ namespace Bolt.Client
 
         public ProxyBase()
         {
-            State = ProxyState.Ready;
+            State = ProxyState.Default;
         }
 
         public ProxyBase(Type contract, IClientPipeline pipeline)
         {
-            State = ProxyState.Ready;
+            State = ProxyState.Default;
             _contract = BoltFramework.GetContract(contract);
             _pipeline = pipeline ?? throw new ArgumentNullException(nameof(pipeline));
         }
@@ -33,7 +33,7 @@ namespace Bolt.Client
                 throw new ArgumentNullException(nameof(proxy));
             }
 
-            State = ProxyState.Ready;
+            State = ProxyState.Default;
             _contract = proxy.Contract;
             _pipeline = proxy.Pipeline;
         }
@@ -47,7 +47,7 @@ namespace Bolt.Client
 
             set
             {
-                EnsureReady();
+                EnsureDefault();
                 _contract = value;
             }
         }
@@ -68,7 +68,7 @@ namespace Bolt.Client
 
             set
             {
-                EnsureReady();
+                EnsureDefault();
                 _pipeline = value;
             }
         }
@@ -116,7 +116,14 @@ namespace Bolt.Client
             try
             {
                 await Pipeline.Instance(ctxt).ConfigureAwait(false);
-                return ctxt.ActionResult;
+                if (ctxt.Action.HasResult)
+                {
+                    return ctxt.ActionResult;
+                }
+                else
+                {
+                    return null;
+                }
             }
             finally
             {
@@ -141,7 +148,7 @@ namespace Bolt.Client
             State = newState;
         }
 
-        private ClientActionContext CreateContext(ActionMetadata action, params object[] parameters)
+        private ClientActionContext CreateContext(ActionMetadata action, object[] parameters)
         {
             ClientActionContext context;
 
@@ -163,9 +170,9 @@ namespace Bolt.Client
             }
         }
 
-        private void EnsureReady()
+        private void EnsureDefault()
         {
-            if (State != ProxyState.Ready)
+            if (State != ProxyState.Default)
             {
                 throw new InvalidOperationException("Enable to update the proxy because it has already been used for communication.");
             }

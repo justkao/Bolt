@@ -29,7 +29,7 @@ namespace Bolt.Client.Pipeline
             {
                 if (typeof(HttpContent).GetTypeInfo().IsAssignableFrom(metadata.ContentResultType.GetTypeInfo()))
                 {
-                    // since we are not supoprting HttpResponseMEssage we will try copy headers to HttpContent
+                    // since we are not supporting HttpResponseMessage we will try copy headers to HttpContent
                     foreach (KeyValuePair<string, IEnumerable<string>> header in context.Response.Headers)
                     {
                         context.Response.Content.Headers.TryAddWithoutValidation(header.Key, header.Value);

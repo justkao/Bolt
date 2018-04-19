@@ -28,7 +28,7 @@ namespace Bolt.Server.IntegrationTest
         {
             var client = GetProxy(null, false);
 
-            Assert.Equal(ProxyState.Ready, ((IProxy)client).State);
+            Assert.Equal(ProxyState.Default, ((IProxy)client).State);
         }
 
         [Fact]

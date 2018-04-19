@@ -74,7 +74,7 @@ namespace Bolt.Client.Pipeline
                     return;
                 }
 
-                if (context.Proxy.State == ProxyState.Ready)
+                if (context.Proxy.State == ProxyState.Default)
                 {
                     // proxy was never initialized, ignore the rest of pipeline and close it
                     context.ActionResult = session.DestroySessionResult;
@@ -86,7 +86,7 @@ namespace Bolt.Client.Pipeline
                 {
                     // we are trying to close proxy using IProxy.CloseAsync even when the destroy action requires actual parameters
                     throw new BoltClientException(
-                        $"Destroing session requires parameters that were not provided for action '{context.Action.Name}'.",
+                        $"Destroying session requires parameters that were not provided for action '{context.Action.Name}'.",
                         ClientErrorCode.InvalidDestroySessionParameters,
                         context.Action.Name,
                         null);
@@ -142,7 +142,7 @@ namespace Bolt.Client.Pipeline
                     break;
                 case ErrorHandlingResult.Recover:
                     session.ClearSession();
-                    session.ChangeState(context.Proxy, ProxyState.Ready);
+                    session.ChangeState(context.Proxy, ProxyState.Default);
                     if (!Recoverable)
                     {
                         session.ChangeState(context.Proxy, ProxyState.Closed);
@@ -168,7 +168,7 @@ namespace Bolt.Client.Pipeline
                     break;
                 case ErrorHandlingResult.Recover:
                 case ErrorHandlingResult.Rethrow:
-                    session.ChangeState(context.Proxy, ProxyState.Ready);
+                    session.ChangeState(context.Proxy, ProxyState.Default);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"The value of '{handlingResult}' is not supported", nameof(handlingResult));
@@ -207,7 +207,7 @@ namespace Bolt.Client.Pipeline
                 ClientActionContext initSessionContext = context;
                 if (context.Action.Action != sessionMetadata.Contract.InitSession.Action)
                 {
-                    // we are not initializaing proxy explicitely, so we need to check whether proxy has been initalized before
+                    // we are not initializing proxy explicitely, so we need to check whether proxy has been initialized before
                     if (sessionMetadata.Contract.InitSession.HasParameters)
                     {
                         if (sessionMetadata.InitSessionParameters == null)
