@@ -7,12 +7,13 @@ using Bolt.Metadata;
 
 namespace Bolt.Client
 {
-    public class ProxyBase : IProxy, IPipelineCallback
+    public class ProxyBase : IProxy
     {
         private readonly ConcurrentQueue<ClientActionContext> _contexts = new ConcurrentQueue<ClientActionContext>();
         private readonly int _poolSize = 128;
         private ContractMetadata _contract;
         private IClientPipeline _pipeline;
+        private IProxyEvents _proxyEvents;
 
         public ProxyBase()
         {
@@ -70,6 +71,53 @@ namespace Bolt.Client
             {
                 EnsureDefault();
                 _pipeline = value;
+            }
+        }
+
+        public IProxyEvents Events
+        {
+            get
+            {
+                if (_pipeline == null)
+                {
+                    throw new ProxyClosedException();
+                }
+
+                return _proxyEvents;
+            }
+
+            set
+            {
+                EnsureDefault();
+                _proxyEvents = value;
+            }
+        }
+
+        public async Task ChangeStateAsync(ProxyState newState)
+        {
+            if (newState == State)
+            {
+                return;
+            }
+
+            var oldState = State;
+            State = newState;
+
+            var events = Events;
+            if (events != null)
+            {
+                if (oldState == ProxyState.Open && newState == ProxyState.Closed)
+                {
+                    await events.OnProxyClosedAsync(this).ConfigureAwait(false);
+                }
+                else if (oldState == ProxyState.Default && newState == ProxyState.Open)
+                {
+                    await events.OnProxyOpenedAsync(this).ConfigureAwait(false);
+                }
+                else if (oldState == ProxyState.Open && newState == ProxyState.Default)
+                {
+                    await events.OnProxyDefaultedAsync(this).ConfigureAwait(false);
+                }
             }
         }
 
@@ -141,11 +189,6 @@ namespace Bolt.Client
             }
 
             _pipeline = null;
-        }
-
-        void IPipelineCallback.ChangeState(ProxyState newState)
-        {
-            State = newState;
         }
 
         private ClientActionContext CreateContext(ActionMetadata action, object[] parameters)

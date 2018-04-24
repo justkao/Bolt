@@ -23,7 +23,7 @@ namespace Bolt.Client.Pipeline
                 ErrorHandlingResult result = _errorHandling.Handle(context, e);
                 if (result == ErrorHandlingResult.Close || result == ErrorHandlingResult.Recover)
                 {
-                    (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
+                    await context.Proxy.ChangeStateAsync(ProxyState.Closed).ConfigureAwait(false);
                 }
 
                 throw;

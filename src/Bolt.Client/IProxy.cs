@@ -11,10 +11,14 @@ namespace Bolt.Client
     {
         ProxyState State { get; }
 
+        IProxyEvents Events { get; set; }
+
         Task OpenAsync();
 
         Task CloseAsync();
 
         Task<object> SendAsync(MethodInfo action, params object[] parameters);
+
+        Task ChangeStateAsync(ProxyState newState);
     }
 }

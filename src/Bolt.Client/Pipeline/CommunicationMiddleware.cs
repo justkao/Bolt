@@ -80,15 +80,25 @@ namespace Bolt.Client.Pipeline
             {
                 CancellationToken timeoutToken = CancellationToken.None;
 
+                CancellationTokenSource timeoutSource = null;
+                CancellationTokenSource linkedSource = null;
+
                 try
                 {
                     CancellationToken token = cancellationToken;
                     if (responseTimeout > TimeSpan.Zero)
                     {
-                        timeoutToken = new CancellationTokenSource(responseTimeout).Token;
-                        token = token != CancellationToken.None
-                            ? CancellationTokenSource.CreateLinkedTokenSource(token, timeoutToken).Token
-                            : timeoutToken;
+                        timeoutSource = new CancellationTokenSource(responseTimeout);
+                        timeoutToken = timeoutSource.Token;
+                        if (token != CancellationToken.None)
+                        {
+                            linkedSource = CancellationTokenSource.CreateLinkedTokenSource(token, timeoutToken);
+                            token = linkedSource.Token;
+                        }
+                        else
+                        {
+                            token = timeoutToken;
+                        }
                     }
 
                     var response = await SendAsync(request, token).ConfigureAwait(false);
@@ -119,6 +129,11 @@ namespace Bolt.Client.Pipeline
                     }
 
                     throw;
+                }
+                finally
+                {
+                    linkedSource?.Dispose();
+                    timeoutSource?.Dispose();
                 }
             }
         }

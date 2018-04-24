@@ -11,6 +11,8 @@ namespace Bolt.Client.Test
     {
         public class SessionOpening : SessionMiddlewareTest
         {
+            private Mock<IProxyEvents> _events = new Mock<IProxyEvents>(MockBehavior.Loose);
+
             [Fact]
             public void EnsureReady()
             {
@@ -71,6 +73,53 @@ namespace Bolt.Client.Test
                 Assert.Equal(result, session.InitSessionResult);
                 Assert.Equal(ProxyState.Open, ProxyState.Open);
                 SessionHandler.Verify();
+            }
+
+            [Fact]
+            public async Task Open_EnsureEventCalled()
+            {
+                Mock<IProxyEvents> events = new Mock<IProxyEvents>();
+                events.Setup(p => p.OnProxyOpenedAsync(It.IsAny<IProxy>())).Returns(Task.CompletedTask).Verifiable();
+
+                string sessionid = "temp session";
+                var pipeline = CreatePipeline(
+                    (next, ctxt) =>
+                    {
+                        ctxt.ActionResult = "result";
+                        ctxt.ServerConnection = ConnectionDescriptor;
+                        return next(ctxt);
+                    });
+                SetupSessionHandler(sessionid);
+                var proxy = CreateProxy(pipeline);
+                proxy.Events = events.Object;
+                await proxy.OpenSession("test");
+                events.Verify();
+            }
+
+            [InlineData(ErrorHandlingResult.Recover, ProxyState.Default)]
+            [InlineData(ErrorHandlingResult.Close, ProxyState.Closed)]
+            [Theory]
+            public async Task Open_EventThrows_EnsureNotOpened(ErrorHandlingResult errorHandling, ProxyState expectedState)
+            {
+                Mock<IProxyEvents> events = new Mock<IProxyEvents>();
+                events.Setup(p => p.OnProxyOpenedAsync(It.IsAny<IProxy>())).Returns(Task.FromException(new InvalidOperationException()));
+
+                SessionErrorHandling.Setup(v => v.Handle(It.IsAny<ClientActionContext>(), It.IsAny<Exception>())).Returns(errorHandling);
+
+                string sessionid = "temp session";
+                var pipeline = CreatePipeline(
+                    (next, ctxt) =>
+                    {
+                        ctxt.ActionResult = "result";
+                        ctxt.ServerConnection = ConnectionDescriptor;
+                        return next(ctxt);
+                    });
+                SetupSessionHandler(sessionid);
+                var proxy = CreateProxy(pipeline);
+                proxy.Events = events.Object;
+                await Assert.ThrowsAsync<InvalidOperationException>(() => proxy.OpenSession("test"));
+
+                Assert.Equal(expectedState, proxy.State);
             }
 
             [Fact]

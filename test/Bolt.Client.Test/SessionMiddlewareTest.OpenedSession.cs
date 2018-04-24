@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Bolt.Client.Pipeline;
 using Moq;
 using Xunit;
@@ -13,8 +14,12 @@ namespace Bolt.Client.Test
 
             private Mock<IInvokeCallback> _callback = new Mock<IInvokeCallback>();
 
+            private Mock<IProxyEvents> _events = new Mock<IProxyEvents>(MockBehavior.Loose);
+
             public OpenedSession()
             {
+                _events.Setup(p => p.OnProxyOpenedAsync(It.IsAny<IProxy>())).Returns(Task.CompletedTask);
+
                 Pipeline = CreatePipeline(
                     (next, ctxt) =>
                     {
@@ -25,6 +30,7 @@ namespace Bolt.Client.Test
 
                 SetupSessionHandler(SessionId, true);
                 Proxy = CreateProxy(Pipeline);
+                Proxy.Events = _events.Object;
                 Proxy.OpenSession("test").GetAwaiter().GetResult();
             }
 
@@ -42,6 +48,25 @@ namespace Bolt.Client.Test
             public async Task Close_Ok()
             {
                 await Proxy.CloseSession("Test");
+
+                Assert.Equal(ProxyState.Closed, Proxy.State);
+            }
+
+            [Fact]
+            public async Task Close_EnsureEventCalled()
+            {
+                _events.Setup(p => p.OnProxyClosedAsync(It.IsAny<IProxy>())).Returns(Task.CompletedTask).Verifiable();
+                await Proxy.CloseSession("Test");
+
+                Assert.Equal(ProxyState.Closed, Proxy.State);
+                _events.Verify();
+            }
+
+            [Fact]
+            public async Task Close_CloseEventThrows_EnsureClosed()
+            {
+                _events.Setup(p => p.OnProxyClosedAsync(It.IsAny<IProxy>())).Callback<IProxy>(p => throw new InvalidOperationException("Forced error")).Returns(Task.CompletedTask);
+                await Assert.ThrowsAsync<InvalidOperationException>(() => Proxy.CloseSession("Test"));
 
                 Assert.Equal(ProxyState.Closed, Proxy.State);
             }

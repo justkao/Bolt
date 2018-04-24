@@ -69,7 +69,7 @@ namespace Bolt.Client.Pipeline
                 if (context.Proxy.State == ProxyState.Closed)
                 {
                     // no reason to continue in pipeline, proxy is already closed
-                    session.ChangeState(context.Proxy, ProxyState.Closed);
+                    await session.ChangeStateAsync(context.Proxy, ProxyState.Closed).ConfigureAwait(false);
                     context.ActionResult = session.DestroySessionResult;
                     return;
                 }
@@ -78,7 +78,7 @@ namespace Bolt.Client.Pipeline
                 {
                     // proxy was never initialized, ignore the rest of pipeline and close it
                     context.ActionResult = session.DestroySessionResult;
-                    session.ChangeState(context.Proxy, ProxyState.Closed);
+                    await session.ChangeStateAsync(context.Proxy, ProxyState.Closed).ConfigureAwait(false);
                     return;
                 }
 
@@ -102,7 +102,7 @@ namespace Bolt.Client.Pipeline
                 {
                     _sessions.TryRemove(context.Proxy, out session);
                     session.ClearSession();
-                    session.ChangeState(context.Proxy, ProxyState.Closed);
+                    await session.ChangeStateAsync(context.Proxy, ProxyState.Closed).ConfigureAwait(false);
                 }
             }
             else
@@ -117,7 +117,7 @@ namespace Bolt.Client.Pipeline
                 }
                 catch (Exception e)
                 {
-                    Exception handled = HandleError(context, e, session);
+                    Exception handled = await HandleErrorAsync(context, e, session).ConfigureAwait(false);
                     if (e == handled)
                     {
                         // the handled error is same, so just rethrow
@@ -132,20 +132,20 @@ namespace Bolt.Client.Pipeline
             }
         }
 
-        protected virtual Exception HandleError(ClientActionContext context, Exception error, SessionMetadata session)
+        protected virtual async Task<Exception> HandleErrorAsync(ClientActionContext context, Exception error, SessionMetadata session)
         {
             ErrorHandlingResult handlingResult = ErrorHandling.Handle(context, error);
             switch (handlingResult)
             {
                 case ErrorHandlingResult.Close:
-                    session.ChangeState(context.Proxy, ProxyState.Closed);
+                    await session.ChangeStateAsync(context.Proxy, ProxyState.Closed).ConfigureAwait(false);
                     break;
                 case ErrorHandlingResult.Recover:
                     session.ClearSession();
-                    session.ChangeState(context.Proxy, ProxyState.Default);
+                    await session.ChangeStateAsync(context.Proxy, ProxyState.Default).ConfigureAwait(false);
                     if (!Recoverable)
                     {
-                        session.ChangeState(context.Proxy, ProxyState.Closed);
+                        await session.ChangeStateAsync(context.Proxy, ProxyState.Closed).ConfigureAwait(false);
                     }
                     break;
                 case ErrorHandlingResult.Rethrow:
@@ -157,18 +157,18 @@ namespace Bolt.Client.Pipeline
             return error;
         }
 
-        protected virtual Exception HandleOpenConnectionError(ClientActionContext context, Exception error, SessionMetadata session)
+        protected virtual async Task<Exception> HandleOpenConnectionErrorAsync(ClientActionContext context, Exception error, SessionMetadata session)
         {
             session.ClearSession();
             ErrorHandlingResult handlingResult = ErrorHandling.Handle(context, error);
             switch (handlingResult)
             {
                 case ErrorHandlingResult.Close:
-                    session.ChangeState(context.Proxy, ProxyState.Closed);
+                    await session.ChangeStateAsync(context.Proxy, ProxyState.Closed).ConfigureAwait(false);
                     break;
                 case ErrorHandlingResult.Recover:
                 case ErrorHandlingResult.Rethrow:
-                    session.ChangeState(context.Proxy, ProxyState.Default);
+                    await session.ChangeStateAsync(context.Proxy, ProxyState.Default).ConfigureAwait(false);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException($"The value of '{handlingResult}' is not supported", nameof(handlingResult));
@@ -264,11 +264,11 @@ namespace Bolt.Client.Pipeline
                             sessionMetadata.Contract.InitSession.Action.Name,
                             initSessionContext.Request?.RequestUri?.ToString());
                     sessionMetadata.ServerConnection = initSessionContext.ServerConnection;
-                    sessionMetadata.ChangeState(context.Proxy, ProxyState.Open);
+                    await sessionMetadata.ChangeStateAsync(context.Proxy, ProxyState.Open).ConfigureAwait(false);
                 }
                 catch (Exception e)
                 {
-                    Exception handled = HandleOpenConnectionError(initSessionContext, e, sessionMetadata);
+                    Exception handled = await HandleOpenConnectionErrorAsync(initSessionContext, e, sessionMetadata).ConfigureAwait(false);
                     if (handled != null && handled != e)
                     {
                         throw handled;

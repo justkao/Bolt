@@ -34,10 +34,10 @@ namespace Bolt.Client.Pipeline
 
         public string SessionId { get; set; }
 
-        public void ChangeState(IProxy proxy, ProxyState state)
+        public Task ChangeStateAsync(IProxy proxy, ProxyState state)
         {
             State = state;
-            (proxy as IPipelineCallback)?.ChangeState(state);
+            return proxy.ChangeStateAsync(state);
         }
 
         public void ClearSession()

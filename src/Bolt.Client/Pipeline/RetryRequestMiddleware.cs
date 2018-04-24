@@ -25,7 +25,7 @@ namespace Bolt.Client.Pipeline
                 try
                 {
                     await Next(context).ConfigureAwait(false);
-                    (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Open);
+                    await context.Proxy.ChangeStateAsync(ProxyState.Open).ConfigureAwait(false);
                     return;
                 }
                 catch (Exception e)
@@ -34,18 +34,18 @@ namespace Bolt.Client.Pipeline
                     switch (errorHandlingResult)
                     {
                         case ErrorHandlingResult.Close:
-                            (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
+                            await context.Proxy.ChangeStateAsync(ProxyState.Closed).ConfigureAwait(false);
                             throw;
                         case ErrorHandlingResult.Recover:
                             if (tries >= Retries)
                             {
-                                (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Closed);
+                                await context.Proxy.ChangeStateAsync(ProxyState.Closed).ConfigureAwait(false);
                                 throw;
                             }
                             tries++;
                             break;
                         case ErrorHandlingResult.Rethrow:
-                            (context.Proxy as IPipelineCallback)?.ChangeState(ProxyState.Open);
+                            await context.Proxy.ChangeStateAsync(ProxyState.Open).ConfigureAwait(false);
                             throw;
                         default:
                             throw new ArgumentOutOfRangeException($"The value of '{errorHandlingResult}' is not supported.", nameof(errorHandlingResult));
