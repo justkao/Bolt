@@ -9,7 +9,7 @@ namespace Bolt.Client
     {
         /// <summary>
         /// Called when the state of proxy is changed to <see cref="ProxyState.Open"/>. Can be used to execute post-open actions.
-        /// If the open callback fails the proxy can transition either to <see cref="ProxyState.Closed"/> or <see cref="ProxyState.Default"/> state 
+        /// If the open callback fails the proxy can transition either to <see cref="ProxyState.Closed"/> or <see cref="ProxyState.Default"/> state
         /// based on the result of <see cref="IErrorHandling"/> call.
         /// </summary>
         /// <param name="proxy">The instance of the proxy.</param>
