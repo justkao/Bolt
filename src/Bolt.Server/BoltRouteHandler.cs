@@ -100,16 +100,10 @@ namespace Bolt.Server
         {
             StringSegment contractSegment;
             StringSegment actionSegment;
-            ReadOnlySpan<char> contract;
-            ReadOnlySpan<char> action;
-            if (!Parse(routeContext.HttpContext.Request.Path, out contractSegment, out actionSegment))
-            {
-                return CompletedTask.Done;
-            }
+            Parse(routeContext.HttpContext.Request.Path, out contractSegment, out actionSegment);
 
-            // TODO: use span API on the string segment
-            contract = contractSegment.Buffer.AsSpan().Slice(contractSegment.Offset, contractSegment.Length);
-            action = actionSegment.Buffer.AsSpan().Slice(actionSegment.Offset, actionSegment.Length);
+            ReadOnlySpan<char> contract = contractSegment.Buffer.AsSpan().Slice(contractSegment.Offset, contractSegment.Length);
+            ReadOnlySpan<char> action = actionSegment.Buffer.AsSpan().Slice(actionSegment.Offset, actionSegment.Length);
 
             var boltFeature = AssignBoltFeature(CreateContext(routeContext));
 
