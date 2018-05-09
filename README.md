@@ -6,16 +6,17 @@ Lean and lightweight http communication library based on ASP.Net Core. The main 
 was to create multiplatform, simple and powerfull replacement for WCF library.
 
 #### Service Contract
-Bolt requires interface describing your service that will be used for communication.
+Bolt requires interface describing your service that will be used for communication. No annotations are 
+required.
 
 ```c#
 public interface IFooService
 {
-    void SimpleMethod();
+    // timeout and cancellation support
+    [Timeout(4500)]   
+    Task<string> GetDataAsync(CancellationToken token);
     
-    // Support for asynchrony, action timeouts and cancellation tokens
-    [Timeout(4500)]
-    Task SimpleMethodWitCancellationAsync(CancellationToken token);
+    Task SendDataAsync(string param1, int param2);
 }
 ```
 
@@ -25,7 +26,7 @@ public interface IFooService
 ```c#
 var configuration = new ClientConfiguration();
 IFooService proxy = configuration.CreateProxy<IFooService>(<service url>);
-proxy.DoYourThing();
+await proxy.GetDataAsync(CancellationToken.None);
 ```
 
 #### Server
@@ -54,14 +55,11 @@ Now you are ready to experiment with Bolt. This was just the very simple scenari
 Bolt also supports:
 
 * Sessions
-* Generation of async interfaces
-* CancellationToken support
-* Asynchronous methods
-* Recoverable Proxy
-* Server Failover support
+* Recoverable proxies
+* Server failover support
+* Streaming
 * Modularity - every component and behavior of Bolt is replaceable
-* User Code Generators - plug your own code into the generated proxies
-* Configuration Based Generation - define Configuration.json file to describe how proxies should be generated
+* Generation of synchronous or asynchronous interfaces using the dotnet-bolt tool
 
 #### Bolt Packages
 * **[Bolt.Core](https://www.nuget.org/packages/Bolt.Core/)** - contains common interfaces and helpers shared by both client and server.
@@ -69,7 +67,7 @@ Bolt also supports:
 * **[Bolt.Server](https://www.nuget.org/packages/Bolt.Server/)** - server side code required to integrate Bolt into ASP.NET Core
 * **[dotnet-bolt](https://www.nuget.org/packages/dotnet-bolt/)** - tool used to generate synchronous and asynchronous interfaces.
 
-To find out more just take a look at Bolt code or check out the [Bolt.Samples](https://github.com/justkao/Bolt.Samples)
-repository.
+To find out more just take a look at Bolt code or check out the [Bolt Samples](https://github.com/justkao/Bolt/tree/master/samples)
+source code.
 
 Any ideas, improvements or code contributions are welcome. Happy coding ;)
